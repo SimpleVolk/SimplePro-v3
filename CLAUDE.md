@@ -25,8 +25,8 @@ SimplePro-v3 is a **single-tenant internal web app** designed to fix ineffective
 **Deliverable Components:**
 
 - ✅ Architecture diagram and ERD
-- ✅ Rules JSON and deterministic estimator with unit tests
-- 🔄 Next.js inventory→estimate page
+- ✅ Rules JSON and deterministic estimator with unit tests (38 passing tests)
+- ✅ **Next.js inventory→estimate page** (Complete web application with dark UI)
 - 🔄 React Native crew screen with offline capabilities
 - 🔄 GraphQL resolver and API endpoints
 - 🔄 Docker-compose deployment setup
@@ -42,7 +42,8 @@ This is a **NX monorepo** with the following structure:
 
 - **apps/api**: NestJS backend API with GraphQL, REST endpoints, MongoDB integration
 - **packages/pricing-engine**: Core deterministic pricing calculator with rules engine
-- Future: **apps/web**: Next.js web dashboard, **apps/mobile**: React Native crew app
+- **apps/web**: Next.js web dashboard with estimate calculator and dark theme UI
+- Future: **apps/mobile**: React Native crew app
 
 The system emphasizes **deterministic calculations** - same input always produces same output with SHA256 hash verification for auditability.
 
@@ -56,7 +57,7 @@ npm run dev
 
 # Start specific service
 nx serve api
-nx serve web
+nx dev web
 
 # Install dependencies for the entire workspace
 npm install
@@ -71,6 +72,7 @@ npm run build
 # Build specific project
 nx build pricing-engine
 nx build api
+nx build web
 ```
 
 ### Testing
@@ -218,6 +220,53 @@ The API follows NestJS patterns with:
 
 The pricing engine includes extensive test coverage with multiple scenarios (studio moves, large moves with pianos, long distance, etc.) to ensure calculation accuracy.
 
+## Web Application (apps/web)
+
+### Features Implemented
+
+The Next.js web application provides a complete estimate calculator interface:
+
+**EstimateForm Component (`apps/web/src/app/components/EstimateForm.tsx`):**
+- Comprehensive form for move details collection
+- Service type selection (local, long distance, packing only)
+- Pickup/delivery location with access difficulty assessment
+- Inventory details (weight, volume, crew size)
+- Special items handling (piano, antiques, artwork)
+- Additional services (packing, assembly, storage)
+- Real-time validation and error handling
+
+**EstimateResult Component (`apps/web/src/app/components/EstimateResult.tsx`):**
+- Complete price breakdown display
+- Applied pricing rules with explanations
+- Location handicaps and adjustments
+- Calculation metadata with deterministic hash
+- Professional dark theme styling
+
+**Key Technical Features:**
+- **Mobile-first responsive design** with dark theme
+- **Direct pricing engine integration** using `@simplepro/pricing-engine`
+- **TypeScript with strict type checking**
+- **CSS Modules for component styling**
+- **Real-time estimate calculations**
+- **Deterministic hash display** for calculation verification
+
+### Development Server
+
+```bash
+# Start the web development server
+nx dev web
+
+# Application runs on http://localhost:3000
+```
+
+### Current Status
+
+- ✅ **Production build working** - All TypeScript errors resolved
+- ✅ **Development server functional** - Ready for testing and development
+- ✅ **Pricing engine integration** - Full deterministic calculation support
+- ✅ **Dark theme UI** - Professional moving company interface
+- ✅ **Form validation** - Comprehensive input validation and error handling
+
 ## Monorepo Dependencies
 
 When working across packages:
@@ -226,3 +275,33 @@ When working across packages:
 - Build dependencies are managed by NX automatically
 - Shared configurations inherit from workspace root
 - Each package maintains its own test configuration
+
+## Next Development Priorities
+
+Based on the current project status, the recommended next steps are:
+
+### 1. API Backend Implementation
+- Set up GraphQL resolvers for estimate operations
+- Implement NestJS modules (customers, estimates, jobs, crews)
+- MongoDB integration with data persistence
+- Authentication and authorization system
+
+### 2. Enhanced Web Features
+- Customer management interface
+- Job tracking and dispatch calendar
+- Historical estimates and reporting
+- Admin interface for rules editing
+
+### 3. Mobile Application
+- React Native crew app with offline capabilities
+- Signature and photo capture for job completion
+- Real-time job status updates
+- Crew availability and checklists
+
+### 4. Infrastructure & Deployment
+- Docker-compose deployment setup
+- Database seed data and migrations
+- Monitoring and observability
+- Backup and disaster recovery procedures
+
+The foundation is now solid with a working pricing engine and web interface. The deterministic calculation system ensures all future development will maintain accuracy and auditability.

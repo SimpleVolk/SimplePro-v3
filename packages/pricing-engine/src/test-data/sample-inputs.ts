@@ -4,7 +4,7 @@ export const sampleInputs = {
   // Basic local move - studio apartment
   studioLocal: {
     customerId: 'customer-001',
-    moveDate: new Date('2024-10-15'),
+    moveDate: new Date('2025-10-15'),
     service: 'local',
     pickup: {
       address: '123 Main St, Apartment 2A, Springfield, IL 62701',
@@ -65,7 +65,7 @@ export const sampleInputs = {
   // Large local move with piano and stairs
   largeLargePiano: {
     customerId: 'customer-002',
-    moveDate: new Date('2024-07-20'), // Peak season
+    moveDate: new Date('2025-07-20'), // Peak season
     service: 'local',
     pickup: {
       address: '789 Elm Street, Springfield, IL 62703',
@@ -135,7 +135,7 @@ export const sampleInputs = {
   // Long distance move - heavy shipment
   longDistanceHeavy: {
     customerId: 'customer-003',
-    moveDate: new Date('2024-11-10'), // Off peak
+    moveDate: new Date('2025-11-10'), // Off peak
     service: 'long_distance',
     pickup: {
       address: '555 Maple Drive, Springfield, IL 62701',
@@ -214,7 +214,7 @@ export const sampleInputs = {
   // Weekend local move with multiple challenges
   weekendChallenge: {
     customerId: 'customer-004',
-    moveDate: new Date('2024-09-14'), // Weekend
+    moveDate: new Date('2025-09-14'), // Weekend
     service: 'local',
     pickup: {
       address: '999 Hill Street, Springfield, IL 62705',
@@ -276,7 +276,7 @@ export const sampleInputs = {
   // Minimum charge scenario
   minimalLocal: {
     customerId: 'customer-005',
-    moveDate: new Date('2024-12-05'),
+    moveDate: new Date('2025-12-05'),
     service: 'local',
     pickup: {
       address: '222 Short St, Springfield, IL 62701',
@@ -337,7 +337,7 @@ export const sampleInputs = {
   // Packing only service
   packingOnly: {
     customerId: 'customer-006',
-    moveDate: new Date('2024-10-25'),
+    moveDate: new Date('2025-10-25'),
     service: 'packing_only',
     pickup: {
       address: '444 Pack Street, Springfield, IL 62702',

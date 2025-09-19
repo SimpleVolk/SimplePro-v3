@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run test:*)",
+      "Bash(npx nx run-many:*)",
+      "Bash(node:*)",
+      "Bash(npx nx test:*)",
+      "Bash(npx nx g:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx nx serve:*)",
+      "Bash(npx nx build:*)",
+      "Bash(npx nx dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

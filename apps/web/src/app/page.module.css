@@ -1,0 +1,84 @@
+/* Dark modern UI styling for SimplePro */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f1419 0%, #1a1d29 100%);
+  color: #e8eaed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  text-align: center;
+  padding: 2rem 0;
+  border-bottom: 1px solid #2d3748;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #4a9eff;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(74, 158, 255, 0.3);
+}
+
+.header p {
+  font-size: 1.1rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+}
+
+.formSection {
+  background: #1e2531;
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid #2d3748;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.resultSection {
+  background: #1e2531;
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid #2d3748;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 1024px) {
+  .main {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 1rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .formSection,
+  .resultSection {
+    padding: 1.5rem;
+  }
+}
