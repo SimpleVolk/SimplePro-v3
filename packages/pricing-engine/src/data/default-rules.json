@@ -1,0 +1,571 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-09-19T00:00:00Z",
+  "description": "Default pricing rules for SimplePro moving services",
+
+  "serviceRates": [
+    {
+      "service": "local",
+      "baseRate": 150,
+      "unit": "per_hour",
+      "minimumCharge": 400,
+      "description": "Local moves within 50 miles, 2-person crew base rate"
+    },
+    {
+      "service": "long_distance",
+      "baseRate": 1.25,
+      "unit": "per_pound",
+      "minimumCharge": 2500,
+      "description": "Long distance moves over 50 miles, weight-based pricing"
+    },
+    {
+      "service": "storage",
+      "baseRate": 8,
+      "unit": "per_cubic_foot",
+      "minimumCharge": 150,
+      "description": "Monthly storage pricing per cubic foot"
+    },
+    {
+      "service": "packing_only",
+      "baseRate": 85,
+      "unit": "per_hour",
+      "minimumCharge": 200,
+      "description": "Packing services without moving"
+    }
+  ],
+
+  "pricingRules": [
+    {
+      "id": "base_local_rate",
+      "name": "Base Local Moving Rate",
+      "description": "Standard hourly rate for local moves with 2-person crew",
+      "category": "base_pricing",
+      "priority": 1,
+      "conditions": [
+        {
+          "field": "service",
+          "operator": "eq",
+          "value": "local"
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 150,
+          "description": "Base 2-person crew hourly rate",
+          "targetField": "basePrice"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "crew_size_adjustment",
+      "name": "Additional Crew Members",
+      "description": "Extra charge for each crew member beyond 2",
+      "category": "base_pricing",
+      "priority": 2,
+      "conditions": [
+        {
+          "field": "crewSize",
+          "operator": "gt",
+          "value": 2
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 75,
+          "description": "Additional crew member per hour (crewSize - 2) * 75",
+          "targetField": "basePrice"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "weight_heavy_surcharge",
+      "name": "Heavy Weight Surcharge",
+      "description": "Additional charge for moves over 8,000 lbs",
+      "category": "weight_based",
+      "priority": 10,
+      "conditions": [
+        {
+          "field": "totalWeight",
+          "operator": "gt",
+          "value": 8000
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_percentage",
+          "amount": 0.15,
+          "description": "15% surcharge for heavy shipments over 8,000 lbs"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "volume_large_surcharge",
+      "name": "High Volume Surcharge",
+      "description": "Additional charge for moves over 1,500 cubic feet",
+      "category": "volume_based",
+      "priority": 11,
+      "conditions": [
+        {
+          "field": "totalVolume",
+          "operator": "gt",
+          "value": 1500
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_percentage",
+          "amount": 0.10,
+          "description": "10% surcharge for high-volume shipments over 1,500 cu ft"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "long_distance_rate",
+      "name": "Long Distance Base Rate",
+      "description": "Weight-based pricing for long distance moves",
+      "category": "distance_based",
+      "priority": 5,
+      "conditions": [
+        {
+          "field": "service",
+          "operator": "eq",
+          "value": "long_distance"
+        },
+        {
+          "field": "distance",
+          "operator": "gt",
+          "value": 50,
+          "logicalOperator": "and"
+        }
+      ],
+      "actions": [
+        {
+          "type": "multiply",
+          "amount": 1.25,
+          "description": "$1.25 per pound for long distance moves",
+          "targetField": "totalWeight"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "distance_surcharge_200",
+      "name": "Extra Long Distance Surcharge",
+      "description": "Additional charge for moves over 200 miles",
+      "category": "distance_based",
+      "priority": 12,
+      "conditions": [
+        {
+          "field": "distance",
+          "operator": "gt",
+          "value": 200
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_percentage",
+          "amount": 0.08,
+          "description": "8% surcharge for moves over 200 miles"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "piano_special_handling",
+      "name": "Piano Special Handling",
+      "description": "Additional charge for piano moves requiring specialty equipment",
+      "category": "special_items",
+      "priority": 20,
+      "conditions": [
+        {
+          "field": "specialItems.piano",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 350,
+          "description": "Piano moving surcharge with specialty equipment and crew"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "antique_handling",
+      "name": "Antique and Valuable Items",
+      "description": "Additional charge for antiques and high-value items",
+      "category": "special_items",
+      "priority": 21,
+      "conditions": [
+        {
+          "field": "specialItems.antiques",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 200,
+          "description": "Antique and valuable item handling surcharge"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "fragile_items_surcharge",
+      "name": "Fragile Items Handling",
+      "description": "Per-item charge for fragile items requiring special care",
+      "category": "special_items",
+      "priority": 22,
+      "conditions": [
+        {
+          "field": "specialItems.fragileItems",
+          "operator": "gt",
+          "value": 5
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 25,
+          "description": "Additional charge per fragile item over 5 items (fragileItems - 5) * $25"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "packing_service_rate",
+      "name": "Professional Packing Service",
+      "description": "Hourly rate for professional packing services",
+      "category": "base_pricing",
+      "priority": 3,
+      "conditions": [
+        {
+          "field": "additionalServices.packing",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 85,
+          "description": "Professional packing hourly rate per person"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance", "packing_only"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "assembly_service",
+      "name": "Furniture Assembly/Disassembly",
+      "description": "Additional charge for furniture assembly services",
+      "category": "base_pricing",
+      "priority": 4,
+      "conditions": [
+        {
+          "field": "additionalServices.assembly",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_fixed",
+          "amount": 150,
+          "description": "Furniture assembly/disassembly service"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "weekend_surcharge",
+      "name": "Weekend Service Surcharge",
+      "description": "Additional charge for weekend moves",
+      "category": "seasonal",
+      "priority": 30,
+      "conditions": [
+        {
+          "field": "isWeekend",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_percentage",
+          "amount": 0.10,
+          "description": "10% weekend surcharge"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "peak_season_surcharge",
+      "name": "Peak Season Surcharge",
+      "description": "Additional charge during peak moving season (May-September)",
+      "category": "seasonal",
+      "priority": 31,
+      "conditions": [
+        {
+          "field": "seasonalPeriod",
+          "operator": "eq",
+          "value": "peak"
+        }
+      ],
+      "actions": [
+        {
+          "type": "add_percentage",
+          "amount": 0.15,
+          "description": "15% peak season surcharge (May-September)"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local", "long_distance"],
+      "version": "1.0.0"
+    },
+
+    {
+      "id": "minimum_charge_local",
+      "name": "Local Move Minimum Charge",
+      "description": "Minimum charge for local moves (2 hours minimum)",
+      "category": "base_pricing",
+      "priority": 50,
+      "conditions": [
+        {
+          "field": "service",
+          "operator": "eq",
+          "value": "local"
+        }
+      ],
+      "actions": [
+        {
+          "type": "set_minimum",
+          "amount": 400,
+          "description": "2-hour minimum charge for local moves"
+        }
+      ],
+      "isActive": true,
+      "applicableServices": ["local"],
+      "version": "1.0.0"
+    }
+  ],
+
+  "locationHandicaps": [
+    {
+      "id": "stairs_pickup",
+      "name": "Stairs at Pickup Location",
+      "description": "Additional charge for each flight of stairs at pickup",
+      "conditions": [
+        {
+          "field": "pickup.stairsCount",
+          "operator": "gt",
+          "value": 0
+        },
+        {
+          "field": "pickup.elevatorAccess",
+          "operator": "eq",
+          "value": false,
+          "logicalOperator": "and"
+        }
+      ],
+      "multiplier": 1.0,
+      "fixedAmount": 75,
+      "isActive": true
+    },
+
+    {
+      "id": "stairs_delivery",
+      "name": "Stairs at Delivery Location",
+      "description": "Additional charge for each flight of stairs at delivery",
+      "conditions": [
+        {
+          "field": "delivery.stairsCount",
+          "operator": "gt",
+          "value": 0
+        },
+        {
+          "field": "delivery.elevatorAccess",
+          "operator": "eq",
+          "value": false,
+          "logicalOperator": "and"
+        }
+      ],
+      "multiplier": 1.0,
+      "fixedAmount": 75,
+      "isActive": true
+    },
+
+    {
+      "id": "long_carry_pickup",
+      "name": "Long Carry at Pickup",
+      "description": "Additional charge for carrying items more than 75 feet from truck",
+      "conditions": [
+        {
+          "field": "pickup.longCarry",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "multiplier": 1.0,
+      "fixedAmount": 125,
+      "isActive": true
+    },
+
+    {
+      "id": "long_carry_delivery",
+      "name": "Long Carry at Delivery",
+      "description": "Additional charge for carrying items more than 75 feet to final location",
+      "conditions": [
+        {
+          "field": "delivery.longCarry",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "multiplier": 1.0,
+      "fixedAmount": 125,
+      "isActive": true
+    },
+
+    {
+      "id": "difficult_access_pickup",
+      "name": "Difficult Access at Pickup",
+      "description": "Surcharge for extremely difficult pickup access",
+      "conditions": [
+        {
+          "field": "pickup.accessDifficulty",
+          "operator": "eq",
+          "value": "extreme"
+        }
+      ],
+      "multiplier": 1.25,
+      "fixedAmount": 0,
+      "isActive": true
+    },
+
+    {
+      "id": "difficult_access_delivery",
+      "name": "Difficult Access at Delivery",
+      "description": "Surcharge for extremely difficult delivery access",
+      "conditions": [
+        {
+          "field": "delivery.accessDifficulty",
+          "operator": "eq",
+          "value": "extreme"
+        }
+      ],
+      "multiplier": 1.25,
+      "fixedAmount": 0,
+      "isActive": true
+    },
+
+    {
+      "id": "parking_distance_pickup",
+      "name": "Distant Parking at Pickup",
+      "description": "Additional charge when truck cannot park within 50 feet",
+      "conditions": [
+        {
+          "field": "pickup.parkingDistance",
+          "operator": "gt",
+          "value": 50
+        }
+      ],
+      "multiplier": 1.0,
+      "fixedAmount": 100,
+      "isActive": true
+    },
+
+    {
+      "id": "parking_distance_delivery",
+      "name": "Distant Parking at Delivery",
+      "description": "Additional charge when truck cannot park within 50 feet",
+      "conditions": [
+        {
+          "field": "delivery.parkingDistance",
+          "operator": "gt",
+          "value": 50
+        }
+      ],
+      "multiplier": 1.0,
+      "fixedAmount": 100,
+      "isActive": true
+    },
+
+    {
+      "id": "narrow_hallways_pickup",
+      "name": "Narrow Hallways at Pickup",
+      "description": "Additional time and care required for narrow hallways",
+      "conditions": [
+        {
+          "field": "pickup.narrowHallways",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "multiplier": 1.15,
+      "fixedAmount": 0,
+      "isActive": true
+    },
+
+    {
+      "id": "narrow_hallways_delivery",
+      "name": "Narrow Hallways at Delivery",
+      "description": "Additional time and care required for narrow hallways",
+      "conditions": [
+        {
+          "field": "delivery.narrowHallways",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "multiplier": 1.15,
+      "fixedAmount": 0,
+      "isActive": true
+    }
+  ]
+}

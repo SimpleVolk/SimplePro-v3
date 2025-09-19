@@ -1,0 +1,53 @@
+{
+  "name": "pricing-engine",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/pricing-engine/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/pricing-engine",
+        "main": "packages/pricing-engine/src/index.ts",
+        "tsConfig": "packages/pricing-engine/tsconfig.json",
+        "assets": [
+          "packages/pricing-engine/README.md",
+          "packages/pricing-engine/package.json",
+          "packages/pricing-engine/src/data/*.json"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/pricing-engine/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/packages/pricing-engine"],
+      "options": {
+        "jestConfig": "packages/pricing-engine/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "test:watch": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "packages/pricing-engine/jest.config.js",
+        "watch": true
+      }
+    },
+    "test:coverage": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "packages/pricing-engine/jest.config.js",
+        "coverage": true,
+        "coverageReporters": ["text", "html", "lcov"]
+      }
+    }
+  },
+  "tags": ["scope:pricing", "type:lib"]
+}

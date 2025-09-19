@@ -1,0 +1,614 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-09-19T00:00:00Z",
+  "description": "Standard inventory catalog with weights and volumes for common household items",
+
+  "categories": {
+    "furniture": {
+      "name": "Furniture",
+      "description": "Standard household furniture items",
+      "items": {
+        "sofa_3_seat": {
+          "name": "Sofa - 3 Seat",
+          "weight": 120,
+          "volume": 45,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "sofa_2_seat": {
+          "name": "Sofa - 2 Seat / Loveseat",
+          "weight": 85,
+          "volume": 32,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "sectional_sofa": {
+          "name": "Sectional Sofa",
+          "weight": 200,
+          "volume": 75,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "recliner": {
+          "name": "Recliner Chair",
+          "weight": 95,
+          "volume": 28,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "armchair": {
+          "name": "Arm Chair",
+          "weight": 45,
+          "volume": 18,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "dining_table": {
+          "name": "Dining Table",
+          "weight": 85,
+          "volume": 25,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "dining_chair": {
+          "name": "Dining Chair",
+          "weight": 25,
+          "volume": 8,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "coffee_table": {
+          "name": "Coffee Table",
+          "weight": 35,
+          "volume": 12,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "end_table": {
+          "name": "End Table / Side Table",
+          "weight": 20,
+          "volume": 6,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "bookshelf": {
+          "name": "Bookshelf",
+          "weight": 60,
+          "volume": 22,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "entertainment_center": {
+          "name": "Entertainment Center",
+          "weight": 120,
+          "volume": 45,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "desk": {
+          "name": "Desk",
+          "weight": 75,
+          "volume": 28,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        },
+        "office_chair": {
+          "name": "Office Chair",
+          "weight": 35,
+          "volume": 15,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "furniture"
+        }
+      }
+    },
+
+    "bedroom": {
+      "name": "Bedroom Furniture",
+      "description": "Bedroom and sleeping furniture",
+      "items": {
+        "queen_bed_frame": {
+          "name": "Queen Bed Frame",
+          "weight": 85,
+          "volume": 25,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "king_bed_frame": {
+          "name": "King Bed Frame",
+          "weight": 110,
+          "volume": 32,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "full_bed_frame": {
+          "name": "Full Bed Frame",
+          "weight": 65,
+          "volume": 20,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "twin_bed_frame": {
+          "name": "Twin Bed Frame",
+          "weight": 45,
+          "volume": 15,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "queen_mattress": {
+          "name": "Queen Mattress",
+          "weight": 65,
+          "volume": 35,
+          "packingRequired": true,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "king_mattress": {
+          "name": "King Mattress",
+          "weight": 85,
+          "volume": 45,
+          "packingRequired": true,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "full_mattress": {
+          "name": "Full Mattress",
+          "weight": 55,
+          "volume": 28,
+          "packingRequired": true,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "twin_mattress": {
+          "name": "Twin Mattress",
+          "weight": 35,
+          "volume": 20,
+          "packingRequired": true,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "dresser": {
+          "name": "Dresser",
+          "weight": 125,
+          "volume": 35,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "nightstand": {
+          "name": "Nightstand",
+          "weight": 35,
+          "volume": 10,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "wardrobe": {
+          "name": "Wardrobe / Armoire",
+          "weight": 185,
+          "volume": 65,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        },
+        "chest_drawers": {
+          "name": "Chest of Drawers",
+          "weight": 95,
+          "volume": 28,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "bedroom"
+        }
+      }
+    },
+
+    "appliances": {
+      "name": "Appliances",
+      "description": "Kitchen and household appliances",
+      "items": {
+        "refrigerator": {
+          "name": "Refrigerator",
+          "weight": 250,
+          "volume": 65,
+          "packingRequired": false,
+          "fragile": true,
+          "category": "appliances"
+        },
+        "washer": {
+          "name": "Washing Machine",
+          "weight": 200,
+          "volume": 35,
+          "packingRequired": false,
+          "fragile": true,
+          "category": "appliances"
+        },
+        "dryer": {
+          "name": "Dryer",
+          "weight": 125,
+          "volume": 35,
+          "packingRequired": false,
+          "fragile": true,
+          "category": "appliances"
+        },
+        "dishwasher": {
+          "name": "Dishwasher",
+          "weight": 150,
+          "volume": 28,
+          "packingRequired": false,
+          "fragile": true,
+          "category": "appliances"
+        },
+        "stove": {
+          "name": "Stove / Range",
+          "weight": 185,
+          "volume": 32,
+          "packingRequired": false,
+          "fragile": true,
+          "category": "appliances"
+        },
+        "microwave": {
+          "name": "Microwave",
+          "weight": 45,
+          "volume": 8,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "appliances"
+        },
+        "water_heater": {
+          "name": "Water Heater",
+          "weight": 125,
+          "volume": 22,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "appliances"
+        }
+      }
+    },
+
+    "electronics": {
+      "name": "Electronics",
+      "description": "TVs, computers, and electronic devices",
+      "items": {
+        "tv_65_inch": {
+          "name": "TV - 65 inch",
+          "weight": 55,
+          "volume": 15,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        },
+        "tv_55_inch": {
+          "name": "TV - 55 inch",
+          "weight": 40,
+          "volume": 12,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        },
+        "tv_42_inch": {
+          "name": "TV - 42 inch",
+          "weight": 28,
+          "volume": 8,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        },
+        "desktop_computer": {
+          "name": "Desktop Computer",
+          "weight": 25,
+          "volume": 5,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        },
+        "laptop": {
+          "name": "Laptop Computer",
+          "weight": 5,
+          "volume": 1,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        },
+        "printer": {
+          "name": "Printer",
+          "weight": 20,
+          "volume": 4,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        },
+        "sound_system": {
+          "name": "Sound System",
+          "weight": 35,
+          "volume": 8,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "electronics"
+        }
+      }
+    },
+
+    "specialty_items": {
+      "name": "Specialty Items",
+      "description": "High-value or specialty items requiring special handling",
+      "items": {
+        "piano_upright": {
+          "name": "Upright Piano",
+          "weight": 450,
+          "volume": 45,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "specialty_items",
+          "specialHandling": true
+        },
+        "piano_grand": {
+          "name": "Grand Piano",
+          "weight": 900,
+          "volume": 85,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "specialty_items",
+          "specialHandling": true
+        },
+        "gun_safe": {
+          "name": "Gun Safe",
+          "weight": 600,
+          "volume": 25,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "specialty_items",
+          "specialHandling": true
+        },
+        "pool_table": {
+          "name": "Pool Table",
+          "weight": 850,
+          "volume": 125,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "specialty_items",
+          "specialHandling": true
+        },
+        "hot_tub": {
+          "name": "Hot Tub / Spa",
+          "weight": 750,
+          "volume": 85,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "specialty_items",
+          "specialHandling": true
+        },
+        "artwork": {
+          "name": "Artwork / Painting",
+          "weight": 15,
+          "volume": 3,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "specialty_items",
+          "specialHandling": true
+        },
+        "antique": {
+          "name": "Antique Item",
+          "weight": 50,
+          "volume": 15,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "specialty_items",
+          "specialHandling": true
+        }
+      }
+    },
+
+    "boxes_miscellaneous": {
+      "name": "Boxes & Miscellaneous",
+      "description": "Packed boxes and miscellaneous household items",
+      "items": {
+        "box_small": {
+          "name": "Small Box (1.5 cu ft)",
+          "weight": 35,
+          "volume": 1.5,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "box_medium": {
+          "name": "Medium Box (3 cu ft)",
+          "weight": 45,
+          "volume": 3,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "box_large": {
+          "name": "Large Box (4.5 cu ft)",
+          "weight": 55,
+          "volume": 4.5,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "box_extra_large": {
+          "name": "Extra Large Box (6 cu ft)",
+          "weight": 65,
+          "volume": 6,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "wardrobe_box": {
+          "name": "Wardrobe Box",
+          "weight": 75,
+          "volume": 10,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "file_box": {
+          "name": "File Box",
+          "weight": 65,
+          "volume": 2,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "lamp": {
+          "name": "Lamp",
+          "weight": 15,
+          "volume": 4,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "boxes_miscellaneous"
+        },
+        "mirror": {
+          "name": "Mirror",
+          "weight": 25,
+          "volume": 5,
+          "packingRequired": true,
+          "fragile": true,
+          "category": "boxes_miscellaneous"
+        },
+        "bicycle": {
+          "name": "Bicycle",
+          "weight": 35,
+          "volume": 12,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "exercise_equipment": {
+          "name": "Exercise Equipment",
+          "weight": 125,
+          "volume": 25,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "outdoor_furniture": {
+          "name": "Outdoor Furniture Item",
+          "weight": 45,
+          "volume": 18,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        },
+        "grill": {
+          "name": "BBQ Grill",
+          "weight": 85,
+          "volume": 22,
+          "packingRequired": false,
+          "fragile": false,
+          "category": "boxes_miscellaneous"
+        }
+      }
+    }
+  },
+
+  "roomTemplates": {
+    "studio_apartment": {
+      "name": "Studio Apartment",
+      "description": "Typical studio apartment inventory",
+      "estimatedWeight": 2500,
+      "estimatedVolume": 400,
+      "items": [
+        { "itemKey": "queen_bed_frame", "quantity": 1 },
+        { "itemKey": "queen_mattress", "quantity": 1 },
+        { "itemKey": "dresser", "quantity": 1 },
+        { "itemKey": "nightstand", "quantity": 1 },
+        { "itemKey": "sofa_2_seat", "quantity": 1 },
+        { "itemKey": "coffee_table", "quantity": 1 },
+        { "itemKey": "tv_42_inch", "quantity": 1 },
+        { "itemKey": "dining_table", "quantity": 1 },
+        { "itemKey": "dining_chair", "quantity": 2 },
+        { "itemKey": "microwave", "quantity": 1 },
+        { "itemKey": "box_medium", "quantity": 15 },
+        { "itemKey": "box_small", "quantity": 10 },
+        { "itemKey": "wardrobe_box", "quantity": 2 }
+      ]
+    },
+
+    "1_bedroom_apartment": {
+      "name": "1 Bedroom Apartment",
+      "description": "Typical 1-bedroom apartment inventory",
+      "estimatedWeight": 4500,
+      "estimatedVolume": 650,
+      "items": [
+        { "itemKey": "queen_bed_frame", "quantity": 1 },
+        { "itemKey": "queen_mattress", "quantity": 1 },
+        { "itemKey": "dresser", "quantity": 1 },
+        { "itemKey": "nightstand", "quantity": 2 },
+        { "itemKey": "sofa_3_seat", "quantity": 1 },
+        { "itemKey": "coffee_table", "quantity": 1 },
+        { "itemKey": "end_table", "quantity": 2 },
+        { "itemKey": "tv_55_inch", "quantity": 1 },
+        { "itemKey": "entertainment_center", "quantity": 1 },
+        { "itemKey": "dining_table", "quantity": 1 },
+        { "itemKey": "dining_chair", "quantity": 4 },
+        { "itemKey": "microwave", "quantity": 1 },
+        { "itemKey": "washer", "quantity": 1 },
+        { "itemKey": "dryer", "quantity": 1 },
+        { "itemKey": "box_medium", "quantity": 25 },
+        { "itemKey": "box_small", "quantity": 15 },
+        { "itemKey": "box_large", "quantity": 8 },
+        { "itemKey": "wardrobe_box", "quantity": 3 }
+      ]
+    },
+
+    "3_bedroom_house": {
+      "name": "3 Bedroom House",
+      "description": "Typical 3-bedroom family home inventory",
+      "estimatedWeight": 12000,
+      "estimatedVolume": 1800,
+      "items": [
+        { "itemKey": "king_bed_frame", "quantity": 1 },
+        { "itemKey": "king_mattress", "quantity": 1 },
+        { "itemKey": "queen_bed_frame", "quantity": 2 },
+        { "itemKey": "queen_mattress", "quantity": 2 },
+        { "itemKey": "dresser", "quantity": 3 },
+        { "itemKey": "nightstand", "quantity": 4 },
+        { "itemKey": "sectional_sofa", "quantity": 1 },
+        { "itemKey": "coffee_table", "quantity": 1 },
+        { "itemKey": "end_table", "quantity": 3 },
+        { "itemKey": "armchair", "quantity": 2 },
+        { "itemKey": "tv_65_inch", "quantity": 1 },
+        { "itemKey": "tv_42_inch", "quantity": 2 },
+        { "itemKey": "entertainment_center", "quantity": 1 },
+        { "itemKey": "dining_table", "quantity": 1 },
+        { "itemKey": "dining_chair", "quantity": 6 },
+        { "itemKey": "bookshelf", "quantity": 3 },
+        { "itemKey": "desk", "quantity": 2 },
+        { "itemKey": "office_chair", "quantity": 2 },
+        { "itemKey": "refrigerator", "quantity": 1 },
+        { "itemKey": "washer", "quantity": 1 },
+        { "itemKey": "dryer", "quantity": 1 },
+        { "itemKey": "dishwasher", "quantity": 1 },
+        { "itemKey": "stove", "quantity": 1 },
+        { "itemKey": "microwave", "quantity": 1 },
+        { "itemKey": "box_medium", "quantity": 45 },
+        { "itemKey": "box_small", "quantity": 30 },
+        { "itemKey": "box_large", "quantity": 15 },
+        { "itemKey": "box_extra_large", "quantity": 8 },
+        { "itemKey": "wardrobe_box", "quantity": 6 },
+        { "itemKey": "file_box", "quantity": 4 },
+        { "itemKey": "outdoor_furniture", "quantity": 5 },
+        { "itemKey": "grill", "quantity": 1 },
+        { "itemKey": "exercise_equipment", "quantity": 2 },
+        { "itemKey": "bicycle", "quantity": 2 }
+      ]
+    }
+  }
+}
