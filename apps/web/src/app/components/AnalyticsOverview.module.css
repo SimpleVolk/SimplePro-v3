@@ -1,0 +1,496 @@
+.analyticsOverview {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Loading States */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #444;
+  border-top: 3px solid #0070f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  background: #2d2d2d;
+  border: 1px solid #ff4444;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  color: #fff;
+}
+
+.error h3 {
+  margin: 0 0 16px 0;
+  color: #ff4444;
+}
+
+.error p {
+  margin: 0 0 24px 0;
+  color: #ccc;
+}
+
+.retryButton {
+  padding: 12px 24px;
+  background: #0070f3;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retryButton:hover {
+  background: #0056b3;
+}
+
+/* Tab Navigation */
+.tabNavigation {
+  display: flex;
+  gap: 4px;
+  background: #2d2d2d;
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid #444;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.tab:hover {
+  background: #3a3a3a;
+  color: #fff;
+}
+
+.tabActive {
+  background: #0070f3;
+  color: #fff;
+}
+
+.tabActive:hover {
+  background: #0070f3;
+}
+
+/* Tab Content */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Metrics Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.metricCard {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+
+.metricCard:hover {
+  border-color: #666;
+}
+
+.metricCard h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metricValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.metricSubtext {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Chart Section */
+.chartSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.chartCard {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.chartCard h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Chart Container */
+.chartContainer {
+  width: 100%;
+  height: auto;
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #333;
+}
+
+/* Services List */
+.servicesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.serviceItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #444;
+}
+
+.serviceItem:last-child {
+  border-bottom: none;
+}
+
+.serviceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.serviceName {
+  font-weight: 500;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.serviceCount {
+  font-size: 14px;
+  color: #888;
+}
+
+.serviceRevenue {
+  font-weight: 600;
+  color: #0070f3;
+}
+
+/* Performance Grid */
+.performanceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.performanceItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.performanceLabel {
+  font-size: 14px;
+  color: #888;
+}
+
+.performanceValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0070f3;
+}
+
+/* Business Metrics Grid */
+.businessMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.metricSection {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.metricSection h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 12px;
+}
+
+.metricsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metricRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.metricRow span:first-child {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.metricRow span:last-child {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Revenue Grid */
+.revenueGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.revenueChart {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  height: 300px;
+  padding: 20px 0;
+  overflow-x: auto;
+}
+
+.revenueBar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+  height: 100%;
+  position: relative;
+}
+
+.revenueBarInner {
+  width: 40px;
+  background: linear-gradient(180deg, #0070f3 0%, #0056b3 100%);
+  border-radius: 4px 4px 0 0;
+  margin-bottom: 12px;
+}
+
+.revenueBarLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.revenueBarLabel div:first-child {
+  color: #888;
+  font-weight: 500;
+}
+
+.revenueBarLabel div:nth-child(2) {
+  color: #fff;
+  font-weight: 600;
+}
+
+.revenueBarLabel div:last-child {
+  color: #666;
+}
+
+/* Performance Cards */
+.performanceCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.performanceCard {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.performanceCard h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 12px;
+}
+
+.performanceMetric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+}
+
+.performanceMetric:last-child {
+  border-bottom: none;
+}
+
+.performanceMetric span:first-child {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.performanceMetric span:last-child {
+  color: #0070f3;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Refresh Section */
+.refreshSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 1px solid #444;
+}
+
+.refreshButton {
+  padding: 12px 24px;
+  background: #0070f3;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refreshButton:hover {
+  background: #0056b3;
+}
+
+.lastUpdated {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartSection {
+    grid-template-columns: 1fr;
+  }
+
+  .businessMetricsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .performanceCards {
+    grid-template-columns: 1fr;
+  }
+
+  .performanceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabNavigation {
+    flex-direction: column;
+  }
+
+  .tab {
+    flex: none;
+  }
+
+  .refreshSection {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .revenueChart {
+    padding: 20px 10px;
+  }
+
+  .revenueBar {
+    min-width: 80px;
+  }
+
+  .revenueBarInner {
+    width: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analyticsOverview {
+    gap: 16px;
+  }
+
+  .metricCard,
+  .chartCard,
+  .metricSection,
+  .performanceCard {
+    padding: 16px;
+  }
+
+  .metricValue {
+    font-size: 24px;
+  }
+
+  .tabContent {
+    gap: 24px;
+  }
+}

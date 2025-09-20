@@ -41,7 +41,9 @@
       "Bash(nx test:*)",
       "Bash(npm run test:api:*)",
       "Bash(npm run test:unit:*)",
-      "Bash(npm run test:api:integration:*)"
+      "Bash(npm run test:api:integration:*)",
+      "Bash(npm run:*)",
+      "Bash(npx next dev:*)"
     ],
     "deny": [],
     "ask": []

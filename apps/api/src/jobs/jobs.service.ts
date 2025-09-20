@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import {
   Job,
   CreateJobDto,
@@ -9,11 +9,17 @@ import {
   JobMilestone,
   InternalNote
 } from './interfaces/job.interface';
+import { RealtimeService } from '../websocket/realtime.service';
 
 @Injectable()
 export class JobsService {
   private jobs = new Map<string, Job>();
   private jobNumberCounter = 1;
+
+  constructor(
+    @Inject(forwardRef(() => RealtimeService))
+    private realtimeService: RealtimeService
+  ) {}
 
   async create(createJobDto: CreateJobDto, createdBy: string): Promise<Job> {
     // Validate that customer exists (in a real app, this would be a DB query)
@@ -199,6 +205,18 @@ export class JobsService {
 
     const updatedJob: Job = { ...job, ...updates };
     this.jobs.set(id, updatedJob);
+
+    // Send real-time notifications
+    if (this.realtimeService) {
+      this.realtimeService.notifyJobStatusChange(id, status, updatedBy);
+
+      // Send specific notifications for important status changes
+      if (status === 'completed' && job.assignedCrew.length > 0) {
+        const crewId = job.assignedCrew[0].crewMemberId;
+        this.realtimeService.notifyJobCompletion(id, crewId, updatedBy);
+      }
+    }
+
     return updatedJob;
   }
 

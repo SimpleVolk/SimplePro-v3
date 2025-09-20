@@ -6,6 +6,7 @@ import { EstimateResult } from './EstimateResult';
 import { CustomerManagement } from './CustomerManagement';
 import { JobManagement } from './JobManagement';
 import { CalendarDispatch } from './CalendarDispatch';
+import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { useState } from 'react';
 import styles from './Dashboard.module.css';
 
@@ -122,13 +123,7 @@ export function Dashboard() {
 
         {activeTab === 'reports' && (
           <div className={styles.content}>
-            <div className={styles.pageHeader}>
-              <h2>Reports & Analytics</h2>
-              <p>Business insights and performance metrics</p>
-            </div>
-            <div className={styles.placeholder}>
-              <p>Reports dashboard coming soon...</p>
-            </div>
+            <AnalyticsDashboard />
           </div>
         )}
 

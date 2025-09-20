@@ -1,0 +1,368 @@
+.dashboard {
+  padding: 1.5rem;
+  background-color: #0f172a;
+  min-height: 100vh;
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #334155;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.connectionStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.connected {
+  background-color: #10b981;
+}
+
+.disconnected {
+  background-color: #ef4444;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.statCard h3 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.panel {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.panel h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background-color: #334155;
+  border-bottom: 1px solid #475569;
+}
+
+.userList,
+.updatesList,
+.crewList,
+.locationList,
+.notificationsList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.userItem,
+.updateItem,
+.crewItem,
+.locationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #374151;
+}
+
+.userItem:last-child,
+.updateItem:last-child,
+.crewItem:last-child,
+.locationItem:last-child {
+  border-bottom: none;
+}
+
+.userInfo,
+.updateInfo,
+.crewInfo,
+.locationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.userId,
+.jobId,
+.crewId {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.userRole {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  background-color: #3b82f6;
+  color: white;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.updateMessage,
+.statusMessage {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+}
+
+.status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.pending {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.in_progress {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.completed {
+  background-color: #10b981;
+  color: white;
+}
+
+.cancelled {
+  background-color: #ef4444;
+  color: white;
+}
+
+.connectTime,
+.updateTime {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.statusIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.statusText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #f8fafc;
+  text-transform: capitalize;
+}
+
+.coordinates {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.accuracy {
+  font-size: 0.75rem;
+  color: #10b981;
+}
+
+.notification {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #374151;
+  border-left: 4px solid;
+}
+
+.notification:last-child {
+  border-bottom: none;
+}
+
+.notification.info {
+  border-left-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.notification.success {
+  border-left-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.notification.warning {
+  border-left-color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.notification.error,
+.notification.emergency {
+  border-left-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.notificationContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notificationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notificationTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #374151;
+  color: #f8fafc;
+}
+
+.notificationMessage {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.notificationTime {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Scrollbar styling */
+.userList::-webkit-scrollbar,
+.updatesList::-webkit-scrollbar,
+.crewList::-webkit-scrollbar,
+.locationList::-webkit-scrollbar,
+.notificationsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.userList::-webkit-scrollbar-track,
+.updatesList::-webkit-scrollbar-track,
+.crewList::-webkit-scrollbar-track,
+.locationList::-webkit-scrollbar-track,
+.notificationsList::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.userList::-webkit-scrollbar-thumb,
+.updatesList::-webkit-scrollbar-thumb,
+.crewList::-webkit-scrollbar-thumb,
+.locationList::-webkit-scrollbar-thumb,
+.notificationsList::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 3px;
+}
+
+.userList::-webkit-scrollbar-thumb:hover,
+.updatesList::-webkit-scrollbar-thumb:hover,
+.crewList::-webkit-scrollbar-thumb:hover,
+.locationList::-webkit-scrollbar-thumb:hover,
+.notificationsList::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}

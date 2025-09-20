@@ -11,10 +11,10 @@ export class PricingRuleCondition {
   @Prop({ required: true, enum: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'in', 'not_in', 'contains', 'starts_with', 'ends_with'] })
   operator!: string;
 
-  @Prop()
+  @Prop({ type: Object })
   value?: any;
 
-  @Prop([])
+  @Prop({ type: [Object] })
   values?: any[];
 }
 

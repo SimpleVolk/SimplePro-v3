@@ -28,6 +28,9 @@ export class User {
   department?: string;
 
   @Prop()
+  crewId?: string;
+
+  @Prop()
   phoneNumber?: string;
 
   @Prop({ default: true, index: true })

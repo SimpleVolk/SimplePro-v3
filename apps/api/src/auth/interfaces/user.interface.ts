@@ -8,6 +8,7 @@ export interface User {
   role: UserRole;
   department?: string;
   phoneNumber?: string;
+  crewId?: string;
   isActive: boolean;
   lastLoginAt?: Date;
   permissions: Permission[];

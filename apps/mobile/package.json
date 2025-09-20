@@ -1,12 +1,21 @@
 {
-  "name": "apps",
-  "version": "0.0.1",
+  "name": "mobile",
+  "displayName": "SimplePro Crew",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@react-native/metro-config": "*",
     "react": "*",
     "react-native": "*",
     "react-native-svg": "*",
-    "metro-config": "*"
+    "metro-config": "*",
+    "@react-navigation/native": "*",
+    "@react-navigation/stack": "*",
+    "react-native-screens": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-signature-canvas": "*",
+    "react-native-image-picker": "*",
+    "@react-native-async-storage/async-storage": "*",
+    "@react-native-community/netinfo": "*"
   }
 }
