@@ -1,0 +1,75 @@
+{
+  "name": "mobile",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mobile/src",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project mobile --web",
+  "targets": {
+    "start": {
+      "executor": "@nx/react-native:start",
+      "options": {
+        "port": 8081
+      }
+    },
+    "run-ios": {
+      "executor": "@nx/react-native:run-ios",
+      "options": {}
+    },
+    "bundle-ios": {
+      "executor": "@nx/react-native:bundle",
+      "outputs": ["{options.bundleOutput}"],
+      "options": {
+        "platform": "ios",
+        "bundleOutput": "dist/apps/mobile/ios/main.bundle"
+      }
+    },
+    "run-android": {
+      "executor": "@nx/react-native:run-android",
+      "options": {}
+    },
+    "bundle-android": {
+      "executor": "@nx/react-native:bundle",
+      "outputs": ["{options.bundleOutput}"],
+      "options": {
+        "platform": "android",
+        "bundleOutput": "dist/apps/mobile/android/main.bundle"
+      }
+    },
+    "build-ios": {
+      "executor": "@nx/react-native:build-ios",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/mobile/ios"
+      }
+    },
+    "build-android": {
+      "executor": "@nx/react-native:build-android",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/mobile/android"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/mobile/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverageReporters": ["text"]
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/mobile/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  }
+}
