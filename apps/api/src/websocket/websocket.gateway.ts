@@ -397,6 +397,77 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     });
   }
 
+  // Analytics Dashboard Subscriptions
+  @SubscribeMessage('subscribeToAnalytics')
+  async handleAnalyticsSubscription(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { dashboardType?: 'overview' | 'business' | 'revenue' | 'performance' }
+  ) {
+    // Only allow admin and dispatcher roles to subscribe to analytics
+    if (!['admin', 'super_admin', 'dispatcher'].includes(client.userRole)) {
+      client.emit('error', { message: 'Unauthorized: Only admins and dispatchers can access analytics' });
+      return;
+    }
+
+    await client.join('analytics:subscribers');
+
+    if (data.dashboardType) {
+      await client.join(`analytics:${data.dashboardType}`);
+    }
+
+    this.logger.log(`Client ${client.id} subscribed to analytics updates`);
+
+    client.emit('analyticsSubscribed', {
+      message: 'Subscribed to analytics updates',
+      dashboardType: data.dashboardType,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  @SubscribeMessage('unsubscribeFromAnalytics')
+  async handleAnalyticsUnsubscription(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { dashboardType?: 'overview' | 'business' | 'revenue' | 'performance' }
+  ) {
+    await client.leave('analytics:subscribers');
+
+    if (data.dashboardType) {
+      await client.leave(`analytics:${data.dashboardType}`);
+    }
+
+    this.logger.log(`Client ${client.id} unsubscribed from analytics updates`);
+
+    client.emit('analyticsUnsubscribed', {
+      dashboardType: data.dashboardType,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // Analytics Broadcasting Methods
+  broadcastAnalyticsUpdate(dashboardType: 'overview' | 'business' | 'revenue' | 'performance', data: any) {
+    this.server.to(`analytics:${dashboardType}`).emit('analyticsUpdate', {
+      dashboardType,
+      data,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  broadcastMetricsUpdate(metrics: any) {
+    this.server.to('analytics:subscribers').emit('metricsUpdate', {
+      metrics,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  broadcastReportUpdate(reportId: string, status: string, progress?: number) {
+    this.server.to('analytics:subscribers').emit('reportUpdate', {
+      reportId,
+      status,
+      progress,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   // Get connected users info
   getConnectedUsers() {
     const users = Array.from(this.connectedClients.values()).map(socket => ({

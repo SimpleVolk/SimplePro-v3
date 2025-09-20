@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useWebSocket } from '../contexts/WebSocketContext';
 import {
   LineChart,
   Line,
@@ -63,17 +64,97 @@ const API_BASE_URL = 'http://localhost:4000/api';
 
 export function AnalyticsOverview() {
   const { user } = useAuth();
+  const { isConnected, subscribeToAnalytics, unsubscribeFromAnalytics, lastUpdate } = useWebSocket();
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null);
   const [businessMetrics, setBusinessMetrics] = useState<BusinessMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'business' | 'revenue' | 'performance'>('overview');
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (user) {
       fetchAnalyticsData();
+
+      // Subscribe to analytics updates when component mounts
+      if (isConnected) {
+        subscribeToAnalytics(activeTab);
+      }
     }
-  }, [user]);
+
+    return () => {
+      // Cleanup: unsubscribe from analytics updates
+      if (isConnected) {
+        unsubscribeFromAnalytics(activeTab);
+      }
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [user, isConnected]);
+
+  // Handle tab changes and re-subscribe to specific dashboard type
+  useEffect(() => {
+    if (isConnected && user) {
+      // Unsubscribe from previous tab
+      const previousTabs = ['overview', 'business', 'revenue', 'performance'].filter(tab => tab !== activeTab);
+      previousTabs.forEach(tab => unsubscribeFromAnalytics(tab));
+
+      // Subscribe to new active tab
+      subscribeToAnalytics(activeTab);
+    }
+  }, [activeTab, isConnected]);
+
+  // Set up auto-refresh interval
+  useEffect(() => {
+    if (autoRefresh && user) {
+      const interval = setInterval(() => {
+        fetchAnalyticsData();
+      }, 30000); // Refresh every 30 seconds
+
+      setRefreshInterval(interval);
+
+      return () => clearInterval(interval);
+    } else if (refreshInterval) {
+      clearInterval(refreshInterval);
+      setRefreshInterval(null);
+    }
+  }, [autoRefresh, user]);
+
+  // Listen for WebSocket analytics updates
+  useEffect(() => {
+    const handleAnalyticsUpdate = (event: CustomEvent) => {
+      const { dashboardType, data } = event.detail;
+      console.log('Real-time analytics update:', dashboardType, data);
+
+      // Update appropriate state based on dashboard type
+      if (dashboardType === activeTab) {
+        if (dashboardType === 'business') {
+          setBusinessMetrics(data);
+        } else {
+          setDashboardMetrics(data);
+        }
+      }
+    };
+
+    const handleMetricsUpdate = (event: CustomEvent) => {
+      const { metrics } = event.detail;
+      console.log('Real-time metrics update:', metrics);
+
+      // Refresh data when metrics are updated
+      fetchAnalyticsData();
+    };
+
+    // Add event listeners for WebSocket events
+    window.addEventListener('analyticsUpdate', handleAnalyticsUpdate as EventListener);
+    window.addEventListener('metricsUpdate', handleMetricsUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('analyticsUpdate', handleAnalyticsUpdate as EventListener);
+      window.removeEventListener('metricsUpdate', handleMetricsUpdate as EventListener);
+    };
+  }, [activeTab]);
 
   const fetchAnalyticsData = async () => {
     try {
@@ -539,13 +620,32 @@ export function AnalyticsOverview() {
         </div>
       )}
 
-      {/* Refresh Button */}
+      {/* Real-time Controls */}
       <div className={styles.refreshSection}>
-        <button onClick={fetchAnalyticsData} className={styles.refreshButton}>
-          Refresh Data
-        </button>
+        <div className={styles.refreshControls}>
+          <div className={styles.connectionStatus}>
+            <div className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`}></div>
+            <span className={styles.statusText}>
+              {isConnected ? 'Live' : 'Offline'}
+            </span>
+          </div>
+
+          <label className={styles.autoRefreshToggle}>
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+            />
+            Auto-refresh
+          </label>
+
+          <button onClick={fetchAnalyticsData} className={styles.refreshButton}>
+            Refresh Data
+          </button>
+        </div>
+
         <span className={styles.lastUpdated}>
-          Last updated: {new Date().toLocaleTimeString()}
+          Last updated: {new Date(lastUpdate).toLocaleTimeString()}
         </span>
       </div>
     </div>

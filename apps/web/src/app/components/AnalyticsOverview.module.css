@@ -403,6 +403,90 @@
   align-items: center;
   padding: 20px 0;
   border-top: 1px solid #444;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.refreshControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.connectionStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border-radius: 6px;
+  border: 1px solid #444;
+}
+
+.statusIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.statusIndicator.connected {
+  background: #22c55e;
+}
+
+.statusIndicator.disconnected {
+  background: #ef4444;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.statusText {
+  font-size: 12px;
+  font-weight: 500;
+  color: #ccc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.autoRefreshToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #ccc;
+  cursor: pointer;
+  user-select: none;
+}
+
+.autoRefreshToggle input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #444;
+  border-radius: 3px;
+  background: #1a1a1a;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.autoRefreshToggle input[type="checkbox"]:checked {
+  background: #0070f3;
+  border-color: #0070f3;
+}
+
+.autoRefreshToggle input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .refreshButton {
