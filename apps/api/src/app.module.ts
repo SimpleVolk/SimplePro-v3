@@ -9,9 +9,10 @@ import { AppService } from './app.service';
 
 // Feature modules
 import { EstimatesModule } from './estimates/estimates.module';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
-  imports: [EstimatesModule],
+  imports: [EstimatesModule, CustomersModule],
   controllers: [AppController, HealthController],
   providers: [AppService],
 })

@@ -24,7 +24,8 @@
       "Bash(dir:*)",
       "Bash(npm run clean:*)",
       "Bash(curl:*)",
-      "Bash(npx ts-node:*)"
+      "Bash(npx ts-node:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

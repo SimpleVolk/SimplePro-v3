@@ -168,7 +168,25 @@ export class DeterministicEstimator {
     };
 
     const inputString = JSON.stringify(normalizedInput, Object.keys(normalizedInput).sort());
-    return crypto.createHash('sha256').update(inputString).digest('hex');
+
+    // Try to use Node.js crypto module if available
+    try {
+      const crypto = require('crypto');
+      if (crypto && crypto.createHash) {
+        return crypto.createHash('sha256').update(inputString).digest('hex');
+      }
+    } catch (e) {
+      // crypto module not available
+    }
+
+    // Fallback to a simple string hash for browsers (less secure but deterministic)
+    let hash = 0;
+    for (let i = 0; i < inputString.length; i++) {
+      const char = inputString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(16).padStart(8, '0');
   }
 
   /**
