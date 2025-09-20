@@ -1,0 +1,104 @@
+[
+  {
+    "email": "admin@simplepro.com",
+    "firstName": "Super",
+    "lastName": "Admin",
+    "role": "super_admin",
+    "password": "Admin123!",
+    "permissions": [
+      "users:read", "users:write", "users:delete",
+      "customers:read", "customers:write", "customers:delete",
+      "jobs:read", "jobs:write", "jobs:delete",
+      "estimates:read", "estimates:write",
+      "reports:read", "system:admin"
+    ],
+    "isActive": true,
+    "preferences": {
+      "theme": "dark",
+      "language": "en",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "sms": false
+      },
+      "dashboard": {
+        "widgets": ["stats", "recent_jobs", "calendar", "notifications"]
+      }
+    }
+  },
+  {
+    "email": "dispatcher@simplepro.com",
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "role": "dispatcher",
+    "password": "Dispatch123!",
+    "permissions": [
+      "customers:read", "customers:write",
+      "jobs:read", "jobs:write",
+      "estimates:read", "estimates:write",
+      "crew:read", "crew:assign"
+    ],
+    "isActive": true,
+    "preferences": {
+      "theme": "dark",
+      "language": "en",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "sms": true
+      },
+      "dashboard": {
+        "widgets": ["calendar", "active_jobs", "crew_status"]
+      }
+    }
+  },
+  {
+    "email": "sales@simplepro.com",
+    "firstName": "Michael",
+    "lastName": "Chen",
+    "role": "admin",
+    "password": "Sales123!",
+    "permissions": [
+      "customers:read", "customers:write",
+      "estimates:read", "estimates:write",
+      "jobs:read", "reports:read"
+    ],
+    "isActive": true,
+    "preferences": {
+      "theme": "dark",
+      "language": "en",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "sms": false
+      },
+      "dashboard": {
+        "widgets": ["leads", "estimates", "conversion_stats"]
+      }
+    }
+  },
+  {
+    "email": "crew.lead@simplepro.com",
+    "firstName": "David",
+    "lastName": "Rodriguez",
+    "role": "crew",
+    "password": "Crew123!",
+    "permissions": [
+      "jobs:read", "jobs:update_status",
+      "customers:read"
+    ],
+    "isActive": true,
+    "preferences": {
+      "theme": "dark",
+      "language": "en",
+      "notifications": {
+        "email": false,
+        "browser": true,
+        "sms": true
+      },
+      "dashboard": {
+        "widgets": ["my_jobs", "schedule"]
+      }
+    }
+  }
+]

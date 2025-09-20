@@ -121,6 +121,67 @@
   transform: none;
 }
 
+/* Error Handling Styles */
+.errorAlert {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #fca5a5;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.validationSummary {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #fcd34d;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.validationSummary ul {
+  margin: 0.5rem 0 0 1rem;
+  padding: 0;
+}
+
+.validationSummary li {
+  margin-bottom: 0.25rem;
+}
+
+.fieldError {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.errorMessage {
+  color: #fca5a5;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* Loading State */
+.loadingSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 0.8s ease-in-out infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.submitButton .loadingSpinner {
+  margin-right: 0.75rem;
+}
+
 @media (max-width: 768px) {
   .fieldGroup {
     grid-template-columns: 1fr;

@@ -1,0 +1,148 @@
+[
+  {
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@email.com",
+    "phone": "(555) 123-4567",
+    "alternatePhone": "(555) 987-6543",
+    "address": {
+      "street": "123 Main Street",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62701",
+      "country": "USA"
+    },
+    "type": "residential",
+    "status": "active",
+    "source": "website",
+    "preferredContactMethod": "email",
+    "communicationPreferences": {
+      "allowMarketing": true,
+      "allowSms": true,
+      "allowEmail": true
+    },
+    "notes": "Preferred customer, always pays on time. Has recommended us to 3 other customers.",
+    "leadScore": 95,
+    "tags": ["VIP", "Referrer", "Repeat Customer"],
+    "assignedSalesRep": "sales@simplepro.com",
+    "createdBy": "admin@simplepro.com"
+  },
+  {
+    "firstName": "Emily",
+    "lastName": "Johnson",
+    "email": "emily.johnson@email.com",
+    "phone": "(555) 234-5678",
+    "address": {
+      "street": "456 Oak Avenue",
+      "city": "Chicago",
+      "state": "IL",
+      "zipCode": "60601",
+      "country": "USA"
+    },
+    "type": "residential",
+    "status": "prospect",
+    "source": "referral",
+    "preferredContactMethod": "phone",
+    "communicationPreferences": {
+      "allowMarketing": false,
+      "allowSms": true,
+      "allowEmail": true
+    },
+    "notes": "Moving from Chicago to Springfield. Needs storage for 2 weeks.",
+    "leadScore": 78,
+    "tags": ["Storage Needed", "Long Distance"],
+    "referredBy": {
+      "partnerName": "John Smith",
+      "source": "customer_referral"
+    },
+    "assignedSalesRep": "sales@simplepro.com",
+    "createdBy": "sales@simplepro.com"
+  },
+  {
+    "firstName": "Michael",
+    "lastName": "Brown",
+    "email": "mbrown@techcorp.com",
+    "phone": "(555) 345-6789",
+    "address": {
+      "street": "789 Business Park Drive",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62702",
+      "country": "USA"
+    },
+    "type": "commercial",
+    "status": "lead",
+    "source": "advertising",
+    "companyName": "TechCorp Solutions",
+    "businessLicense": "IL-BUS-12345",
+    "preferredContactMethod": "email",
+    "communicationPreferences": {
+      "allowMarketing": true,
+      "allowSms": false,
+      "allowEmail": true
+    },
+    "notes": "Office relocation project. 50 employees, multiple floors.",
+    "leadScore": 85,
+    "tags": ["Commercial", "Large Job", "Office Move"],
+    "assignedSalesRep": "sales@simplepro.com",
+    "createdBy": "dispatcher@simplepro.com"
+  },
+  {
+    "firstName": "Sarah",
+    "lastName": "Davis",
+    "email": "sarah.davis@email.com",
+    "phone": "(555) 456-7890",
+    "address": {
+      "street": "321 Pine Street",
+      "city": "Decatur",
+      "state": "IL",
+      "zipCode": "62521",
+      "country": "USA"
+    },
+    "type": "residential",
+    "status": "inactive",
+    "source": "social_media",
+    "preferredContactMethod": "text",
+    "communicationPreferences": {
+      "allowMarketing": true,
+      "allowSms": true,
+      "allowEmail": false
+    },
+    "notes": "Completed move 6 months ago. Very satisfied with service.",
+    "leadScore": 60,
+    "tags": ["Completed", "Satisfied"],
+    "assignedSalesRep": "sales@simplepro.com",
+    "createdBy": "admin@simplepro.com"
+  },
+  {
+    "firstName": "Robert",
+    "lastName": "Wilson",
+    "email": "robert.wilson@email.com",
+    "phone": "(555) 567-8901",
+    "address": {
+      "street": "654 Elm Street",
+      "city": "Peoria",
+      "state": "IL",
+      "zipCode": "61601",
+      "country": "USA"
+    },
+    "type": "residential",
+    "status": "prospect",
+    "source": "partner",
+    "preferredContactMethod": "phone",
+    "communicationPreferences": {
+      "allowMarketing": true,
+      "allowSms": true,
+      "allowEmail": true
+    },
+    "notes": "Senior citizen, needs extra care with fragile items. Has antique piano.",
+    "leadScore": 72,
+    "tags": ["Senior", "Piano", "Fragile Items"],
+    "referredBy": {
+      "partnerName": "Springfield Real Estate",
+      "source": "real_estate_partner"
+    },
+    "assignedSalesRep": "sales@simplepro.com",
+    "createdBy": "sales@simplepro.com"
+  }
+]

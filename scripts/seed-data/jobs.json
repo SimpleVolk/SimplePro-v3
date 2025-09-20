@@ -1,0 +1,238 @@
+[
+  {
+    "title": "Smith Family Residential Move",
+    "description": "Complete household move including piano and antiques",
+    "type": "local",
+    "status": "completed",
+    "priority": "normal",
+    "customerId": "john.smith@email.com",
+    "scheduledDate": "2025-01-15",
+    "scheduledStartTime": "08:00",
+    "scheduledEndTime": "16:00",
+    "estimatedDuration": 8,
+    "actualStartTime": "2025-01-15T08:00:00Z",
+    "actualEndTime": "2025-01-15T15:30:00Z",
+    "pickupAddress": {
+      "street": "123 Main Street",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62701",
+      "country": "USA",
+      "accessNotes": "Front door access, 3 steps up",
+      "contactPerson": "John Smith",
+      "contactPhone": "(555) 123-4567"
+    },
+    "deliveryAddress": {
+      "street": "789 New Home Drive",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62703",
+      "country": "USA",
+      "accessNotes": "Garage access available, level entry",
+      "contactPerson": "John Smith",
+      "contactPhone": "(555) 123-4567"
+    },
+    "assignedCrew": [
+      {
+        "crewMemberId": "crew.lead@simplepro.com",
+        "role": "lead",
+        "hourlyRate": 25,
+        "status": "checked_out",
+        "checkInTime": "2025-01-15T07:45:00Z",
+        "checkOutTime": "2025-01-15T15:30:00Z",
+        "hoursWorked": 7.75
+      }
+    ],
+    "leadCrew": "crew.lead@simplepro.com",
+    "estimatedCost": 1200,
+    "actualCost": 1150,
+    "laborCost": 800,
+    "materialsCost": 150,
+    "transportationCost": 200,
+    "specialInstructions": "Handle piano with extra care. Antique furniture requires blanket wrapping.",
+    "createdBy": "sales@simplepro.com"
+  },
+  {
+    "title": "Johnson Long Distance Move",
+    "description": "Chicago to Springfield relocation with temporary storage",
+    "type": "long_distance",
+    "status": "in_progress",
+    "priority": "high",
+    "customerId": "emily.johnson@email.com",
+    "scheduledDate": "2025-01-20",
+    "scheduledStartTime": "07:00",
+    "scheduledEndTime": "18:00",
+    "estimatedDuration": 11,
+    "actualStartTime": "2025-01-20T07:00:00Z",
+    "pickupAddress": {
+      "street": "456 Oak Avenue",
+      "city": "Chicago",
+      "state": "IL",
+      "zipCode": "60601",
+      "country": "USA",
+      "accessNotes": "Apartment building, elevator available",
+      "contactPerson": "Emily Johnson",
+      "contactPhone": "(555) 234-5678"
+    },
+    "deliveryAddress": {
+      "street": "SimplePro Storage Facility",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62701",
+      "country": "USA",
+      "accessNotes": "Storage unit #A-45, dock access",
+      "contactPerson": "Storage Manager",
+      "contactPhone": "(555) 999-0000"
+    },
+    "assignedCrew": [
+      {
+        "crewMemberId": "crew.lead@simplepro.com",
+        "role": "lead",
+        "hourlyRate": 25,
+        "status": "checked_in",
+        "checkInTime": "2025-01-20T06:45:00Z",
+        "hoursWorked": 5.5
+      }
+    ],
+    "leadCrew": "crew.lead@simplepro.com",
+    "estimatedCost": 2800,
+    "laborCost": 1600,
+    "materialsCost": 300,
+    "transportationCost": 900,
+    "specialInstructions": "Items will be stored for 2 weeks before final delivery to new home.",
+    "createdBy": "dispatcher@simplepro.com"
+  },
+  {
+    "title": "TechCorp Office Relocation",
+    "description": "Corporate office move - 3 floors to new building",
+    "type": "local",
+    "status": "scheduled",
+    "priority": "urgent",
+    "customerId": "mbrown@techcorp.com",
+    "scheduledDate": "2025-01-25",
+    "scheduledStartTime": "06:00",
+    "scheduledEndTime": "20:00",
+    "estimatedDuration": 14,
+    "pickupAddress": {
+      "street": "789 Business Park Drive",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62702",
+      "country": "USA",
+      "accessNotes": "Freight elevator, weekend access required",
+      "contactPerson": "Michael Brown",
+      "contactPhone": "(555) 345-6789"
+    },
+    "deliveryAddress": {
+      "street": "1000 Corporate Plaza",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62704",
+      "country": "USA",
+      "accessNotes": "Loading dock, security clearance required",
+      "contactPerson": "Facilities Manager",
+      "contactPhone": "(555) 345-6789"
+    },
+    "assignedCrew": [
+      {
+        "crewMemberId": "crew.lead@simplepro.com",
+        "role": "lead",
+        "hourlyRate": 25,
+        "status": "assigned"
+      }
+    ],
+    "leadCrew": "crew.lead@simplepro.com",
+    "estimatedCost": 5500,
+    "laborCost": 3500,
+    "materialsCost": 800,
+    "transportationCost": 1200,
+    "specialInstructions": "IT equipment requires special handling. Must complete over weekend to minimize business disruption.",
+    "createdBy": "sales@simplepro.com"
+  },
+  {
+    "title": "Wilson Piano and Antiques Move",
+    "description": "Specialized move for senior customer with valuable items",
+    "type": "local",
+    "status": "scheduled",
+    "priority": "high",
+    "customerId": "robert.wilson@email.com",
+    "scheduledDate": "2025-01-22",
+    "scheduledStartTime": "09:00",
+    "scheduledEndTime": "15:00",
+    "estimatedDuration": 6,
+    "pickupAddress": {
+      "street": "654 Elm Street",
+      "city": "Peoria",
+      "state": "IL",
+      "zipCode": "61601",
+      "country": "USA",
+      "accessNotes": "Narrow doorway, stairs to second floor",
+      "contactPerson": "Robert Wilson",
+      "contactPhone": "(555) 567-8901"
+    },
+    "deliveryAddress": {
+      "street": "111 Retirement Village Lane",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62705",
+      "country": "USA",
+      "accessNotes": "Ground floor unit, wide hallways",
+      "contactPerson": "Robert Wilson",
+      "contactPhone": "(555) 567-8901"
+    },
+    "assignedCrew": [
+      {
+        "crewMemberId": "crew.lead@simplepro.com",
+        "role": "lead",
+        "hourlyRate": 25,
+        "status": "confirmed"
+      }
+    ],
+    "leadCrew": "crew.lead@simplepro.com",
+    "estimatedCost": 1800,
+    "laborCost": 1200,
+    "materialsCost": 300,
+    "transportationCost": 300,
+    "specialInstructions": "Baby grand piano requires professional piano movers. Customer is elderly and needs patient, careful service.",
+    "createdBy": "dispatcher@simplepro.com"
+  },
+  {
+    "title": "Davis Storage Unit Pickup",
+    "description": "Retrieve items from storage and deliver to new home",
+    "type": "storage",
+    "status": "on_hold",
+    "priority": "low",
+    "customerId": "sarah.davis@email.com",
+    "scheduledDate": "2025-01-28",
+    "scheduledStartTime": "10:00",
+    "scheduledEndTime": "14:00",
+    "estimatedDuration": 4,
+    "pickupAddress": {
+      "street": "SimplePro Storage Facility",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62701",
+      "country": "USA",
+      "accessNotes": "Storage unit #B-12, ground level",
+      "contactPerson": "Storage Manager",
+      "contactPhone": "(555) 999-0000"
+    },
+    "deliveryAddress": {
+      "street": "321 Pine Street",
+      "city": "Decatur",
+      "state": "IL",
+      "zipCode": "62521",
+      "country": "USA",
+      "accessNotes": "Driveway access, no stairs",
+      "contactPerson": "Sarah Davis",
+      "contactPhone": "(555) 456-7890"
+    },
+    "assignedCrew": [],
+    "estimatedCost": 600,
+    "laborCost": 400,
+    "materialsCost": 50,
+    "transportationCost": 150,
+    "specialInstructions": "Customer requested delay due to home repairs. Will reschedule when ready.",
+    "createdBy": "admin@simplepro.com"
+  }
+]

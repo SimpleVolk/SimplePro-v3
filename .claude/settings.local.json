@@ -36,7 +36,12 @@
       "Bash(grep:*)",
       "Bash(npm run lint)",
       "Bash(nx lint:*)",
-      "Bash(npx nx lint:*)"
+      "Bash(npx nx lint:*)",
+      "Bash(npm run docker:dev:*)",
+      "Bash(nx test:*)",
+      "Bash(npm run test:api:*)",
+      "Bash(npm run test:unit:*)",
+      "Bash(npm run test:api:integration:*)"
     ],
     "deny": [],
     "ask": []
