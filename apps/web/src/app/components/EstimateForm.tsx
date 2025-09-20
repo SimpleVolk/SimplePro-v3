@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
-import type { EstimateInput } from '@simplepro/pricing-engine';
+import type { EstimateInput, EstimateResult } from '@simplepro/pricing-engine';
 import styles from './EstimateForm.module.css';
 
 interface EstimateFormProps {
-  onEstimateComplete: (result: any) => void;
+  onEstimateComplete: (result: EstimateResult) => void;
 }
 
 export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
@@ -80,12 +80,12 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
       const estimateInput: EstimateInput = {
         ...formData,
         rooms,
-        moveDate: new Date(formData.moveDate!),
+        moveDate: new Date(formData.moveDate || ''),
       } as EstimateInput;
 
       const estimator = new DeterministicEstimator(
-        defaultRules.pricingRules as any,
-        defaultRules.locationHandicaps as any
+        defaultRules.pricingRules,
+        defaultRules.locationHandicaps
       );
 
       const result = estimator.calculateEstimate(estimateInput, 'web-user');
@@ -98,14 +98,14 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
     }
   };
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const updateNestedField = (parent: string, field: string, value: any) => {
+  const updateNestedField = (parent: string, field: string, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
-      [parent]: { ...(prev[parent as keyof typeof prev] as any), [field]: value }
+      [parent]: { ...(prev[parent as keyof typeof prev] as Record<string, unknown>), [field]: value }
     }));
   };
 

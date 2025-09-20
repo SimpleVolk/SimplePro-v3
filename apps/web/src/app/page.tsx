@@ -1,35 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { EstimateForm } from './components/EstimateForm';
-import { EstimateResult } from './components/EstimateResult';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginForm } from './components/LoginForm';
+import { Dashboard } from './components/Dashboard';
 import styles from './page.module.css';
 
-export default function Index() {
-  const [estimateResult, setEstimateResult] = useState(null);
+function AppContent() {
+  const { isAuthenticated, isLoading } = useAuth();
 
-  return (
-    <div className={styles.page}>
-      <div className="wrapper">
-        <div className="container">
-          <header className={styles.header}>
-            <h1>SimplePro Moving Estimates</h1>
-            <p>Get accurate, deterministic pricing for your move</p>
-          </header>
-
-          <main className={styles.main}>
-            <div className={styles.formSection}>
-              <EstimateForm onEstimateComplete={setEstimateResult} />
-            </div>
-
-            {estimateResult && (
-              <div className={styles.resultSection}>
-                <EstimateResult result={estimateResult} />
-              </div>
-            )}
-          </main>
-        </div>
+  if (isLoading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <p>Loading...</p>
       </div>
-    </div>
+    );
+  }
+
+  return isAuthenticated ? <Dashboard /> : <LoginForm />;
+}
+
+export default function Index() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

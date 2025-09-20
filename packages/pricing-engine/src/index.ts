@@ -1,5 +1,6 @@
 export { DeterministicEstimator } from './estimator';
 export * from './schemas/rules.schema';
+export type { EstimateResult, EstimateInput, PricingRule, LocationHandicap } from './schemas/rules.schema';
 export { sampleInputs } from './test-data/sample-inputs';
 
 // Re-export default rules and inventory catalog for easy access
