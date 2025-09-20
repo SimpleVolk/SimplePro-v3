@@ -205,7 +205,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       jobId?: string;
     }
   ) {
-    if (client.userRole !== 'crew') {
+    if (!client.userRole || client.userRole !== 'crew') {
       client.emit('error', { message: 'Unauthorized: Only crew can send location updates' });
       return;
     }
@@ -245,7 +245,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       jobId?: string;
     }
   ) {
-    if (client.userRole !== 'crew') {
+    if (!client.userRole || client.userRole !== 'crew') {
       client.emit('error', { message: 'Unauthorized: Only crew can send status updates' });
       return;
     }
@@ -311,7 +311,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         }
         break;
       case 'broadcast':
-        if (client.userRole === 'admin' || client.userRole === 'super_admin') {
+        if (client.userRole && (client.userRole === 'admin' || client.userRole === 'super_admin')) {
           this.server.emit('broadcast', messageData);
         } else {
           client.emit('error', { message: 'Unauthorized: Only admins can broadcast' });
@@ -404,7 +404,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @MessageBody() data: { dashboardType?: 'overview' | 'business' | 'revenue' | 'performance' }
   ) {
     // Only allow admin and dispatcher roles to subscribe to analytics
-    if (!['admin', 'super_admin', 'dispatcher'].includes(client.userRole)) {
+    if (!client.userRole || !['admin', 'super_admin', 'dispatcher'].includes(client.userRole)) {
       client.emit('error', { message: 'Unauthorized: Only admins and dispatchers can access analytics' });
       return;
     }
