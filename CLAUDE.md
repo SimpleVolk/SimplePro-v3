@@ -230,6 +230,7 @@ The pricing engine includes extensive test coverage with multiple scenarios (stu
 The Next.js web application provides a complete estimate calculator interface:
 
 **EstimateForm Component (`apps/web/src/app/components/EstimateForm.tsx`):**
+
 - Comprehensive form for move details collection
 - Service type selection (local, long distance, packing only)
 - Pickup/delivery location with access difficulty assessment
@@ -239,6 +240,7 @@ The Next.js web application provides a complete estimate calculator interface:
 - Real-time validation and error handling
 
 **EstimateResult Component (`apps/web/src/app/components/EstimateResult.tsx`):**
+
 - Complete price breakdown display
 - Applied pricing rules with explanations
 - Location handicaps and adjustments
@@ -246,6 +248,7 @@ The Next.js web application provides a complete estimate calculator interface:
 - Professional dark theme styling
 
 **Key Technical Features:**
+
 - **Mobile-first responsive design** with dark theme
 - **Direct pricing engine integration** using `@simplepro/pricing-engine`
 - **TypeScript with strict type checking**
@@ -286,6 +289,7 @@ When working across packages:
 The core estimation system is **fully functional and production-ready**:
 
 #### **API Server** (`localhost:4002`)
+
 - ✅ **NestJS REST API** with complete estimate calculation endpoint
 - ✅ **CORS Configuration** supporting multiple frontend origins
 - ✅ **Pricing Engine Integration** with deterministic calculations
@@ -293,10 +297,12 @@ The core estimation system is **fully functional and production-ready**:
 - ✅ **Cross-Platform Compatibility** (Node.js + Browser environments)
 
 **Available Endpoints:**
+
 - `GET /api/health` - Health check endpoint
 - `POST /api/estimates/calculate` - Complete estimate calculation with pricing rules
 
 **Sample API Response:**
+
 ```json
 {
   "success": true,
@@ -325,6 +331,7 @@ The core estimation system is **fully functional and production-ready**:
 ```
 
 #### **Web Application** (`localhost:3008`)
+
 - ✅ **Next.js Frontend** with dark theme mobile-first design
 - ✅ **Estimate Calculator Form** with comprehensive input validation
 - ✅ **Real-time Price Calculations** using pricing engine
@@ -332,6 +339,7 @@ The core estimation system is **fully functional and production-ready**:
 - ✅ **Responsive Design** optimized for moving company workflows
 
 #### **Pricing Engine** (`@simplepro/pricing-engine`)
+
 - ✅ **Deterministic Calculations** - identical inputs produce identical outputs
 - ✅ **Comprehensive Rule Engine** with 15+ pricing rules and location handicaps
 - ✅ **38 Passing Unit Tests** covering all calculation scenarios
@@ -350,30 +358,35 @@ The core estimation system is **fully functional and production-ready**:
 With the core estimation system complete, the next priorities focus on business operations:
 
 ### 1. Customer Relationship Management
+
 - Customer database with contact management
 - Lead tracking and follow-up automation
 - Quote history and conversion tracking
 - Partner/referral source integration
 
 ### 2. Operations & Dispatch Management
+
 - Job scheduling and crew assignment
 - Real-time job status tracking
 - Resource allocation and availability management
 - Dispatch calendar with drag-and-drop interface
 
 ### 3. Authentication & Security
+
 - SSO integration with enterprise identity providers
 - Role-based access control (RBAC) system
 - PII data masking and encryption
 - Complete audit logging for compliance
 
 ### 4. Data Persistence & Infrastructure
+
 - MongoDB integration with data models
 - Database migrations and seed data
 - Docker-compose deployment configuration
 - Backup and disaster recovery procedures
 
 ### 5. Mobile Crew Application
+
 - React Native app for field crews
 - Offline capability with data synchronization
 - Signature and photo capture for job completion
