@@ -25,7 +25,8 @@
       "Bash(npm run clean:*)",
       "Bash(curl:*)",
       "Bash(npx ts-node:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(docker-compose:*)"
     ],
     "deny": [],
     "ask": []
