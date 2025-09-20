@@ -1,4 +1,31 @@
-import * as crypto from 'crypto';
+// Browser-compatible UUID generation
+function generateUUID(): string {
+  // Try to use crypto.randomUUID if available (Node.js 15+ or modern browsers)
+  try {
+    const crypto = require('crypto');
+    if (crypto && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+  } catch (e) {
+    // crypto module not available in browser
+  }
+
+  // Fallback to crypto.getRandomValues for browsers
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = (window.crypto.getRandomValues(new Uint8Array(1))[0] & 15) | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  // Final fallback using Math.random (less secure but works everywhere)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 import {
   EstimateInput,
   EstimateResult,
@@ -81,7 +108,7 @@ export class DeterministicEstimator {
     const breakdown = this.createPriceBreakdown(input, basePrice, appliedRules, appliedHandicaps, currentPrice);
 
     return {
-      estimateId: crypto.randomUUID(),
+      estimateId: generateUUID(),
       input,
       calculations: {
         basePrice,

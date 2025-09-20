@@ -5,15 +5,14 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nx/node:build",
+      "executor": "@nx/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "target": "node",
         "outputPath": "dist/apps/api",
         "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
-        "assets": [
-          "apps/api/src/assets"
-        ]
+        "webpackConfig": "apps/api/webpack.config.js"
       },
       "configurations": {
         "production": {
@@ -30,14 +29,18 @@
       }
     },
     "serve": {
-      "executor": "@nx/node:execute",
+      "executor": "nx:run-commands",
       "options": {
-        "buildTarget": "api:build"
+        "command": "node dist/apps/api/main.js",
+        "cwd": "{workspaceRoot}"
       },
-      "configurations": {
-        "production": {
-          "buildTarget": "api:build:production"
-        }
+      "dependsOn": ["build"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx nodemon --watch apps/api/src --ext ts --exec \"npx ts-node --project apps/api/tsconfig.app.json apps/api/src/main.ts\"",
+        "cwd": "{workspaceRoot}"
       }
     },
     "lint": {

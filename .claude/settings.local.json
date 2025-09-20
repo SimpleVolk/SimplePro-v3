@@ -9,7 +9,22 @@
       "Bash(npm run build:*)",
       "Bash(npx nx serve:*)",
       "Bash(npx nx build:*)",
-      "Bash(npx nx dev:*)"
+      "Bash(npx nx dev:*)",
+      "Bash(nx build:*)",
+      "Bash(npm install)",
+      "Bash(npx nx list:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx nx show projects:*)",
+      "Bash(npx nx show:*)",
+      "Bash(pkill:*)",
+      "Bash(npx tsc:*)",
+      "Bash(nx reset:*)",
+      "Bash(npx nx reset:*)",
+      "Bash(dir:*)",
+      "Bash(npm run clean:*)",
+      "Bash(curl:*)",
+      "Bash(npx ts-node:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly configService: ConfigService) {}
-
   getInfo() {
     return {
       name: 'SimplePro API',
       description: 'Moving Company Management System API',
-      environment: this.configService.get<string>('NODE_ENV'),
+      environment: process.env.NODE_ENV || 'development',
       timestamp: new Date().toISOString(),
     };
   }
