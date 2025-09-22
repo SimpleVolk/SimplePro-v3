@@ -10,6 +10,7 @@ export interface User {
   phoneNumber?: string;
   crewId?: string;
   isActive: boolean;
+  mustChangePassword: boolean;
   lastLoginAt?: Date;
   permissions: Permission[];
 

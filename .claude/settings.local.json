@@ -43,7 +43,18 @@
       "Bash(npm run test:unit:*)",
       "Bash(npm run test:api:integration:*)",
       "Bash(npm run:*)",
-      "Bash(npx next dev:*)"
+      "Bash(npx next dev:*)",
+      "Bash(cat:*)",
+      "Bash(npm audit:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx syncpack list-mismatches:*)",
+      "Bash(npx depcheck:*)",
+      "Bash(npm test)",
+      "Bash(npm update:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

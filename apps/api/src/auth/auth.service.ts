@@ -84,10 +84,15 @@ export class AuthService implements OnModuleInit {
     const adminRole = this.roles.get('role_super_admin');
     if (!adminRole) return;
 
+    // Generate a secure random password
+    const crypto = require('crypto');
+    const randomPassword = crypto.randomBytes(16).toString('hex');
+    const passwordHash = await bcrypt.hash(randomPassword, 12);
+
     const adminUser = new this.userModel({
       username: 'admin',
       email: 'admin@simplepro.com',
-      passwordHash: await bcrypt.hash('admin123', 12),
+      passwordHash,
       firstName: 'System',
       lastName: 'Administrator',
       role: adminRole,
@@ -111,9 +116,22 @@ export class AuthService implements OnModuleInit {
       },
       createdBy: 'system',
       lastModifiedBy: 'system',
+      // Force password change on first login
+      mustChangePassword: true,
     });
 
     await adminUser.save();
+
+    // Log the temporary password for initial setup (this should be handled via secure channel in production)
+    console.warn(`
+    ⚠️  SECURITY NOTICE: Default admin user created with temporary password.
+    Username: admin
+    Temporary Password: ${randomPassword}
+
+    ❗ IMPORTANT: This password must be changed on first login.
+    ❗ Store this password securely and change it immediately after first login.
+    ❗ This message will only be shown once.
+    `);
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponse> {
@@ -132,6 +150,11 @@ export class AuthService implements OnModuleInit {
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHash);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if password change is required
+    if (user.mustChangePassword) {
+      throw new UnauthorizedException('Password change required. Please change your password before continuing.');
     }
 
     // Update last login
@@ -378,6 +401,7 @@ export class AuthService implements OnModuleInit {
 
     // Update user
     user.passwordHash = newPasswordHash;
+    user.mustChangePassword = false; // Clear password change requirement
     user.lastModifiedBy = id; // User updating their own password
     await user.save();
 
@@ -445,6 +469,7 @@ export class AuthService implements OnModuleInit {
       department: doc.department,
       phoneNumber: doc.phoneNumber,
       isActive: doc.isActive,
+      mustChangePassword: doc.mustChangePassword,
       lastLoginAt: doc.lastLoginAt,
       permissions: doc.permissions,
       profilePicture: doc.profilePicture,

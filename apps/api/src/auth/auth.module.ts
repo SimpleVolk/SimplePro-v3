@@ -16,7 +16,22 @@ import { UserSession as UserSessionSchema, UserSessionSchema as UserSessionSchem
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'simplepro-development-secret-key-change-in-production',
+      secret: (() => {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+          throw new Error(
+            'JWT_SECRET environment variable is required. ' +
+            'Please set a strong, randomly generated secret key for production use.'
+          );
+        }
+        if (secret.length < 32) {
+          throw new Error(
+            'JWT_SECRET must be at least 32 characters long for security. ' +
+            'Please use a strong, randomly generated secret key.'
+          );
+        }
+        return secret;
+      })(),
       signOptions: {
         expiresIn: '1h',
       },

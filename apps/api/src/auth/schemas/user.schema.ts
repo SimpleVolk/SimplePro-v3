@@ -36,6 +36,9 @@ export class User {
   @Prop({ default: true, index: true })
   isActive!: boolean;
 
+  @Prop({ default: false })
+  mustChangePassword!: boolean;
+
   @Prop({ type: Date })
   lastLoginAt?: Date;
 

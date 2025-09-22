@@ -97,3 +97,18 @@ AnalyticsEventSchema.index({ processed: 1 });
 // Compound indexes for common queries
 AnalyticsEventSchema.index({ category: 1, eventType: 1, timestamp: -1 });
 AnalyticsEventSchema.index({ revenue: -1, timestamp: -1 });
+
+// Additional performance indexes
+AnalyticsEventSchema.index({ userId: 1, category: 1, timestamp: -1 });
+AnalyticsEventSchema.index({ customerId: 1, eventType: 1 }, { sparse: true });
+AnalyticsEventSchema.index({ jobId: 1, timestamp: -1 }, { sparse: true });
+AnalyticsEventSchema.index({ processed: 1, processedAt: 1 });
+
+// Partial indexes for better performance
+AnalyticsEventSchema.index(
+  { revenue: -1, timestamp: -1 },
+  { partialFilterExpression: { revenue: { $exists: true, $gt: 0 } } }
+);
+
+// TTL index for automatic cleanup of old events (optional - keep 2 years)
+AnalyticsEventSchema.index({ timestamp: 1 }, { expireAfterSeconds: 63072000 }); // 2 years

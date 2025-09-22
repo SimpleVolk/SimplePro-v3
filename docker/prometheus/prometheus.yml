@@ -1,40 +1,65 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    monitor: 'simplepro-monitor'
+    environment: 'production'
 
 rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+  - "/etc/prometheus/rules/*.yml"
 
 scrape_configs:
+  # Prometheus self-monitoring
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+    scrape_interval: 15s
+    metrics_path: '/metrics'
 
+  # SimplePro API Application
   - job_name: 'simplepro-api'
     static_configs:
       - targets: ['api:4000']
     metrics_path: '/api/metrics'
     scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+    params:
+      format: ['prometheus']
 
+  # SimplePro Web Application
   - job_name: 'simplepro-web'
     static_configs:
       - targets: ['web:3000']
-    metrics_path: '/metrics'
+    metrics_path: '/health'
     scrape_interval: 30s
+    scrape_timeout: 10s
 
+  # Nginx Reverse Proxy
   - job_name: 'nginx'
     static_configs:
       - targets: ['nginx:80']
-    metrics_path: '/nginx_status'
+    metrics_path: '/health'
     scrape_interval: 30s
+    scrape_timeout: 10s
 
-  - job_name: 'mongodb'
+  # MongoDB Database
+  - job_name: 'mongodb-exporter'
     static_configs:
-      - targets: ['mongodb:27017']
+      - targets: ['mongodb-exporter:9216']
     scrape_interval: 30s
+    scrape_timeout: 10s
 
-  - job_name: 'redis'
+  # Redis Cache
+  - job_name: 'redis-exporter'
     static_configs:
-      - targets: ['redis:6379']
+      - targets: ['redis-exporter:9121']
     scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Node Exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+    scrape_timeout: 10s
