@@ -6,28 +6,20 @@ This directory contains operational scripts for SimplePro-v3 deployment, mainten
 
 ### Deployment Scripts
 
-| Script | Purpose | Usage |
-|--------|---------|-------|
 | `deploy-prod.sh` | Production deployment with validation | `./deploy-prod.sh [deploy|health|help]` |
 | `deploy-dev.sh` | Development environment setup | `./deploy-dev.sh` |
 | `validate-environment.sh` | Environment validation and checks | `./validate-environment.sh` |
 
 ### Security and Secrets Management
 
-| Script | Purpose | Usage |
-|--------|---------|-------|
 | `secrets-management.sh` | Production secrets management | `./secrets-management.sh [setup|validate|rotate|cleanup]` |
 
 ### Backup and Recovery
 
-| Script | Purpose | Usage |
-|--------|---------|-------|
-| `backup-restore.sh` | Backup and disaster recovery | `./backup-restore.sh [backup|restore-mongodb|restore-redis|cleanup|health]` |
+|`backup-restore.sh` | Backup and disaster recovery | `./backup-restore.sh [backup|restore-mongodb|restore-redis|cleanup|health]` |
 
 ### Database Operations
 
-| Script | Purpose | Usage |
-|--------|---------|-------|
 | `seed-database.js` | Database seeding with test data | `node seed-database.js` |
 | `validate-seed-data.js` | Validate seeded data integrity | `node validate-seed-data.js` |
 
@@ -38,6 +30,7 @@ This directory contains operational scripts for SimplePro-v3 deployment, mainten
 Comprehensive production deployment script with validation, monitoring, and rollback capabilities.
 
 **Features:**
+
 - Pre-deployment environment validation
 - Automated secrets and SSL setup
 - Service health monitoring
@@ -46,6 +39,7 @@ Comprehensive production deployment script with validation, monitoring, and roll
 - Detailed deployment reporting
 
 **Usage Examples:**
+
 ```bash
 # Full production deployment
 ./scripts/deploy-prod.sh
@@ -58,6 +52,7 @@ HEALTH_CHECK_TIMEOUT=600 ./scripts/deploy-prod.sh
 ```
 
 **Environment Variables:**
+
 - `ENVIRONMENT`: Deployment environment (default: production)
 - `BACKUP_BEFORE_DEPLOY`: Create backup before deploy (default: true)
 - `HEALTH_CHECK_TIMEOUT`: Health check timeout in seconds (default: 300)
@@ -68,6 +63,7 @@ HEALTH_CHECK_TIMEOUT=600 ./scripts/deploy-prod.sh
 Validates deployment environment for production readiness.
 
 **Validation Checks:**
+
 - Docker installation and daemon status
 - Node.js and npm versions
 - System resources (memory, disk space)
@@ -78,11 +74,13 @@ Validates deployment environment for production readiness.
 - Secrets management setup
 
 **Usage:**
+
 ```bash
 ./scripts/validate-environment.sh
 ```
 
 **Output:**
+
 - Pass/fail status for each check
 - Detailed warnings and recommendations
 - Summary report with remediation steps
@@ -92,6 +90,7 @@ Validates deployment environment for production readiness.
 Secure management of production secrets and credentials.
 
 **Features:**
+
 - Automated secret generation
 - Secure storage with proper permissions
 - Secret validation and health checks
@@ -99,6 +98,7 @@ Secure management of production secrets and credentials.
 - Backup cleanup and management
 
 **Commands:**
+
 ```bash
 # Initial setup (first time)
 ./scripts/secrets-management.sh setup
@@ -110,10 +110,12 @@ Secure management of production secrets and credentials.
 ./scripts/secrets-management.sh rotate
 
 # Clean old secret backups
+
 ./scripts/secrets-management.sh cleanup
 ```
 
 **Generated Secrets:**
+
 - MongoDB admin password (24 characters)
 - Redis password (24 characters)
 - JWT secret (64-character hex)
@@ -122,6 +124,7 @@ Secure management of production secrets and credentials.
 - Grafana admin password (16 characters)
 
 **Security Features:**
+
 - 600 permissions on secret files
 - Secure random generation using OpenSSL
 - Automatic backup before rotation
@@ -132,6 +135,7 @@ Secure management of production secrets and credentials.
 Comprehensive backup and disaster recovery system.
 
 **Backup Components:**
+
 - MongoDB database (compressed archive)
 - Redis cache (RDB and AOF files)
 - Application and Docker logs
@@ -140,6 +144,7 @@ Comprehensive backup and disaster recovery system.
 - Backup manifest with checksums
 
 **Features:**
+
 - Automated full system backups
 - Individual component backup/restore
 - Backup verification and integrity checks
@@ -147,6 +152,7 @@ Comprehensive backup and disaster recovery system.
 - Health checks after restore operations
 
 **Usage Examples:**
+
 ```bash
 # Full system backup
 ./scripts/backup-restore.sh backup
@@ -165,6 +171,7 @@ Comprehensive backup and disaster recovery system.
 ```
 
 **Backup Schedule Recommendations:**
+
 - Daily: Full system backup (automated via cron)
 - Hourly: Database incremental backup during business hours
 - Weekly: Complete volume backup for disaster recovery
@@ -174,6 +181,7 @@ Comprehensive backup and disaster recovery system.
 Populates the database with comprehensive test data for development and testing.
 
 **Seeded Data:**
+
 - User accounts with different roles
 - Customer records (residential and commercial)
 - Job records with various statuses
@@ -181,6 +189,7 @@ Populates the database with comprehensive test data for development and testing.
 - Historical data for analytics testing
 
 **Usage:**
+
 ```bash
 # Seed development database
 NODE_ENV=development node scripts/seed-database.js
@@ -194,6 +203,7 @@ DATABASE_URL=mongodb://localhost:27017/test node scripts/seed-database.js
 Validates database integrity and data consistency after seeding.
 
 **Validation Checks:**
+
 - User account integrity
 - Role and permission assignments
 - Customer data consistency
@@ -201,6 +211,7 @@ Validates database integrity and data consistency after seeding.
 - Pricing calculation accuracy
 
 **Usage:**
+
 ```bash
 node scripts/validate-seed-data.js
 ```
@@ -214,16 +225,19 @@ The `docker/ssl/` directory contains SSL certificate management tools:
 Creates self-signed certificates for development and testing.
 
 **Usage:**
+
 ```bash
 ./docker/ssl/generate-certs.sh
 ```
 
 **Output:**
+
 - `cert.pem`: SSL certificate
 - `key.pem`: Private key
 - Certificate information display
 
 **Security Notes:**
+
 - Development/testing only - use CA certificates for production
 - 2048-bit RSA keys
 - 365-day validity period
@@ -243,6 +257,7 @@ Creates self-signed certificates for development and testing.
 ### Node.js Dependencies
 
 Scripts use the following npm packages:
+
 - `mongoose` for MongoDB operations
 - `bcrypt` for password hashing
 - Environment-specific packages as defined in package.json
@@ -259,6 +274,7 @@ Scripts use the following npm packages:
 ### File Permissions
 
 Ensure proper permissions on executable scripts:
+
 ```bash
 chmod +x scripts/*.sh
 chmod +x docker/ssl/generate-certs.sh
