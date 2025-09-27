@@ -14,7 +14,7 @@ import PhotoScreen from './screens/PhotoScreen';
 import OfflineScreen from './screens/OfflineScreen';
 import { useAuth } from './hooks/useAuth';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
-import { darkTheme } from './theme/colors';
+import { darkTheme } from '../theme/colors';
 
 const Stack = createStackNavigator();
 

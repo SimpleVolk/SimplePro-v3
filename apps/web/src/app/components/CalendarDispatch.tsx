@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getApiUrl } from '@/lib/config';
 import styles from './CalendarDispatch.module.css';
 
 interface Job {
@@ -50,7 +51,6 @@ interface CalendarDay {
   isCurrentMonth: boolean;
 }
 
-const API_BASE_URL = 'http://localhost:4000/api';
 
 export function CalendarDispatch() {
   const { user: _user } = useAuth();
@@ -76,11 +76,11 @@ export function CalendarDispatch() {
       setLoading(true);
       const token = localStorage.getItem('access_token');
 
-      let url = `${API_BASE_URL}/jobs`;
+      let url = getApiUrl('jobs');
 
       if (viewMode === 'week') {
         const startDate = getWeekStart(currentDate);
-        url = `${API_BASE_URL}/jobs/calendar/week/${formatDate(startDate)}`;
+        url = getApiUrl(`jobs/calendar/week/${formatDate(startDate)}`);
       }
 
       const response = await fetch(url, {

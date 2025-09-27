@@ -55,7 +55,7 @@ export class AnalyticsOptimizedService {
     const cacheKey = `dashboard:metrics:${filters.startDate.getTime()}-${filters.endDate.getTime()}`;
 
     // Try cache first
-    const cached = await this.cacheService.getAnalyticsCache(cacheKey);
+    const cached = await this.cacheService.getAnalyticsCache<OptimizedDashboardMetrics>(cacheKey);
     if (cached) {
       return cached;
     }
@@ -212,8 +212,7 @@ export class AnalyticsOptimizedService {
           processed: false
         })),
         {
-          ordered: false, // Continue on error
-          writeConcern: { w: 'majority', j: true }
+          ordered: false // Continue on error
         }
       );
 
@@ -246,7 +245,7 @@ export class AnalyticsOptimizedService {
     const cacheKey = `events:${JSON.stringify(filters)}:${page}:${limit}`;
 
     // Try cache first
-    const cached = await this.cacheService.getAnalyticsCache(cacheKey);
+    const cached = await this.cacheService.getAnalyticsCache<OptimizedDashboardMetrics>(cacheKey);
     if (cached) {
       return cached;
     }

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { getWebSocketUrl } from '@/lib/config';
 
 interface WebSocketContextType {
   socket: Socket | null;
@@ -31,7 +32,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     if (!token) return;
 
     // Create socket connection
-    const newSocket = io('http://localhost:4000/realtime', {
+    const newSocket = io(getWebSocketUrl(), {
       auth: {
         token: token,
       },

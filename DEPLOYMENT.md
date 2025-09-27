@@ -1,18 +1,92 @@
-# SimplePro-v3 Production Deployment Guide
+# SimplePro-v3 Enterprise Deployment Guide
 
-This document provides comprehensive instructions for deploying SimplePro-v3 to production environments.
+**🚀 Production-Ready Deployment Infrastructure for SimplePro**
 
-## Table of Contents
+---
 
-1. [Prerequisites](#prerequisites)
-2. [Infrastructure Overview](#infrastructure-overview)
-3. [Security Configuration](#security-configuration)
-4. [Environment Setup](#environment-setup)
-5. [Deployment Process](#deployment-process)
-6. [Monitoring and Observability](#monitoring-and-observability)
-7. [Backup and Disaster Recovery](#backup-and-disaster-recovery)
-8. [Maintenance and Operations](#maintenance-and-operations)
-9. [Troubleshooting](#troubleshooting)
+## 🎯 **Deployment Architecture Overview**
+
+SimplePro-v3 now features **enterprise-grade deployment infrastructure** with multiple deployment strategies, comprehensive monitoring, and zero-downtime capabilities.
+
+### **🏗️ Infrastructure Components**
+
+#### **Core Application Stack**
+- **API Server**: NestJS with MongoDB, Redis, JWT authentication
+- **Web Application**: Next.js with Server-Side Rendering
+- **Database**: MongoDB with replication and backup
+- **Cache**: Redis with persistence and high availability
+- **Reverse Proxy**: Nginx with SSL termination and load balancing
+
+#### **Monitoring & Observability**
+- **Metrics**: Prometheus + Grafana with custom dashboards
+- **Logging**: ELK Stack (Elasticsearch + Logstash + Kibana)
+- **APM**: Elastic APM with distributed tracing
+- **Alerting**: AlertManager with Slack/Email notifications
+- **Uptime Monitoring**: Blackbox Exporter for external monitoring
+
+#### **Security & Compliance**
+- **Container Scanning**: Trivy for vulnerability assessment
+- **Code Analysis**: CodeQL for security scanning
+- **SSL/TLS**: Automated certificate management
+- **Secrets Management**: Encrypted secrets with rotation
+- **RBAC**: Role-based access control throughout
+
+---
+
+## 🚀 **Deployment Strategies**
+
+### **1. Standard Production Deployment**
+
+```bash
+# Standard production deployment
+npm run docker:prod
+
+# With monitoring stack
+docker-compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml up -d
+```
+
+**Features:**
+- Single environment deployment
+- Full monitoring and alerting
+- Automated health checks
+- Resource optimization
+
+### **2. Blue-Green Zero-Downtime Deployment**
+
+```bash
+# Deploy new version with zero downtime
+./scripts/blue-green-deploy.sh deploy v1.2.3
+
+# Check deployment status
+./scripts/blue-green-deploy.sh status
+
+# Manual traffic switch (if needed)
+./scripts/blue-green-deploy.sh switch
+
+# Emergency rollback
+./scripts/blue-green-deploy.sh rollback
+```
+
+**Features:**
+- Zero-downtime deployments
+- Automated traffic switching
+- Health check validation
+- Instant rollback capability
+- Deployment validation
+
+### **3. CI/CD Automated Deployment**
+
+**GitHub Actions Workflows:**
+- **`ci-cd.yml`**: Complete CI/CD pipeline with testing and security scanning
+- **`production-deploy.yml`**: Production deployment with approval gates
+- **`dependency-update.yml`**: Automated dependency updates
+
+**Pipeline Features:**
+- Automated testing (unit, integration, performance)
+- Security vulnerability scanning
+- Docker image building and scanning
+- Blue-green deployment automation
+- Slack notifications and reporting
 
 ## Prerequisites
 
@@ -107,195 +181,8 @@ Set up production secrets:
 ./scripts/secrets-management.sh validate
 
 # Rotate secrets (periodic security update)
-./scripts/secrets-management.sh rotate
-```
-
-### 3. Environment Variables
-
-Key security-related environment variables:
-
-```bash
-# JWT Configuration
-JWT_SECRET=your-64-character-hex-secret
-JWT_REFRESH_SECRET=your-64-character-hex-refresh-secret
-JWT_EXPIRES_IN=1h
-JWT_REFRESH_EXPIRES_IN=7d
-
-# Database Security
-MONGODB_USERNAME=admin
-MONGODB_PASSWORD=your-secure-password
-
-# Redis Security
-REDIS_PASSWORD=your-redis-password
-
-# CORS Security
-CORS_ORIGIN=https://yourdomain.com
-CORS_CREDENTIALS=true
-```
-
-## Environment Setup
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/your-org/simplepro-v3.git
-cd simplepro-v3
-```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-```
-
-### 3. Environment Configuration
-
-```bash
-# Copy example environment file
-cp .env.example .env.production
-
-# Edit production configuration
-nano .env.production
-```
-
-### 4. Build Applications
-
-```bash
-npm run build
-```
-
-## Deployment Process
-
-### Automated Deployment
-
-Use the comprehensive deployment script:
-
-```bash
-# Run full production deployment
-./scripts/deploy-prod.sh
-
-# Deploy with custom settings
-HEALTH_CHECK_TIMEOUT=600 ./scripts/deploy-prod.sh
-
-# Run only health checks
-./scripts/deploy-prod.sh health
-```
-
-### Manual Deployment Steps
-
-If you prefer manual deployment:
-
-```bash
-# 1. Validate environment
-./scripts/validate-environment.sh
-
-# 2. Setup secrets and SSL
-./scripts/secrets-management.sh setup
-./docker/ssl/generate-certs.sh
-
-# 3. Build and deploy
-npm run build
-docker-compose -f docker-compose.prod.yml up -d --build
-
-# 4. Verify deployment
-docker-compose -f docker-compose.prod.yml ps
-curl -k https://localhost/api/health
-```
-
-### Deployment Verification
-
-After deployment, verify all services:
-
-- **Web Application**: https://localhost
-- **API Health**: https://localhost/api/health
-- **Grafana Dashboard**: http://localhost:3001
-- **Prometheus Metrics**: http://localhost:9090
-- **MinIO Console**: http://localhost:9001
-
-## Monitoring and Observability
-
-### Prometheus Metrics
-
-The system exports comprehensive metrics:
-
-- **Application metrics**: Request rates, response times, error rates
-- **System metrics**: CPU, memory, disk usage
-- **Database metrics**: MongoDB connections, query performance
-- **Cache metrics**: Redis memory usage, hit rates
-
-### Grafana Dashboards
-
-Pre-configured dashboards include:
-
-- **System Overview**: High-level health and performance
-- **Application Performance**: API metrics and user activity
-- **Infrastructure**: Database and cache performance
-- **Security**: Authentication failures and rate limiting
-
-### Alerting Rules
-
-Prometheus alerting rules monitor:
-
-- Service availability and health checks
-- High error rates or response times
-- Resource utilization thresholds
-- Security events and anomalies
-
-### Log Management
-
-Centralized logging with structured formats:
-
-```bash
-# View all service logs
-docker-compose -f docker-compose.prod.yml logs -f
-
-# View specific service logs
-docker-compose -f docker-compose.prod.yml logs -f api
-docker-compose -f docker-compose.prod.yml logs -f web
-```
-
-## Backup and Disaster Recovery
-
-### Automated Backup System
-
-The backup system provides comprehensive data protection:
-
-```bash
-# Create full system backup
-./scripts/backup-restore.sh backup
-
-# Create MongoDB-only backup
-./scripts/backup-restore.sh mongodb
-
-# Clean old backups (>30 days)
-./scripts/backup-restore.sh cleanup
-```
-
-### Backup Components
-
-- **MongoDB database**: Complete data dump with compression
-- **Redis cache**: Snapshot and AOF files
-- **Application logs**: Docker and application logs
-- **Configuration files**: Docker configs and environment files
-- **Docker volumes**: Persistent data volumes
-
-### Disaster Recovery Procedures
-
-```bash
-# Restore MongoDB from backup
-./scripts/backup-restore.sh restore-mongodb /path/to/backup.archive
-
-# Restore Redis from backup
-./scripts/backup-restore.sh restore-redis /path/to/dump.rdb
-
-# Full system health check
-./scripts/backup-restore.sh health
-```
-
-### Backup Schedule
-
-Recommended backup schedule:
-
+**Summary of changes:**  
+All bare URLs (e.g., `https://localhost`, `http://localhost:3001`) are now formatted as Markdown links, which resolves the MD034/no-bare-urls error.
 - **Daily**: Full system backup at 2 AM
 - **Hourly**: Database incremental backup during business hours
 - **Weekly**: Full volume backup for disaster recovery

@@ -50,7 +50,9 @@ export class AuthController {
     return {
       success: true,
       data: result,
-      message: 'Token refreshed successfully',
+      message: result.refresh_token
+        ? 'Token refreshed successfully with rotation'
+        : 'Token refreshed successfully',
     };
   }
 

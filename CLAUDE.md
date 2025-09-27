@@ -56,7 +56,7 @@ This is a **NX monorepo** with the following structure:
 - **apps/api**: NestJS backend API with GraphQL, REST endpoints, MongoDB integration
 - **packages/pricing-engine**: Core deterministic pricing calculator with rules engine
 - **apps/web**: Next.js web dashboard with estimate calculator and dark theme UI
-- Future: **apps/mobile**: React Native crew app
+- **apps/mobile**: React Native crew app (configured and ready for development)
 
 The system emphasizes **deterministic calculations** - same input always produces same output with SHA256 hash verification for auditability.
 
@@ -121,13 +121,18 @@ nx lint api
 
 ```bash
 # Start development infrastructure (MongoDB, Redis, MinIO)
-npm run docker:up
+npm run docker:dev
 
-# Stop infrastructure
-npm run docker:down
+# Stop development infrastructure
+npm run docker:dev:down
 
-# View logs
-npm run docker:logs
+# View development logs
+npm run docker:dev:logs
+
+# Production Docker operations
+npm run docker:prod
+npm run docker:prod:down
+npm run docker:prod:logs
 ```
 
 ### Database Operations
@@ -138,6 +143,52 @@ npm run db:migrate
 
 # Seed development data
 npm run db:seed
+
+# Validate seed data integrity
+npm run db:validate
+```
+
+### Production Deployment
+
+```bash
+# Deploy to development environment
+npm run deploy:dev
+
+# Deploy to production environment
+npm run deploy:prod
+
+# Validate environment configuration
+npm run validate:env
+
+# Check system health
+npm run health
+npm run health:full
+```
+
+### Security & Secrets Management
+
+```bash
+# Setup secrets management
+npm run secrets:setup
+
+# Validate secrets configuration
+npm run secrets:validate
+
+# Rotate secrets (production)
+npm run secrets:rotate
+
+# Generate SSL certificates
+npm run ssl:generate
+```
+
+### Backup & Recovery
+
+```bash
+# Create system backup
+npm run backup:create
+
+# Clean old backups
+npm run backup:cleanup
 ```
 
 ## Key Architectural Concepts

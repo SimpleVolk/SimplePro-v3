@@ -11,29 +11,44 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { User as UserSchema, UserSchema as UserSchemaDefinition } from './schemas/user.schema';
 import { UserSession as UserSessionSchema, UserSessionSchema as UserSessionSchemaDefinition } from './schemas/user-session.schema';
+import { loadSecrets } from '../config/secrets.config';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: (() => {
-        const secret = process.env.JWT_SECRET;
-        if (!secret) {
-          throw new Error(
-            'JWT_SECRET environment variable is required. ' +
-            'Please set a strong, randomly generated secret key for production use.'
-          );
+        try {
+          const secrets = loadSecrets();
+          return secrets.jwt.secret;
+        } catch (error) {
+          // Fallback to environment variable for development
+          const secret = process.env.JWT_SECRET;
+          if (!secret) {
+            throw new Error(
+              'JWT_SECRET configuration failed. ' +
+              'For production: ensure secrets are configured via production-secrets.sh script. ' +
+              'For development: set JWT_SECRET environment variable.'
+            );
+          }
+          if (secret.length < 32) {
+            throw new Error(
+              'JWT_SECRET must be at least 32 characters long for security. ' +
+              'Please use a strong, randomly generated secret key.'
+            );
+          }
+          return secret;
         }
-        if (secret.length < 32) {
-          throw new Error(
-            'JWT_SECRET must be at least 32 characters long for security. ' +
-            'Please use a strong, randomly generated secret key.'
-          );
-        }
-        return secret;
       })(),
       signOptions: {
-        expiresIn: '1h',
+        expiresIn: (() => {
+          try {
+            const secrets = loadSecrets();
+            return secrets.jwt.expiresIn;
+          } catch (error) {
+            return process.env.JWT_EXPIRES_IN || '1h';
+          }
+        })(),
       },
     }),
     MongooseModule.forFeature([

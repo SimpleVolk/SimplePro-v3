@@ -22,6 +22,8 @@ import { UserSession as UserSessionSchema, UserSessionDocument } from './schemas
 @Injectable()
 export class AuthService implements OnModuleInit {
   private roles = new Map<string, UserRole>();
+  private tokenRefreshMutex = new Map<string, Promise<{ access_token: string; refresh_token?: string }>>(); // Prevent concurrent refreshes
+  private readonly REFRESH_TOKEN_ROTATION_ENABLED = true; // Enable refresh token rotation for security
 
   constructor(
     private jwtService: JwtService,
@@ -122,16 +124,54 @@ export class AuthService implements OnModuleInit {
 
     await adminUser.save();
 
-    // Log the temporary password for initial setup (this should be handled via secure channel in production)
-    console.warn(`
-    ⚠️  SECURITY NOTICE: Default admin user created with temporary password.
-    Username: admin
-    Temporary Password: ${randomPassword}
+    // SECURITY FIX: Never log credentials to console in any environment
+    // Store the initial admin credentials securely
+    if (process.env.NODE_ENV !== 'production') {
+      // In development, store in environment variable instead of logging
+      process.env.INITIAL_ADMIN_PASSWORD = randomPassword;
+      console.warn(`
+      ⚠️  SECURITY NOTICE: Default admin user created.
+      Username: admin
 
-    ❗ IMPORTANT: This password must be changed on first login.
-    ❗ Store this password securely and change it immediately after first login.
-    ❗ This message will only be shown once.
-    `);
+      ❗ IMPORTANT: Initial password stored in INITIAL_ADMIN_PASSWORD environment variable.
+      ❗ This password must be changed on first login.
+      ❗ Password change is required before system access.
+      `);
+    } else {
+      // In production, require external password initialization
+      console.error(`
+      🚨 CRITICAL: Admin user created but requires password initialization.
+      Run the password initialization script or contact system administrator.
+      System will not be fully functional until admin password is properly set.
+      `);
+
+      // Optionally, you could save the password to a secure file or require
+      // external initialization in production environments
+      const fs = require('fs');
+      const path = require('path');
+      const secretsPath = path.join(process.cwd(), '.secrets');
+
+      try {
+        if (!fs.existsSync(secretsPath)) {
+          fs.mkdirSync(secretsPath, { mode: 0o700 });
+        }
+
+        const credentialsFile = path.join(secretsPath, 'admin-init.json');
+        const credentials = {
+          username: 'admin',
+          temporaryPassword: randomPassword,
+          createdAt: new Date().toISOString(),
+          mustChangePassword: true,
+          note: 'This file should be deleted after password change'
+        };
+
+        fs.writeFileSync(credentialsFile, JSON.stringify(credentials, null, 2), { mode: 0o600 });
+        console.log(`🔐 Admin credentials stored securely in ${credentialsFile}`);
+        console.log(`🗑️  Remember to delete this file after setting the admin password.`);
+      } catch (error) {
+        console.error('Failed to store admin credentials securely:', error.message);
+      }
+    }
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponse> {
@@ -173,7 +213,7 @@ export class AuthService implements OnModuleInit {
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
     const refreshToken = this.jwtService.sign({ sub: (user._id as any).toString() }, { expiresIn: '7d' });
 
-    // Create session
+    // SECURITY ENHANCEMENT: Create session with enhanced security features
     const session = new this.sessionModel({
       userId: (user._id as any).toString(),
       token: accessToken,
@@ -181,6 +221,10 @@ export class AuthService implements OnModuleInit {
       isActive: true,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       lastAccessedAt: new Date(),
+      tokenRefreshCount: 0,
+      lastTokenRefreshAt: null,
+      // Generate session fingerprint for additional security
+      sessionFingerprint: this.generateSessionFingerprint(user.id, Date.now())
     });
 
     await session.save();
@@ -193,55 +237,177 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  async refreshToken(refreshToken: string): Promise<{ access_token: string }> {
+  async refreshToken(refreshToken: string): Promise<{ access_token: string; refresh_token?: string }> {
+    // SECURITY FIX: Implement database-level atomic token rotation to prevent race conditions
+    const mutexKey = `refresh_${refreshToken}`;
+
+    // Check if there's already a refresh in progress for this token
+    const existingRefresh = this.tokenRefreshMutex.get(mutexKey);
+    if (existingRefresh) {
+      return existingRefresh;
+    }
+
+    // Create new refresh promise with enhanced security
+    const refreshPromise = this.performAtomicTokenRefresh(refreshToken);
+    this.tokenRefreshMutex.set(mutexKey, refreshPromise);
+
     try {
+      const result = await refreshPromise;
+      return result;
+    } finally {
+      // Clean up mutex
+      this.tokenRefreshMutex.delete(mutexKey);
+    }
+  }
+
+  private async performAtomicTokenRefresh(refreshToken: string): Promise<{ access_token: string; refresh_token?: string }> {
+    try {
+      // SECURITY FIX: Verify refresh token before database operations
       const decoded = this.jwtService.verify(refreshToken);
-      const user = await this.userModel.findById(decoded.sub);
+      const userId = decoded.sub;
 
+      // SECURITY FIX: Get user with atomic validation
+      const user = await this.userModel.findById(userId);
       if (!user || !user.isActive) {
-        throw new UnauthorizedException('Invalid refresh token');
+        throw new UnauthorizedException('Invalid refresh token - user not found or inactive');
       }
 
-      // Check if session exists and is active
-      const session = await this.sessionModel.findOne({
-        userId: (user._id as any).toString(),
-        refreshToken,
-        isActive: true,
-        expiresAt: { $gt: new Date() }
-      });
+      // SECURITY FIX: Implement atomic token rotation with database-level locking
+      // Use MongoDB's findOneAndUpdate with atomic operations to prevent race conditions
+      const now = new Date();
+      const newRefreshToken = this.REFRESH_TOKEN_ROTATION_ENABLED
+        ? this.jwtService.sign({ sub: userId }, { expiresIn: '7d' })
+        : refreshToken;
 
+      // CRITICAL SECURITY FIX: Atomic session update with refresh token rotation
+      const session = await this.sessionModel.findOneAndUpdate(
+        {
+          userId: userId,
+          refreshToken: refreshToken, // Exact match for the current refresh token
+          isActive: true,
+          expiresAt: { $gt: now }
+        },
+        {
+          // Atomically update all session fields in a single operation
+          $set: {
+            refreshToken: newRefreshToken,
+            lastAccessedAt: now,
+            // Add concurrency protection
+            lastTokenRefreshAt: now,
+            tokenRefreshCount: { $inc: 1 }
+          }
+        },
+        {
+          new: true,
+          runValidators: true,
+          // CRITICAL: This ensures only ONE request can update this session
+          // If another request already updated it, this will return null
+          upsert: false
+        }
+      );
+
+      // SECURITY FIX: Detect race condition - if session is null, the refresh token was already used
       if (!session) {
-        throw new UnauthorizedException('Session expired');
+        // SECURITY ALERT: Potential token replay attack or race condition detected
+        console.error(`SECURITY ALERT: Refresh token reuse detected for user ${userId}. Token: ${refreshToken.substring(0, 10)}...`);
+
+        // Revoke all sessions for this user as a security measure
+        await this.sessionModel.updateMany(
+          { userId: userId, isActive: true },
+          {
+            $set: {
+              isActive: false,
+              revokedAt: now,
+              revokedReason: 'Token reuse detected - security violation'
+            }
+          }
+        );
+
+        throw new UnauthorizedException('Refresh token already used or session expired - all sessions revoked for security');
       }
 
-      // Generate new access token
+      // Generate new access token with enhanced security
       const payload: JwtPayload = {
-        sub: (user._id as any).toString(),
+        sub: userId,
         username: user.username,
         email: user.email,
         role: user.role.name,
         permissions: user.permissions.map(p => `${p.resource}:${p.action}`),
+        iat: Math.floor(Date.now() / 1000),
+        jti: `${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Enhanced unique token ID
+        sessionId: session._id!.toString() // Link token to specific session
       };
 
       const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
 
-      // Update session
-      session.token = accessToken;
-      session.lastAccessedAt = new Date();
-      await session.save();
+      // SECURITY FIX: Update session with new access token atomically
+      await this.sessionModel.findByIdAndUpdate(
+        session._id!,
+        {
+          $set: {
+            token: accessToken,
+            lastAccessedAt: now
+          }
+        },
+        { runValidators: true }
+      );
 
-      return { access_token: accessToken };
+      // Return both tokens (refresh token only if rotation is enabled)
+      const result: { access_token: string; refresh_token?: string } = {
+        access_token: accessToken
+      };
+
+      if (this.REFRESH_TOKEN_ROTATION_ENABLED) {
+        result.refresh_token = newRefreshToken;
+      }
+
+      return result;
     } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      // Log security-relevant errors
+      console.error('Token refresh error:', error.message);
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  async logout(userId: string): Promise<void> {
-    // Deactivate all user sessions
-    await this.sessionModel.updateMany(
-      { userId, isActive: true },
-      { isActive: false }
-    );
+  async logout(userId: string, sessionId?: string): Promise<void> {
+    // Clear any pending refresh operations for this user
+    Array.from(this.tokenRefreshMutex.keys())
+      .filter(key => key.includes(userId))
+      .forEach(key => this.tokenRefreshMutex.delete(key));
+
+    const now = new Date();
+
+    if (sessionId) {
+      // SECURITY ENHANCEMENT: Logout specific session with proper audit trail
+      await this.sessionModel.findByIdAndUpdate(
+        sessionId,
+        {
+          $set: {
+            isActive: false,
+            revokedAt: now,
+            revokedReason: 'User logout',
+            lastAccessedAt: now
+          }
+        },
+        { runValidators: true }
+      );
+    } else {
+      // SECURITY ENHANCEMENT: Deactivate all user sessions with audit trail
+      await this.sessionModel.updateMany(
+        { userId, isActive: true },
+        {
+          $set: {
+            isActive: false,
+            revokedAt: now,
+            revokedReason: 'User logout all sessions',
+            lastAccessedAt: now
+          }
+        }
+      );
+    }
   }
 
   async validateUser(payload: JwtPayload): Promise<User | null> {
@@ -494,6 +660,11 @@ export class AuthService implements OnModuleInit {
       expiresAt: doc.expiresAt,
       createdAt: (doc as any).createdAt,
       lastAccessedAt: doc.lastAccessedAt,
+      lastTokenRefreshAt: doc.lastTokenRefreshAt,
+      tokenRefreshCount: doc.tokenRefreshCount || 0,
+      revokedAt: doc.revokedAt,
+      revokedReason: doc.revokedReason,
+      sessionFingerprint: doc.sessionFingerprint,
     };
   }
 
@@ -511,5 +682,46 @@ export class AuthService implements OnModuleInit {
 
   hasAllPermissions(user: User, permissions: { resource: string; action: string }[]): boolean {
     return permissions.every(p => this.hasPermission(user, p.resource, p.action));
+  }
+
+  // SECURITY ENHANCEMENT: Session fingerprinting for additional security
+  private generateSessionFingerprint(userId: string, timestamp: number): string {
+    const crypto = require('crypto');
+    const data = `${userId}_${timestamp}_${process.env.JWT_SECRET}`;
+    return crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);
+  }
+
+  // SECURITY ENHANCEMENT: Detect concurrent session usage
+  async detectConcurrentRefreshUsage(userId: string, refreshToken: string): Promise<boolean> {
+    const recentRefreshes = await this.sessionModel.find({
+      userId,
+      refreshToken,
+      lastTokenRefreshAt: {
+        $gte: new Date(Date.now() - 5000) // Check for refreshes in last 5 seconds
+      }
+    });
+
+    return recentRefreshes.length > 0;
+  }
+
+  // SECURITY ENHANCEMENT: Revoke all sessions for security incidents
+  async revokeAllUserSessions(userId: string, reason: string): Promise<void> {
+    const now = new Date();
+    await this.sessionModel.updateMany(
+      { userId, isActive: true },
+      {
+        $set: {
+          isActive: false,
+          revokedAt: now,
+          revokedReason: reason,
+          lastAccessedAt: now
+        }
+      }
+    );
+
+    // Clear any pending refresh operations
+    Array.from(this.tokenRefreshMutex.keys())
+      .filter(key => key.includes(userId))
+      .forEach(key => this.tokenRefreshMutex.delete(key));
   }
 }

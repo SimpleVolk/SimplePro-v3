@@ -4,7 +4,7 @@ export default {
   resolver: '@nx/jest/plugins/resolver',
   moduleFileExtensions: ['ts', 'js', 'html', 'tsx', 'jsx'],
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '\\.svg$': '@nx/react-native/plugins/jest/svg-mock'
   },
   transformIgnorePatterns: [

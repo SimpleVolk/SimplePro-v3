@@ -13,7 +13,7 @@ COPY nx.json ./
 COPY tsconfig.base.json ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci && npm cache clean --force
+RUN npm ci --legacy-peer-deps && npm cache clean --force
 
 # Builder stage
 FROM node:20-alpine AS builder
@@ -48,7 +48,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --only=production --ignore-scripts && npm cache clean --force
+RUN npm ci --only=production --ignore-scripts --legacy-peer-deps && npm cache clean --force
 
 # Production stage
 FROM node:20-alpine AS production

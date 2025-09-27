@@ -264,6 +264,7 @@ erDiagram
 ### Core Business Objects
 
 #### Customer Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -312,6 +313,7 @@ erDiagram
 ```
 
 #### Estimate Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -378,6 +380,7 @@ erDiagram
 ```
 
 #### Job Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -428,6 +431,7 @@ erDiagram
 ```
 
 #### Crew Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -465,6 +469,7 @@ erDiagram
 ```
 
 #### PricingRule Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -505,6 +510,7 @@ erDiagram
 ```
 
 #### InventoryRoom Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -540,6 +546,7 @@ erDiagram
 ### Supporting Schemas
 
 #### User Schema (Authentication & Authorization)
+
 ```javascript
 {
   _id: ObjectId,
@@ -566,6 +573,7 @@ erDiagram
 ```
 
 #### AuditLog Schema
+
 ```javascript
 {
   _id: ObjectId,
@@ -584,6 +592,7 @@ erDiagram
 ## Indexes for Performance
 
 ### Primary Indexes
+
 ```javascript
 // Customer indexes
 Customer.index({ email: 1 }, { unique: true })
@@ -620,6 +629,7 @@ PricingRule.index({ effectiveFrom: 1, effectiveTo: 1, isActive: 1 })
 ## Data Relationships & Constraints
 
 ### Business Rules
+
 1. **Customer → Estimate**: One customer can have multiple estimates
 2. **Estimate → Job**: One estimate can convert to one job maximum
 3. **Job → Crew**: One job can have multiple crews assigned
@@ -629,6 +639,7 @@ PricingRule.index({ effectiveFrom: 1, effectiveTo: 1, isActive: 1 })
 7. **Estimate → PricingRule**: Multiple rules can apply to one estimate
 
 ### Data Integrity
+
 1. **Soft Deletes**: Most entities use `isActive` flag instead of deletion
 2. **Audit Trail**: All changes tracked in AuditLog collection
 3. **Reference Integrity**: Foreign key relationships maintained
@@ -636,6 +647,7 @@ PricingRule.index({ effectiveFrom: 1, effectiveTo: 1, isActive: 1 })
 5. **Unique Constraints**: Estimate numbers, job numbers, user emails
 
 ### Performance Considerations
+
 1. **Compound Indexes**: Multi-field queries optimized
 2. **TTL Indexes**: Automatic cleanup of expired data
 3. **Aggregation Pipelines**: Complex queries pre-optimized

@@ -28,6 +28,23 @@ export class UserSession {
 
   @Prop({ type: Date, default: Date.now })
   lastAccessedAt!: Date;
+
+  // SECURITY ENHANCEMENT: Additional fields for race condition detection
+  @Prop({ type: Date })
+  lastTokenRefreshAt?: Date;
+
+  @Prop({ type: Number, default: 0 })
+  tokenRefreshCount!: number;
+
+  @Prop({ type: Date })
+  revokedAt?: Date;
+
+  @Prop({ type: String })
+  revokedReason?: string;
+
+  // Session fingerprinting for additional security
+  @Prop({ type: String })
+  sessionFingerprint?: string;
 }
 
 export const UserSessionSchema = SchemaFactory.createForClass(UserSession);
@@ -39,3 +56,8 @@ UserSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 // Compound indexes for common queries
 UserSessionSchema.index({ userId: 1, isActive: 1 });
 UserSessionSchema.index({ userId: 1, refreshToken: 1, isActive: 1 });
+
+// SECURITY ENHANCEMENT: Additional indexes for race condition protection
+UserSessionSchema.index({ refreshToken: 1, isActive: 1 }, { unique: true, sparse: true });
+UserSessionSchema.index({ userId: 1, lastTokenRefreshAt: -1 });
+UserSessionSchema.index({ revokedAt: 1 }, { sparse: true });

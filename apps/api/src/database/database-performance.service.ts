@@ -41,7 +41,7 @@ export class DatabasePerformanceService {
 
   private setupQueryLogging(): void {
     // Enable MongoDB query logging for performance monitoring
-    this.connection.set('debug', (collection: string, method: string, query: any, doc?: any) => {
+    this.connection.set('debug', (collection: string, method: string, query: any, _doc?: any) => {
       const startTime = Date.now();
 
       // Log slow queries (> 100ms)
@@ -88,6 +88,9 @@ export class DatabasePerformanceService {
   async analyzeIndexUsage(collection: string): Promise<any> {
     try {
       const db = this.connection.db;
+      if (!db) {
+        throw new Error('Database connection not available');
+      }
       const stats = await db.collection(collection).aggregate([
         { $indexStats: {} }
       ]).toArray();
@@ -102,6 +105,9 @@ export class DatabasePerformanceService {
   async explainQuery(collection: string, query: any): Promise<any> {
     try {
       const db = this.connection.db;
+      if (!db) {
+        throw new Error('Database connection not available');
+      }
       const explanation = await db.collection(collection).find(query).explain('executionStats');
       return explanation;
     } catch (error) {
@@ -168,15 +174,19 @@ export class DatabasePerformanceService {
     version: string;
   }> {
     try {
-      const adminDb = this.connection.db.admin();
+      const db = this.connection.db;
+      if (!db) {
+        throw new Error('Database connection not available');
+      }
+      const adminDb = db.admin();
       const serverStatus = await adminDb.serverStatus();
 
       return {
         status: this.connection.readyState === 1 ? 'connected' : 'disconnected',
-        connections: serverStatus.connections?.current || 0,
-        uptime: serverStatus.uptime || 0,
-        host: serverStatus.host || 'unknown',
-        version: serverStatus.version || 'unknown'
+        connections: serverStatus?.connections?.current || 0,
+        uptime: serverStatus?.uptime || 0,
+        host: serverStatus?.host || 'unknown',
+        version: serverStatus?.version || 'unknown'
       };
     } catch (error) {
       this.logger.error('Failed to get connection health:', error);

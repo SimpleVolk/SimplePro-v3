@@ -304,7 +304,7 @@
 
 .revenueChart {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: 16px;
   height: 300px;
   padding: 20px 0;

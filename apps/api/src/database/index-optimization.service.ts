@@ -16,6 +16,9 @@ export class IndexOptimizationService implements OnModuleInit {
   private async createOptimizedIndexes(): Promise<void> {
     try {
       const db = this.connection.db;
+      if (!db) {
+        throw new Error('Database connection not available');
+      }
 
       // User collection optimizations
       await this.createUserIndexes(db);
@@ -259,7 +262,11 @@ export class IndexOptimizationService implements OnModuleInit {
 
     for (const collectionName of collections) {
       try {
-        const collection = this.connection.db.collection(collectionName);
+        const db = this.connection.db;
+        if (!db) {
+          throw new Error('Database connection not available');
+        }
+        const collection = db.collection(collectionName);
         const indexStats = await collection.aggregate([{ $indexStats: {} }]).toArray();
 
         results[collectionName] = indexStats.map((stat: any) => ({
@@ -295,7 +302,11 @@ export class IndexOptimizationService implements OnModuleInit {
     const results: any = {};
 
     for (const [collectionName, indexes] of Object.entries(unused)) {
-      const collection = this.connection.db.collection(collectionName);
+      const db = this.connection.db;
+      if (!db) {
+        throw new Error('Database connection not available');
+      }
+      const collection = db.collection(collectionName);
       results[collectionName] = [];
 
       for (const index of indexes as any[]) {

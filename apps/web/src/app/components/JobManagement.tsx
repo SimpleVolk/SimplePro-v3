@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getApiUrl } from '@/lib/config';
 import styles from './JobManagement.module.css';
 
 interface Job {
@@ -102,7 +103,6 @@ interface CreateJobDto {
   specialInstructions?: string;
 }
 
-const API_BASE_URL = 'http://localhost:4000/api';
 
 export function JobManagement() {
   const { user: _user } = useAuth();
@@ -149,7 +149,7 @@ export function JobManagement() {
       setLoading(true);
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`${API_BASE_URL}/jobs`, {
+      const response = await fetch(getApiUrl('jobs'), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -173,7 +173,7 @@ export function JobManagement() {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`${API_BASE_URL}/jobs`, {
+      const response = await fetch(getApiUrl('jobs'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +201,7 @@ export function JobManagement() {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/status`, {
+      const response = await fetch(getApiUrl(`jobs/${jobId}/status`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -291,9 +291,6 @@ export function JobManagement() {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
 
   if (loading) {
     return (
@@ -474,7 +471,10 @@ export function JobManagement() {
                 </button>
               )}
               <button
-                onClick={() => setSelectedJob(job)}
+                onClick={() => {
+                  setSelectedJob(job);
+                  console.log('Selected job:', selectedJob?.id || 'none', '-> new:', job.id);
+                }}
                 className={styles.secondaryButton}
               >
                 View Details

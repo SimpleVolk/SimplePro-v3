@@ -9,25 +9,35 @@ import {
   Query,
   HttpStatus,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { CustomersService } from './customers.service';
 import {
   CreateCustomerDto,
   UpdateCustomerDto,
   CustomerFilters,
 } from './interfaces/customer.interface';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../auth/interfaces/user.interface';
 
 @Controller('customers')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createCustomerDto: CreateCustomerDto) {
-    // For now, use a default user. In the future, this will come from authentication
-    const createdBy = 'api-user';
-
-    const customer = await this.customersService.create(createCustomerDto, createdBy);
+  @RequirePermissions({ resource: 'customers', action: 'create' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 customer creations per minute
+  async create(
+    @Body() createCustomerDto: CreateCustomerDto,
+    @CurrentUser() user: User,
+  ) {
+    const customer = await this.customersService.create(createCustomerDto, user.id);
 
     return {
       success: true,
@@ -37,6 +47,8 @@ export class CustomersController {
   }
 
   @Get()
+  @RequirePermissions({ resource: 'customers', action: 'read' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } }) // 30 reads per minute
   async findAll(@Query() query: any) {
     // Parse query parameters into filters
     const filters: CustomerFilters = {
@@ -74,6 +86,8 @@ export class CustomersController {
   }
 
   @Get('stats')
+  @RequirePermissions({ resource: 'customers', action: 'read' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async getStats() {
     const stats = await this.customersService.getCustomerStats();
 
@@ -84,6 +98,8 @@ export class CustomersController {
   }
 
   @Get(':id')
+  @RequirePermissions({ resource: 'customers', action: 'read' })
+  @Throttle({ default: { limit: 50, ttl: 60000 } })
   async findOne(@Param('id') id: string) {
     const customer = await this.customersService.findOne(id);
 
@@ -94,14 +110,14 @@ export class CustomersController {
   }
 
   @Patch(':id')
+  @RequirePermissions({ resource: 'customers', action: 'update' })
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   async update(
     @Param('id') id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const updatedBy = 'api-user';
-
-    const customer = await this.customersService.update(id, updateCustomerDto, updatedBy);
+    const customer = await this.customersService.update(id, updateCustomerDto, user.id);
 
     return {
       success: true,
@@ -112,11 +128,15 @@ export class CustomersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @RequirePermissions({ resource: 'customers', action: 'delete' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async remove(@Param('id') id: string) {
     await this.customersService.remove(id);
   }
 
   @Post(':id/contact')
+  @RequirePermissions({ resource: 'customers', action: 'update' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async updateLastContact(@Param('id') id: string) {
     const customer = await this.customersService.updateLastContact(id);
 
@@ -128,6 +148,8 @@ export class CustomersController {
   }
 
   @Post(':id/estimates/:estimateId')
+  @RequirePermissions({ resource: 'customers', action: 'update' })
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   async addEstimate(
     @Param('id') customerId: string,
     @Param('estimateId') estimateId: string,
@@ -142,6 +164,8 @@ export class CustomersController {
   }
 
   @Post(':id/jobs/:jobId')
+  @RequirePermissions({ resource: 'customers', action: 'update' })
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   async addJob(
     @Param('id') customerId: string,
     @Param('jobId') jobId: string,
@@ -156,6 +180,8 @@ export class CustomersController {
   }
 
   @Get('search/email/:email')
+  @RequirePermissions({ resource: 'customers', action: 'read' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async findByEmail(@Param('email') email: string) {
     const customer = await this.customersService.findByEmail(email);
 

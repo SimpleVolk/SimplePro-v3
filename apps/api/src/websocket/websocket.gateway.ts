@@ -9,7 +9,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
 
@@ -26,12 +26,17 @@ interface AuthenticatedSocket extends Socket {
   },
   namespace: '/realtime',
 })
-export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
   @WebSocketServer() server!: Server;
   private logger: Logger = new Logger('WebSocketGateway');
   private connectedClients = new Map<string, AuthenticatedSocket>();
   private userSockets = new Map<string, Set<string>>(); // userId -> socketIds
   private crewRooms = new Map<string, Set<string>>(); // crewId -> socketIds
+  private connectionTimers = new Map<string, NodeJS.Timeout>(); // socketId -> timeout
+  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private readonly CONNECTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+  private readonly HEARTBEAT_INTERVAL = 30 * 1000; // 30 seconds
+  private readonly MAX_CONNECTIONS_PER_USER = 5; // Prevent connection spam
 
   constructor(
     private jwtService: JwtService,
@@ -40,10 +45,88 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   afterInit(_server: Server) {
     this.logger.log('WebSocket Gateway initialized');
+    this.startHeartbeat();
+  }
+
+  async onModuleDestroy() {
+    this.logger.log('WebSocket Gateway shutting down...');
+
+    // Clear all timers
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+
+    this.connectionTimers.forEach((timer) => clearTimeout(timer));
+    this.connectionTimers.clear();
+
+    // Disconnect all clients gracefully
+    this.connectedClients.forEach((client) => {
+      client.emit('serverShutdown', { message: 'Server is shutting down' });
+      client.disconnect(true);
+    });
+
+    // Clear all tracking maps
+    this.connectedClients.clear();
+    this.userSockets.clear();
+    this.crewRooms.clear();
+
+    this.logger.log('WebSocket Gateway shutdown complete');
+  }
+
+  private startHeartbeat() {
+    this.heartbeatInterval = setInterval(() => {
+      this.cleanupStaleConnections();
+      this.logConnectionStats();
+    }, this.HEARTBEAT_INTERVAL);
+  }
+
+  private cleanupStaleConnections() {
+    const staleConnections: string[] = [];
+
+    this.connectedClients.forEach((client, socketId) => {
+      if (!client.connected) {
+        staleConnections.push(socketId);
+      }
+    });
+
+    staleConnections.forEach((socketId) => {
+      this.logger.warn(`Cleaning up stale connection: ${socketId}`);
+      const client = this.connectedClients.get(socketId);
+      if (client) {
+        this.handleDisconnect(client);
+      }
+    });
+  }
+
+  private logConnectionStats() {
+    const stats = {
+      totalConnections: this.connectedClients.size,
+      uniqueUsers: this.userSockets.size,
+      activeCrews: this.crewRooms.size,
+      connectionTimers: this.connectionTimers.size
+    };
+
+    this.logger.debug('Connection stats:', stats);
+
+    // Alert if connection count is unusually high
+    if (stats.totalConnections > 1000) {
+      this.logger.warn(`High connection count detected: ${stats.totalConnections}`);
+    }
   }
 
   async handleConnection(client: AuthenticatedSocket) {
     try {
+      // Rate limiting: Check for too many connections from same user
+      const existingConnections = Array.from(this.connectedClients.values())
+        .filter(c => c.handshake.address === client.handshake.address).length;
+
+      if (existingConnections >= this.MAX_CONNECTIONS_PER_USER) {
+        this.logger.warn(`Connection limit exceeded for IP: ${client.handshake.address}`);
+        client.emit('error', { message: 'Too many connections from this IP' });
+        client.disconnect();
+        return;
+      }
+
       const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.replace('Bearer ', '');
 
       if (!token) {
@@ -69,12 +152,29 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       // Track connected clients
       this.connectedClients.set(client.id, client);
 
-      // Track user sockets
-      if (client.userId && !this.userSockets.has(client.userId)) {
-        this.userSockets.set(client.userId, new Set());
-      }
+      // Set connection timeout
+      const timeout = setTimeout(() => {
+        this.logger.warn(`Connection timeout for client ${client.id}`);
+        this.handleDisconnect(client);
+        client.disconnect();
+      }, this.CONNECTION_TIMEOUT);
+      this.connectionTimers.set(client.id, timeout);
+
+      // Track user sockets with connection limit per user
       if (client.userId) {
-        this.userSockets.get(client.userId)!.add(client.id);
+        if (!this.userSockets.has(client.userId)) {
+          this.userSockets.set(client.userId, new Set());
+        }
+
+        const userConnections = this.userSockets.get(client.userId)!;
+        if (userConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
+          this.logger.warn(`User ${client.userId} exceeded connection limit`);
+          client.emit('error', { message: 'Maximum connections per user exceeded' });
+          client.disconnect();
+          return;
+        }
+
+        userConnections.add(client.id);
       }
 
       // Join role-based rooms
@@ -121,6 +221,13 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   handleDisconnect(client: AuthenticatedSocket) {
     const { userId, crewId } = client;
+
+    // Clear connection timeout
+    const timer = this.connectionTimers.get(client.id);
+    if (timer) {
+      clearTimeout(timer);
+      this.connectionTimers.delete(client.id);
+    }
 
     // Remove from tracking maps
     this.connectedClients.delete(client.id);
@@ -468,16 +575,51 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     });
   }
 
-  // Get connected users info
+  // Get connected users info with safety checks
   getConnectedUsers() {
-    const users = Array.from(this.connectedClients.values()).map(socket => ({
-      socketId: socket.id,
-      userId: socket.userId,
-      userRole: socket.userRole,
-      crewId: socket.crewId,
-      connectedAt: socket.handshake.time,
-    }));
+    const users = Array.from(this.connectedClients.values())
+      .filter(socket => socket && socket.connected) // Only include active connections
+      .map(socket => ({
+        socketId: socket.id,
+        userId: socket.userId,
+        userRole: socket.userRole,
+        crewId: socket.crewId,
+        connectedAt: socket.handshake.time,
+        ipAddress: socket.handshake.address,
+      }));
     return users;
+  }
+
+  // Memory usage monitoring
+  getMemoryStats() {
+    return {
+      connectedClientsSize: this.connectedClients.size,
+      userSocketsSize: this.userSockets.size,
+      crewRoomsSize: this.crewRooms.size,
+      connectionTimersSize: this.connectionTimers.size,
+      totalMappedEntries: Array.from(this.userSockets.values()).reduce((sum, set) => sum + set.size, 0) +
+                          Array.from(this.crewRooms.values()).reduce((sum, set) => sum + set.size, 0)
+    };
+  }
+
+  // Force cleanup method for emergency situations
+  forceCleanup() {
+    this.logger.warn('Forcing WebSocket cleanup...');
+
+    this.connectionTimers.forEach((timer) => clearTimeout(timer));
+    this.connectionTimers.clear();
+
+    this.connectedClients.forEach((client) => {
+      if (client && client.connected) {
+        client.disconnect(true);
+      }
+    });
+
+    this.connectedClients.clear();
+    this.userSockets.clear();
+    this.crewRooms.clear();
+
+    this.logger.warn('WebSocket cleanup completed');
   }
 
   getCrewStatus() {

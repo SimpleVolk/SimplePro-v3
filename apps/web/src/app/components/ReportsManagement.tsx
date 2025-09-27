@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useWebSocket } from '../contexts/WebSocketContext';
+import { getApiUrl } from '@/lib/config';
 import styles from './ReportsManagement.module.css';
 
 interface Report {
@@ -30,7 +30,6 @@ interface ReportType {
   description: string;
 }
 
-const API_BASE_URL = 'http://localhost:4000/api';
 
 export function ReportsManagement() {
   const { user } = useAuth();
@@ -38,7 +37,6 @@ export function ReportsManagement() {
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'generate'>('list');
 
   // Form state
@@ -65,7 +63,7 @@ export function ReportsManagement() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch(`${API_BASE_URL}/analytics/reports`, {
+      const response = await fetch(getApiUrl('analytics/reports'), {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -87,7 +85,7 @@ export function ReportsManagement() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch(`${API_BASE_URL}/analytics/metadata/report-types`, {
+      const response = await fetch(getApiUrl('analytics/metadata/report-types'), {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -112,7 +110,7 @@ export function ReportsManagement() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch(`${API_BASE_URL}/analytics/reports`, {
+      const response = await fetch(getApiUrl('analytics/reports'), {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -158,7 +156,7 @@ export function ReportsManagement() {
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 1);
 
-      const response = await fetch(`${API_BASE_URL}/analytics/reports/${type}`, {
+      const response = await fetch(getApiUrl(`analytics/reports/${type}`), {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

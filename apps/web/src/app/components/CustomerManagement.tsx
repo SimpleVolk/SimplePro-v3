@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getApiUrl } from '@/lib/config';
 import styles from './CustomerManagement.module.css';
 
 interface Customer {
@@ -75,7 +76,6 @@ interface CreateCustomerDto {
   assignedSalesRep?: string;
 }
 
-const API_BASE_URL = 'http://localhost:4000/api';
 
 export function CustomerManagement() {
   const { user: _user } = useAuth();
@@ -118,7 +118,7 @@ export function CustomerManagement() {
       setLoading(true);
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`${API_BASE_URL}/customers`, {
+      const response = await fetch(getApiUrl('customers'), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -142,7 +142,7 @@ export function CustomerManagement() {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`${API_BASE_URL}/customers`, {
+      const response = await fetch(getApiUrl('customers'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,42 +166,12 @@ export function CustomerManagement() {
     }
   };
 
-  const _updateCustomer = async (customerId: string, updateData: Partial<Customer>) => {
-    try {
-      const token = localStorage.getItem('access_token');
-
-      const response = await fetch(`${API_BASE_URL}/customers/${customerId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updateData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setCustomers(prev =>
-          prev.map(customer =>
-            customer.id === customerId ? result.customer : customer
-          )
-        );
-        setEditingCustomer(null);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Failed to update customer');
-      }
-    } catch (err) {
-      setError('Error updating customer');
-      console.error('Error updating customer:', err);
-    }
-  };
 
   const updateLastContact = async (customerId: string) => {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`${API_BASE_URL}/customers/${customerId}/contact`, {
+      const response = await fetch(getApiUrl(`customers/${customerId}/contact`), {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

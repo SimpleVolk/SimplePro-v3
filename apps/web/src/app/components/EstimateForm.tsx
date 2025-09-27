@@ -140,8 +140,8 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
       } as EstimateInput;
 
       const estimator = new DeterministicEstimator(
-        defaultRules.pricingRules,
-        defaultRules.locationHandicaps
+        defaultRules.pricingRules as any,
+        defaultRules.locationHandicaps as any
       );
 
       const result = estimator.calculateEstimate(estimateInput, 'web-user');
@@ -216,8 +216,8 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
           <input
             id="moveDate"
             type="date"
-            value={formData.moveDate?.toISOString().split('T')[0]}
-            onChange={(e) => updateFormData('moveDate', new Date(e.target.value))}
+            value={typeof formData.moveDate === 'string' ? formData.moveDate : formData.moveDate?.toISOString().split('T')[0] || ''}
+            onChange={(e) => updateFormData('moveDate', e.target.value)}
             required
           />
         </div>

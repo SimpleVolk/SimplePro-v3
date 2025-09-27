@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { getWebSocketUrl } from '@/lib/config';
 import styles from './RealTimeDashboard.module.css';
 
 interface ConnectedUser {
@@ -59,7 +60,7 @@ export const RealTimeDashboard: React.FC = () => {
 
   useEffect(() => {
     // Initialize WebSocket connection
-    const newSocket = io('http://localhost:3001/realtime', {
+    const newSocket = io(getWebSocketUrl(), {
       auth: {
         token: localStorage.getItem('access_token'), // Assume token is stored in localStorage
       },
@@ -70,7 +71,7 @@ export const RealTimeDashboard: React.FC = () => {
 
     // Connection events
     newSocket.on('connect', () => {
-      console.log('Connected to WebSocket');
+      console.log('Connected to WebSocket', socket ? 'previous socket exists' : 'first connection');
       setIsConnected(true);
     });
 

@@ -1,30 +1,99 @@
-// Browser-compatible UUID generation
+// Robust cross-platform UUID generation with error handling and validation
 function generateUUID(): string {
-  // Try to use crypto.randomUUID if available (Node.js 15+ or modern browsers)
+  let uuid: string;
+
   try {
-    const crypto = require('crypto');
-    if (crypto && crypto.randomUUID) {
-      return crypto.randomUUID();
+    // Node.js environment - try crypto.randomUUID first (Node.js 15.6.0+)
+    if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+      const crypto = require('crypto');
+      if (crypto && typeof crypto.randomUUID === 'function') {
+        uuid = crypto.randomUUID();
+        if (isValidUUID(uuid)) {
+          return uuid;
+        }
+      }
     }
+  } catch (error) {
+    console.warn('Node.js crypto.randomUUID failed, falling back to alternative methods:', error instanceof Error ? error.message : String(error));
+  }
+
+  try {
+    // Browser environment - use crypto.randomUUID if available (modern browsers)
+    if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+      uuid = globalThis.crypto.randomUUID();
+      if (isValidUUID(uuid)) {
+        return uuid;
+      }
+    }
+  } catch (error) {
+    console.warn('Browser crypto.randomUUID failed, falling back to getRandomValues:', error instanceof Error ? error.message : String(error));
+  }
+
+  try {
+    // Fallback to crypto.getRandomValues (both Node.js with webcrypto and browsers)
+    const crypto = typeof globalThis !== 'undefined' ? globalThis.crypto :
+                  typeof window !== 'undefined' ? window.crypto : null;
+
+    if (crypto && typeof crypto.getRandomValues === 'function') {
+      const randomBytes = crypto.getRandomValues(new Uint8Array(16));
+
+      // Set version (4) and variant bits according to RFC 4122
+      randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40; // Version 4
+      randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80; // Variant bits
+
+      uuid = Array.from(randomBytes, (byte, index) => {
+        const hex = byte.toString(16).padStart(2, '0');
+        // Add hyphens at correct positions
+        if (index === 4 || index === 6 || index === 8 || index === 10) {
+          return '-' + hex;
+        }
+        return hex;
+      }).join('');
+
+      if (isValidUUID(uuid)) {
+        return uuid;
+      }
+    }
+  } catch (error) {
+    console.warn('crypto.getRandomValues failed, falling back to Math.random:', error instanceof Error ? error.message : String(error));
+  }
+
+  // Final fallback using Math.random with better entropy
+  console.warn('Using Math.random fallback for UUID generation - not cryptographically secure');
+
+  let timestamp = Date.now();
+  let performanceNow = 0;
+
+  try {
+    // Add performance counter for better entropy if available
+    performanceNow = typeof performance !== 'undefined' && performance.now ? performance.now() : 0;
   } catch (e) {
-    // crypto module not available in browser
+    // Performance API not available
   }
 
-  // Fallback to crypto.getRandomValues for browsers
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = (window.crypto.getRandomValues(new Uint8Array(1))[0] & 15) | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
-
-  // Final fallback using Math.random (less secure but works everywhere)
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
+  uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16 + timestamp + performanceNow) % 16 | 0;
+    timestamp = Math.floor(timestamp / 16);
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
+
+  if (!isValidUUID(uuid)) {
+    throw new Error('Failed to generate valid UUID after all attempts');
+  }
+
+  return uuid;
+}
+
+// UUID validation function
+function isValidUUID(uuid: string): boolean {
+  if (typeof uuid !== 'string') {
+    return false;
+  }
+
+  // Standard UUID v4 format validation
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }
 import {
   EstimateInput,

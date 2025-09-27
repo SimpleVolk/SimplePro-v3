@@ -9,7 +9,9 @@ import {
   Query,
   HttpStatus,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { JobsService } from './jobs.service';
 import {
   CreateJobDto,
@@ -18,18 +20,26 @@ import {
   CrewAssignment,
   InternalNote,
 } from './interfaces/job.interface';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../auth/interfaces/user.interface';
 
 @Controller('jobs')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createJobDto: CreateJobDto) {
-    // For now, use a default user. In the future, this will come from authentication
-    const createdBy = 'api-user';
-
-    const job = await this.jobsService.create(createJobDto, createdBy);
+  @RequirePermissions({ resource: 'jobs', action: 'create' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  async create(
+    @Body() createJobDto: CreateJobDto,
+    @CurrentUser() user: User,
+  ) {
+    const job = await this.jobsService.create(createJobDto, user.id);
 
     return {
       success: true,
@@ -39,6 +49,8 @@ export class JobsController {
   }
 
   @Get()
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 50, ttl: 60000 } })
   async findAll(@Query() query: any) {
     // Parse query parameters into filters
     const filters: JobFilters = {
@@ -74,6 +86,8 @@ export class JobsController {
   }
 
   @Get('stats')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async getStats() {
     const stats = await this.jobsService.getJobStats();
 
@@ -84,6 +98,8 @@ export class JobsController {
   }
 
   @Get('by-date/:date')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getJobsByDate(@Param('date') dateString: string) {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
@@ -104,6 +120,8 @@ export class JobsController {
   }
 
   @Get(':id')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 50, ttl: 60000 } })
   async findOne(@Param('id') id: string) {
     const job = await this.jobsService.findOne(id);
 
@@ -114,6 +132,8 @@ export class JobsController {
   }
 
   @Get('job-number/:jobNumber')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   async findByJobNumber(@Param('jobNumber') jobNumber: string) {
     const job = await this.jobsService.findByJobNumber(jobNumber);
 
@@ -125,14 +145,14 @@ export class JobsController {
   }
 
   @Patch(':id')
+  @RequirePermissions({ resource: 'jobs', action: 'update' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async update(
     @Param('id') id: string,
     @Body() updateJobDto: UpdateJobDto,
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const updatedBy = 'api-user';
-
-    const job = await this.jobsService.update(id, updateJobDto, updatedBy);
+    const job = await this.jobsService.update(id, updateJobDto, user.id);
 
     return {
       success: true,
@@ -142,14 +162,14 @@ export class JobsController {
   }
 
   @Patch(':id/status')
+  @RequirePermissions({ resource: 'jobs', action: 'update' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   async updateStatus(
     @Param('id') id: string,
     @Body() statusUpdate: { status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold' },
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const updatedBy = 'api-user';
-
-    const job = await this.jobsService.updateStatus(id, statusUpdate.status, updatedBy);
+    const job = await this.jobsService.updateStatus(id, statusUpdate.status, user.id);
 
     return {
       success: true,
@@ -160,19 +180,21 @@ export class JobsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @RequirePermissions({ resource: 'jobs', action: 'delete' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async remove(@Param('id') id: string) {
     await this.jobsService.remove(id);
   }
 
   @Post(':id/crew')
+  @RequirePermissions({ resource: 'jobs', action: 'assign' })
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   async assignCrew(
     @Param('id') id: string,
     @Body() crewData: { crew: Omit<CrewAssignment, 'assignedAt' | 'status'>[] },
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const assignedBy = 'api-user';
-
-    const job = await this.jobsService.assignCrew(id, crewData.crew, assignedBy);
+    const job = await this.jobsService.assignCrew(id, crewData.crew, user.id);
 
     return {
       success: true,
@@ -182,15 +204,15 @@ export class JobsController {
   }
 
   @Patch(':id/crew/:crewMemberId/status')
+  @RequirePermissions({ resource: 'jobs', action: 'update' })
+  @Throttle({ default: { limit: 25, ttl: 60000 } })
   async updateCrewStatus(
     @Param('id') id: string,
     @Param('crewMemberId') crewMemberId: string,
     @Body() statusUpdate: { status: 'assigned' | 'confirmed' | 'checked_in' | 'checked_out' | 'absent' },
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const updatedBy = 'api-user';
-
-    const job = await this.jobsService.updateCrewStatus(id, crewMemberId, statusUpdate.status, updatedBy);
+    const job = await this.jobsService.updateCrewStatus(id, crewMemberId, statusUpdate.status, user.id);
 
     return {
       success: true,
@@ -200,14 +222,14 @@ export class JobsController {
   }
 
   @Post(':id/notes')
+  @RequirePermissions({ resource: 'jobs', action: 'update' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async addNote(
     @Param('id') id: string,
     @Body() noteData: Omit<InternalNote, 'id' | 'createdAt' | 'createdBy'>,
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const addedBy = 'api-user';
-
-    const job = await this.jobsService.addNote(id, { ...noteData, createdBy: addedBy }, addedBy);
+    const job = await this.jobsService.addNote(id, { ...noteData, createdBy: user.id }, user.id);
 
     return {
       success: true,
@@ -217,6 +239,8 @@ export class JobsController {
   }
 
   @Patch(':id/milestones/:milestoneId')
+  @RequirePermissions({ resource: 'jobs', action: 'update' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async updateMilestone(
     @Param('id') id: string,
     @Param('milestoneId') milestoneId: string,
@@ -224,11 +248,9 @@ export class JobsController {
       status: 'pending' | 'in_progress' | 'completed' | 'skipped';
       notes?: string;
     },
+    @CurrentUser() user: User,
   ) {
-    // For now, use a default user. In the future, this will come from authentication
-    const completedBy = 'api-user';
-
-    const job = await this.jobsService.updateMilestone(id, milestoneId, milestoneUpdate.status, completedBy);
+    const job = await this.jobsService.updateMilestone(id, milestoneId, milestoneUpdate.status, user.id);
 
     return {
       success: true,
@@ -238,6 +260,8 @@ export class JobsController {
   }
 
   @Get('customer/:customerId')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getJobsForCustomer(@Param('customerId') customerId: string) {
     const jobs = await this.jobsService.findAll({ customerId });
 
@@ -250,6 +274,8 @@ export class JobsController {
   }
 
   @Get('crew/:crewMemberId')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getJobsForCrewMember(@Param('crewMemberId') crewMemberId: string) {
     const jobs = await this.jobsService.findAll({ assignedCrew: crewMemberId });
 
@@ -262,6 +288,8 @@ export class JobsController {
   }
 
   @Get('calendar/week/:startDate')
+  @RequirePermissions({ resource: 'jobs', action: 'read' })
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async getWeeklySchedule(@Param('startDate') startDateString: string) {
     const startDate = new Date(startDateString);
     if (isNaN(startDate.getTime())) {

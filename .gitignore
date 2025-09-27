@@ -36,13 +36,34 @@ lerna-debug.log*
 *.swo
 *~
 
-# Environment variables
+# Environment variables - NEVER commit credentials to version control
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 .env.production
+
+# Production secrets directory - NEVER commit secrets to version control
+.secrets/
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.csr
+
+# Secret and credential files - NEVER commit any credentials
+*secret*
+*password*
+*credential*
+*apikey*
+*token*
+!*secret*.example
+!*secret*.template
+!*password*.example
+!*credential*.example
 
 
 

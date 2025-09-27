@@ -20,6 +20,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { getApiUrl } from '@/lib/config';
 import styles from './AnalyticsOverview.module.css';
 
 interface DashboardMetrics {
@@ -60,7 +61,6 @@ interface BusinessMetrics {
   costPerJob: number;
 }
 
-const API_BASE_URL = 'http://localhost:4000/api';
 
 export function AnalyticsOverview() {
   const { user } = useAuth();
@@ -120,6 +120,8 @@ export function AnalyticsOverview() {
       clearInterval(refreshInterval);
       setRefreshInterval(null);
     }
+    // Explicit return for other cases
+    return undefined;
   }, [autoRefresh, user]);
 
   // Listen for WebSocket analytics updates
@@ -171,7 +173,7 @@ export function AnalyticsOverview() {
       };
 
       // Fetch dashboard metrics
-      const dashboardResponse = await fetch(`${API_BASE_URL}/analytics/dashboard`, { headers });
+      const dashboardResponse = await fetch(getApiUrl('analytics/dashboard'), { headers });
       if (!dashboardResponse.ok) {
         throw new Error('Failed to fetch dashboard metrics');
       }
@@ -179,7 +181,7 @@ export function AnalyticsOverview() {
       setDashboardMetrics(dashboardData);
 
       // Fetch business metrics
-      const businessResponse = await fetch(`${API_BASE_URL}/analytics/business-metrics`, { headers });
+      const businessResponse = await fetch(getApiUrl('analytics/business-metrics'), { headers });
       if (!businessResponse.ok) {
         throw new Error('Failed to fetch business metrics');
       }
@@ -308,12 +310,15 @@ export function AnalyticsOverview() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ service, percent }) => `${service} ${(percent * 100).toFixed(0)}%`}
+                      label={(props: any) => {
+                        const { service, percent } = props;
+                        return `${service} ${(percent * 100).toFixed(0)}%`;
+                      }}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="revenue"
                     >
-                      {dashboardMetrics.topServices.map((entry, index) => (
+                      {dashboardMetrics.topServices.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={['#0070f3', '#00d9ff', '#ff6b6b', '#4ecdc4', '#45b7d1'][index % 5]} />
                       ))}
                     </Pie>

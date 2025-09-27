@@ -3,6 +3,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { EstimateForm } from './EstimateForm';
 import { EstimateResult } from './EstimateResult';
+import type { EstimateResult as EstimateResultType } from '@simplepro/pricing-engine';
 import { CustomerManagement } from './CustomerManagement';
 import { JobManagement } from './JobManagement';
 import { CalendarDispatch } from './CalendarDispatch';
@@ -12,7 +13,7 @@ import styles from './Dashboard.module.css';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
-  const [estimateResult, setEstimateResult] = useState(null);
+  const [estimateResult, setEstimateResult] = useState<EstimateResultType | null>(null);
   const [activeTab, setActiveTab] = useState('estimates');
 
   const userRoleDisplayName = (role: string) => {
@@ -45,7 +46,7 @@ export function Dashboard() {
 
   return (
     <div className={styles.dashboard}>
-      <header className={styles.header}>
+      <header className={styles.header} role="banner">
         <div className={styles.headerContent}>
           <div className={styles.logo}>
             <h1>SimplePro Dashboard</h1>
@@ -53,27 +54,47 @@ export function Dashboard() {
 
           <div className={styles.userInfo}>
             <div className={styles.userDetails}>
-              <span className={styles.userName}>
+              <span className={styles.userName} aria-label={`Current user: ${user?.firstName} ${user?.lastName}`}>
                 {user?.firstName} {user?.lastName}
               </span>
-              <span className={styles.userRole}>
+              <span className={styles.userRole} aria-label={`User role: ${userRoleDisplayName(user?.role || '')}`}>
                 {userRoleDisplayName(user?.role || '')}
               </span>
             </div>
-            <button onClick={logout} className={styles.logoutButton}>
+            <button
+              onClick={logout}
+              className={styles.logoutButton}
+              aria-label="Sign out of SimplePro Dashboard"
+              type="button"
+            >
+              <span aria-hidden="true">📤</span>
               Sign Out
             </button>
           </div>
         </div>
 
-        <nav className={styles.navigation}>
-          {availableTabs.map((tab) => (
+        <nav className={styles.navigation} role="navigation" aria-label="Main navigation">
+          {availableTabs.map((tab, index) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`${styles.navButton} ${
                 activeTab === tab.id ? styles.navButtonActive : ''
               }`}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`tabpanel-${tab.id}`}
+              id={`tab-${tab.id}`}
+              tabIndex={activeTab === tab.id ? 0 : -1}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  const direction = e.key === 'ArrowLeft' ? -1 : 1;
+                  const newIndex = (index + direction + availableTabs.length) % availableTabs.length;
+                  setActiveTab(availableTabs[newIndex].id);
+                  document.getElementById(`tab-${availableTabs[newIndex].id}`)?.focus();
+                }
+              }}
             >
               {tab.label}
             </button>
@@ -81,9 +102,9 @@ export function Dashboard() {
         </nav>
       </header>
 
-      <main className={styles.main}>
+      <main className={styles.main} id="main-content" role="main" tabIndex={-1}>
         {activeTab === 'estimates' && (
-          <div className={styles.content}>
+          <div className={styles.content} role="tabpanel" id="tabpanel-estimates" aria-labelledby="tab-estimates">
             <div className={styles.pageHeader}>
               <h2>Moving Estimates</h2>
               <p>Create accurate pricing estimates for customer moves</p>
@@ -95,7 +116,7 @@ export function Dashboard() {
               </div>
 
               {estimateResult && (
-                <div className={styles.resultSection}>
+                <div className={styles.resultSection} aria-live="polite">
                   <EstimateResult result={estimateResult} />
                 </div>
               )}
@@ -104,31 +125,31 @@ export function Dashboard() {
         )}
 
         {activeTab === 'customers' && (
-          <div className={styles.content}>
+          <div className={styles.content} role="tabpanel" id="tabpanel-customers" aria-labelledby="tab-customers">
             <CustomerManagement />
           </div>
         )}
 
         {activeTab === 'jobs' && (
-          <div className={styles.content}>
+          <div className={styles.content} role="tabpanel" id="tabpanel-jobs" aria-labelledby="tab-jobs">
             <JobManagement />
           </div>
         )}
 
         {activeTab === 'calendar' && (
-          <div className={styles.content}>
+          <div className={styles.content} role="tabpanel" id="tabpanel-calendar" aria-labelledby="tab-calendar">
             <CalendarDispatch />
           </div>
         )}
 
         {activeTab === 'reports' && (
-          <div className={styles.content}>
+          <div className={styles.content} role="tabpanel" id="tabpanel-reports" aria-labelledby="tab-reports">
             <AnalyticsDashboard />
           </div>
         )}
 
         {activeTab === 'settings' && (
-          <div className={styles.content}>
+          <div className={styles.content} role="tabpanel" id="tabpanel-settings" aria-labelledby="tab-settings">
             <div className={styles.pageHeader}>
               <h2>System Settings</h2>
               <p>Configure pricing rules, user management, and system preferences</p>

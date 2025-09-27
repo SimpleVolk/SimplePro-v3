@@ -6,7 +6,7 @@
 
 set -e
 
-CERT_DIR="/etc/nginx/ssl"
+CERT_DIR="$(dirname "$0")"
 DAYS=365
 KEY_SIZE=2048
 

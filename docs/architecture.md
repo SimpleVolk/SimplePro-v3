@@ -109,6 +109,7 @@ graph TB
 ## Component Architecture
 
 ### 1. Web Dashboard (Next.js)
+
 - **Purpose**: Primary interface for sales, management, and operations
 - **Features**:
   - Customer management and CRM
@@ -120,6 +121,7 @@ graph TB
 - **Security**: SSO integration, role-based access control
 
 ### 2. Mobile Crew App (React Native)
+
 - **Purpose**: Field operations and crew management
 - **Features**:
   - Offline-first architecture
@@ -131,6 +133,7 @@ graph TB
 - **Sync**: Background synchronization when online
 
 ### 3. Admin Interface (Next.js)
+
 - **Purpose**: System administration and configuration
 - **Features**:
   - Rules engine configuration
@@ -142,6 +145,7 @@ graph TB
 - **Access**: Admin-only with enhanced security
 
 ### 4. API Gateway (NestJS)
+
 - **Purpose**: Centralized API management and security
 - **Features**:
   - Authentication and authorization
@@ -155,6 +159,7 @@ graph TB
 ### 5. Core Business Services
 
 #### CRM Service
+
 - Customer lifecycle management
 - Lead tracking and conversion
 - Automated follow-ups and templates
@@ -162,6 +167,7 @@ graph TB
 - Activity audit trail
 
 #### Estimate Service
+
 - **Deterministic Calculator**: Room-by-room inventory analysis
 - **Rules Engine**: Configurable pricing and adjustment rules
 - **Location Handicaps**: Geographic and access modifiers
@@ -169,6 +175,7 @@ graph TB
 - **Audit Trail**: Complete estimate history and changes
 
 #### Operations Service
+
 - Dispatch calendar management
 - Drag-and-drop resource assignment
 - Job scheduling and optimization
@@ -176,6 +183,7 @@ graph TB
 - Payroll calculation integration
 
 #### Crew Service
+
 - Crew availability management
 - Task assignment and tracking
 - Mobile app synchronization
@@ -185,6 +193,7 @@ graph TB
 ### 6. Data Architecture
 
 #### MongoDB (Primary Database)
+
 ```javascript
 // Collections Structure
 {
@@ -200,6 +209,7 @@ graph TB
 ```
 
 #### Redis (Cache & Sessions)
+
 - User sessions and JWT tokens
 - Frequently accessed estimates and jobs
 - Real-time data for dashboard updates
@@ -207,6 +217,7 @@ graph TB
 - Background job queues
 
 #### MinIO/S3 (File Storage)
+
 - Customer photos and signatures
 - Job documentation and receipts
 - Estimate attachments
@@ -216,18 +227,21 @@ graph TB
 ## Security Architecture
 
 ### Authentication & Authorization
+
 - **SSO Integration**: SAML/OAuth2 with corporate identity provider
 - **RBAC**: Role-based access control with granular permissions
 - **JWT Tokens**: Stateless authentication with refresh tokens
 - **Session Management**: Redis-based session storage
 
 ### Data Protection
+
 - **Encryption at Rest**: MongoDB and file storage encryption
 - **Encryption in Transit**: TLS 1.3 for all communications
 - **PII Masking**: Automatic masking of sensitive customer data
 - **Audit Logging**: Complete activity trail with tamper protection
 
 ### Network Security
+
 - **Internal-Only Deployment**: No public internet access
 - **Network Segmentation**: Isolated service communications
 - **Rate Limiting**: Per-user and per-endpoint throttling
@@ -236,12 +250,14 @@ graph TB
 ## Integration Architecture
 
 ### External Services
+
 - **Email Provider**: Automated notifications and follow-ups
 - **SMS Gateway**: Real-time alerts and confirmations
 - **Payment Gateway**: Secure payment processing
 - **Partner APIs**: Lead source integrations
 
 ### Mock Integrations
+
 - **Configurable Mocks**: Development and testing environments
 - **Partner Simulation**: Realistic data for testing
 - **Payment Simulation**: Safe payment flow testing
@@ -249,6 +265,7 @@ graph TB
 ## Deployment Architecture
 
 ### Development Environment
+
 ```yaml
 # docker-compose.dev.yml
 services:
@@ -262,6 +279,7 @@ services:
 ```
 
 ### Production Environment
+
 - **Container Orchestration**: Docker Compose or Kubernetes
 - **Load Balancing**: NGINX or cloud load balancer
 - **SSL Termination**: Automated certificate management
@@ -271,18 +289,21 @@ services:
 ## Observability & Monitoring
 
 ### Metrics & Monitoring
+
 - **Application Metrics**: Custom business metrics
 - **Infrastructure Metrics**: System health and performance
 - **User Analytics**: Feature usage and adoption
 - **Error Tracking**: Real-time error reporting
 
 ### Logging & Auditing
+
 - **Structured Logging**: JSON-formatted application logs
 - **Audit Trail**: Immutable record of all user actions
 - **Performance Logging**: Request/response timing
 - **Security Logging**: Authentication and authorization events
 
 ### Backup & Disaster Recovery
+
 - **Automated Backups**: Daily database and file backups
 - **Point-in-Time Recovery**: Transaction log backups
 - **Cross-Region Replication**: Optional for high availability
@@ -291,12 +312,14 @@ services:
 ## Compliance & Legal
 
 ### E-Signature Compliance
+
 - **ESIGN Act Compliance**: Legal electronic signatures
 - **UETA Compliance**: Uniform Electronic Transactions Act
 - **Audit Trail**: Complete signature history
 - **Authentication**: Multi-factor signature verification
 
 ### Data Governance
+
 - **Data Retention**: Configurable retention policies
 - **Data Purging**: Automated cleanup of expired data
 - **Export Capabilities**: Customer data portability
@@ -305,12 +328,14 @@ services:
 ## Scalability Considerations
 
 ### Performance Optimization
+
 - **Database Indexing**: Optimized query performance
 - **Caching Strategy**: Multi-layer caching approach
 - **Lazy Loading**: On-demand data loading
 - **Connection Pooling**: Efficient database connections
 
 ### Horizontal Scaling
+
 - **Service Isolation**: Microservices architecture
 - **Database Sharding**: Optional for large datasets
 - **CDN Integration**: Static asset optimization

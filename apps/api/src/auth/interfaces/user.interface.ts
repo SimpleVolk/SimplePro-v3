@@ -140,6 +140,8 @@ export interface JwtPayload {
   permissions: string[];
   iat?: number;
   exp?: number;
+  jti?: string; // JWT token ID for tracking
+  sessionId?: string; // Link token to specific session for enhanced security
 }
 
 export interface UserSession {
@@ -153,6 +155,13 @@ export interface UserSession {
   expiresAt: Date;
   createdAt: Date;
   lastAccessedAt: Date;
+
+  // SECURITY ENHANCEMENT: Additional fields for race condition detection
+  lastTokenRefreshAt?: Date;
+  tokenRefreshCount: number;
+  revokedAt?: Date;
+  revokedReason?: string;
+  sessionFingerprint?: string;
 }
 
 // Default role definitions

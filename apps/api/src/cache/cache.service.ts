@@ -1,6 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import { Redis } from 'ioredis';
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
@@ -29,250 +27,125 @@ export class CacheService {
 
   // Cache TTL constants (in seconds)
   private readonly DEFAULT_TTL = 3600; // 1 hour
-  private readonly SHORT_TTL = 300; // 5 minutes
   private readonly LONG_TTL = 86400; // 24 hours
 
-  constructor(@InjectRedis() private readonly redis: Redis) {}
+  // In-memory cache implementation
+  private memoryCache = new Map<string, { value: any; expires: number; tags?: string[] }>();
+
+  constructor() {
+    this.logger.log('Cache service initialized with in-memory storage');
+  }
 
   async get<T>(key: string): Promise<T | null> {
     try {
-      const value = await this.redis.get(key);
-      if (value) {
+      const cached = this.memoryCache.get(key);
+
+      if (cached && cached.expires > Date.now()) {
         this.stats.hits++;
         this.updateHitRate();
-
-        // Handle compressed data
-        const parsed = JSON.parse(value);
-        if (parsed._compressed) {
-          const zlib = require('zlib');
-          const decompressed = zlib.gunzipSync(Buffer.from(parsed.data, 'base64'));
-          return JSON.parse(decompressed.toString());
-        }
-
-        return parsed;
-      } else {
-        this.stats.misses++;
-        this.updateHitRate();
-        return null;
+        return cached.value as T;
+      } else if (cached) {
+        this.memoryCache.delete(key);
       }
-    } catch (error) {
-      this.logger.error(`Cache get error for key ${key}:`, error);
+
       this.stats.misses++;
       this.updateHitRate();
+      return null;
+    } catch (error) {
+      this.logger.error(`Cache get error for key ${key}:`, error);
       return null;
     }
   }
 
   async set<T>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
     try {
-      const { ttl = this.DEFAULT_TTL, tags = [], compress = false } = options;
-      let serialized = JSON.stringify(value);
+      const ttl = options.ttl || this.DEFAULT_TTL;
+      const expires = Date.now() + (ttl * 1000);
 
-      // Compress large objects
-      if (compress || serialized.length > 10000) {
-        const zlib = require('zlib');
-        const compressed = zlib.gzipSync(serialized);
-        serialized = JSON.stringify({
-          _compressed: true,
-          data: compressed.toString('base64')
-        });
-      }
-
-      await this.redis.setex(key, ttl, serialized);
-
-      // Store tags for cache invalidation
-      if (tags.length > 0) {
-        const tagPromises = tags.map(tag =>
-          this.redis.sadd(`tag:${tag}`, key)
-        );
-        await Promise.all(tagPromises);
-      }
+      this.memoryCache.set(key, {
+        value,
+        expires,
+        tags: options.tags
+      });
 
       this.stats.sets++;
-      this.logger.debug(`Cached key ${key} with TTL ${ttl}s`);
+      this.logger.debug(`Cache set: ${key} (TTL: ${ttl}s)`);
     } catch (error) {
       this.logger.error(`Cache set error for key ${key}:`, error);
+      throw error;
     }
   }
 
   async del(key: string): Promise<void> {
     try {
-      await this.redis.del(key);
+      this.memoryCache.delete(key);
       this.stats.deletes++;
-      this.logger.debug(`Deleted cache key ${key}`);
+      this.logger.debug(`Cache delete: ${key}`);
     } catch (error) {
       this.logger.error(`Cache delete error for key ${key}:`, error);
-    }
-  }
-
-  async invalidateByTag(tag: string): Promise<void> {
-    try {
-      const keys = await this.redis.smembers(`tag:${tag}`);
-      if (keys.length > 0) {
-        await this.redis.del(...keys);
-        await this.redis.del(`tag:${tag}`);
-        this.stats.deletes += keys.length;
-        this.logger.debug(`Invalidated ${keys.length} keys for tag ${tag}`);
-      }
-    } catch (error) {
-      this.logger.error(`Cache tag invalidation error for tag ${tag}:`, error);
+      throw error;
     }
   }
 
   async exists(key: string): Promise<boolean> {
+    const cached = this.memoryCache.get(key);
+    return cached ? cached.expires > Date.now() : false;
+  }
+
+  async clear(): Promise<void> {
     try {
-      const result = await this.redis.exists(key);
-      return result === 1;
+      this.memoryCache.clear();
+      this.logger.log('Cache cleared');
     } catch (error) {
-      this.logger.error(`Cache exists check error for key ${key}:`, error);
-      return false;
+      this.logger.error('Cache clear error:', error);
+      throw error;
     }
   }
 
-  async mget<T>(keys: string[]): Promise<(T | null)[]> {
+  async invalidateByTags(tags: string[]): Promise<void> {
     try {
-      const values = await this.redis.mget(...keys);
-      return values.map(value => {
-        if (value) {
-          this.stats.hits++;
-          try {
-            const parsed = JSON.parse(value);
-            if (parsed._compressed) {
-              const zlib = require('zlib');
-              const decompressed = zlib.gunzipSync(Buffer.from(parsed.data, 'base64'));
-              return JSON.parse(decompressed.toString());
-            }
-            return parsed;
-          } catch (error) {
-            this.logger.error('Error parsing cached value:', error);
-            return null;
-          }
-        } else {
-          this.stats.misses++;
-          return null;
+      let deleted = 0;
+      for (const [key, cached] of this.memoryCache.entries()) {
+        if (cached.tags && cached.tags.some(tag => tags.includes(tag))) {
+          this.memoryCache.delete(key);
+          deleted++;
         }
-      });
-    } catch (error) {
-      this.logger.error('Cache mget error:', error);
-      this.stats.misses += keys.length;
-      return keys.map(() => null);
-    } finally {
-      this.updateHitRate();
-    }
-  }
-
-  async mset<T>(keyValuePairs: Record<string, T>, ttl: number = this.DEFAULT_TTL): Promise<void> {
-    try {
-      const pipeline = this.redis.pipeline();
-
-      for (const [key, value] of Object.entries(keyValuePairs)) {
-        let serialized = JSON.stringify(value);
-
-        // Compress large objects
-        if (serialized.length > 10000) {
-          const zlib = require('zlib');
-          const compressed = zlib.gzipSync(serialized);
-          serialized = JSON.stringify({
-            _compressed: true,
-            data: compressed.toString('base64')
-          });
-        }
-
-        pipeline.setex(key, ttl, serialized);
       }
-
-      await pipeline.exec();
-      this.stats.sets += Object.keys(keyValuePairs).length;
+      this.logger.debug(`Invalidated ${deleted} cache entries by tags: ${tags.join(', ')}`);
     } catch (error) {
-      this.logger.error('Cache mset error:', error);
+      this.logger.error('Cache invalidation error:', error);
+      throw error;
     }
   }
 
-  // Cache patterns for common use cases
-  async getUserCache(userId: string): Promise<any> {
-    return this.get(`user:${userId}`);
+  // Analytics-specific cache methods
+  async clearAnalyticsCaches(): Promise<void> {
+    await this.invalidateByTags(['analytics', 'dashboard', 'reports']);
   }
 
-  async setUserCache(userId: string, userData: any, ttl: number = this.LONG_TTL): Promise<void> {
-    await this.set(`user:${userId}`, userData, {
-      ttl,
-      tags: ['users', `user:${userId}`]
-    });
+  async getAnalyticsCache<T>(key: string): Promise<T | null> {
+    return this.get<T>(`analytics:${key}`);
   }
 
-  async getJobCache(jobId: string): Promise<any> {
-    return this.get(`job:${jobId}`);
+  async setAnalyticsCache<T>(key: string, value: T, ttl?: number): Promise<void> {
+    return this.set(`analytics:${key}`, value, { ttl: ttl || this.LONG_TTL, tags: ['analytics'] });
   }
 
-  async setJobCache(jobId: string, jobData: any, ttl: number = this.DEFAULT_TTL): Promise<void> {
-    await this.set(`job:${jobId}`, jobData, {
-      ttl,
-      tags: ['jobs', `job:${jobId}`]
-    });
-  }
-
-  async getCustomerCache(customerId: string): Promise<any> {
-    return this.get(`customer:${customerId}`);
-  }
-
-  async setCustomerCache(customerId: string, customerData: any, ttl: number = this.DEFAULT_TTL): Promise<void> {
-    await this.set(`customer:${customerId}`, customerData, {
-      ttl,
-      tags: ['customers', `customer:${customerId}`]
-    });
-  }
-
-  async getAnalyticsCache(key: string): Promise<any> {
-    return this.get(`analytics:${key}`);
-  }
-
-  async setAnalyticsCache(key: string, data: any, ttl: number = this.SHORT_TTL): Promise<void> {
-    await this.set(`analytics:${key}`, data, {
-      ttl,
-      tags: ['analytics'],
-      compress: true // Analytics data is often large
-    });
-  }
-
-  async getPricingRulesCache(): Promise<any> {
-    return this.get('pricing:rules');
-  }
-
-  async setPricingRulesCache(rules: any, ttl: number = this.LONG_TTL): Promise<void> {
-    await this.set('pricing:rules', rules, {
-      ttl,
-      tags: ['pricing']
-    });
-  }
-
-  // Cache management methods
+  // Additional cache methods for performance monitor
   async clearUserCaches(): Promise<void> {
-    await this.invalidateByTag('users');
+    await this.invalidateByTags(['users']);
   }
 
   async clearJobCaches(): Promise<void> {
-    await this.invalidateByTag('jobs');
+    await this.invalidateByTags(['jobs']);
   }
 
   async clearCustomerCaches(): Promise<void> {
-    await this.invalidateByTag('customers');
-  }
-
-  async clearAnalyticsCaches(): Promise<void> {
-    await this.invalidateByTag('analytics');
+    await this.invalidateByTags(['customers']);
   }
 
   async clearAllCaches(): Promise<void> {
-    try {
-      await this.redis.flushdb();
-      this.logger.warn('All caches cleared');
-    } catch (error) {
-      this.logger.error('Error clearing all caches:', error);
-    }
-  }
-
-  getStats(): CacheStats {
-    return { ...this.stats };
+    await this.clear();
   }
 
   resetStats(): void {
@@ -285,31 +158,36 @@ export class CacheService {
     };
   }
 
+  // Cache statistics
+  getStats(): CacheStats {
+    return { ...this.stats };
+  }
+
   private updateHitRate(): void {
     const total = this.stats.hits + this.stats.misses;
     this.stats.hitRate = total > 0 ? (this.stats.hits / total) * 100 : 0;
   }
 
-  // Decorator method for caching function results
-  cache(key: string, options: CacheOptions = {}) {
-    return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
-      const method = descriptor.value;
+  // Cleanup expired entries periodically
+  private cleanupExpired(): void {
+    let cleaned = 0;
+    const now = Date.now();
 
-      descriptor.value = async function (...args: any[]) {
-        const cacheKey = typeof key === 'function' ? key(...args) : key;
+    for (const [key, cached] of this.memoryCache.entries()) {
+      if (cached.expires <= now) {
+        this.memoryCache.delete(key);
+        cleaned++;
+      }
+    }
 
-        // Try to get from cache first
-        const cached = await this.cacheService.get(cacheKey);
-        if (cached !== null) {
-          return cached;
-        }
+    if (cleaned > 0) {
+      this.logger.debug(`Cleaned up ${cleaned} expired cache entries`);
+    }
+  }
 
-        // If not in cache, execute method and cache result
-        const result = await method.apply(this, args);
-        await this.cacheService.set(cacheKey, result, options);
-
-        return result;
-      };
-    };
+  // Initialize periodic cleanup
+  onModuleInit(): void {
+    // Clean up expired entries every 5 minutes
+    setInterval(() => this.cleanupExpired(), 5 * 60 * 1000);
   }
 }

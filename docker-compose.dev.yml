@@ -63,16 +63,6 @@ services:
       timeout: 20s
       retries: 3
 
-  # Mailhog (Email testing)
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: simplepro-mailhog
-    restart: unless-stopped
-    ports:
-      - "1025:1025" # SMTP
-      - "8025:8025" # Web UI
-    networks:
-      - simplepro-network
 
 volumes:
   mongodb_data:

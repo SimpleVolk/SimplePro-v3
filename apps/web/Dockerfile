@@ -13,7 +13,7 @@ COPY nx.json ./
 COPY tsconfig.base.json ./
 
 # Install all dependencies
-RUN npm ci && npm cache clean --force
+RUN npm ci --legacy-peer-deps && npm cache clean --force
 
 # Builder stage
 FROM node:20-alpine AS builder

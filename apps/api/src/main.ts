@@ -1,11 +1,30 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, BadRequestException } from '@nestjs/common';
+import { ValidationPipe, BadRequestException, Logger } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { SecurityMiddleware } from './common/middleware/security.middleware';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const port = process.env.PORT || 4000;
+  const logger = new Logger('Bootstrap');
+
+  // Enable graceful shutdown
+  app.enableShutdownHooks();
+
+  // Security middleware
+  app.use(compression()); // Enable gzip compression
+  app.use(cookieParser()); // Parse cookies securely
+  app.use(new SecurityMiddleware().use.bind(new SecurityMiddleware()));
+  app.use(new LoggingMiddleware().use.bind(new LoggingMiddleware()));
+
+  // Global exception filter for standardized error handling
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Global validation pipe with security enhancements
   app.useGlobalPipes(
@@ -43,11 +62,119 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
+  // Setup Swagger documentation
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
+    setupSwagger(app);
+  }
+
   // Start server
   await app.listen(port);
 
-  console.log(`🚀 Application is running on: http://localhost:${port}/api`);
-  console.log(`🔒 CORS enabled for origins: ${JSON.stringify(allowedOrigins)}`);
+  logger.log(`🚀 Application is running on: http://localhost:${port}/api`);
+  logger.log(`🔒 CORS enabled for origins: ${JSON.stringify(allowedOrigins)}`);
+  logger.log(`🛡️  Security middleware enabled`);
+  logger.log(`📊 Request logging enabled`);
+
+  // Setup graceful shutdown handlers
+  setupGracefulShutdown(app);
 }
 
-bootstrap();
+// Swagger API documentation setup
+function setupSwagger(app: any) {
+  const config = new DocumentBuilder()
+    .setTitle('SimplePro API')
+    .setDescription('Moving Company Management System API')
+    .setVersion('1.0.0')
+    .addTag('auth', 'Authentication and authorization')
+    .addTag('customers', 'Customer management')
+    .addTag('estimates', 'Estimate calculations')
+    .addTag('jobs', 'Job management')
+    .addTag('analytics', 'Analytics and reporting')
+    .addTag('health', 'System health checks')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth'
+    )
+    .addServer('http://localhost:4000/api', 'Development server')
+    .addServer('https://api.simplepro.com/api', 'Production server')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config, {
+    operationIdFactory: (_controllerKey: string, methodKey: string) => methodKey,
+  });
+
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'SimplePro API Documentation',
+    customfavIcon: '/favicon.ico',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    ],
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      docExpansion: 'none',
+      filter: true,
+      showRequestHeaders: true,
+      tryItOutEnabled: true,
+    },
+  });
+
+  console.log('📚 API Documentation available at: http://localhost:4000/api/docs');
+}
+
+// Graceful shutdown handler
+function setupGracefulShutdown(app: any) {
+  const signals = ['SIGTERM', 'SIGINT', 'SIGQUIT'] as const;
+  const logger = new (require('@nestjs/common').Logger)('Bootstrap');
+
+  signals.forEach((signal) => {
+    process.on(signal, async () => {
+      logger.log(`Received ${signal}, starting graceful shutdown...`);
+
+      try {
+        // Set shutdown timeout
+        const shutdownTimer = setTimeout(() => {
+          logger.error('Forced shutdown due to timeout');
+          process.exit(1);
+        }, 30000); // 30 second timeout
+
+        // Close the application gracefully
+        await app.close();
+
+        clearTimeout(shutdownTimer);
+        logger.log('Application closed gracefully');
+        process.exit(0);
+      } catch (error) {
+        logger.error('Error during graceful shutdown:', error);
+        process.exit(1);
+      }
+    });
+  });
+
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception:', error);
+    process.exit(1);
+  });
+
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+  });
+}
+
+bootstrap().catch((error) => {
+  console.error('Failed to start application:', error);
+  process.exit(1);
+});

@@ -28,52 +28,93 @@ export function LoginForm() {
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <div className={styles.header}>
+        <header className={styles.header}>
           <h1>SimplePro Login</h1>
           <p>Access your moving company dashboard</p>
-        </div>
+        </header>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          {error && <div className={styles.error}>{error}</div>}
+        <main>
+          <form onSubmit={handleSubmit} className={styles.form} noValidate aria-label="User login form">
+            {error && (
+              <div
+                className={styles.error}
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+              >
+                <span className="sr-only">Error: </span>
+                {error}
+              </div>
+            )}
 
-          <div className={styles.field}>
-            <label htmlFor="email">Email Address</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+            <div className={styles.field}>
+              <label htmlFor="email">Email Address</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                aria-required="true"
+                aria-invalid={error ? 'true' : 'false'}
+                aria-describedby={error ? 'login-error' : undefined}
+                autoComplete="email"
+                placeholder="Enter your email address"
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                aria-required="true"
+                aria-invalid={error ? 'true' : 'false'}
+                aria-describedby={error ? 'login-error' : undefined}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className={styles.submitButton}
               disabled={isLoading}
-            />
-          </div>
+              aria-describedby="login-status"
+            >
+              {isLoading ? (
+                <>
+                  <span className="sr-only">Please wait, </span>
+                  <span aria-hidden="true">⏳ </span>
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  <span aria-hidden="true">🔑 </span>
+                  Sign In
+                </>
+              )}
+            </button>
 
-          <div className={styles.field}>
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
+            <div id="login-status" className="sr-only" aria-live="polite">
+              {isLoading ? 'Signing in, please wait...' : ''}
+            </div>
+          </form>
+        </main>
 
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className={styles.footer}>
+        <footer className={styles.footer}>
+          <h2 className="sr-only">Demo Information</h2>
           <p>Demo Credentials:</p>
           <p><strong>Admin:</strong> admin@simplepro.com / admin123</p>
           <p><em>Additional users can be created from the admin dashboard</em></p>
-        </div>
+        </footer>
       </div>
     </div>
   );
