@@ -70,7 +70,8 @@ import { loadSecrets } from '../config/secrets.config';
         appName: 'SimplePro-v3-API',
 
         // Additional performance settings
-        maxStalenessSeconds: 90, // For secondary reads
+        // maxStalenessSeconds is only valid for secondary read preferences
+        // Removed as we're using primary read preference
         localThresholdMS: 15, // Latency window for server selection
       }
     ),

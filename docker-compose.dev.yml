@@ -6,6 +6,7 @@ services:
     image: mongo:7.0
     container_name: simplepro-mongodb
     restart: unless-stopped
+    # Port exposure for development (API running on host needs access)
     ports:
       - "27017:27017"
     environment:
@@ -16,7 +17,7 @@ services:
       - mongodb_data:/data/db
       - ./docker/mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
-      - simplepro-network
+      - storage-network
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -28,13 +29,14 @@ services:
     image: redis:7-alpine
     container_name: simplepro-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    # Remove direct port exposure - only accessible via internal network
+    # ports:
+    #   - "6379:6379"
     command: redis-server --requirepass ${REDIS_PASSWORD:-simplepro_redis_2024}
     volumes:
       - redis_data:/data
     networks:
-      - simplepro-network
+      - storage-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -46,9 +48,10 @@ services:
     image: minio/minio:latest
     container_name: simplepro-minio
     restart: unless-stopped
+    # Expose MinIO console only in development for debugging
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9001:9001"  # Console only accessible from localhost
+    # API port (9000) only accessible via internal network
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-simplepro_minio_2024}
@@ -56,7 +59,7 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - simplepro-network
+      - storage-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -73,5 +76,9 @@ volumes:
     driver: local
 
 networks:
-  simplepro-network:
+  # Storage network for databases and internal services
+  storage-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24

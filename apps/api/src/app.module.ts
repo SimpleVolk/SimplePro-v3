@@ -4,7 +4,6 @@ import { APP_GUARD } from '@nestjs/core';
 
 // Controllers
 import { AppController } from './app.controller';
-import { HealthController } from './health.controller';
 
 // Services
 import { AppService } from './app.service';
@@ -22,6 +21,7 @@ import { PricingRulesModule } from './pricing-rules/pricing-rules.module';
 import { WebSocketModule } from './websocket/websocket.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { SecurityModule } from './security/security.module';
+import { HealthModule } from './health/health.module';
 
 // Security
 import { CustomThrottlerGuard } from './common/guards/throttle.guard';
@@ -55,9 +55,10 @@ import { CustomThrottlerGuard } from './common/guards/throttle.guard';
     // GraphqlModule,
     WebSocketModule,
     AnalyticsModule,
-    SecurityModule
+    SecurityModule,
+    HealthModule
   ],
-  controllers: [AppController, HealthController],
+  controllers: [AppController],
   providers: [
     AppService,
     {

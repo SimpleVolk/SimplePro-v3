@@ -11,7 +11,7 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const port = process.env.PORT || 4000;
+  const port = parseInt(process.env.PORT || '3001', 10);
   const logger = new Logger('Bootstrap');
 
   // Enable graceful shutdown
@@ -50,7 +50,7 @@ async function bootstrap() {
   // CORS configuration - restrict origins in production
   const allowedOrigins = process.env.NODE_ENV === 'production'
     ? (process.env.ALLOWED_ORIGINS?.split(',') || [])
-    : ['http://localhost:3000', 'http://localhost:3004', 'http://localhost:3007', 'http://localhost:3008', 'http://localhost:3009'];
+    : ['http://localhost:3000', 'http://localhost:3004', 'http://localhost:3007', 'http://localhost:3008', 'http://localhost:3009', 'http://localhost:4000'];
 
   app.enableCors({
     origin: allowedOrigins,
@@ -64,7 +64,7 @@ async function bootstrap() {
 
   // Setup Swagger documentation
   if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
-    setupSwagger(app);
+    setupSwagger(app, port);
   }
 
   // Start server
@@ -80,7 +80,7 @@ async function bootstrap() {
 }
 
 // Swagger API documentation setup
-function setupSwagger(app: any) {
+function setupSwagger(app: any, port: number) {
   const config = new DocumentBuilder()
     .setTitle('SimplePro API')
     .setDescription('Moving Company Management System API')
@@ -102,7 +102,7 @@ function setupSwagger(app: any) {
       },
       'JWT-auth'
     )
-    .addServer('http://localhost:4000/api', 'Development server')
+    .addServer(`http://localhost:${port}/api`, 'Development server')
     .addServer('https://api.simplepro.com/api', 'Production server')
     .build();
 
@@ -128,8 +128,6 @@ function setupSwagger(app: any) {
       tryItOutEnabled: true,
     },
   });
-
-  console.log('📚 API Documentation available at: http://localhost:4000/api/docs');
 }
 
 // Graceful shutdown handler

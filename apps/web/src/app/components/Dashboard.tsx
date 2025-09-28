@@ -4,12 +4,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { EstimateForm } from './EstimateForm';
 import { EstimateResult } from './EstimateResult';
 import type { EstimateResult as EstimateResultType } from '@simplepro/pricing-engine';
-import { CustomerManagement } from './CustomerManagement';
-import { JobManagement } from './JobManagement';
-import { CalendarDispatch } from './CalendarDispatch';
-import { AnalyticsDashboard } from './AnalyticsDashboard';
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import styles from './Dashboard.module.css';
+import { LoadingSkeleton } from './LoadingSkeleton';
+
+// Dynamic imports for heavy components
+const CustomerManagement = lazy(() => import('./CustomerManagement').then(mod => ({ default: mod.CustomerManagement })));
+const JobManagement = lazy(() => import('./JobManagement').then(mod => ({ default: mod.JobManagement })));
+const CalendarDispatch = lazy(() => import('./CalendarDispatch').then(mod => ({ default: mod.CalendarDispatch })));
+const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard').then(mod => ({ default: mod.AnalyticsDashboard })));
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -126,25 +129,33 @@ export function Dashboard() {
 
         {activeTab === 'customers' && (
           <div className={styles.content} role="tabpanel" id="tabpanel-customers" aria-labelledby="tab-customers">
-            <CustomerManagement />
+            <Suspense fallback={<LoadingSkeleton type="cards" rows={6} />}>
+              <CustomerManagement />
+            </Suspense>
           </div>
         )}
 
         {activeTab === 'jobs' && (
           <div className={styles.content} role="tabpanel" id="tabpanel-jobs" aria-labelledby="tab-jobs">
-            <JobManagement />
+            <Suspense fallback={<LoadingSkeleton type="table" rows={8} />}>
+              <JobManagement />
+            </Suspense>
           </div>
         )}
 
         {activeTab === 'calendar' && (
           <div className={styles.content} role="tabpanel" id="tabpanel-calendar" aria-labelledby="tab-calendar">
-            <CalendarDispatch />
+            <Suspense fallback={<LoadingSkeleton type="default" rows={5} />}>
+              <CalendarDispatch />
+            </Suspense>
           </div>
         )}
 
         {activeTab === 'reports' && (
           <div className={styles.content} role="tabpanel" id="tabpanel-reports" aria-labelledby="tab-reports">
-            <AnalyticsDashboard />
+            <Suspense fallback={<LoadingSkeleton type="analytics" />}>
+              <AnalyticsDashboard />
+            </Suspense>
           </div>
         )}
 

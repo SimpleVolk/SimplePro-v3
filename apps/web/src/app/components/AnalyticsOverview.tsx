@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import {
@@ -62,7 +62,7 @@ interface BusinessMetrics {
 }
 
 
-export function AnalyticsOverview() {
+export const AnalyticsOverview = memo(function AnalyticsOverview() {
   const { user } = useAuth();
   const { isConnected, subscribeToAnalytics, unsubscribeFromAnalytics, lastUpdate } = useWebSocket();
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null);
@@ -196,16 +196,27 @@ export function AnalyticsOverview() {
     }
   };
 
-  const formatCurrency = (amount: number) => {
+  // Memoized formatters for performance
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount);
-  };
+  }, []);
 
-  const formatPercentage = (value: number) => {
+  const formatPercentage = useCallback((value: number) => {
     return `${value.toFixed(1)}%`;
-  };
+  }, []);
+
+  // Memoized chart colors
+  const chartColors = useMemo(() => ({
+    primary: '#4caf50',
+    secondary: '#2196f3',
+    accent: '#ff9800',
+    warning: '#f44336',
+    pie: ['#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0', '#00bcd4', '#ffeb3b']
+  }), []);
+
 
   if (loading) {
     return (
@@ -287,7 +298,7 @@ export function AnalyticsOverview() {
             </div>
 
             <div className={styles.metricCard}>
-              <h3>Today's Revenue</h3>
+              <h3>Today&apos;s Revenue</h3>
               <div className={styles.metricValue}>{formatCurrency(dashboardMetrics.revenueToday)}</div>
               <div className={styles.metricSubtext}>Revenue generated today</div>
             </div>
@@ -319,7 +330,7 @@ export function AnalyticsOverview() {
                       dataKey="revenue"
                     >
                       {dashboardMetrics.topServices.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={['#0070f3', '#00d9ff', '#ff6b6b', '#4ecdc4', '#45b7d1'][index % 5]} />
+                        <Cell key={`cell-${index}`} fill={chartColors.pie[index % chartColors.pie.length]} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(Number(value))} />
@@ -655,4 +666,4 @@ export function AnalyticsOverview() {
       </div>
     </div>
   );
-}
+});

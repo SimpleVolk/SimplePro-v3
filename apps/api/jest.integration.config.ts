@@ -1,7 +1,8 @@
 export default {
   displayName: 'api-integration',
-  preset: '../../jest.preset.js',
+  preset: 'ts-jest',
   testEnvironment: 'node',
+  roots: ['<rootDir>/test', '<rootDir>/src'],
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
@@ -29,4 +30,6 @@ export default {
   },
   testTimeout: 30000,
   maxWorkers: 1, // Run integration tests sequentially
+  // Disable coverage for integration tests to improve performance
+  collectCoverage: false,
 };

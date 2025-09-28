@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { AnalyticsOverview } from './AnalyticsOverview';
-import { ReportsManagement } from './ReportsManagement';
+import { useState, Suspense, lazy, memo } from 'react';
+import { LoadingSkeleton } from './LoadingSkeleton';
 import styles from './AnalyticsDashboard.module.css';
 
-export function AnalyticsDashboard() {
+// Dynamic imports for chart-heavy components
+const AnalyticsOverview = lazy(() => import('./AnalyticsOverview').then(mod => ({ default: mod.AnalyticsOverview })));
+const ReportsManagement = lazy(() => import('./ReportsManagement').then(mod => ({ default: mod.ReportsManagement })));
+
+export const AnalyticsDashboard = memo(function AnalyticsDashboard() {
   const [activeSection, setActiveSection] = useState<'overview' | 'reports'>('overview');
 
   return (
@@ -44,9 +47,17 @@ export function AnalyticsDashboard() {
       </div>
 
       <div className={styles.sectionContent}>
-        {activeSection === 'overview' && <AnalyticsOverview />}
-        {activeSection === 'reports' && <ReportsManagement />}
+        {activeSection === 'overview' && (
+          <Suspense fallback={<LoadingSkeleton type="analytics" />}>
+            <AnalyticsOverview />
+          </Suspense>
+        )}
+        {activeSection === 'reports' && (
+          <Suspense fallback={<LoadingSkeleton type="table" rows={5} />}>
+            <ReportsManagement />
+          </Suspense>
+        )}
       </div>
     </div>
   );
-}
+});

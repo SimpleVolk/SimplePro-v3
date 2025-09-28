@@ -74,7 +74,22 @@
       "Bash(git rm:*)",
       "Bash(npm test:*)",
       "Bash(npx jest:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(echo $NODE_ENV)",
+      "Bash(env)",
+      "Bash(NODE_ENV=production npx nx build web)",
+      "Bash(NODE_ENV=production npx nx start web --help)",
+      "Bash(npx @next/bundle-analyzer:*)",
+      "Bash(echo $MONGODB_URI)",
+      "Bash(DATABASE_URL=mongodb://admin:simplepro_dev_2024@localhost:27017/simplepro_dev?authSource=admin)",
+      "Bash(npx dotenv-cli:*)",
+      "Bash(echo $INITIAL_ADMIN_PASSWORD)",
+      "Bash(PORT=3001 npx dotenv-cli -e .env -- node dist/apps/api/main.js)",
+      "Bash(tasklist)",
+      "Bash(PORT=3000 npx nx dev web)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
