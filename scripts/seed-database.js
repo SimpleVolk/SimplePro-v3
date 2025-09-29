@@ -27,21 +27,31 @@ async function loadSeedData() {
   }
 }
 
-// Hash passwords for users
+// Hash passwords for users and map to proper schema fields
 async function hashPasswords(users) {
   const hashedUsers = [];
 
   for (const user of users) {
     const hashedPassword = await bcrypt.hash(user.password, 12);
     hashedUsers.push({
-      ...user,
-      password: hashedPassword,
+      username: user.username,
+      email: user.email,
+      passwordHash: hashedPassword, // Map password to passwordHash
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      department: user.department,
+      phoneNumber: user.phoneNumber,
+      crewId: user.crewId,
+      isActive: user.isActive,
+      mustChangePassword: user.mustChangePassword,
+      permissions: user.permissions,
+      preferences: user.preferences,
+      createdBy: user.createdBy,
+      lastModifiedBy: user.lastModifiedBy,
       createdAt: new Date(),
       updatedAt: new Date(),
-      lastLoginAt: null,
-      loginAttempts: 0,
-      isLocked: false,
-      lockUntil: null
+      lastLoginAt: null
     });
   }
 
@@ -131,9 +141,12 @@ async function seedDatabase() {
     console.log('📊 Creating database indexes...');
     await Promise.all([
       // User indexes
+      db.collection('users').createIndex({ username: 1 }, { unique: true }),
       db.collection('users').createIndex({ email: 1 }, { unique: true }),
-      db.collection('users').createIndex({ role: 1 }),
+      db.collection('users').createIndex({ 'role.name': 1 }),
       db.collection('users').createIndex({ isActive: 1 }),
+      db.collection('users').createIndex({ createdAt: 1 }),
+      db.collection('users').createIndex({ lastLoginAt: 1 }),
 
       // Customer indexes
       db.collection('customers').createIndex({ email: 1 }, { unique: true }),
@@ -163,10 +176,10 @@ async function seedDatabase() {
     console.log(`   Jobs:      ${preparedJobs.length}`);
 
     console.log('\n🔐 Login Credentials:');
-    console.log('   Super Admin: admin@simplepro.com / Admin123!');
-    console.log('   Dispatcher:  dispatcher@simplepro.com / Dispatch123!');
-    console.log('   Sales:       sales@simplepro.com / Sales123!');
-    console.log('   Crew:        crew.lead@simplepro.com / Crew123!');
+    console.log('   Super Admin: admin / Admin123!');
+    console.log('   Dispatcher:  dispatcher / Dispatch123!');
+    console.log('   Sales:       sales / Sales123!');
+    console.log('   Crew Lead:   crew.lead / Crew123!');
 
     console.log('\n🌐 Next Steps:');
     console.log('   1. Start the API: npm run dev:api');

@@ -1,0 +1,232 @@
+.topBar {
+  background: #2d2d2d;
+  border-bottom: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topBarContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.breadcrumb {
+  flex: 1;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.userRole {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #ff4444;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.logoutButton:hover {
+  background: #cc3333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+}
+
+.logoutButton:active {
+  transform: translateY(0);
+}
+
+.logoutIcon {
+  font-size: 16px;
+}
+
+.logoutText {
+  white-space: nowrap;
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .topBarContent {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .pageTitle {
+    font-size: 20px;
+  }
+
+  .rightSection {
+    gap: 12px;
+  }
+
+  .userInfo {
+    padding: 6px 12px;
+  }
+
+  .userDetails {
+    display: none;
+  }
+
+  .userAvatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .logoutButton {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .logoutText {
+    display: none;
+  }
+
+  .logoutIcon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topBarContent {
+    padding: 10px 12px;
+  }
+
+  .pageTitle {
+    font-size: 18px;
+  }
+
+  .rightSection {
+    gap: 8px;
+  }
+
+  .userInfo {
+    padding: 4px 8px;
+  }
+
+  .userAvatar {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .logoutButton {
+    padding: 6px 10px;
+    min-height: 36px;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .topBarContent {
+    padding: 14px 24px;
+  }
+
+  .pageTitle {
+    font-size: 22px;
+  }
+
+  .userInfo {
+    padding: 6px 14px;
+  }
+
+  .logoutButton {
+    padding: 9px 14px;
+  }
+}
+
+/* Focus states for accessibility */
+.logoutButton:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .topBar {
+    border-bottom: 2px solid #666;
+  }
+
+  .userInfo {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .logoutButton {
+    transition: none;
+  }
+
+  .logoutButton:hover {
+    transform: none;
+  }
+}

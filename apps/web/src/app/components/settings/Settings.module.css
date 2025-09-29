@@ -1,0 +1,135 @@
+.defaultView {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.defaultContent {
+  text-align: center;
+  max-width: 600px;
+}
+
+.iconContainer {
+  margin-bottom: 1.5rem;
+}
+
+.icon {
+  font-size: 4rem;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+.defaultContent h3 {
+  margin: 0 0 1rem 0;
+  color: var(--color-text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.defaultContent p {
+  margin: 0 0 2rem 0;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.quickLinks {
+  text-align: left;
+}
+
+.quickLinks h4 {
+  margin: 0 0 1rem 0;
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.linkGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.quickLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.quickLink:hover {
+  background: var(--color-background);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.quickLink:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.quickLink span {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .defaultView {
+    padding: 1rem;
+    min-height: 300px;
+  }
+
+  .defaultContent {
+    max-width: 100%;
+  }
+
+  .icon {
+    font-size: 3rem;
+  }
+
+  .defaultContent h3 {
+    font-size: 1.3rem;
+  }
+
+  .linkGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .quickLink {
+    padding: 0.75rem;
+  }
+}
+
+/* Loading States */
+.loadingContainer {
+  padding: 2rem;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .quickLink {
+    transition: none;
+  }
+
+  .quickLink:hover {
+    transform: none;
+  }
+}
+
+/* Focus Management */
+.defaultContent:focus-within .quickLink {
+  transition: all 0.1s ease;
+}

@@ -1,3 +1,7 @@
+// Load environment variables first
+import { config } from 'dotenv';
+config(); // Load .env file
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, BadRequestException, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -50,7 +54,7 @@ async function bootstrap() {
   // CORS configuration - restrict origins in production
   const allowedOrigins = process.env.NODE_ENV === 'production'
     ? (process.env.ALLOWED_ORIGINS?.split(',') || [])
-    : ['http://localhost:3000', 'http://localhost:3004', 'http://localhost:3007', 'http://localhost:3008', 'http://localhost:3009', 'http://localhost:4000'];
+    : ['http://localhost:3000', 'http://localhost:3004', 'http://localhost:3007', 'http://localhost:3008', 'http://localhost:3009', 'http://localhost:3010', 'http://localhost:4000'];
 
   app.enableCors({
     origin: allowedOrigins,

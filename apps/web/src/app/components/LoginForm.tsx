@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import styles from './LoginForm.module.css';
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
@@ -14,14 +14,14 @@ export function LoginForm() {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('Please enter both email and password');
+    if (!username || !password) {
+      setError('Please enter both username and password');
       return;
     }
 
-    const success = await login(email, password);
+    const success = await login(username, password);
     if (!success) {
-      setError('Invalid email or password');
+      setError('Invalid username or password');
     }
   };
 
@@ -48,20 +48,20 @@ export function LoginForm() {
             )}
 
             <div className={styles.field}>
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="username">Username or Email</label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                name="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
                 disabled={isLoading}
                 aria-required="true"
                 aria-invalid={error ? 'true' : 'false'}
                 aria-describedby={error ? 'login-error' : undefined}
-                autoComplete="email"
-                placeholder="Enter your email address"
+                autoComplete="username"
+                placeholder="Enter your username or email"
               />
             </div>
 
@@ -112,7 +112,7 @@ export function LoginForm() {
         <footer className={styles.footer}>
           <h2 className="sr-only">Demo Information</h2>
           <p>Demo Credentials:</p>
-          <p><strong>Admin:</strong> admin@simplepro.com / admin123</p>
+          <p><strong>Admin:</strong> admin / Admin123!</p>
           <p><em>Additional users can be created from the admin dashboard</em></p>
         </footer>
       </div>

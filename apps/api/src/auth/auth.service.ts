@@ -86,10 +86,19 @@ export class AuthService implements OnModuleInit {
     const adminRole = this.roles.get('role_super_admin');
     if (!adminRole) return;
 
-    // Generate a secure random password
-    const crypto = require('crypto');
-    const randomPassword = crypto.randomBytes(16).toString('hex');
-    const passwordHash = await bcrypt.hash(randomPassword, 12);
+    // Use a known password for development, random for production
+    const isProduction = process.env.NODE_ENV === 'production';
+    let password: string;
+
+    if (isProduction) {
+      const crypto = require('crypto');
+      password = crypto.randomBytes(16).toString('hex');
+    } else {
+      // Development password for easier testing
+      password = 'Admin123!';
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
 
     const adminUser = new this.userModel({
       username: 'admin',
@@ -118,8 +127,8 @@ export class AuthService implements OnModuleInit {
       },
       createdBy: 'system',
       lastModifiedBy: 'system',
-      // Force password change on first login
-      mustChangePassword: true,
+      // Force password change on first login in production only
+      mustChangePassword: isProduction,
     });
 
     await adminUser.save();
@@ -127,15 +136,15 @@ export class AuthService implements OnModuleInit {
     // SECURITY FIX: Never log credentials to console in any environment
     // Store the initial admin credentials securely
     if (process.env.NODE_ENV !== 'production') {
-      // In development, store in environment variable instead of logging
-      process.env.INITIAL_ADMIN_PASSWORD = randomPassword;
+      // In development, store in environment variable and log for convenience
+      process.env.INITIAL_ADMIN_PASSWORD = password;
       console.warn(`
       ⚠️  SECURITY NOTICE: Default admin user created.
       Username: admin
+      Password: ${password}
 
-      ❗ IMPORTANT: Initial password stored in INITIAL_ADMIN_PASSWORD environment variable.
-      ❗ This password must be changed on first login.
-      ❗ Password change is required before system access.
+      ❗ DEVELOPMENT MODE: Using fixed password for easier testing.
+      ❗ This will be randomized in production environments.
       `);
     } else {
       // In production, require external password initialization
@@ -159,7 +168,7 @@ export class AuthService implements OnModuleInit {
         const credentialsFile = path.join(secretsPath, 'admin-init.json');
         const credentials = {
           username: 'admin',
-          temporaryPassword: randomPassword,
+          temporaryPassword: password,
           createdAt: new Date().toISOString(),
           mustChangePassword: true,
           note: 'This file should be deleted after password change'

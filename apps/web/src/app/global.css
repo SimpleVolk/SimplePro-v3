@@ -1,5 +1,51 @@
 /* SimplePro Dark Theme Global Styles with Accessibility Enhancements */
 
+/* CSS Custom Properties for Dashboard Components */
+:root {
+  /* Color Palette */
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-accent: #4a9eff;
+
+  /* Background Colors */
+  --background-primary: #0f1419;
+  --background-secondary: #1e2531;
+  --card-background: #2d2d2d;
+  --hover-background: rgba(74, 158, 255, 0.1);
+
+  /* Border Colors */
+  --border-color: #444;
+  --border-hover: #4a9eff;
+
+  /* Accent Colors */
+  --accent-color: #4a9eff;
+  --accent-color-hover: #3d8bdb;
+
+  /* Status Colors */
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --info-color: #2196f3;
+
+  /* Chart Colors */
+  --chart-primary: #4caf50;
+  --chart-secondary: #2196f3;
+  --chart-accent: #ff9800;
+  --chart-warning: #f44336;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   :root {

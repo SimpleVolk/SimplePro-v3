@@ -1,102 +1,191 @@
 [
   {
+    "username": "admin",
     "email": "admin@simplepro.com",
     "firstName": "Super",
     "lastName": "Admin",
-    "role": "super_admin",
+    "role": {
+      "id": "role_super_admin",
+      "name": "super_admin",
+      "displayName": "Super Administrator",
+      "description": "Full system access with all permissions",
+      "isSystemRole": true,
+      "permissions": []
+    },
     "password": "Admin123!",
     "permissions": [
-      "users:read", "users:write", "users:delete",
-      "customers:read", "customers:write", "customers:delete",
-      "jobs:read", "jobs:write", "jobs:delete",
-      "estimates:read", "estimates:write",
-      "reports:read", "system:admin"
+      { "id": "perm_users_all", "resource": "users", "action": "create" },
+      { "id": "perm_users_read", "resource": "users", "action": "read" },
+      { "id": "perm_users_update", "resource": "users", "action": "update" },
+      { "id": "perm_users_delete", "resource": "users", "action": "delete" },
+      { "id": "perm_customers_all", "resource": "customers", "action": "create" },
+      { "id": "perm_customers_read", "resource": "customers", "action": "read" },
+      { "id": "perm_customers_update", "resource": "customers", "action": "update" },
+      { "id": "perm_customers_delete", "resource": "customers", "action": "delete" },
+      { "id": "perm_jobs_all", "resource": "jobs", "action": "create" },
+      { "id": "perm_jobs_read", "resource": "jobs", "action": "read" },
+      { "id": "perm_jobs_update", "resource": "jobs", "action": "update" },
+      { "id": "perm_jobs_delete", "resource": "jobs", "action": "delete" },
+      { "id": "perm_estimates_all", "resource": "estimates", "action": "create" },
+      { "id": "perm_estimates_read", "resource": "estimates", "action": "read" },
+      { "id": "perm_estimates_update", "resource": "estimates", "action": "update" },
+      { "id": "perm_reports_read", "resource": "reports", "action": "read" },
+      { "id": "perm_system_admin", "resource": "system_settings", "action": "update" }
     ],
     "isActive": true,
+    "mustChangePassword": false,
+    "department": "Administration",
+    "phoneNumber": "+1-555-0101",
+    "createdBy": "system",
+    "lastModifiedBy": "system",
     "preferences": {
       "theme": "dark",
       "language": "en",
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "12h",
       "notifications": {
         "email": true,
-        "browser": true,
-        "sms": false
+        "sms": false,
+        "push": true
       },
       "dashboard": {
+        "layout": "default",
         "widgets": ["stats", "recent_jobs", "calendar", "notifications"]
       }
     }
   },
   {
+    "username": "dispatcher",
     "email": "dispatcher@simplepro.com",
     "firstName": "Sarah",
     "lastName": "Johnson",
-    "role": "dispatcher",
+    "role": {
+      "id": "role_dispatcher",
+      "name": "dispatcher",
+      "displayName": "Dispatcher",
+      "description": "Job scheduling and crew assignment",
+      "isSystemRole": true,
+      "permissions": []
+    },
     "password": "Dispatch123!",
     "permissions": [
-      "customers:read", "customers:write",
-      "jobs:read", "jobs:write",
-      "estimates:read", "estimates:write",
-      "crew:read", "crew:assign"
+      { "id": "perm_jobs_read", "resource": "jobs", "action": "read" },
+      { "id": "perm_jobs_update", "resource": "jobs", "action": "update" },
+      { "id": "perm_jobs_assign", "resource": "jobs", "action": "assign" },
+      { "id": "perm_crews_read", "resource": "crews", "action": "read" },
+      { "id": "perm_crews_assign", "resource": "crews", "action": "assign" },
+      { "id": "perm_customers_read", "resource": "customers", "action": "read" },
+      { "id": "perm_estimates_read", "resource": "estimates", "action": "read" },
+      { "id": "perm_estimates_update", "resource": "estimates", "action": "update" }
     ],
     "isActive": true,
+    "mustChangePassword": false,
+    "department": "Operations",
+    "phoneNumber": "+1-555-0102",
+    "createdBy": "system",
+    "lastModifiedBy": "system",
     "preferences": {
       "theme": "dark",
       "language": "en",
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "12h",
       "notifications": {
         "email": true,
-        "browser": true,
-        "sms": true
+        "sms": true,
+        "push": true
       },
       "dashboard": {
+        "layout": "default",
         "widgets": ["calendar", "active_jobs", "crew_status"]
       }
     }
   },
   {
+    "username": "sales",
     "email": "sales@simplepro.com",
     "firstName": "Michael",
     "lastName": "Chen",
-    "role": "admin",
+    "role": {
+      "id": "role_sales",
+      "name": "sales",
+      "displayName": "Sales Representative",
+      "description": "Customer management and estimate creation",
+      "isSystemRole": true,
+      "permissions": []
+    },
     "password": "Sales123!",
     "permissions": [
-      "customers:read", "customers:write",
-      "estimates:read", "estimates:write",
-      "jobs:read", "reports:read"
+      { "id": "perm_customers_create", "resource": "customers", "action": "create" },
+      { "id": "perm_customers_read", "resource": "customers", "action": "read" },
+      { "id": "perm_customers_update", "resource": "customers", "action": "update" },
+      { "id": "perm_estimates_create", "resource": "estimates", "action": "create" },
+      { "id": "perm_estimates_read", "resource": "estimates", "action": "read" },
+      { "id": "perm_estimates_update", "resource": "estimates", "action": "update" },
+      { "id": "perm_jobs_read", "resource": "jobs", "action": "read" },
+      { "id": "perm_reports_read", "resource": "reports", "action": "read" }
     ],
     "isActive": true,
+    "mustChangePassword": false,
+    "department": "Sales",
+    "phoneNumber": "+1-555-0103",
+    "createdBy": "system",
+    "lastModifiedBy": "system",
     "preferences": {
       "theme": "dark",
       "language": "en",
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "12h",
       "notifications": {
         "email": true,
-        "browser": true,
-        "sms": false
+        "sms": false,
+        "push": true
       },
       "dashboard": {
+        "layout": "default",
         "widgets": ["leads", "estimates", "conversion_stats"]
       }
     }
   },
   {
+    "username": "crew.lead",
     "email": "crew.lead@simplepro.com",
     "firstName": "David",
     "lastName": "Rodriguez",
-    "role": "crew",
+    "role": {
+      "id": "role_crew_lead",
+      "name": "crew_lead",
+      "displayName": "Crew Lead",
+      "description": "Lead crew operations and job completion",
+      "isSystemRole": true,
+      "permissions": []
+    },
     "password": "Crew123!",
     "permissions": [
-      "jobs:read", "jobs:update_status",
-      "customers:read"
+      { "id": "perm_jobs_read_assigned", "resource": "jobs", "action": "read", "conditions": [{"field": "assignedCrew", "operator": "in", "value": "current_user"}] },
+      { "id": "perm_jobs_update_assigned", "resource": "jobs", "action": "update", "conditions": [{"field": "assignedCrew", "operator": "in", "value": "current_user"}] },
+      { "id": "perm_customers_read", "resource": "customers", "action": "read" },
+      { "id": "perm_inventory_read", "resource": "inventory", "action": "read" },
+      { "id": "perm_inventory_update", "resource": "inventory", "action": "update" }
     ],
     "isActive": true,
+    "mustChangePassword": false,
+    "department": "Operations",
+    "crewId": "crew_001",
+    "phoneNumber": "+1-555-0104",
+    "createdBy": "system",
+    "lastModifiedBy": "system",
     "preferences": {
       "theme": "dark",
       "language": "en",
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "12h",
       "notifications": {
         "email": false,
-        "browser": true,
-        "sms": true
+        "sms": true,
+        "push": true
       },
       "dashboard": {
+        "layout": "default",
         "widgets": ["my_jobs", "schedule"]
       }
     }

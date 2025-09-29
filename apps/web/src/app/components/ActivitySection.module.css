@@ -1,0 +1,211 @@
+.activitySection {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tabNavigation {
+  display: flex;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  background: var(--hover-background);
+  color: var(--text-primary);
+}
+
+.tabActive {
+  background: var(--accent-color) !important;
+  color: white !important;
+}
+
+.sectionContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.metricItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.metricItem:hover {
+  background: var(--hover-background);
+  transform: translateY(-1px);
+}
+
+.metricIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.metricDetails {
+  flex: 1;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.metricValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.chartSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartSection h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chartContainer {
+  flex: 1;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chartLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .activitySection {
+    padding: 1rem;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .tabNavigation {
+    justify-content: center;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .metricItem {
+    padding: 0.5rem;
+  }
+
+  .metricIcon {
+    font-size: 1rem;
+  }
+
+  .metricValue {
+    font-size: 1rem;
+  }
+
+  .chartContainer {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .activitySection {
+    padding: 0.75rem;
+  }
+
+  .tab {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .metricLabel {
+    font-size: 0.7rem;
+  }
+
+  .metricValue {
+    font-size: 0.875rem;
+  }
+
+  .chartContainer {
+    min-height: 180px;
+  }
+}

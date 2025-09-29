@@ -3,12 +3,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getApiUrl } from '@/lib/config';
 
+interface UserRole {
+  id: string;
+  name: 'super_admin' | 'admin' | 'manager' | 'dispatcher' | 'sales' | 'crew_lead' | 'crew_member' | 'customer_service';
+  displayName: string;
+  description: string;
+  isSystemRole: boolean;
+}
+
 interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role: UserRole;
   permissions: string[];
 }
 

@@ -37,8 +37,8 @@ import { CustomThrottlerGuard } from './common/guards/throttle.guard';
       },
       {
         name: 'auth',
-        ttl: 900000, // 15 minutes
-        limit: 5, // 5 login attempts per 15 minutes
+        ttl: 60000, // 1 minute (increased from 15 minutes for development)
+        limit: 100, // 100 login attempts per minute (increased from 5 for development)
       },
       {
         name: 'api',

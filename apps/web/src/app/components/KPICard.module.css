@@ -1,0 +1,251 @@
+.kpiCard {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpiCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-color);
+  transition: background-color 0.3s ease;
+}
+
+.kpiCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-color);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background: var(--hover-background);
+}
+
+.clickable:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Color Variants */
+.success::before {
+  background: #4caf50;
+}
+
+.success {
+  --accent-color: #4caf50;
+  --text-accent: #4caf50;
+}
+
+.warning::before {
+  background: #ff9800;
+}
+
+.warning {
+  --accent-color: #ff9800;
+  --text-accent: #ff9800;
+}
+
+.info::before {
+  background: #2196f3;
+}
+
+.info {
+  --accent-color: #2196f3;
+  --text-accent: #2196f3;
+}
+
+.neutral::before {
+  background: #6c757d;
+}
+
+.neutral {
+  --accent-color: #6c757d;
+  --text-accent: #6c757d;
+}
+
+/* Card Header */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.cardIcon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.changeIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.trendUp {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.trendDown {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.trendNeutral {
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+
+.trendIcon {
+  font-size: 0.7rem;
+}
+
+.changeValue {
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+/* Card Content */
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.cardValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 0.25rem 0;
+}
+
+.cardSubValue {
+  font-size: 0.75rem;
+  color: var(--text-accent, var(--text-secondary));
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* Loading State */
+.loading {
+  pointer-events: none;
+}
+
+.loadingSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+.skeletonIcon,
+.skeletonText,
+.skeletonValue {
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeletonIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.skeletonText {
+  width: 70%;
+  height: 0.875rem;
+}
+
+.skeletonValue {
+  width: 50%;
+  height: 2rem;
+  margin-top: auto;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .kpiCard {
+    padding: 1rem;
+    min-height: 120px;
+  }
+
+  .cardIcon {
+    font-size: 1.5rem;
+  }
+
+  .cardValue {
+    font-size: 1.5rem;
+  }
+
+  .cardTitle {
+    font-size: 0.8rem;
+  }
+
+  .changeIndicator {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpiCard {
+    padding: 0.75rem;
+    min-height: 100px;
+  }
+
+  .cardValue {
+    font-size: 1.25rem;
+  }
+
+  .cardTitle {
+    font-size: 0.75rem;
+  }
+}

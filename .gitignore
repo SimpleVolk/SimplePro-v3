@@ -173,3 +173,4 @@ vitest.config.*.timestamp*
 
 .claude
 
+docs/ui-reference

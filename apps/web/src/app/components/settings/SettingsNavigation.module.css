@@ -1,0 +1,141 @@
+.settingsNavigation {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.navigationContent {
+  padding: 1rem 0;
+}
+
+.navigationItem {
+  margin-bottom: 0.125rem;
+}
+
+.navButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+  text-align: left;
+}
+
+.navButton:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.navButton.active {
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.navButton.parentActive {
+  background: var(--color-primary-alpha);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.navContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.navIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expandIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+  transform: rotate(0deg);
+  flex-shrink: 0;
+}
+
+.expandIcon.expanded {
+  transform: rotate(90deg);
+}
+
+.childrenContainer {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid var(--color-border);
+  margin-left: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navigationContent {
+    padding: 0.5rem 0;
+  }
+
+  .navButton {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .navContent {
+    gap: 0.5rem;
+  }
+
+  .navIcon {
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Focus States */
+.navButton:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* Keyboard Navigation */
+.navButton[aria-selected="true"] {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Loading States */
+.navButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .navButton,
+  .expandIcon {
+    transition: none;
+  }
+}

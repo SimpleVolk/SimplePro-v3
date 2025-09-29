@@ -118,6 +118,118 @@ export class AnalyticsController {
     return this.analyticsService.getEventsByCategory(category, period, eventLimit);
   }
 
+  // Activity metrics endpoint for dashboard
+  @Get('activity-metrics')
+  @Roles('super_admin', 'admin', 'dispatcher')
+  async getActivityMetrics(
+    @Query('period') period: 'today' | 'week' | 'month' = 'today'
+  ) {
+    try {
+      // For now, return mock data based on period - replace with actual database queries
+      const multiplier = period === 'month' ? 3 : period === 'week' ? 2 : 1;
+      return {
+        leads: Math.floor(Math.random() * 15 * multiplier) + 5,
+        quotesSent: Math.floor(Math.random() * 12 * multiplier) + 3,
+        booked: Math.floor(Math.random() * 8 * multiplier) + 2,
+        cancellations: Math.floor(Math.random() * 3 * multiplier)
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch activity metrics');
+    }
+  }
+
+  // Open items endpoint for dashboard
+  @Get('open-items')
+  @Roles('super_admin', 'admin', 'dispatcher')
+  async getOpenItems() {
+    try {
+      // For now, return mock data - replace with actual database queries
+      return {
+        unassignedLeads: Math.floor(Math.random() * 5),
+        newLeads: Math.floor(Math.random() * 8),
+        acceptedNotBooked: Math.floor(Math.random() * 3),
+        staleOpportunities: Math.floor(Math.random() * 4) + 1,
+        customerServiceTickets: Math.floor(Math.random() * 2),
+        inventorySubmissions: Math.floor(Math.random() * 3) + 1
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch open items');
+    }
+  }
+
+  // Sales performance endpoint for dashboard
+  @Get('sales-performance')
+  @Roles('super_admin', 'admin', 'dispatcher')
+  async getSalesPerformance() {
+    try {
+      // For now, return mock data - replace with actual database queries
+      return {
+        topPerformers: [
+          {
+            id: '1',
+            name: 'Sarah Johnson',
+            role: 'Sales Manager',
+            sales: 12,
+            revenue: 18500,
+            conversion: 85
+          },
+          {
+            id: '2',
+            name: 'Mike Chen',
+            role: 'Sales Rep',
+            sales: 8,
+            revenue: 12200,
+            conversion: 72
+          },
+          {
+            id: '3',
+            name: 'Lisa Rodriguez',
+            role: 'Sales Rep',
+            sales: 6,
+            revenue: 9800,
+            conversion: 68
+          }
+        ],
+        referralSources: [
+          {
+            id: '1',
+            name: 'Google Ads',
+            leads: 25,
+            conversions: 8,
+            revenue: 12400,
+            conversionRate: 32
+          },
+          {
+            id: '2',
+            name: 'Referrals',
+            leads: 18,
+            conversions: 12,
+            revenue: 18600,
+            conversionRate: 67
+          },
+          {
+            id: '3',
+            name: 'Website',
+            leads: 15,
+            conversions: 4,
+            revenue: 6200,
+            conversionRate: 27
+          },
+          {
+            id: '4',
+            name: 'Yelp',
+            leads: 12,
+            conversions: 3,
+            revenue: 4800,
+            conversionRate: 25
+          }
+        ]
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch sales performance');
+    }
+  }
+
   // Track custom metric
   @Post('metrics/track')
   @Roles('super_admin', 'admin', 'manager', 'dispatcher', 'crew_lead', 'crew_member')
