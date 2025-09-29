@@ -257,6 +257,22 @@ All estimate calculations should flow through the DeterministicEstimator to ensu
 - Complete audit trails
 - Reproducible results for the same input
 
+### Modern UI Development
+
+**Critical Architecture Notes:**
+
+1. **Sidebar Navigation Pattern** - The app uses a modern sidebar layout (`AppLayout` component) rather than horizontal tabs
+2. **Component Lazy Loading** - Heavy components are lazy-loaded with `Suspense` for performance
+3. **Settings System** - Comprehensive hierarchical settings system with 30+ pages organized by category
+4. **Dashboard-First Approach** - Dashboard is the default landing page, not estimates
+5. **Responsive Design** - All components support mobile-first responsive design with collapsible sidebar
+
+**When Adding New Features:**
+- Wrap new components in the `AppLayout` for consistent navigation
+- Use `LoadingSkeleton` components for loading states
+- Follow the established CSS Modules pattern for styling
+- Maintain role-based access control for navigation items
+
 ### API Development
 
 The API follows NestJS patterns with:
@@ -274,6 +290,29 @@ The API follows NestJS patterns with:
 - **User Schema** (`apps/api/src/auth/schemas/user.schema.ts`) - Complete user management with roles and permissions
 - **UserSession Schema** (`apps/api/src/auth/schemas/user-session.schema.ts`) - Session tracking with automatic expiration
 - **Job Schema** (`apps/api/src/jobs/schemas/job.schema.ts`) - Comprehensive job lifecycle management
+
+## Default Authentication Credentials
+
+**Default Admin Login:**
+- **Username:** `admin`
+- **Email:** `admin@simplepro.com` (can also be used as username)
+- **Password:** `Admin123!` (case-sensitive with exclamation mark)
+
+**Important:** This is for development only. The password is case-sensitive and must include the exclamation mark.
+
+## Modern UI Architecture
+
+**Layout Transformation (Completed):**
+- **AppLayout Component** (`apps/web/src/app/components/AppLayout.tsx`) - Main layout wrapper with sidebar + content areas
+- **Sidebar Component** (`apps/web/src/app/components/Sidebar.tsx`) - Modern blue gradient sidebar with collapsible navigation
+- **DashboardOverview Component** (`apps/web/src/app/components/DashboardOverview.tsx`) - KPI dashboard with real-time metrics
+- **Comprehensive Settings System** (`apps/web/src/app/components/settings/`) - Hierarchical 30+ page settings interface
+
+**Navigation Pattern:**
+- Transformed from horizontal tabs to modern sidebar navigation
+- Dashboard is the default landing page
+- All existing components preserved and wrapped in new layout
+- Role-based navigation filtering maintained
 
 ## Environment Requirements
 
@@ -358,7 +397,8 @@ The Next.js web application provides a complete estimate calculator interface:
 # Start the web development server
 nx dev web
 
-# Application runs on http://localhost:3008 (or available port)
+# Default application runs on http://localhost:3009
+# Alternative port: http://localhost:3010
 ```
 
 ### Current Status
@@ -457,8 +497,11 @@ The complete business management system is **fully functional and production-rea
 }
 ```
 
-#### **Web Application** (`localhost:3008`)
+#### **Web Application** (Default: `localhost:3009`, Alternative: `localhost:3010`)
 
+- ✅ **Modern Sidebar Navigation** - Transformed from horizontal tabs to professional blue gradient sidebar with collapsible design
+- ✅ **KPI Dashboard Overview** - Real-time business metrics with 4 KPI cards and activity tracking
+- ✅ **Comprehensive Settings System** - Hierarchical settings (30+ pages) with company management, pricing, and tariffs
 - ✅ **Next.js Frontend** with dark theme mobile-first design
 - ✅ **Estimate Calculator Form** with comprehensive input validation
 - ✅ **Real-time Price Calculations** using pricing engine
@@ -604,9 +647,32 @@ With the complete business management system now operational, the next prioritie
 
 **Current Status**: **Production-ready business management platform** with:
 - ✅ **Complete Frontend Application** with all business interfaces implemented
+- ✅ **Modern UI/UX Transformation** - Professional sidebar navigation, KPI dashboard, and comprehensive settings system
 - ✅ **Full Authentication & Authorization** with JWT, RBAC, and session management
 - ✅ **MongoDB Database Integration** with persistent data storage and comprehensive schemas
 - ✅ **Deterministic Pricing Engine** with 38 passing tests and complete audit trails
 - ✅ **Comprehensive REST API** with 53+ endpoints covering all core business operations
 - ✅ **Enterprise-Ready Architecture** with proper error handling, validation, and security
 - ✅ **Quality Assurance** with successful builds and comprehensive testing
+
+## Common Development Issues & Solutions
+
+### Login Issues
+- **Problem**: "Invalid credentials" error
+- **Solution**: Use correct password `Admin123!` (case-sensitive with exclamation mark)
+- **Check**: Ensure API is running on port 3001 and MongoDB is connected
+
+### Port Conflicts
+- **Problem**: Multiple services trying to use same ports
+- **Solution**: Kill conflicting Node.js processes with `TASKKILL /F /IM node.exe` (Windows)
+- **Check**: Use `netstat -ano | findstr :PORT_NUMBER` to identify processes
+
+### Build Failures
+- **Problem**: TypeScript or dependency errors
+- **Solution**: Run `npm install` in root, then try `npm run build`
+- **Check**: Ensure Node.js >= 20.0.0 and npm >= 10.0.0
+
+### UI Layout Issues
+- **Problem**: Components not showing sidebar or modern layout
+- **Solution**: Ensure components are wrapped in `AppLayout` and using correct navigation pattern
+- **Check**: Verify `Dashboard.tsx` is using `AppLayout` wrapper and `activeTab` state management

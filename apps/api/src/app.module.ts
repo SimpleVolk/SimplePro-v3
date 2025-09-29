@@ -17,6 +17,9 @@ import { EstimatesModule } from './estimates/estimates.module';
 import { CustomersModule } from './customers/customers.module';
 import { JobsModule } from './jobs/jobs.module';
 import { PricingRulesModule } from './pricing-rules/pricing-rules.module';
+import { TariffSettingsModule } from './tariff-settings/tariff-settings.module';
+import { CompanyModule } from './company/company.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 // import { GraphqlModule } from './graphql/graphql.module';
 import { WebSocketModule } from './websocket/websocket.module';
 import { AnalyticsModule } from './analytics/analytics.module';
@@ -52,6 +55,9 @@ import { CustomThrottlerGuard } from './common/guards/throttle.guard';
     CustomersModule,
     JobsModule,
     PricingRulesModule,
+    TariffSettingsModule,
+    CompanyModule,
+    AuditLogsModule,
     // GraphqlModule,
     WebSocketModule,
     AnalyticsModule,

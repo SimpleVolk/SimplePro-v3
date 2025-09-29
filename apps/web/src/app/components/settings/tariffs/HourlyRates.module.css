@@ -360,3 +360,107 @@
 .rateButton:active {
   animation: cellHighlight 0.3s ease-out;
 }
+
+/* Loading and Error States */
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorMessage {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.retryButton,
+.refreshButton {
+  padding: 0.75rem 1.5rem;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retryButton:hover,
+.refreshButton:hover {
+  background: var(--color-primary-alpha);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.successMessage {
+  color: var(--color-success);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+}
+
+/* Day Info */
+.dayInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.minHours {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* Status Indicator */
+.statusIndicator {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.savingText {
+  color: var(--color-warning);
+  font-size: 0.85rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enabledText {
+  color: var(--color-success);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Disabled States */
+.exportButton:disabled,
+.refreshButton:disabled,
+.rateButton:disabled,
+.rateInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

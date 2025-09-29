@@ -18,6 +18,34 @@ async function bootstrap() {
   const port = parseInt(process.env.PORT || '3001', 10);
   const logger = new Logger('Bootstrap');
 
+  // Initialize company settings on startup
+  try {
+    const companyService = app.get('CompanyService');
+    await companyService.getSettings(); // Will create defaults if not exists
+    logger.log('✓ Company settings initialized');
+  } catch (error) {
+    logger.warn('Company settings initialization skipped:', error.message);
+  }
+
+  // Initialize tariff settings on startup (if SEED_DATA=true)
+  if (process.env.SEED_DATA === 'true') {
+    try {
+      logger.log('🌱 Seeding tariff settings...');
+      const { TariffSettingsSeeder } = await import('./database/seeders/tariff-settings.seeder');
+      const tariffSeeder = app.get(TariffSettingsSeeder);
+      const hasDefaultTariff = await tariffSeeder.hasDefaultTariff();
+
+      if (!hasDefaultTariff) {
+        await tariffSeeder.seed();
+        logger.log('✓ Tariff settings seeded successfully');
+      } else {
+        logger.log('✓ Default tariff settings already exist (skipping seed)');
+      }
+    } catch (error) {
+      logger.warn('Tariff settings seed skipped:', error.message);
+    }
+  }
+
   // Enable graceful shutdown
   app.enableShutdownHooks();
 

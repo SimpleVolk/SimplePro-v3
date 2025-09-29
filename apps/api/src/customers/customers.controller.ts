@@ -10,6 +10,7 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { CustomersService } from './customers.service';
@@ -23,11 +24,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/interfaces/user.interface';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Controller('customers')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CustomersController {
-  constructor(private readonly customersService: CustomersService) {}
+  constructor(
+    private readonly customersService: CustomersService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -36,8 +41,34 @@ export class CustomersController {
   async create(
     @Body() createCustomerDto: CreateCustomerDto,
     @CurrentUser() user: User,
+    @Req() req: any,
   ) {
     const customer = await this.customersService.create(createCustomerDto, user.id);
+
+    // Log customer creation
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'CREATE_CUSTOMER',
+      'Customer',
+      {
+        resourceId: customer.id,
+        severity: 'info',
+        outcome: 'success',
+        changes: {
+          after: {
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            email: customer.email,
+            type: customer.type
+          },
+        },
+      }
+    );
 
     return {
       success: true,
@@ -116,8 +147,29 @@ export class CustomersController {
     @Param('id') id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
     @CurrentUser() user: User,
+    @Req() req: any,
   ) {
     const customer = await this.customersService.update(id, updateCustomerDto, user.id);
+
+    // Log customer update
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'UPDATE_CUSTOMER',
+      'Customer',
+      {
+        resourceId: id,
+        severity: 'info',
+        outcome: 'success',
+        changes: {
+          after: updateCustomerDto,
+        },
+      }
+    );
 
     return {
       success: true,
@@ -130,8 +182,25 @@ export class CustomersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequirePermissions({ resource: 'customers', action: 'delete' })
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string, @CurrentUser() user: User, @Req() req: any) {
     await this.customersService.remove(id);
+
+    // Log customer deletion
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'DELETE_CUSTOMER',
+      'Customer',
+      {
+        resourceId: id,
+        severity: 'warning',
+        outcome: 'success',
+      }
+    );
   }
 
   @Post(':id/contact')

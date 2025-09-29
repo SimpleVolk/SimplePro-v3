@@ -9,6 +9,7 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -25,21 +26,63 @@ import { Public } from './decorators/public.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { RequirePermissions } from './decorators/permissions.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
-    const result = await this.authService.login(loginDto);
-    return {
-      success: true,
-      data: result,
-      message: 'Login successful',
-    };
+  async login(@Body() loginDto: LoginDto, @Req() req: any) {
+    try {
+      const result = await this.authService.login(loginDto);
+
+      // Log successful login
+      await this.auditLogsService.log(
+        {
+          userId: result.user.id,
+          userName: `${result.user.firstName} ${result.user.lastName}`,
+          ipAddress: req.ip || 'unknown',
+          userAgent: req.headers['user-agent'],
+        },
+        'LOGIN',
+        'Authentication',
+        {
+          severity: 'info',
+          outcome: 'success',
+          metadata: {
+            username: loginDto.username,
+          },
+        }
+      );
+
+      return {
+        success: true,
+        data: result,
+        message: 'Login successful',
+      };
+    } catch (error) {
+      // Log failed login attempt
+      await this.auditLogsService.createLog({
+        timestamp: new Date(),
+        userId: 'unknown',
+        userName: loginDto.username,
+        action: 'LOGIN_FAILED',
+        resource: 'Authentication',
+        severity: 'warning',
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+        outcome: 'failure',
+        errorMessage: error.message,
+      });
+
+      throw error;
+    }
   }
 
   @Public()
@@ -59,8 +102,25 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@CurrentUser() user: User) {
+  async logout(@CurrentUser() user: User, @Req() req: any) {
     await this.authService.logout(user.id);
+
+    // Log logout
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'LOGOUT',
+      'Authentication',
+      {
+        severity: 'info',
+        outcome: 'success',
+      }
+    );
+
     return {
       success: true,
       message: 'Logout successful',
@@ -99,8 +159,26 @@ export class AuthController {
   async changePassword(
     @CurrentUser() user: User,
     @Body() changePasswordDto: ChangePasswordDto,
+    @Req() req: any,
   ) {
     await this.authService.changePassword(user.id, changePasswordDto);
+
+    // Log password change
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'PASSWORD_CHANGE',
+      'Authentication',
+      {
+        severity: 'warning',
+        outcome: 'success',
+      }
+    );
+
     return {
       success: true,
       message: 'Password changed successfully',
@@ -135,9 +213,29 @@ export class AuthController {
   @RequirePermissions({ resource: 'users', action: 'create' })
   @Post('users')
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+  async createUser(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User, @Req() req: any) {
     const newUser = await this.authService.create(createUserDto, user.id);
     const { passwordHash, ...userProfile } = newUser;
+
+    // Log user creation
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'CREATE_USER',
+      'User',
+      {
+        resourceId: newUser.id,
+        severity: 'info',
+        outcome: 'success',
+        changes: {
+          after: { username: newUser.username, email: newUser.email, role: newUser.role.name },
+        },
+      }
+    );
 
     return {
       success: true,
@@ -180,9 +278,30 @@ export class AuthController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: User,
+    @Req() req: any,
   ) {
     const updatedUser = await this.authService.update(id, updateUserDto, user.id);
     const { passwordHash, ...userProfile } = updatedUser;
+
+    // Log user update
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'UPDATE_USER',
+      'User',
+      {
+        resourceId: id,
+        severity: 'info',
+        outcome: 'success',
+        changes: {
+          after: updateUserDto,
+        },
+      }
+    );
 
     return {
       success: true,
@@ -195,8 +314,26 @@ export class AuthController {
   @RequirePermissions({ resource: 'users', action: 'delete' })
   @Delete('users/:id')
   @HttpCode(HttpStatus.OK)
-  async removeUser(@Param('id') id: string) {
+  async removeUser(@Param('id') id: string, @CurrentUser() user: User, @Req() req: any) {
     await this.authService.remove(id);
+
+    // Log user deletion
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'DELETE_USER',
+      'User',
+      {
+        resourceId: id,
+        severity: 'warning',
+        outcome: 'success',
+      }
+    );
+
     return {
       success: true,
       message: 'User deactivated successfully',

@@ -109,11 +109,13 @@ import {
 export class DeterministicEstimator {
   private rules: PricingRule[] = [];
   private locationHandicaps: LocationHandicap[] = [];
+  private tariffSettings: any = null;
   private readonly VERSION = '1.0.0';
 
-  constructor(rules: PricingRule[], locationHandicaps: LocationHandicap[]) {
+  constructor(rules: PricingRule[], locationHandicaps: LocationHandicap[], tariffSettings?: any) {
     this.rules = rules.sort((a, b) => a.priority - b.priority);
     this.locationHandicaps = locationHandicaps.filter(h => h.isActive);
+    this.tariffSettings = tariffSettings || null;
   }
 
   /**
@@ -262,6 +264,42 @@ export class DeterministicEstimator {
    * Calculate base price before applying rules and handicaps
    */
   private calculateBasePrice(input: EstimateInput): number {
+    if (this.tariffSettings) {
+      try {
+        return this.calculateBasePriceFromTariff(input);
+      } catch (error) {
+        console.warn('Failed to calculate from tariff, using legacy:', error instanceof Error ? error.message : String(error));
+        return this.calculateBasePriceLegacy(input);
+      }
+    }
+
+    return this.calculateBasePriceLegacy(input);
+  }
+
+  /**
+   * Calculate base price using tariff settings
+   */
+  private calculateBasePriceFromTariff(input: EstimateInput): number {
+    const dayOfWeek = this.getDayOfWeek(input.moveDate || new Date());
+
+    switch (input.service) {
+      case 'local':
+        return this.calculateLocalRate(input, dayOfWeek);
+      case 'long_distance':
+        return this.calculateLongDistanceRate(input);
+      case 'storage':
+        return this.calculateStorageRate(input);
+      case 'packing_only':
+        return this.calculatePackingRate(input, dayOfWeek);
+      default:
+        return this.calculateBasePriceLegacy(input);
+    }
+  }
+
+  /**
+   * Legacy base price calculation (hardcoded values)
+   */
+  private calculateBasePriceLegacy(input: EstimateInput): number {
     switch (input.service) {
       case 'local':
         // Base rate is typically per hour, multiply by estimated duration and crew size
@@ -287,6 +325,119 @@ export class DeterministicEstimator {
       default:
         throw new Error(`Unknown service type: ${input.service}`);
     }
+  }
+
+  /**
+   * Get day of week from date
+   */
+  private getDayOfWeek(date: Date): 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+    return days[date.getDay()];
+  }
+
+  /**
+   * Calculate local move rate from tariff settings
+   */
+  private calculateLocalRate(input: EstimateInput, dayOfWeek: string): number {
+    if (!this.tariffSettings?.hourlyRates) {
+      console.warn('No hourly rates in tariff settings, using legacy');
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    const { hourlyRates } = this.tariffSettings;
+
+    // Find rate for crew size
+    const rateEntry = hourlyRates.rates?.find((r: any) => r.crewSize === input.crewSize);
+    if (!rateEntry) {
+      console.warn(`No hourly rate found for crew size ${input.crewSize}, using legacy`);
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    // Get hourly rate for day
+    const hourlyRate = rateEntry[dayOfWeek];
+    if (!hourlyRate) {
+      console.warn(`No hourly rate found for ${dayOfWeek}, using legacy`);
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    // Get minimum hours
+    const minHours = hourlyRates.minHours?.[dayOfWeek] || 2;
+
+    // Calculate billable hours
+    const duration = input.estimatedDuration || 2;
+    const billableHours = Math.max(duration, minHours);
+
+    return hourlyRate * billableHours;
+  }
+
+  /**
+   * Calculate packing rate from tariff settings
+   */
+  private calculatePackingRate(input: EstimateInput, dayOfWeek: string): number {
+    if (!this.tariffSettings?.packingRates) {
+      console.warn('No packing rates in tariff settings, using legacy');
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    const { packingRates } = this.tariffSettings;
+
+    // Find rate for crew size
+    const rateEntry = packingRates.rates?.find((r: any) => r.crewSize === input.crewSize);
+    if (!rateEntry) {
+      console.warn(`No packing rate found for crew size ${input.crewSize}, using legacy`);
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    // Get hourly rate for day
+    const hourlyRate = rateEntry[dayOfWeek];
+    if (!hourlyRate) {
+      console.warn(`No packing rate found for ${dayOfWeek}, using legacy`);
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    const duration = input.estimatedDuration || 2;
+    return hourlyRate * duration;
+  }
+
+  /**
+   * Calculate long distance rate from tariff settings
+   */
+  private calculateLongDistanceRate(input: EstimateInput): number {
+    if (!this.tariffSettings?.distanceRates) {
+      console.warn('No distance rates in tariff settings, using legacy');
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    // Find active by_weight distance rate
+    const distanceRate = this.tariffSettings.distanceRates.find(
+      (r: any) => r.isActive && r.type === 'by_weight'
+    );
+
+    if (!distanceRate) {
+      console.warn('No active by_weight distance rate found, using legacy');
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    // Find applicable bracket
+    const bracket = distanceRate.brackets?.find(
+      (b: any) => input.totalWeight >= b.min && input.totalWeight < b.max
+    );
+
+    if (!bracket) {
+      console.warn(`No distance rate bracket found for weight ${input.totalWeight}, using legacy`);
+      return this.calculateBasePriceLegacy(input);
+    }
+
+    return input.totalWeight * bracket.rate;
+  }
+
+  /**
+   * Calculate storage rate from tariff settings
+   */
+  private calculateStorageRate(input: EstimateInput): number {
+    // Storage rates might come from a specific rate table in future
+    // For now, use legacy calculation
+    return this.calculateBasePriceLegacy(input);
   }
 
   /**
@@ -446,6 +597,37 @@ export class DeterministicEstimator {
     let impact = 0;
     let finalPrice = currentPrice;
 
+    // NEW: Check tariff settings for percentage-based handicap
+    if (this.tariffSettings?.handicaps) {
+      try {
+        const tariffHandicap = this.tariffSettings.handicaps.find(
+          (h: any) => h.isActive && this.matchesHandicap(h, handicap)
+        );
+
+        if (tariffHandicap?.percentage) {
+          // Apply percentage-based surcharge
+          const percentageImpact = currentPrice * (tariffHandicap.percentage / 100);
+
+          // Check if multiplier applies (e.g., per flight of stairs)
+          if (tariffHandicap.isMultiplier && tariffHandicap.category === 'stairs') {
+            const multiplier = this.getStairsMultiplier(handicap, input);
+            impact = percentageImpact * multiplier;
+          } else {
+            impact = percentageImpact;
+          }
+
+          finalPrice = currentPrice + impact;
+          return {
+            impact: Math.round(impact * 100) / 100,
+            finalPrice: Math.round(finalPrice * 100) / 100
+          };
+        }
+      } catch (error) {
+        console.warn('Failed to apply tariff handicap, using legacy:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    // LEGACY: Use fixed amounts and multipliers
     if (handicap.fixedAmount && handicap.fixedAmount > 0) {
       // For stairs, multiply by number of flights
       if (handicap.id.includes('stairs')) {
@@ -469,6 +651,39 @@ export class DeterministicEstimator {
       impact: Math.round(impact * 100) / 100,
       finalPrice: Math.round(finalPrice * 100) / 100
     };
+  }
+
+  /**
+   * Match tariff handicap to location handicap
+   */
+  private matchesHandicap(tariffHandicap: any, locationHandicap: LocationHandicap): boolean {
+    // Match by category
+    if (tariffHandicap.category === 'stairs' && locationHandicap.id.includes('stairs')) return true;
+    if (tariffHandicap.category === 'elevator' && locationHandicap.id.includes('elevator')) return true;
+    if (tariffHandicap.category === 'long_carry' && locationHandicap.id.includes('long_carry')) return true;
+
+    // Match by name (partial)
+    if (tariffHandicap.name.toLowerCase().includes('flight') && locationHandicap.id.includes('stairs')) return true;
+    if (tariffHandicap.name.toLowerCase().includes('elevator') && locationHandicap.id.includes('elevator')) return true;
+
+    return false;
+  }
+
+  /**
+   * Get stairs multiplier based on flight count
+   */
+  private getStairsMultiplier(handicap: LocationHandicap, input: EstimateInput): number {
+    let totalFlights = 0;
+
+    if (handicap.id.includes('pickup')) {
+      totalFlights += input.pickup.stairsCount || 0;
+    }
+
+    if (handicap.id.includes('delivery')) {
+      totalFlights += input.delivery.stairsCount || 0;
+    }
+
+    return Math.max(totalFlights, 1);
   }
 
   /**
@@ -601,5 +816,81 @@ export class DeterministicEstimator {
       valid: errors.length === 0,
       errors
     };
+  }
+
+  /**
+   * Calculate required crew size based on volume using tariff settings
+   * Falls back to default logic if tariff settings not available
+   */
+  public calculateRequiredCrew(cubicFeet: number): number {
+    if (!this.tariffSettings?.autoPricing?.crewRequired) {
+      // Default: 2 crew for < 800cf, 3 for < 1500cf, 4 for larger
+      if (cubicFeet < 800) return 2;
+      if (cubicFeet < 1500) return 3;
+      return 4;
+    }
+
+    const { crewRequired } = this.tariffSettings.autoPricing;
+
+    // Sort by minCubicFeet ascending
+    const sorted = [...crewRequired].sort((a: any, b: any) => a.minCubicFeet - b.minCubicFeet);
+
+    // Find first crew size where cubic feet is below threshold
+    for (const entry of sorted) {
+      if (cubicFeet < entry.minCubicFeet) {
+        return entry.crewSize;
+      }
+    }
+
+    // If volume exceeds all thresholds, return largest crew
+    return sorted[sorted.length - 1]?.crewSize || 4;
+  }
+
+  /**
+   * Calculate required truck count based on volume using tariff settings
+   * Falls back to default logic if tariff settings not available
+   */
+  public calculateRequiredTrucks(cubicFeet: number): number {
+    if (!this.tariffSettings?.autoPricing?.trucksRequired) {
+      // Default: 1 truck per 1500 cf
+      return Math.max(1, Math.ceil(cubicFeet / 1500));
+    }
+
+    const { trucksRequired } = this.tariffSettings.autoPricing;
+
+    // Sort by minCubicFeet ascending
+    const sorted = [...trucksRequired].sort((a: any, b: any) => a.minCubicFeet - b.minCubicFeet);
+
+    // Find first truck count where cubic feet is below threshold
+    for (const entry of sorted) {
+      if (cubicFeet < entry.minCubicFeet) {
+        return entry.truckCount;
+      }
+    }
+
+    // If volume exceeds all thresholds, return largest count
+    return sorted[sorted.length - 1]?.truckCount || 1;
+  }
+
+  /**
+   * Estimate duration based on volume and crew ability using tariff settings
+   * Falls back to default logic if tariff settings not available
+   */
+  public estimateDuration(cubicFeet: number, crewSize: number): number {
+    if (!this.tariffSettings?.autoPricing?.crewAbility) {
+      // Default: ~100 cubic feet per hour per 2-person crew
+      return Math.ceil(cubicFeet / (50 * crewSize));
+    }
+
+    const maxHours = this.tariffSettings.autoPricing.maxHoursPerJob || 12;
+    const { crewAbility } = this.tariffSettings.autoPricing;
+
+    const ability = crewAbility.find((c: any) => c.crewSize === crewSize);
+    if (!ability) {
+      return Math.ceil(cubicFeet / (50 * crewSize));
+    }
+
+    const estimatedHours = cubicFeet / ability.volumeCapacity;
+    return Math.min(Math.ceil(estimatedHours), maxHours);
   }
 }

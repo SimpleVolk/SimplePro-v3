@@ -6,9 +6,9 @@ import { ReportsService } from './reports.service';
 import { MetricsService } from './metrics.service';
 import { AnalyticsEvent, AnalyticsEventSchema } from './schemas/analytics-event.schema';
 import { Report, ReportSchema } from './schemas/report.schema';
-// Future imports for enhanced analytics:
-// import { CustomersModule } from '../customers/customers.module';
-// import { JobsModule } from '../jobs/jobs.module';
+import { Customer, CustomerSchema } from '../customers/schemas/customer.schema';
+import { Job, JobSchema } from '../jobs/schemas/job.schema';
+import { User, UserSchema } from '../auth/schemas/user.schema';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
@@ -16,11 +16,11 @@ import { AuthModule } from '../auth/auth.module';
     MongooseModule.forFeature([
       { name: AnalyticsEvent.name, schema: AnalyticsEventSchema },
       { name: Report.name, schema: ReportSchema },
+      { name: Customer.name, schema: CustomerSchema },
+      { name: Job.name, schema: JobSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     AuthModule,
-    // Future imports for enhanced analytics:
-    // CustomersModule,
-    // JobsModule,
   ],
   controllers: [AnalyticsController],
   providers: [AnalyticsService, ReportsService, MetricsService],

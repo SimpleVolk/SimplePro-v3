@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AnalyticsEvent, AnalyticsEventDocument } from './schemas/analytics-event.schema';
+import { Customer, CustomerDocument } from '../customers/schemas/customer.schema';
+import { Job, JobDocument } from '../jobs/schemas/job.schema';
+import { User, UserDocument } from '../auth/schemas/user.schema';
 
 export interface AnalyticsEventInput {
   eventType: string;
@@ -59,7 +62,13 @@ export class AnalyticsService {
 
   constructor(
     @InjectModel(AnalyticsEvent.name)
-    private analyticsEventModel: Model<AnalyticsEventDocument>
+    private analyticsEventModel: Model<AnalyticsEventDocument>,
+    @InjectModel(Customer.name)
+    private customerModel: Model<CustomerDocument>,
+    @InjectModel(Job.name)
+    private jobModel: Model<JobDocument>,
+    @InjectModel(User.name)
+    private userModel: Model<UserDocument>,
   ) {}
 
   // Track events for analytics
@@ -405,5 +414,317 @@ export class AnalyticsService {
       crewUtilization: 78.2, // percentage
       onTimePerformance: 91.5 // percentage
     };
+  }
+
+  /**
+   * Helper method to calculate date range based on period
+   */
+  private calculateDateRange(period: 'today' | 'week' | 'month'): Date {
+    const now = new Date();
+
+    if (period === 'today') {
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    } else if (period === 'week') {
+      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else {
+      return new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+  }
+
+  /**
+   * Get activity metrics from real database queries
+   * Replaces mock data with actual customer and job data
+   */
+  async getActivityMetrics(period: 'today' | 'week' | 'month' = 'today') {
+    try {
+      const startDate = this.calculateDateRange(period);
+
+      // Run all queries in parallel for better performance
+      const [leads, quotes, booked, cancellations] = await Promise.all([
+        // Leads: Count customers with status 'lead' created within period
+        this.customerModel.countDocuments({
+          status: 'lead',
+          createdAt: { $gte: startDate }
+        }),
+
+        // Quotes: Count jobs with status 'quoted' or 'estimate_sent' within period
+        // Note: Using 'scheduled' as proxy since we don't have explicit 'quoted' status in schema
+        this.jobModel.countDocuments({
+          status: 'scheduled',
+          createdAt: { $gte: startDate }
+        }),
+
+        // Booked: Count jobs with status 'scheduled' or 'in_progress' within period
+        this.jobModel.countDocuments({
+          status: { $in: ['scheduled', 'in_progress'] },
+          createdAt: { $gte: startDate }
+        }),
+
+        // Cancellations: Count jobs with status 'cancelled' updated within period
+        this.jobModel.countDocuments({
+          status: 'cancelled',
+          updatedAt: { $gte: startDate }
+        })
+      ]);
+
+      return {
+        leads,
+        quotesSent: quotes,
+        booked,
+        cancellations
+      };
+    } catch (error) {
+      this.logger.error(`Failed to get activity metrics: ${error.message}`, error.stack);
+      // Return fallback values on error
+      return {
+        leads: 0,
+        quotesSent: 0,
+        booked: 0,
+        cancellations: 0
+      };
+    }
+  }
+
+  /**
+   * Get open items from real database queries
+   * Replaces mock data with actual customer data
+   */
+  async getOpenItems() {
+    try {
+      const now = new Date();
+      const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      // Run all queries in parallel for better performance
+      const [
+        unassignedLeads,
+        newLeads,
+        staleOpportunities
+      ] = await Promise.all([
+        // Unassigned Leads: Count customers with status 'lead' and no assigned sales rep
+        this.customerModel.countDocuments({
+          status: 'lead',
+          $or: [
+            { assignedSalesRep: { $exists: false } },
+            { assignedSalesRep: null }
+          ]
+        }),
+
+        // New Leads: Count customers created in last 48 hours
+        this.customerModel.countDocuments({
+          createdAt: { $gte: twoDaysAgo }
+        }),
+
+        // Stale Opportunities: Count customers with status 'lead' or 'prospect'
+        // and last contact date more than 7 days ago
+        this.customerModel.countDocuments({
+          status: { $in: ['lead', 'prospect'] },
+          lastContactDate: { $lt: sevenDaysAgo }
+        })
+      ]);
+
+      // TODO: Implement accepted not booked calculation
+      // This requires estimate/quote tracking system which isn't fully implemented
+      const acceptedNotBooked = 0;
+
+      // TODO: Implement customer service tickets system
+      const customerServiceTickets = 0;
+
+      // TODO: Implement inventory submissions system
+      const inventorySubmissions = 0;
+
+      return {
+        unassignedLeads,
+        newLeads,
+        acceptedNotBooked,
+        staleOpportunities,
+        customerServiceTickets,
+        inventorySubmissions
+      };
+    } catch (error) {
+      this.logger.error(`Failed to get open items: ${error.message}`, error.stack);
+      // Return fallback values on error
+      return {
+        unassignedLeads: 0,
+        newLeads: 0,
+        acceptedNotBooked: 0,
+        staleOpportunities: 0,
+        customerServiceTickets: 0,
+        inventorySubmissions: 0
+      };
+    }
+  }
+
+  /**
+   * Get sales performance from real database queries
+   * Replaces mock data with actual job and customer data
+   */
+  async getSalesPerformance(period: 'today' | 'week' | 'month' = 'month') {
+    try {
+      const startDate = this.calculateDateRange(period);
+
+      // Get top performers by revenue using MongoDB aggregation
+      const topPerformersData = await this.jobModel.aggregate([
+        {
+          $match: {
+            status: { $in: ['scheduled', 'in_progress', 'completed'] },
+            createdAt: { $gte: startDate },
+            createdBy: { $exists: true, $ne: null }
+          }
+        },
+        {
+          $group: {
+            _id: '$createdBy',
+            sales: { $sum: 1 },
+            revenue: { $sum: '$estimatedCost' }
+          }
+        },
+        {
+          $sort: { revenue: -1 }
+        },
+        {
+          $limit: 5
+        }
+      ]).exec();
+
+      // Lookup user details for top performers
+      const topPerformers = await Promise.all(
+        topPerformersData.map(async (performer) => {
+          try {
+            const user = await this.userModel.findById(performer._id).exec();
+
+            if (!user) {
+              return {
+                id: performer._id.toString(),
+                name: 'Unknown User',
+                role: 'Unknown',
+                sales: performer.sales,
+                revenue: Math.round(performer.revenue),
+                conversion: 0 // TODO: Calculate from estimates
+              };
+            }
+
+            return {
+              id: performer._id.toString(),
+              name: `${user.firstName} ${user.lastName}`,
+              role: user.role?.name || 'Unknown',
+              sales: performer.sales,
+              revenue: Math.round(performer.revenue),
+              conversion: 0 // TODO: Calculate conversion rate from estimates to jobs
+            };
+          } catch (error) {
+            this.logger.error(`Failed to lookup user ${performer._id}: ${error.message}`);
+            return {
+              id: performer._id.toString(),
+              name: 'Unknown User',
+              role: 'Unknown',
+              sales: performer.sales,
+              revenue: Math.round(performer.revenue),
+              conversion: 0
+            };
+          }
+        })
+      );
+
+      // Get referral sources by leads
+      const referralSourcesData = await this.customerModel.aggregate([
+        {
+          $match: {
+            source: { $exists: true, $ne: null },
+            createdAt: { $gte: startDate }
+          }
+        },
+        {
+          $group: {
+            _id: '$source',
+            leads: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { leads: -1 }
+        },
+        {
+          $limit: 10
+        }
+      ]).exec();
+
+      // Calculate conversions for each source
+      const referralSources = await Promise.all(
+        referralSourcesData.map(async (source) => {
+          try {
+            // Find customers from this source that have jobs
+            const customersWithJobs = await this.customerModel.aggregate([
+              {
+                $match: {
+                  source: source._id,
+                  createdAt: { $gte: startDate },
+                  jobs: { $exists: true, $not: { $size: 0 } }
+                }
+              },
+              {
+                $count: 'total'
+              }
+            ]).exec();
+
+            const conversions = customersWithJobs[0]?.total || 0;
+            const conversionRate = source.leads > 0
+              ? Math.round((conversions / source.leads) * 100)
+              : 0;
+
+            // Get total revenue from jobs associated with this source
+            // This is a simplified calculation - ideally we'd join through customer->job relationship
+            const revenue = 0; // TODO: Calculate actual revenue from jobs
+
+            return {
+              id: source._id,
+              name: this.formatSourceName(source._id),
+              leads: source.leads,
+              conversions,
+              revenue,
+              conversionRate
+            };
+          } catch (error) {
+            this.logger.error(`Failed to calculate conversions for source ${source._id}: ${error.message}`);
+            return {
+              id: source._id,
+              name: this.formatSourceName(source._id),
+              leads: source.leads,
+              conversions: 0,
+              revenue: 0,
+              conversionRate: 0
+            };
+          }
+        })
+      );
+
+      return {
+        topPerformers,
+        referralSources
+      };
+    } catch (error) {
+      this.logger.error(`Failed to get sales performance: ${error.message}`, error.stack);
+      // Return fallback values on error
+      return {
+        topPerformers: [],
+        referralSources: []
+      };
+    }
+  }
+
+  /**
+   * Format source name for display
+   */
+  private formatSourceName(source: string): string {
+    const sourceMap: Record<string, string> = {
+      'website': 'Website',
+      'referral': 'Referrals',
+      'google': 'Google',
+      'facebook': 'Facebook',
+      'yelp': 'Yelp',
+      'direct': 'Direct',
+      'other': 'Other'
+    };
+
+    return sourceMap[source] || source.charAt(0).toUpperCase() + source.slice(1);
   }
 }
