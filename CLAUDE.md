@@ -615,6 +615,22 @@ SimplePro-v3 is now a **complete, enterprise-ready business management platform*
 
 ### **Next Development Priorities**
 
+Focus on these tasks first!
+
+#### **Build remaining settings UI**
+
+- Packing Rates, Handicaps, Distance Rates, Move Sizes (follow same patterns as completed components)
+
+#### **Create New Opportunity form**
+
+- Connect estimate form to dynamic pricing engine
+
+#### **End-to-end testing**
+
+- Change settings → create estimate → verify calculations work correctly
+
+### **More Development Tasks**
+
 With the complete business management system now operational, the next priorities focus on advanced features and deployment:
 
 #### **1. Infrastructure & Deployment**
@@ -676,3 +692,4 @@ With the complete business management system now operational, the next prioritie
 - **Problem**: Components not showing sidebar or modern layout
 - **Solution**: Ensure components are wrapped in `AppLayout` and using correct navigation pattern
 - **Check**: Verify `Dashboard.tsx` is using `AppLayout` wrapper and `activeTab` state management
+- Add remaining tasks to memory so we can pick up where we left off next session
