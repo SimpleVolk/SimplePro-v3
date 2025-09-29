@@ -52,7 +52,8 @@ export type ResourceType =
   | 'billing'
   | 'reports'
   | 'system_settings'
-  | 'pricing_rules';
+  | 'pricing_rules'
+  | 'tariff_settings';
 
 export type ActionType =
   | 'create'
@@ -62,7 +63,8 @@ export type ActionType =
   | 'assign'
   | 'approve'
   | 'export'
-  | 'import';
+  | 'import'
+  | 'activate';
 
 export interface PermissionCondition {
   field: string;

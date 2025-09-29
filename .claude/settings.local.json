@@ -110,7 +110,9 @@
       "Bash(PORT=3010 npm run dev:web)",
       "Bash(nc localhost 3001)",
       "Bash(nc:*)",
-      "Bash(TASKKILL /F /IM node.exe)"
+      "Bash(TASKKILL /F /IM node.exe)",
+      "Bash(PORT=3012 npm start)",
+      "Read(//d/**)"
     ],
     "deny": [],
     "ask": []

@@ -1,101 +1,170 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { getApiUrl } from '@/lib/config';
 import styles from './UserManagement.module.css';
 
 interface User {
   id: string;
+  username: string;
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber?: string;
   role: {
+    id: string;
     name: string;
     displayName: string;
+    permissions: Array<{
+      id: string;
+      resource: string;
+      action: string;
+    }>;
   };
-  status: 'active' | 'inactive' | 'suspended';
-  lastLogin?: string;
+  isActive: boolean;
+  lastLoginAt?: string;
   createdAt: string;
-  permissions: string[];
+  permissions: Array<{
+    id: string;
+    resource: string;
+    action: string;
+  }>;
 }
 
 interface CreateUserForm {
+  username: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
-  role: string;
+  roleId: string;
+  phoneNumber?: string;
+}
+
+interface Role {
+  id: string;
+  name: string;
+  displayName: string;
+  description: string;
+  permissions: Array<{
+    id: string;
+    resource: string;
+    action: string;
+  }>;
 }
 
 export default function UserManagement() {
   const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@movecorp.com',
-      role: { name: 'super_admin', displayName: 'Super Admin' },
-      status: 'active',
-      lastLogin: '2024-01-15T10:30:00Z',
-      createdAt: '2024-01-01T00:00:00Z',
-      permissions: ['*']
-    },
-    {
-      id: '2',
-      firstName: 'John',
-      lastName: 'Dispatcher',
-      email: 'john@movecorp.com',
-      role: { name: 'dispatcher', displayName: 'Dispatcher' },
-      status: 'active',
-      lastLogin: '2024-01-14T16:45:00Z',
-      createdAt: '2024-01-05T00:00:00Z',
-      permissions: ['jobs.read', 'jobs.write', 'customers.read', 'customers.write']
-    },
-    {
-      id: '3',
-      firstName: 'Mike',
-      lastName: 'CrewLead',
-      email: 'mike@movecorp.com',
-      role: { name: 'crew', displayName: 'Crew Member' },
-      status: 'active',
-      lastLogin: '2024-01-13T08:15:00Z',
-      createdAt: '2024-01-08T00:00:00Z',
-      permissions: ['jobs.read', 'mobile.access']
-    }
-  ]);
-
+  const [users, setUsers] = useState<User[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createForm, setCreateForm] = useState<CreateUserForm>({
+    username: '',
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'dispatcher'
+    roleId: '',
+    phoneNumber: ''
   });
 
   const [, setSelectedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'suspended'>('all');
-  const [filterRole, setFilterRole] = useState<'all' | 'super_admin' | 'admin' | 'dispatcher' | 'crew'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [filterRole, setFilterRole] = useState<string>('all');
 
-  const availableRoles = [
-    { name: 'super_admin', displayName: 'Super Admin', permissions: ['*'] },
-    { name: 'admin', displayName: 'Admin', permissions: ['users.*', 'jobs.*', 'customers.*', 'reports.*'] },
-    { name: 'dispatcher', displayName: 'Dispatcher', permissions: ['jobs.*', 'customers.*', 'calendar.*'] },
-    { name: 'crew', displayName: 'Crew Member', permissions: ['jobs.read', 'mobile.access'] }
-  ];
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+    fetchRoles();
+  }, []);
+
+  // Fetch users from API
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const token = localStorage.getItem('access_token');
+
+      if (!token) {
+        setError('Authentication required');
+        return;
+      }
+
+      const response = await fetch(getApiUrl('auth/users'), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401) {
+        setError('Session expired. Please log in again.');
+        return;
+      }
+
+      if (response.status === 403) {
+        setError('You do not have permission to view users.');
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const result = await response.json();
+      setUsers(result.data || []);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError('Failed to load users. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch available roles from API
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      const response = await fetch(getApiUrl('auth/roles'), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAvailableRoles(result.data || []);
+        // Set default role if not set
+        if (result.data && result.data.length > 0 && !createForm.roleId) {
+          setCreateForm(prev => ({
+            ...prev,
+            roleId: result.data.find((r: Role) => r.name === 'dispatcher')?.id || result.data[0].id
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching roles:', err);
+    }
+  };
 
   const filteredUsers = users.filter(user => {
     const matchesSearch =
       user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.username.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
+    const matchesStatus = filterStatus === 'all' ||
+      (filterStatus === 'active' && user.isActive) ||
+      (filterStatus === 'inactive' && !user.isActive);
+
     const matchesRole = filterRole === 'all' || user.role.name === filterRole;
 
     return matchesSearch && matchesStatus && matchesRole;
@@ -109,46 +178,139 @@ export default function UserManagement() {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // TODO: Implement API call
-      const newUser: User = {
-        id: Date.now().toString(),
-        firstName: createForm.firstName,
-        lastName: createForm.lastName,
-        email: createForm.email,
-        role: availableRoles.find(r => r.name === createForm.role)! as any,
-        status: 'active',
-        createdAt: new Date().toISOString(),
-        permissions: availableRoles.find(r => r.name === createForm.role)?.permissions || []
-      };
+    if (!createForm.username || !createForm.email || !createForm.password) {
+      alert('Please fill in all required fields');
+      return;
+    }
 
-      setUsers(prev => [...prev, newUser]);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem('access_token');
+
+      if (!token) {
+        setError('Authentication required');
+        return;
+      }
+
+      const response = await fetch(getApiUrl('auth/users'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          username: createForm.username,
+          email: createForm.email,
+          password: createForm.password,
+          firstName: createForm.firstName,
+          lastName: createForm.lastName,
+          roleId: createForm.roleId,
+          phoneNumber: createForm.phoneNumber || undefined,
+        }),
+      });
+
+      if (response.status === 401) {
+        setError('Session expired. Please log in again.');
+        return;
+      }
+
+      if (response.status === 403) {
+        setError('You do not have permission to create users.');
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to create user' }));
+        throw new Error(errorData.message || 'Failed to create user');
+      }
+
+      const result = await response.json();
+
+      // Add the new user to the state
+      if (result.success && result.data) {
+        setUsers(prev => [...prev, result.data]);
+      }
+
+      // Reset form and close modal
       setCreateForm({
+        username: '',
         firstName: '',
         lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'dispatcher'
+        roleId: availableRoles.find(r => r.name === 'dispatcher')?.id || availableRoles[0]?.id || '',
+        phoneNumber: ''
       });
       setShowCreateForm(false);
+
+      // Show success message
+      alert('User created successfully!');
+
     } catch (error) {
       console.error('Error creating user:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create user');
+      alert(error instanceof Error ? error.message : 'Failed to create user. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleStatusChange = async (userId: string, newStatus: User['status']) => {
+  const handleStatusChange = async (userId: string, newIsActive: boolean) => {
     setIsLoading(true);
+    setError(null);
+
     try {
-      // TODO: Implement API call
-      setUsers(prev => prev.map(user =>
-        user.id === userId ? { ...user, status: newStatus } : user
-      ));
+      const token = localStorage.getItem('access_token');
+
+      if (!token) {
+        setError('Authentication required');
+        return;
+      }
+
+      const response = await fetch(getApiUrl(`auth/users/${userId}`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          isActive: newIsActive,
+        }),
+      });
+
+      if (response.status === 401) {
+        setError('Session expired. Please log in again.');
+        return;
+      }
+
+      if (response.status === 403) {
+        setError('You do not have permission to update users.');
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to update user status' }));
+        throw new Error(errorData.message || 'Failed to update user status');
+      }
+
+      const result = await response.json();
+
+      // Update user in state
+      if (result.success && result.data) {
+        setUsers(prev => prev.map(user =>
+          user.id === userId ? result.data : user
+        ));
+      }
+
+      alert(`User ${newIsActive ? 'activated' : 'deactivated'} successfully!`);
+
     } catch (error) {
       console.error('Error updating user status:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update user status');
+      alert(error instanceof Error ? error.message : 'Failed to update user status. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -164,13 +326,10 @@ export default function UserManagement() {
     });
   };
 
-  const getStatusBadge = (status: User['status']) => {
-    const badges = {
-      active: { label: 'Active', className: styles.statusActive },
-      inactive: { label: 'Inactive', className: styles.statusInactive },
-      suspended: { label: 'Suspended', className: styles.statusSuspended }
-    };
-    return badges[status];
+  const getStatusBadge = (isActive: boolean) => {
+    return isActive
+      ? { label: 'Active', className: styles.statusActive }
+      : { label: 'Inactive', className: styles.statusInactive };
   };
 
   return (
@@ -188,6 +347,20 @@ export default function UserManagement() {
           + Add User
         </button>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div style={{ padding: '1rem', backgroundColor: '#f44336', color: 'white', borderRadius: '4px', marginBottom: '1rem' }}>
+          {error}
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading && users.length === 0 && (
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <p>Loading users...</p>
+        </div>
+      )}
 
       {/* Filters */}
       <div className={styles.filters}>
@@ -210,7 +383,6 @@ export default function UserManagement() {
           <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
-          <option value="suspended">Suspended</option>
         </select>
 
         <select
@@ -260,12 +432,12 @@ export default function UserManagement() {
                   </span>
                 </td>
                 <td>
-                  <span className={`${styles.statusBadge} ${getStatusBadge(user.status).className}`}>
-                    {getStatusBadge(user.status).label}
+                  <span className={`${styles.statusBadge} ${getStatusBadge(user.isActive).className}`}>
+                    {getStatusBadge(user.isActive).label}
                   </span>
                 </td>
                 <td>
-                  {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
+                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
                 </td>
                 <td>{formatDate(user.createdAt)}</td>
                 <td>
@@ -277,11 +449,11 @@ export default function UserManagement() {
                     >
                       ✏️
                     </button>
-                    {user.status === 'active' ? (
+                    {user.isActive ? (
                       <button
                         className={styles.actionButton}
-                        onClick={() => handleStatusChange(user.id, 'suspended')}
-                        title="Suspend User"
+                        onClick={() => handleStatusChange(user.id, false)}
+                        title="Deactivate User"
                         disabled={user.id === currentUser?.id}
                       >
                         🚫
@@ -289,7 +461,7 @@ export default function UserManagement() {
                     ) : (
                       <button
                         className={styles.actionButton}
-                        onClick={() => handleStatusChange(user.id, 'active')}
+                        onClick={() => handleStatusChange(user.id, true)}
                         title="Activate User"
                       >
                         ✅
@@ -326,31 +498,20 @@ export default function UserManagement() {
             <form onSubmit={handleCreateUser} className={styles.createForm}>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label htmlFor="firstName">First Name</label>
+                  <label htmlFor="username">Username *</label>
                   <input
-                    id="firstName"
+                    id="username"
                     type="text"
-                    value={createForm.firstName}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, firstName: e.target.value }))}
+                    value={createForm.username}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, username: e.target.value }))}
                     required
                     className={styles.input}
+                    placeholder="Enter username"
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="lastName">Last Name</label>
-                  <input
-                    id="lastName"
-                    type="text"
-                    value={createForm.lastName}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, lastName: e.target.value }))}
-                    required
-                    className={styles.input}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="email">Email Address</label>
+                  <label htmlFor="email">Email Address *</label>
                   <input
                     id="email"
                     type="email"
@@ -358,22 +519,62 @@ export default function UserManagement() {
                     onChange={(e) => setCreateForm(prev => ({ ...prev, email: e.target.value }))}
                     required
                     className={styles.input}
+                    placeholder="user@example.com"
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="role">Role</label>
+                  <label htmlFor="firstName">First Name *</label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    value={createForm.firstName}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, firstName: e.target.value }))}
+                    required
+                    className={styles.input}
+                    placeholder="John"
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="lastName">Last Name *</label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={createForm.lastName}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, lastName: e.target.value }))}
+                    required
+                    className={styles.input}
+                    placeholder="Doe"
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="phoneNumber">Phone Number</label>
+                  <input
+                    id="phoneNumber"
+                    type="tel"
+                    value={createForm.phoneNumber || ''}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    className={styles.input}
+                    placeholder="+1 (555) 000-0000"
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="roleId">Role *</label>
                   <select
-                    id="role"
-                    value={createForm.role}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, role: e.target.value }))}
+                    id="roleId"
+                    value={createForm.roleId}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, roleId: e.target.value }))}
                     required
                     className={styles.select}
                   >
+                    {availableRoles.length === 0 && <option value="">Loading roles...</option>}
                     {availableRoles
                       .filter(role => currentUser?.role?.name === 'super_admin' || role.name !== 'super_admin')
                       .map(role => (
-                        <option key={role.name} value={role.name}>
+                        <option key={role.id} value={role.id}>
                           {role.displayName}
                         </option>
                       ))}

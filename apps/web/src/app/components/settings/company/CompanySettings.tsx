@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getApiUrl } from '@/lib/config';
 import styles from './CompanySettings.module.css';
 
 interface CompanyInfo {
@@ -77,16 +78,87 @@ export default function CompanySettings() {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'contact' | 'business' | 'settings'>('basic');
+
+  // Fetch company settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(getApiUrl('company/settings'), {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            setError('Session expired. Please log in again.');
+            return;
+          }
+          throw new Error('Failed to fetch company settings');
+        }
+
+        const result = await response.json();
+        if (result.data) {
+          setCompanyInfo(result.data);
+        }
+      } catch (err) {
+        console.error('Error fetching company settings:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load company settings');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
+    setError(null);
+    setSuccessMessage(null);
+
     try {
-      // TODO: Implement API call to save company settings
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Company settings saved:', companyInfo);
-    } catch (error) {
-      console.error('Error saving company settings:', error);
+      const token = localStorage.getItem('access_token');
+
+      const response = await fetch(getApiUrl('company/settings'), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(companyInfo),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Session expired. Please log in again.');
+          return;
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update settings');
+      }
+
+      const result = await response.json();
+      if (result.data) {
+        setCompanyInfo(result.data);
+      }
+
+      setSuccessMessage('Company settings updated successfully');
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error saving company settings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update settings');
     } finally {
       setIsSaving(false);
     }
@@ -113,6 +185,26 @@ export default function CompanySettings() {
         <h3>Company Settings</h3>
         <p>Configure your company information and business settings</p>
       </div>
+
+      {loading && (
+        <div className={styles.loadingMessage}>
+          Loading company settings...
+        </div>
+      )}
+
+      {error && (
+        <div className={styles.errorMessage}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className={styles.successMessage}>
+          <span>✅ {successMessage}</span>
+          <button onClick={() => setSuccessMessage(null)} className={styles.closeSuccess}>×</button>
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className={styles.tabNavigation}>
@@ -394,7 +486,7 @@ export default function CompanySettings() {
       <div className={styles.footer}>
         <button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || loading}
           className={styles.saveButton}
         >
           {isSaving ? 'Saving...' : 'Save Changes'}

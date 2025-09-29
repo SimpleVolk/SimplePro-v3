@@ -61,6 +61,8 @@
     "ssl:generate": "bash docker/ssl/generate-certs.sh",
     "db:migrate": "nx run database:migrate",
     "db:seed": "node scripts/seed-database.js",
+    "db:seed:tariffs": "ts-node apps/api/src/database/seeders/run-seed.ts",
+    "db:seed:tariffs:reset": "RESET_TARIFFS=true ts-node apps/api/src/database/seeders/run-seed.ts",
     "db:validate": "node scripts/validate-seed-data.js",
     "health": "curl -f http://localhost:4000/api/health && curl -f http://localhost:3000/",
     "health:full": "bash scripts/deploy-prod.sh health",

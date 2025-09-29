@@ -10,6 +10,7 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { JobsService } from './jobs.service';
@@ -25,11 +26,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/interfaces/user.interface';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Controller('jobs')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(
+    private readonly jobsService: JobsService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -38,8 +43,29 @@ export class JobsController {
   async create(
     @Body() createJobDto: CreateJobDto,
     @CurrentUser() user: User,
+    @Req() req: any,
   ) {
     const job = await this.jobsService.create(createJobDto, user.id);
+
+    // Log job creation
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'CREATE_JOB',
+      'Job',
+      {
+        resourceId: job.id,
+        severity: 'info',
+        outcome: 'success',
+        changes: {
+          after: { customerId: job.customerId, type: job.type, status: job.status },
+        },
+      }
+    );
 
     return {
       success: true,
@@ -168,8 +194,32 @@ export class JobsController {
     @Param('id') id: string,
     @Body() statusUpdate: { status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold' },
     @CurrentUser() user: User,
+    @Req() req: any,
   ) {
+    // Get old job state for audit trail
+    const oldJob = await this.jobsService.findOne(id);
     const job = await this.jobsService.updateStatus(id, statusUpdate.status, user.id);
+
+    // Log status change
+    await this.auditLogsService.log(
+      {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'],
+      },
+      'JOB_STATUS_CHANGE',
+      'Job',
+      {
+        resourceId: id,
+        severity: 'info',
+        outcome: 'success',
+        changes: {
+          before: { status: oldJob.status },
+          after: { status: statusUpdate.status },
+        },
+      }
+    );
 
     return {
       success: true,

@@ -44,10 +44,16 @@ export const ActivitySection = memo(function ActivitySection() {
         'Content-Type': 'application/json',
       };
 
+      // Calculate date range for revenue analytics (last 6 months)
+      const endDate = new Date().toISOString();
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 6);
+      const startDateISO = startDate.toISOString();
+
       // Fetch activity metrics based on selected time period
       const [activityResponse, revenueResponse] = await Promise.all([
         fetch(getApiUrl(`analytics/activity-metrics?period=${activeTab}`), { headers }),
-        fetch(getApiUrl('analytics/revenue'), { headers })
+        fetch(getApiUrl(`analytics/revenue?startDate=${startDateISO}&endDate=${endDate}`), { headers })
       ]);
 
       if (activityResponse.ok) {
@@ -58,6 +64,9 @@ export const ActivitySection = memo(function ActivitySection() {
       if (revenueResponse.ok) {
         const revenueResult = await revenueResponse.json();
         setRevenueData(revenueResult.monthlyData || []);
+      } else {
+        console.error('Revenue analytics error:', revenueResponse.status);
+        setRevenueData([]);
       }
 
     } catch (error) {

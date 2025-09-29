@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getApiUrl } from '@/lib/config';
 import styles from './AuditLogs.module.css';
 
 interface AuditLog {
@@ -14,78 +15,15 @@ interface AuditLog {
   details: string;
   ipAddress: string;
   userAgent: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'info' | 'warning' | 'error' | 'critical';
+  outcome?: 'success' | 'failure';
 }
 
 export default function AuditLogs() {
-  const [logs] = useState<AuditLog[]>([
-    {
-      id: '1',
-      timestamp: '2024-01-15T14:30:00Z',
-      userId: '1',
-      userName: 'Admin User',
-      action: 'USER_CREATED',
-      resource: 'user',
-      resourceId: '5',
-      details: 'Created new user: John Doe (john.doe@company.com)',
-      ipAddress: '192.168.1.100',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      severity: 'medium'
-    },
-    {
-      id: '2',
-      timestamp: '2024-01-15T13:45:00Z',
-      userId: '2',
-      userName: 'John Dispatcher',
-      action: 'JOB_STATUS_CHANGED',
-      resource: 'job',
-      resourceId: '123',
-      details: 'Changed job status from "scheduled" to "in_progress"',
-      ipAddress: '192.168.1.101',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      severity: 'low'
-    },
-    {
-      id: '3',
-      timestamp: '2024-01-15T12:20:00Z',
-      userId: '1',
-      userName: 'Admin User',
-      action: 'PRICING_RULE_MODIFIED',
-      resource: 'pricing_rule',
-      resourceId: 'base_local_rate',
-      details: 'Modified base local moving rate from $150/hour to $160/hour',
-      ipAddress: '192.168.1.100',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      severity: 'high'
-    },
-    {
-      id: '4',
-      timestamp: '2024-01-15T11:15:00Z',
-      userId: '1',
-      userName: 'Admin User',
-      action: 'USER_LOGIN',
-      resource: 'authentication',
-      details: 'Successful login',
-      ipAddress: '192.168.1.100',
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      severity: 'low'
-    },
-    {
-      id: '5',
-      timestamp: '2024-01-15T10:30:00Z',
-      userId: '3',
-      userName: 'Mike CrewLead',
-      action: 'JOB_COMPLETED',
-      resource: 'job',
-      resourceId: '122',
-      details: 'Marked job as completed with customer signature',
-      ipAddress: '10.0.0.25',
-      userAgent: 'SimplePro Mobile App v1.0',
-      severity: 'low'
-    }
-  ]);
-
-  const [filteredLogs, setFilteredLogs] = useState<AuditLog[]>(logs);
+  const [_logs, setLogs] = useState<AuditLog[]>([]);
+  const [filteredLogs, setFilteredLogs] = useState<AuditLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0]
@@ -104,32 +42,56 @@ export default function AuditLogs() {
     'PRICING_RULE_MODIFIED', 'SYSTEM_SETTINGS_CHANGED'
   ];
 
-  // Filter logs based on criteria
-  const applyFilters = () => {
-    let filtered = logs.filter(log => {
-      const logDate = new Date(log.timestamp);
-      const startDate = new Date(dateRange.startDate);
-      const endDate = new Date(dateRange.endDate);
-      endDate.setHours(23, 59, 59, 999);
+  // Fetch audit logs from API
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError(null);
 
-      const matchesDateRange = logDate >= startDate && logDate <= endDate;
-      const matchesAction = filterAction === 'all' || log.action === filterAction;
-      const matchesSeverity = filterSeverity === 'all' || log.severity === filterSeverity;
-      const matchesSearch = searchQuery === '' ||
-        log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.resource.toLowerCase().includes(searchQuery.toLowerCase());
+    try {
+      const params = new URLSearchParams({
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        limit: '50',
+        skip: '0'
+      });
 
-      return matchesDateRange && matchesAction && matchesSeverity && matchesSearch;
-    });
+      if (filterAction !== 'all') params.append('action', filterAction);
+      if (filterSeverity !== 'all') params.append('severity', filterSeverity);
+      if (searchQuery) params.append('search', searchQuery);
 
-    setFilteredLogs(filtered);
-    setCurrentPage(1);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(`${getApiUrl('audit-logs')}?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Session expired. Please log in again.');
+          return;
+        }
+        throw new Error('Failed to fetch audit logs');
+      }
+
+      const result = await response.json();
+      const fetchedLogs = result.data || [];
+      setLogs(fetchedLogs);
+      setFilteredLogs(fetchedLogs);
+    } catch (err) {
+      console.error('Error fetching audit logs:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load audit logs');
+      setLogs([]);
+      setFilteredLogs([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Apply filters whenever criteria change
-  React.useEffect(() => {
-    applyFilters();
+  // Fetch logs on component mount and filter changes
+  useEffect(() => {
+    fetchLogs();
   }, [dateRange, filterAction, filterSeverity, searchQuery]);
 
   const formatDate = (dateString: string) => {
@@ -145,10 +107,14 @@ export default function AuditLogs() {
 
   const getSeverityClass = (severity: string) => {
     const classes = {
+      info: styles.severityLow,
+      warning: styles.severityMedium,
+      error: styles.severityHigh,
+      critical: styles.severityCritical,
+      // Legacy mappings for backward compatibility
       low: styles.severityLow,
       medium: styles.severityMedium,
-      high: styles.severityHigh,
-      critical: styles.severityCritical
+      high: styles.severityHigh
     };
     return classes[severity as keyof typeof classes] || styles.severityLow;
   };
@@ -182,23 +148,42 @@ export default function AuditLogs() {
   const endIndex = startIndex + logsPerPage;
   const currentLogs = filteredLogs.slice(startIndex, endIndex);
 
-  const exportLogs = () => {
-    const csvContent = [
-      'Timestamp,User,Action,Resource,Details,IP Address,Severity',
-      ...filteredLogs.map(log =>
-        `"${log.timestamp}","${log.userName}","${log.action}","${log.resource}","${log.details}","${log.ipAddress}","${log.severity}"`
-      )
-    ].join('\n');
+  const exportLogs = async () => {
+    try {
+      const params = new URLSearchParams({
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        format: 'csv'
+      });
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      if (filterAction !== 'all') params.append('action', filterAction);
+      if (filterSeverity !== 'all') params.append('severity', filterSeverity);
+      if (searchQuery) params.append('search', searchQuery);
+
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(`${getApiUrl('audit-logs/export/csv')}?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export logs');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error exporting logs:', err);
+      setError('Failed to export audit logs');
+    }
   };
 
   return (
@@ -208,10 +193,23 @@ export default function AuditLogs() {
           <h3>Audit Logs</h3>
           <p>View system activity and security events</p>
         </div>
-        <button onClick={exportLogs} className={styles.exportButton}>
+        <button onClick={exportLogs} className={styles.exportButton} disabled={loading}>
           📥 Export Logs
         </button>
       </div>
+
+      {error && (
+        <div className={styles.errorMessage}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+        </div>
+      )}
+
+      {loading && (
+        <div className={styles.loadingMessage}>
+          Loading audit logs...
+        </div>
+      )}
 
       <div className={styles.filters}>
         <div className={styles.dateRange}>
@@ -249,9 +247,9 @@ export default function AuditLogs() {
           className={styles.filterSelect}
         >
           <option value="all">All Severity</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="info">Info</option>
+          <option value="warning">Warning</option>
+          <option value="error">Error</option>
           <option value="critical">Critical</option>
         </select>
 

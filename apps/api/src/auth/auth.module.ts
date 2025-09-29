@@ -12,9 +12,11 @@ import { RolesGuard } from './guards/roles.guard';
 import { User as UserSchema, UserSchema as UserSchemaDefinition } from './schemas/user.schema';
 import { UserSession as UserSessionSchema, UserSessionSchema as UserSessionSchemaDefinition } from './schemas/user-session.schema';
 import { loadSecrets } from '../config/secrets.config';
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 @Module({
   imports: [
+    AuditLogsModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: (() => {

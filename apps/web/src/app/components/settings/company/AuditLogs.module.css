@@ -341,3 +341,48 @@
 .logsList::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-secondary);
 }
+
+/* Error and Loading Messages */
+.errorMessage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  color: #c33;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.closeError {
+  background: none;
+  border: none;
+  color: #c33;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 1rem;
+}
+
+.closeError:hover {
+  opacity: 0.7;
+}
+
+.loadingMessage {
+  padding: 1rem 1.5rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.exportButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
