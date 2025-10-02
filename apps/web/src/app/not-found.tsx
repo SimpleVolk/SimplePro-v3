@@ -1,5 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import styles from './page.module.css';
+
+// Force dynamic rendering for not-found page
+export const dynamic = 'force-dynamic';
 
 export default function NotFound() {
   return (

@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { getApiUrl } from '@/lib/config';
 
+// Force dynamic rendering for debug page
+export const dynamic = 'force-dynamic';
+
 export default function DebugPage() {
   const [testResult, setTestResult] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);

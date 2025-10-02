@@ -7,6 +7,9 @@ import { Dashboard } from './components/Dashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import styles from './page.module.css';
 
+// Force dynamic rendering for authenticated app
+export const dynamic = 'force-dynamic';
+
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
 

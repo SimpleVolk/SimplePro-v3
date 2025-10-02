@@ -41,7 +41,9 @@ export class JobsResolver {
     @Args('first') first?: number,
     @Args('after') after?: string
   ): Promise<any> {
-    const jobs = await this.jobsService.findAll(filters);
+    // Fetch all jobs (use large limit for GraphQL compatibility)
+    const result = await this.jobsService.findAll(filters, 0, 1000);
+    const jobs = result.data;
 
     // Apply sorting if specified
     if (sortBy) {
@@ -80,7 +82,9 @@ export class JobsResolver {
     @Args('filters') filters?: JobFilters,
     @Args('sortBy') sortBy?: { field: string; order: 'asc' | 'desc' }
   ): Promise<any[]> {
-    const jobs = await this.jobsService.findAll(filters);
+    // Fetch all jobs (use large limit for GraphQL compatibility)
+    const result = await this.jobsService.findAll(filters, 0, 1000);
+    const jobs = result.data;
 
     // Apply sorting
     if (sortBy) {
@@ -168,7 +172,7 @@ export class JobsResolver {
     const userId = req.user?.userId || 'system';
     return this.jobsService.addNote(
       jobId,
-      { content, isPinned },
+      { content } as any,
       userId
     );
   }

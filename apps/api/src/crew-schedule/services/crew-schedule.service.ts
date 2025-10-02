@@ -110,7 +110,7 @@ export class CrewScheduleService {
       );
     }
 
-    const dayOfWeekMap = {
+    const dayOfWeekMap: Record<string, number> = {
       sunday: 0,
       monday: 1,
       tuesday: 2,

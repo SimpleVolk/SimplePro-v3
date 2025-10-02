@@ -8,11 +8,22 @@ import {
   CustomerFilters
 } from './interfaces/customer.interface';
 import { Customer as CustomerSchema, CustomerDocument } from './schemas/customer.schema';
+import { PaginatedResponse } from '../common/dto/pagination.dto';
+import { TransactionService } from '../database/transaction.service';
+import { Job, JobDocument } from '../jobs/schemas/job.schema';
+import { Opportunity, OpportunityDocument } from '../opportunities/schemas/opportunity.schema';
+import { DocumentEntity as DocumentSchema, DocumentDocument } from '../documents/schemas/document.schema';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectModel(CustomerSchema.name) private customerModel: Model<CustomerDocument>
+    @InjectModel(CustomerSchema.name) private customerModel: Model<CustomerDocument>,
+    @InjectModel(Job.name) private jobModel: Model<JobDocument>,
+    @InjectModel(Opportunity.name) private opportunityModel: Model<OpportunityDocument>,
+    @InjectModel(DocumentSchema.name) private documentModel: Model<DocumentDocument>,
+    private transactionService: TransactionService,
+    private cacheService: CacheService,
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto, createdBy: string): Promise<Customer> {
@@ -43,7 +54,11 @@ export class CustomersService {
     return this.convertCustomerDocument(customer);
   }
 
-  async findAll(filters?: CustomerFilters): Promise<Customer[]> {
+  async findAll(
+    filters?: CustomerFilters,
+    skip: number = 0,
+    limit: number = 20,
+  ): Promise<PaginatedResponse<Customer>> {
     // Build MongoDB query object
     const query: any = {};
 
@@ -89,14 +104,31 @@ export class CustomersService {
       }
     }
 
-    // Execute query with sorting (newest first) and use lean() for performance
-    const customers = await this.customerModel
-      .find(query)
-      .sort({ createdAt: -1 })
-      .lean()
-      .exec();
+    // Execute count and find queries in parallel for performance
+    const [total, customers] = await Promise.all([
+      this.customerModel.countDocuments(query).exec(),
+      this.customerModel
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+    ]);
 
-    return customers.map(customer => this.convertCustomerDocument(customer as any));
+    const data = customers.map(customer => this.convertCustomerDocument(customer as any));
+    const page = Math.floor(skip / limit) + 1;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string): Promise<Customer> {
@@ -174,11 +206,54 @@ export class CustomersService {
     return this.convertCustomerDocument(updatedCustomer);
   }
 
+  /**
+   * Delete customer with cascading deletes using transaction
+   *
+   * This method uses a transaction to ensure:
+   * 1. All customer jobs are deleted
+   * 2. All customer opportunities are deleted
+   * 3. All customer documents are archived (not deleted for audit purposes)
+   * 4. Customer record is deleted
+   *
+   * All operations succeed or fail atomically to maintain data consistency.
+   */
   async remove(id: string): Promise<void> {
-    const result = await this.customerModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new NotFoundException(`Customer with ID ${id} not found`);
-    }
+    return this.transactionService.withTransaction(async (session) => {
+      // 1. Verify customer exists
+      const customer = await this.customerModel.findById(id).session(session).exec();
+      if (!customer) {
+        throw new NotFoundException(`Customer with ID ${id} not found`);
+      }
+
+      // 2. Delete all customer jobs (or set to deleted status)
+      const jobDeleteResult = await this.jobModel.deleteMany(
+        { customerId: id },
+        { session }
+      ).exec();
+
+      // 3. Delete all customer opportunities
+      const opportunityDeleteResult = await this.opportunityModel.deleteMany(
+        { customerId: id },
+        { session }
+      ).exec();
+
+      // 4. Archive customer documents (don't delete for audit trail)
+      const documentArchiveResult = await this.documentModel.updateMany(
+        { relatedCustomer: id },
+        { $set: { archived: true, archivedAt: new Date() } },
+        { session }
+      ).exec();
+
+      // 5. Delete customer
+      await this.customerModel.findByIdAndDelete(id, { session }).exec();
+
+      // Log the cleanup results for monitoring
+      console.log(`Customer ${id} deleted with cascades:`, {
+        jobsDeleted: jobDeleteResult.deletedCount,
+        opportunitiesDeleted: opportunityDeleteResult.deletedCount,
+        documentsArchived: documentArchiveResult.modifiedCount,
+      });
+    });
   }
 
   async addEstimate(customerId: string, estimateId: string): Promise<Customer> {

@@ -15,6 +15,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { AuthenticatedRequest } from '../types';
 import {
   CrewScheduleService,
   TimeOffService,
@@ -120,7 +121,7 @@ export class CrewScheduleController {
 
   @Post('time-off')
   @Roles('super_admin', 'admin', 'dispatcher', 'crew')
-  async requestTimeOff(@Body() dto: TimeOffRequestDto, @Request() req) {
+  async requestTimeOff(@Body() dto: TimeOffRequestDto, @Request() req: AuthenticatedRequest) {
     const request = await this.timeOffService.requestTimeOff(
       dto,
       req.user.userId,
@@ -137,7 +138,7 @@ export class CrewScheduleController {
   async reviewTimeOffRequest(
     @Param('id') id: string,
     @Body() dto: ReviewTimeOffDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ) {
     const request = await this.timeOffService.reviewTimeOffRequest(
       id,
@@ -166,7 +167,7 @@ export class CrewScheduleController {
   @Delete('time-off/:id')
   @Roles('super_admin', 'admin', 'dispatcher', 'crew')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async cancelTimeOffRequest(@Param('id') id: string, @Request() req) {
+  async cancelTimeOffRequest(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
     await this.timeOffService.cancelTimeOffRequest(id, req.user.userId);
   }
 
@@ -213,7 +214,7 @@ export class CrewScheduleController {
   async autoAssignCrew(
     @Param('jobId') jobId: string,
     @Body() dto: AutoAssignDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ) {
     const requirements = {
       requiredSkills: dto.requiredSkills,
@@ -277,7 +278,7 @@ export class CrewScheduleController {
 
   @Patch('assignment/:id/confirm')
   @Roles('super_admin', 'admin', 'dispatcher', 'crew')
-  async confirmAssignment(@Param('id') id: string, @Request() req) {
+  async confirmAssignment(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
     const assignment = await this.autoAssignmentService.confirmAssignment(
       id,
       req.user.userId,

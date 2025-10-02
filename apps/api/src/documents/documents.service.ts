@@ -45,7 +45,7 @@ export class DocumentsService {
   /**
    * Validate file before upload
    */
-  private validateFile(file: Express.Multer.File): void {
+  private validateFile(file: any): void {
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
       throw new BadRequestException(
@@ -70,7 +70,7 @@ export class DocumentsService {
    * Upload a document
    */
   async uploadDocument(
-    file: Express.Multer.File,
+    file: any,
     dto: UploadDocumentDto,
     userId: string,
   ): Promise<IDocument> {
@@ -109,7 +109,7 @@ export class DocumentsService {
         `Document uploaded: ${document._id} by user ${userId}`,
       );
 
-      return document.toObject();
+      return document.toObject() as IDocument;
     } catch (error) {
       this.logger.error(`Error uploading document: ${error.message}`, error.stack);
 
@@ -173,7 +173,7 @@ export class DocumentsService {
         .lean()
         .exec();
 
-      return documents as IDocument[];
+      return documents as unknown as IDocument[];
     } catch (error) {
       this.logger.error(`Error finding documents: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to retrieve documents');
@@ -195,7 +195,7 @@ export class DocumentsService {
         throw new NotFoundException('Document not found');
       }
 
-      return document as IDocument;
+      return document as unknown as IDocument;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -221,7 +221,7 @@ export class DocumentsService {
         .lean()
         .exec();
 
-      return documents as IDocument[];
+      return documents as unknown as IDocument[];
     } catch (error) {
       this.logger.error(`Error finding documents by entity: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to retrieve documents');
@@ -378,7 +378,7 @@ export class DocumentsService {
         { $inc: { shareAccessCount: 1 } },
       );
 
-      return document as IDocument;
+      return document as unknown as IDocument;
     } catch (error) {
       if (
         error instanceof NotFoundException ||
@@ -421,7 +421,7 @@ export class DocumentsService {
 
       this.logger.log(`Document updated: ${id}`);
 
-      return document as IDocument;
+      return document as unknown as IDocument;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

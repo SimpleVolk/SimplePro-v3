@@ -17,6 +17,7 @@ import { ActivityQueryDto } from './dto/activity-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthenticatedRequest } from '../types';
 
 @Controller('api/lead-activities')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,7 +28,7 @@ export class LeadActivitiesController {
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
   async createActivity(
     @Body() createDto: CreateActivityDto,
-    @Request() req
+    @Request() req: AuthenticatedRequest
   ) {
     const activity = await this.activitiesService.createActivity(
       createDto,
@@ -42,7 +43,7 @@ export class LeadActivitiesController {
 
   @Get()
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
-  async findAll(@Query() query: ActivityQueryDto, @Request() req) {
+  async findAll(@Query() query: ActivityQueryDto, @Request() req: AuthenticatedRequest) {
     // If not admin, only show user's own activities
     if (!['super_admin', 'admin'].includes(req.user.role)) {
       query.assignedTo = req.user.userId;
@@ -83,7 +84,7 @@ export class LeadActivitiesController {
 
   @Get('pending')
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
-  async findPending(@Request() req) {
+  async findPending(@Request() req: AuthenticatedRequest) {
     const userId = ['super_admin', 'admin'].includes(req.user.role)
       ? undefined
       : req.user.userId;
@@ -99,7 +100,7 @@ export class LeadActivitiesController {
 
   @Get('overdue')
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
-  async findOverdue(@Request() req) {
+  async findOverdue(@Request() req: AuthenticatedRequest) {
     const userId = ['super_admin', 'admin'].includes(req.user.role)
       ? undefined
       : req.user.userId;
@@ -115,7 +116,7 @@ export class LeadActivitiesController {
 
   @Get('statistics')
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
-  async getStatistics(@Request() req, @Query('userId') userId?: string) {
+  async getStatistics(@Request() req: AuthenticatedRequest, @Query('userId') userId?: string) {
     // If not admin, only show user's own stats
     const targetUserId = ['super_admin', 'admin'].includes(req.user.role)
       ? userId
@@ -157,7 +158,7 @@ export class LeadActivitiesController {
   async completeActivity(
     @Param('activityId') activityId: string,
     @Body() completeDto: CompleteActivityDto,
-    @Request() req
+    @Request() req: AuthenticatedRequest
   ) {
     const activity = await this.activitiesService.completeActivity(
       activityId,

@@ -21,7 +21,8 @@
       "outputs": ["{options.bundleOutput}"],
       "options": {
         "platform": "ios",
-        "bundleOutput": "dist/apps/mobile/ios/main.bundle"
+        "entryFile": "src/main.tsx",
+        "bundleOutput": "dist/apps/mobile/ios/main.jsbundle"
       }
     },
     "run-android": {
@@ -33,7 +34,8 @@
       "outputs": ["{options.bundleOutput}"],
       "options": {
         "platform": "android",
-        "bundleOutput": "dist/apps/mobile/android/main.bundle"
+        "entryFile": "src/main.tsx",
+        "bundleOutput": "dist/apps/mobile/android/main.jsbundle"
       }
     },
     "build-ios": {
@@ -47,7 +49,8 @@
       "executor": "@nx/react-native:build-android",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/mobile/android"
+        "outputPath": "dist/apps/mobile/android",
+        "apkPath": "android/app/build/outputs/apk/release/app-release.apk"
       }
     },
     "test": {

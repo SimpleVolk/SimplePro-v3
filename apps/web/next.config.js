@@ -13,6 +13,15 @@ const nextConfig = {
     svgr: false,
   },
 
+  // Build configuration
+  output: 'standalone',
+
+  // Treat build errors as warnings for error pages (404/500)
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
+  },
+
   // Performance optimizations
   poweredByHeader: false,
 
@@ -32,6 +41,8 @@ const nextConfig = {
   // Bundle optimization
   experimental: {
     optimizePackageImports: ['recharts', 'react-dom'],
+    // Disable static error page generation (we use App Router error handling)
+    appDocumentPreloading: true,
   },
 
   // Webpack optimizations

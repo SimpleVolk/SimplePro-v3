@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 
 // Core modules
 import { DatabaseModule } from './database/database.module';
+import { CacheModule } from './cache/cache.module';
 
 // Feature modules
 import { AuthModule } from './auth/auth.module';
@@ -70,6 +71,7 @@ import { CustomThrottlerGuard } from './common/guards/throttle.guard';
     ]),
     // Event emitter for automation workflows
     EventEmitterModule.forRoot(),
+    CacheModule,
     DatabaseModule,
     AuthModule,
     EstimatesModule,

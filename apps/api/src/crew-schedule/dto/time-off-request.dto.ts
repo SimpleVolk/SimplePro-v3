@@ -17,7 +17,7 @@ export class TimeOffRequestDto {
 
 export class ReviewTimeOffDto {
   @IsEnum(['approved', 'denied'])
-  decision: string;
+  decision: 'approved' | 'denied';
 
   @IsString()
   @IsOptional()

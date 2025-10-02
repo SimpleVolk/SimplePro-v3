@@ -3,6 +3,9 @@
 import { useEffect } from 'react';
 import styles from './page.module.css';
 
+// Force dynamic rendering for error page
+export const dynamic = 'force-dynamic';
+
 export default function Error({
   error,
   reset,

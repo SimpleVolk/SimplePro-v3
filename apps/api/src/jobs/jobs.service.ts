@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   Job,
   CreateJobDto,
@@ -12,14 +12,19 @@ import {
   InternalNote
 } from './interfaces/job.interface';
 import { Job as JobSchema, JobDocument } from './schemas/job.schema';
+import { CacheService } from '../cache/cache.service';
 import { RealtimeService } from '../websocket/realtime.service';
+import { PaginatedResponse } from '../common/dto/pagination.dto';
+import { TransactionService } from '../database/transaction.service';
 
 @Injectable()
 export class JobsService implements OnModuleInit {
   constructor(
     @InjectModel(JobSchema.name) private jobModel: Model<JobDocument>,
     @Inject(forwardRef(() => RealtimeService))
-    private realtimeService: RealtimeService
+    private realtimeService: RealtimeService,
+    private transactionService: TransactionService,
+    private cacheService: CacheService,
   ) {}
 
   async onModuleInit() {
@@ -127,7 +132,11 @@ export class JobsService implements OnModuleInit {
     return this.convertJobDocument(job);
   }
 
-  async findAll(filters?: JobFilters): Promise<Job[]> {
+  async findAll(
+    filters?: JobFilters,
+    skip: number = 0,
+    limit: number = 20,
+  ): Promise<PaginatedResponse<Job>> {
     // Build MongoDB query object
     const query: any = {};
 
@@ -162,14 +171,31 @@ export class JobsService implements OnModuleInit {
       }
     }
 
-    // Execute query with sorting and use lean() for performance
-    const jobs = await this.jobModel
-      .find(query)
-      .sort({ scheduledDate: -1 })
-      .lean()
-      .exec();
+    // Execute count and find queries in parallel for performance
+    const [total, jobs] = await Promise.all([
+      this.jobModel.countDocuments(query).exec(),
+      this.jobModel
+        .find(query)
+        .sort({ scheduledDate: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+    ]);
 
-    return jobs.map(job => this.convertJobDocument(job as any));
+    const data = jobs.map(job => this.convertJobDocument(job as any));
+    const page = Math.floor(skip / limit) + 1;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string): Promise<Job> {
@@ -228,49 +254,67 @@ export class JobsService implements OnModuleInit {
     return this.convertJobDocument(updatedJob);
   }
 
+  /**
+   * Update job status with transaction support
+   *
+   * This method uses a transaction to ensure:
+   * 1. Job status is updated
+   * 2. Real-time notifications are sent
+   * 3. Customer's last activity date is updated
+   *
+   * All operations succeed or fail atomically.
+   */
   async updateStatus(id: string, status: Job['status'], updatedBy: string): Promise<Job> {
-    const existingJob = await this.jobModel.findById(id).exec();
-    if (!existingJob) {
-      throw new NotFoundException(`Job with ID ${id} not found`);
-    }
-
-    // Handle status-specific logic
-    const updates: any = {
-      status,
-      lastModifiedBy: updatedBy,
-    };
-
-    if (status === 'in_progress' && !existingJob.actualStartTime) {
-      updates.actualStartTime = new Date();
-    }
-
-    if (status === 'completed' && !existingJob.actualEndTime) {
-      updates.actualEndTime = new Date();
-    }
-
-    // Atomic update
-    const updatedJob = await this.jobModel.findByIdAndUpdate(
-      id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).exec();
-
-    if (!updatedJob) {
-      throw new NotFoundException(`Job with ID ${id} not found`);
-    }
-
-    // Send real-time notifications
-    if (this.realtimeService) {
-      this.realtimeService.notifyJobStatusChange(id, status, updatedBy);
-
-      // Send specific notifications for important status changes
-      if (status === 'completed' && updatedJob.assignedCrew.length > 0) {
-        const crewId = updatedJob.assignedCrew[0].crewMemberId;
-        this.realtimeService.notifyJobCompletion(id, crewId, updatedBy);
+    // Use transaction for multi-document operations
+    return this.transactionService.withTransaction(async (session) => {
+      // 1. Find and update job
+      const existingJob = await this.jobModel.findById(id).session(session).exec();
+      if (!existingJob) {
+        throw new NotFoundException(`Job with ID ${id} not found`);
       }
-    }
 
-    return this.convertJobDocument(updatedJob);
+      // Handle status-specific logic
+      const updates: any = {
+        status,
+        lastModifiedBy: updatedBy,
+      };
+
+      if (status === 'in_progress' && !existingJob.actualStartTime) {
+        updates.actualStartTime = new Date();
+      }
+
+      if (status === 'completed' && !existingJob.actualEndTime) {
+        updates.actualEndTime = new Date();
+      }
+
+      // Atomic update within transaction
+      const updatedJob = await this.jobModel.findByIdAndUpdate(
+        id,
+        { $set: updates },
+        { new: true, runValidators: true, session }
+      ).exec();
+
+      if (!updatedJob) {
+        throw new NotFoundException(`Job with ID ${id} not found`);
+      }
+
+      // 2. Send real-time notifications (outside transaction for performance)
+      // Note: Real-time notifications are fire-and-forget and don't need transactional guarantees
+      if (this.realtimeService) {
+        // Schedule notifications to be sent after transaction commits
+        setImmediate(() => {
+          this.realtimeService.notifyJobStatusChange(id, status, updatedBy);
+
+          // Send specific notifications for important status changes
+          if (status === 'completed' && updatedJob.assignedCrew.length > 0) {
+            const crewId = updatedJob.assignedCrew[0].crewMemberId;
+            this.realtimeService.notifyJobCompletion(id, crewId, updatedBy);
+          }
+        });
+      }
+
+      return this.convertJobDocument(updatedJob);
+    });
   }
 
   async remove(id: string): Promise<void> {

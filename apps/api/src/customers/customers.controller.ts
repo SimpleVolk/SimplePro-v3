@@ -27,6 +27,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/interfaces/user.interface';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { CustomerQueryFiltersDto } from '../common/dto/query-filters.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Controller('customers')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -82,7 +83,10 @@ export class CustomersController {
   @Get()
   @RequirePermissions({ resource: 'customers', action: 'read' })
   @Throttle({ default: { limit: 30, ttl: 60000 } }) // 30 reads per minute
-  async findAll(@Query(ValidationPipe) query: CustomerQueryFiltersDto) {
+  async findAll(
+    @Query(ValidationPipe) query: CustomerQueryFiltersDto,
+    @Query() pagination: PaginationDto,
+  ) {
     // Parse query parameters into filters
     const filters: CustomerFilters = {
       status: query.status,
@@ -90,8 +94,8 @@ export class CustomersController {
       source: query.source,
       assignedSalesRep: query.assignedSalesRep,
       tags: query.tags ? (Array.isArray(query.tags) ? query.tags : [query.tags]) : undefined,
-      leadScoreMin: query.leadScoreMin ? parseInt(query.leadScoreMin) : undefined,
-      leadScoreMax: query.leadScoreMax ? parseInt(query.leadScoreMax) : undefined,
+      leadScoreMin: query.leadScoreMin,
+      leadScoreMax: query.leadScoreMax,
       createdAfter: query.createdAfter ? new Date(query.createdAfter) : undefined,
       createdBefore: query.createdBefore ? new Date(query.createdBefore) : undefined,
       lastContactAfter: query.lastContactAfter ? new Date(query.lastContactAfter) : undefined,
@@ -106,15 +110,18 @@ export class CustomersController {
       }
     });
 
-    const customers = await this.customersService.findAll(
-      Object.keys(filters).length > 0 ? filters : undefined
+    const result = await this.customersService.findAll(
+      Object.keys(filters).length > 0 ? filters : undefined,
+      pagination.skip,
+      pagination.limit,
     );
 
     return {
       success: true,
-      customers,
-      count: customers.length,
+      customers: result.data,
+      count: result.data.length,
       filters: Object.keys(filters).length > 0 ? filters : undefined,
+      pagination: result.pagination,
     };
   }
 

@@ -55,7 +55,7 @@ async function main() {
     console.log('');
 
     // Register the schema
-    const TariffModel = mongoose.models.TariffSettings ||
+    const TariffModel: any = mongoose.models.TariffSettings ||
       mongoose.model('TariffSettings', TariffSettingsSchema, 'tariff_settings');
 
     // Check for existing tariff
@@ -79,7 +79,7 @@ async function main() {
         console.log('');
 
         // Show existing tariff info
-        const existing = await TariffModel.findOne({ name: 'Default Tariff Settings' });
+        const existing: any = await TariffModel.findOne({ name: 'Default Tariff Settings' });
         if (existing) {
           console.log('📋 Existing Tariff Info:');
           console.log(`   ID: ${existing._id}`);

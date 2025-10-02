@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CircuitBreakerService } from './circuit-breaker.service';
 import { DatabasePerformanceService } from './database-performance.service';
 import { IndexOptimizationService } from './index-optimization.service';
+import { TransactionService } from './transaction.service';
 import { loadSecrets } from '../config/secrets.config';
 
+@Global()
 @Module({
   imports: [
     MongooseModule.forRoot(
@@ -47,7 +49,7 @@ import { loadSecrets } from '../config/secrets.config';
         socketTimeoutMS: parseInt(process.env.MONGODB_SOCKET_TIMEOUT || '45000', 10),
         connectTimeoutMS: parseInt(process.env.MONGODB_CONNECT_TIMEOUT || '10000', 10),
 
-        // Write concern for data safety
+        // Write concern for data safety (required for transactions)
         retryWrites: true,
         writeConcern: {
           w: 'majority',
@@ -55,7 +57,7 @@ import { loadSecrets } from '../config/secrets.config';
           wtimeout: parseInt(process.env.MONGODB_WRITE_TIMEOUT || '10000', 10)
         },
 
-        // Read preferences for performance
+        // Read preferences for performance (transactions require 'primary' or 'primaryPreferred')
         readPreference: (process.env.MONGODB_READ_PREFERENCE as any) || 'primary',
         readConcern: { level: 'majority' },
 
@@ -79,13 +81,15 @@ import { loadSecrets } from '../config/secrets.config';
   providers: [
     CircuitBreakerService,
     DatabasePerformanceService,
-    IndexOptimizationService
+    IndexOptimizationService,
+    TransactionService,
   ],
   exports: [
     MongooseModule,
     CircuitBreakerService,
     DatabasePerformanceService,
-    IndexOptimizationService
+    IndexOptimizationService,
+    TransactionService,
   ],
 })
 export class DatabaseModule {}

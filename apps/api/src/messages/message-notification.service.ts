@@ -19,7 +19,7 @@ export class MessageNotificationService {
       // 3. Optionally send email for missed messages after a delay
 
       this.logger.debug(
-        `Would send notification for message ${message._id} to ${recipients.length} recipients`
+        `Would send notification for message ${(message as any)._id} to ${recipients.length} recipients`
       );
 
       // Placeholder implementation

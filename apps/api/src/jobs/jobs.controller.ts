@@ -29,6 +29,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/interfaces/user.interface';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { JobQueryFiltersDto } from '../common/dto/query-filters.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Controller('jobs')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -79,7 +80,10 @@ export class JobsController {
   @Get()
   @RequirePermissions({ resource: 'jobs', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
-  async findAll(@Query(ValidationPipe) query: JobQueryFiltersDto) {
+  async findAll(
+    @Query(ValidationPipe) query: JobQueryFiltersDto,
+    @Query() pagination: PaginationDto,
+  ) {
     // Parse query parameters into filters
     const filters: JobFilters = {
       status: query.status,
@@ -101,15 +105,18 @@ export class JobsController {
       }
     });
 
-    const jobs = await this.jobsService.findAll(
-      Object.keys(filters).length > 0 ? filters : undefined
+    const result = await this.jobsService.findAll(
+      Object.keys(filters).length > 0 ? filters : undefined,
+      pagination.skip,
+      pagination.limit,
     );
 
     return {
       success: true,
-      jobs,
-      count: jobs.length,
+      jobs: result.data,
+      count: result.data.length,
       filters: Object.keys(filters).length > 0 ? filters : undefined,
+      pagination: result.pagination,
     };
   }
 
@@ -315,13 +322,13 @@ export class JobsController {
   @RequirePermissions({ resource: 'jobs', action: 'read' })
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getJobsForCustomer(@Param('customerId') customerId: string) {
-    const jobs = await this.jobsService.findAll({ customerId });
+    const result = await this.jobsService.findAll({ customerId }, 0, 100);
 
     return {
       success: true,
-      jobs,
+      jobs: result.data,
       customerId,
-      count: jobs.length,
+      count: result.data.length,
     };
   }
 
@@ -329,13 +336,13 @@ export class JobsController {
   @RequirePermissions({ resource: 'jobs', action: 'read' })
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getJobsForCrewMember(@Param('crewMemberId') crewMemberId: string) {
-    const jobs = await this.jobsService.findAll({ assignedCrew: crewMemberId });
+    const result = await this.jobsService.findAll({ assignedCrew: crewMemberId }, 0, 100);
 
     return {
       success: true,
-      jobs,
+      jobs: result.data,
       crewMemberId,
-      count: jobs.length,
+      count: result.data.length,
     };
   }
 

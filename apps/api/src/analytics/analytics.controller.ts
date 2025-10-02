@@ -87,6 +87,7 @@ export class AnalyticsController {
     @Param('eventType') eventType: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
+    @Query('page') page?: string,
     @Query('limit') limit?: string
   ) {
     const period = this.parsePeriodFilter(startDate, endDate);
@@ -95,8 +96,22 @@ export class AnalyticsController {
       throw new BadRequestException('Both startDate and endDate are required');
     }
 
-    const eventLimit = limit ? parseInt(limit, 10) : 100;
-    return this.analyticsService.getEventsByType(eventType, period, eventLimit);
+    const eventPage = page ? parseInt(page, 10) : 1;
+    const eventLimit = limit ? Math.min(parseInt(limit, 10), 100) : 20;
+    const skip = (eventPage - 1) * eventLimit;
+
+    const result = await this.analyticsService.getEventsByType(eventType, period, eventLimit, skip);
+
+    return {
+      success: true,
+      events: result.events,
+      pagination: {
+        page: eventPage,
+        limit: eventLimit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / eventLimit)
+      }
+    };
   }
 
   // Get events by category
@@ -106,6 +121,7 @@ export class AnalyticsController {
     @Param('category') category: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
+    @Query('page') page?: string,
     @Query('limit') limit?: string
   ) {
     const period = this.parsePeriodFilter(startDate, endDate);
@@ -114,8 +130,22 @@ export class AnalyticsController {
       throw new BadRequestException('Both startDate and endDate are required');
     }
 
-    const eventLimit = limit ? parseInt(limit, 10) : 100;
-    return this.analyticsService.getEventsByCategory(category, period, eventLimit);
+    const eventPage = page ? parseInt(page, 10) : 1;
+    const eventLimit = limit ? Math.min(parseInt(limit, 10), 100) : 20;
+    const skip = (eventPage - 1) * eventLimit;
+
+    const result = await this.analyticsService.getEventsByCategory(category, period, eventLimit, skip);
+
+    return {
+      success: true,
+      events: result.events,
+      pagination: {
+        page: eventPage,
+        limit: eventLimit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / eventLimit)
+      }
+    };
   }
 
   // Activity metrics endpoint for dashboard

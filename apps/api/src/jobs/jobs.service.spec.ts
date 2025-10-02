@@ -793,6 +793,10 @@ describe('JobsService', () => {
         providers: [
           JobsService,
           {
+            provide: getModelToken(JobSchema.name),
+            useValue: createMockJobModel()
+          },
+          {
             provide: RealtimeService,
             useValue: null
           }

@@ -75,8 +75,8 @@ export class TariffSettings {
     default: () => ({
       enabled: true,
       minimumHours: { weekday: 2, weekend: 3, holiday: 3 },
-      rates: [],
-      crewAbility: []
+      rates: [] as any[],
+      crewAbility: [] as any[]
     })
   })
   hourlyRates!: HourlyRates;
@@ -84,7 +84,7 @@ export class TariffSettings {
   @Prop({
     type: PackingRatesSchema,
     required: true,
-    default: () => ({ enabled: true, rates: [] })
+    default: () => ({ enabled: true, rates: [] as any[] })
   })
   packingRates!: PackingRates;
 

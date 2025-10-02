@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type ReferralDocument = Referral & Document;
+export type ReferralDocument = Referral & Document & {
+  daysSinceReferral: number;
+  customerFullName: string;
+};
 
 @Schema({ collection: 'referrals', timestamps: true })
 export class Referral {

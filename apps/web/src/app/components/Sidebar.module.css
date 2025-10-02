@@ -1,7 +1,8 @@
 .sidebar {
   width: 280px;
-  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
+  /* Darker gradient for better text contrast (8.2:1 with white text) */
+  background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+  color: var(--sidebar-text-primary, #ffffff);
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
@@ -26,7 +27,7 @@
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: white;
+  color: var(--sidebar-text-primary, #ffffff);
   transition: all 0.3s ease;
 }
 
@@ -36,7 +37,7 @@
 }
 
 .collapseButton {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.25);
   border: none;
   color: white;
   padding: 8px;
@@ -70,7 +71,7 @@
   padding: 16px 20px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--sidebar-text-primary, #ffffff);
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
@@ -87,13 +88,13 @@
 }
 
 .navItem:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--sidebar-hover-bg, rgba(255, 255, 255, 0.15));
+  color: var(--sidebar-text-primary, #ffffff);
 }
 
 .navItemActive {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: var(--sidebar-active-bg, rgba(255, 255, 255, 0.2));
+  color: var(--sidebar-text-primary, #ffffff);
   position: relative;
 }
 
@@ -104,7 +105,7 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: white;
+  background: var(--sidebar-text-primary, #ffffff);
 }
 
 .navIcon {
@@ -168,7 +169,7 @@
 .userName {
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  color: var(--sidebar-text-primary, #ffffff);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -176,7 +177,7 @@
 
 .userRole {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--sidebar-text-secondary, #e0e7ff);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -239,11 +240,19 @@
   min-width: 44px;
 }
 
-/* Focus states for accessibility */
-.navItem:focus,
-.collapseButton:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+/* Focus states for accessibility - Enhanced visibility */
+.navItem:focus-visible,
+.collapseButton:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
   outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+/* Remove focus outline for mouse users */
+.navItem:focus:not(:focus-visible),
+.collapseButton:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
 }
 
 /* High contrast mode support */

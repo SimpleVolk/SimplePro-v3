@@ -32,7 +32,7 @@ module.exports = {
       statements: 80
     }
   },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  // setupFilesAfterEnv should be configured in individual project jest configs
   testTimeout: 10000,
   maxWorkers: '50%',
 };

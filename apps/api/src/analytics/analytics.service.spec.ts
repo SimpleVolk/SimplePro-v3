@@ -48,6 +48,36 @@ describe('AnalyticsService', () => {
         {
           provide: getModelToken(AnalyticsEvent.name),
           useValue: mockEventModel
+        },
+        {
+          provide: getModelToken('Customer'),
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            findById: jest.fn(),
+            aggregate: jest.fn(),
+            countDocuments: jest.fn()
+          }
+        },
+        {
+          provide: getModelToken('Job'),
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            findById: jest.fn(),
+            aggregate: jest.fn(),
+            countDocuments: jest.fn()
+          }
+        },
+        {
+          provide: getModelToken('User'),
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            findById: jest.fn(),
+            aggregate: jest.fn(),
+            countDocuments: jest.fn()
+          }
         }
       ],
     }).compile();

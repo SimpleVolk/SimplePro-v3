@@ -43,7 +43,7 @@ MessageThreadSchema.index({ threadType: 1, createdAt: -1 });
 // Ensure virtuals are serialized
 MessageThreadSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret) {
+  transform: function(_doc, ret: any) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
@@ -53,7 +53,7 @@ MessageThreadSchema.set('toJSON', {
 
 MessageThreadSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret) {
+  transform: function(_doc, ret: any) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;

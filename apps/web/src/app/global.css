@@ -1,37 +1,42 @@
 /* SimplePro Dark Theme Global Styles with Accessibility Enhancements */
 
-/* CSS Custom Properties for Dashboard Components */
+/* Import WCAG AA Compliant Color System */
+@import '../styles/accessibility-colors.css';
+@import '../styles/accessible-buttons.css';
+@import '../styles/accessible-forms.css';
+
+/* Legacy CSS Custom Properties (Mapped to accessible colors) */
 :root {
-  /* Color Palette */
-  --text-primary: #e8eaed;
-  --text-secondary: #9aa0a6;
-  --text-accent: #4a9eff;
+  /* Color Palette - WCAG AA Compliant */
+  --text-primary: var(--text-primary, #ffffff);
+  --text-secondary: var(--text-muted, #94a3b8);
+  --text-accent: var(--link-primary, #60a5fa);
 
   /* Background Colors */
-  --background-primary: #0f1419;
-  --background-secondary: #1e2531;
-  --card-background: #2d2d2d;
-  --hover-background: rgba(74, 158, 255, 0.1);
+  --background-primary: var(--bg-primary, #0f1419);
+  --background-secondary: var(--bg-secondary, #1e2531);
+  --card-background: var(--bg-tertiary, #2d3748);
+  --hover-background: var(--bg-hover, rgba(96, 165, 250, 0.1));
 
   /* Border Colors */
-  --border-color: #444;
-  --border-hover: #4a9eff;
+  --border-color: var(--border-primary, #475569);
+  --border-hover: var(--border-accent, #60a5fa);
 
   /* Accent Colors */
-  --accent-color: #4a9eff;
-  --accent-color-hover: #3d8bdb;
+  --accent-color: var(--link-primary, #60a5fa);
+  --accent-color-hover: var(--link-hover, #93c5fd);
 
-  /* Status Colors */
-  --success-color: #4caf50;
-  --warning-color: #ff9800;
-  --error-color: #f44336;
-  --info-color: #2196f3;
+  /* Status Colors - WCAG AA Compliant */
+  --success-color: var(--success-400, #4ade80);
+  --warning-color: var(--warning-400, #fbbf24);
+  --error-color: var(--error-400, #f87171);
+  --info-color: var(--info-400, #22d3ee);
 
-  /* Chart Colors */
-  --chart-primary: #4caf50;
-  --chart-secondary: #2196f3;
-  --chart-accent: #ff9800;
-  --chart-warning: #f44336;
+  /* Chart Colors - WCAG AA Compliant */
+  --chart-primary: var(--chart-green, #4ade80);
+  --chart-secondary: var(--chart-blue, #60a5fa);
+  --chart-accent: var(--chart-amber, #fbbf24);
+  --chart-warning: var(--chart-red, #f87171);
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -138,7 +143,7 @@ svg {
 /* Form elements dark theme */
 input, select, textarea {
   background: #1e2531;
-  border: 1px solid #4a5568;
+  border: 1px solid #626d7d;
   color: #e8eaed;
 }
 
@@ -149,15 +154,27 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
 }
 
-/* Enhanced focus styles for all interactive elements */
-button:focus,
-a:focus,
-[role="button"]:focus,
-[role="link"]:focus,
-[tabindex]:focus {
-  outline: 2px solid #4a9eff;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.2);
+/* Enhanced focus styles for all interactive elements - WCAG AA Compliant */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="link"]:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring-color, #60a5fa);
+  outline-offset: var(--focus-ring-offset, 2px);
+  box-shadow: var(--shadow-focus, 0 0 0 3px rgba(96, 165, 250, 0.4));
+}
+
+/* Remove focus-visible styles for mouse users (preserve for keyboard) */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible),
+[role="link"]:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
 }
 
 /* Skip navigation link */

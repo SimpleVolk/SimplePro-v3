@@ -102,7 +102,7 @@ export class CompanyService {
         thursday: { isOpen: true, openTime: '08:00', closeTime: '18:00' },
         friday: { isOpen: true, openTime: '08:00', closeTime: '18:00' },
         saturday: { isOpen: true, openTime: '08:00', closeTime: '16:00' },
-        sunday: { isOpen: false, openTime: undefined, closeTime: undefined },
+        sunday: { isOpen: false },
       },
       preferences: {
         defaultCrewSize: 4,

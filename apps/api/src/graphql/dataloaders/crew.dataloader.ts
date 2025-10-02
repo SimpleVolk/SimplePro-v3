@@ -53,7 +53,7 @@ export class CrewDataLoader {
   }
 
   async loadMany(crewMemberIds: string[]): Promise<(CrewMember | null)[]> {
-    return this.batchCrewMembers.loadMany(crewMemberIds);
+    return this.batchCrewMembers.loadMany(crewMemberIds) as Promise<(CrewMember | null)[]>;
   }
 
   async loadAvailableCrew(date: Date): Promise<CrewMember[]> {

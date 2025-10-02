@@ -127,18 +127,18 @@ export class PerformanceMonitorController {
     const slowQueries = this.dbPerformanceService.getSlowQueries(100);
 
     // Calculate index efficiency
-    const totalIndexes = Object.values(indexUsage).reduce(
+    const totalIndexes: number = Object.values(indexUsage).reduce(
       (total: number, collection: any) => total + collection.length,
       0
     );
 
-    const usedIndexes = Object.values(indexUsage).reduce(
+    const usedIndexes: number = Object.values(indexUsage).reduce(
       (used: number, collection: any) =>
         used + collection.filter((index: any) => index.usageCount > 0).length,
       0
     );
 
-    const indexEfficiency = totalIndexes > 0 ? (usedIndexes / totalIndexes) * 100 : 0;
+    const indexEfficiency: number = totalIndexes > 0 ? (usedIndexes / totalIndexes) * 100 : 0;
 
     return {
       success: true,

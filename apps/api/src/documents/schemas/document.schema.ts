@@ -118,7 +118,7 @@ DocumentSchema.index({
 // Ensure toJSON and toObject transformations
 DocumentSchema.set('toJSON', {
   virtuals: true,
-  transform: function (_doc, ret) {
+  transform: function (_doc, ret: any) {
     delete ret.sharePassword; // Never expose share password hash
     return ret;
   },
@@ -126,7 +126,7 @@ DocumentSchema.set('toJSON', {
 
 DocumentSchema.set('toObject', {
   virtuals: true,
-  transform: function (_doc, ret) {
+  transform: function (_doc, ret: any) {
     delete ret.sharePassword; // Never expose share password hash
     return ret;
   },

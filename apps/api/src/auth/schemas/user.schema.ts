@@ -84,16 +84,16 @@ UserSchema.virtual('fullName').get(function(this: UserDocument) {
 // Ensure virtual fields are serialized
 UserSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret) {
-    delete (ret as any).passwordHash; // Never include password hash in JSON output
+  transform: function(_doc, ret: any) {
+    delete ret.passwordHash; // Never include password hash in JSON output
     return ret;
   }
 });
 
 UserSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret) {
-    delete (ret as any).passwordHash; // Never include password hash in object output
+  transform: function(_doc, ret: any) {
+    delete ret.passwordHash; // Never include password hash in object output
     return ret;
   }
 });

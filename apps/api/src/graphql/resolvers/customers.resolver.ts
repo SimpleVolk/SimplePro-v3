@@ -1,15 +1,19 @@
-import { Resolver, Query, Args, ResolveField, Parent } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import { UseGuards, Request } from '@nestjs/common';
 import { CustomersService } from '../../customers/customers.service';
 import { JobsService } from '../../jobs/jobs.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import {
   Customer,
-  CustomerFilters
+  CustomerFilters,
+  CreateCustomerDto,
+  UpdateCustomerDto
 } from '../../customers/interfaces/customer.interface';
 
 @Resolver('Customer')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class CustomersResolver {
   constructor(
     private readonly customersService: CustomersService,
@@ -34,7 +38,9 @@ export class CustomersResolver {
     @Args('first') first?: number,
     @Args('after') after?: string
   ): Promise<any> {
-    const customers = await this.customersService.findAll(filters);
+    // Fetch all customers (use large limit for GraphQL compatibility)
+    const result = await this.customersService.findAll(filters, 0, 1000);
+    const customers = result.data;
 
     // Apply sorting if specified
     if (sortBy) {
@@ -79,10 +85,50 @@ export class CustomersResolver {
     if (!customer.jobs || customer.jobs.length === 0) return [];
 
     // Fetch all jobs for this customer
-    const jobs = await this.jobsService.findAll({
+    const result = await this.jobsService.findAll({
       customerId: customer.id
-    });
+    }, 0, 100);
 
-    return jobs;
+    return result.data;
+  }
+
+  // Mutations
+  @Mutation('createCustomer')
+  @Roles('super_admin', 'admin', 'dispatcher')
+  async createCustomer(
+    @Args('input') input: CreateCustomerDto,
+    @Request() req: any
+  ): Promise<Customer> {
+    const userId = req.user?.userId || 'system';
+    return this.customersService.create(input, userId);
+  }
+
+  @Mutation('updateCustomer')
+  @Roles('super_admin', 'admin', 'dispatcher')
+  async updateCustomer(
+    @Args('id') id: string,
+    @Args('input') input: UpdateCustomerDto,
+    @Request() req: any
+  ): Promise<Customer> {
+    const userId = req.user?.userId || 'system';
+    return this.customersService.update(id, input, userId);
+  }
+
+  @Mutation('deleteCustomer')
+  @Roles('super_admin', 'admin')
+  async deleteCustomer(@Args('id') id: string): Promise<boolean> {
+    await this.customersService.remove(id);
+    return true;
+  }
+
+  @Mutation('updateCustomerStatus')
+  @Roles('super_admin', 'admin', 'dispatcher')
+  async updateCustomerStatus(
+    @Args('id') id: string,
+    @Args('status') status: Customer['status'],
+    @Request() req: any
+  ): Promise<Customer> {
+    const userId = req.user?.userId || 'system';
+    return this.customersService.update(id, { status }, userId);
   }
 }

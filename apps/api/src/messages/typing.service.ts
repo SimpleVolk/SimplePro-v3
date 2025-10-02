@@ -39,12 +39,21 @@ export class TypingService {
 
   async stopTyping(threadId: string, userId: string): Promise<void> {
     try {
-      await this.typingIndicatorModel.deleteOne({
-        threadId: new Types.ObjectId(threadId),
-        userId: new Types.ObjectId(userId),
-      });
-
-      this.logger.debug(`User ${userId} stopped typing in thread ${threadId}`);
+      // Support wildcard threadId for cleanup on disconnect
+      if (threadId === '*') {
+        // Clear all typing indicators for this user across all threads
+        await this.typingIndicatorModel.deleteMany({
+          userId: new Types.ObjectId(userId),
+        });
+        this.logger.debug(`Cleared all typing indicators for user ${userId}`);
+      } else {
+        // Clear specific thread typing indicator
+        await this.typingIndicatorModel.deleteOne({
+          threadId: new Types.ObjectId(threadId),
+          userId: new Types.ObjectId(userId),
+        });
+        this.logger.debug(`User ${userId} stopped typing in thread ${threadId}`);
+      }
     } catch (error) {
       this.logger.error(`Failed to stop typing indicator: ${error.message}`);
       throw error;

@@ -87,9 +87,8 @@ export class CustomerQueryFiltersDto extends QueryFiltersDto {
 
   @ApiPropertyOptional({ description: 'Lead source filter' })
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  source?: string;
+  @IsEnum(['website', 'referral', 'advertising', 'social_media', 'partner', 'other'])
+  source?: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
 
   @ApiPropertyOptional({ description: 'Assigned sales representative ID' })
   @IsOptional()
@@ -147,26 +146,51 @@ export class CustomerQueryFiltersDto extends QueryFiltersDto {
 export class JobQueryFiltersDto extends QueryFiltersDto {
   @ApiPropertyOptional({ description: 'Job status filter' })
   @IsOptional()
-  @IsEnum(['scheduled', 'in_progress', 'completed', 'cancelled'])
+  @IsEnum(['scheduled', 'in_progress', 'completed', 'cancelled', 'on_hold'])
   @Transform(({ value }) => {
     return typeof value === 'string' ? value.toLowerCase() : value;
   })
-  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
 
   @ApiPropertyOptional({ description: 'Job type filter' })
   @IsOptional()
   @IsEnum(['local', 'long_distance', 'packing_only', 'storage'])
-  serviceType?: 'local' | 'long_distance' | 'packing_only' | 'storage';
+  type?: 'local' | 'long_distance' | 'packing_only' | 'storage';
 
   @ApiPropertyOptional({ description: 'Priority filter' })
   @IsOptional()
-  @IsEnum(['low', 'medium', 'high', 'urgent'])
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  @IsEnum(['low', 'normal', 'high', 'urgent'])
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
 
   @ApiPropertyOptional({ description: 'Customer ID (MongoDB ObjectId)' })
   @IsOptional()
   @IsMongoId()
   customerId?: string;
+
+  @ApiPropertyOptional({ description: 'Assigned crew ID (MongoDB ObjectId)' })
+  @IsOptional()
+  @IsMongoId()
+  assignedCrew?: string;
+
+  @ApiPropertyOptional({ description: 'Scheduled after date (ISO 8601)' })
+  @IsOptional()
+  @IsString()
+  scheduledAfter?: string;
+
+  @ApiPropertyOptional({ description: 'Scheduled before date (ISO 8601)' })
+  @IsOptional()
+  @IsString()
+  scheduledBefore?: string;
+
+  @ApiPropertyOptional({ description: 'Created after date (ISO 8601)' })
+  @IsOptional()
+  @IsString()
+  createdAfter?: string;
+
+  @ApiPropertyOptional({ description: 'Created before date (ISO 8601)' })
+  @IsOptional()
+  @IsString()
+  createdBefore?: string;
 }
 
 /**

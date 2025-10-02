@@ -172,7 +172,10 @@ yarn-error.log
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
 
+# Ignore all .md files except in docs/ and CLAUDE.md
 *.md
+!docs/**/*.md
+!CLAUDE.md
 
 .claude
 

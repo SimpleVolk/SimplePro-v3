@@ -39,7 +39,7 @@ export const defaultTariffData = {
   status: TariffStatus.ACTIVE,
   version: '1.0.0',
   effectiveFrom: new Date('2025-01-01'),
-  effectiveTo: undefined,
+  // effectiveTo is optional - omitted means no end date
   createdBy: 'system',
   lastModifiedBy: 'system',
   isArchived: false,

@@ -6,8 +6,9 @@
 
 ```bash
 npm run docker:dev    # Start MongoDB, Redis, MinIO
+npm run seed:dev      # Populate database with test data (optional)
 npm run dev           # Start API (3001) + Web (3009)
-# Login: admin / Admin123!
+# Login: admin / Admin123! or sarah.sales / Test123!
 ```
 
 **Architecture**: NX monorepo with 3 apps (API, Web, Mobile) + pricing-engine package
@@ -39,6 +40,11 @@ npm run lint             # Lint and fix all code
 npm run docker:dev       # Start MongoDB + Redis + MinIO
 npm run docker:dev:down  # Stop infrastructure
 npm run docker:dev:logs  # View logs
+
+# Database Seeding
+npm run seed:dev         # Seed development data (users, customers, jobs, etc.)
+npm run seed:dev:clear   # Clear and reseed all data
+npm run seed:tariffs     # Seed tariff settings only
 
 # NX Commands
 nx build <project>       # Build specific project (api, web, pricing-engine)
@@ -227,4 +233,5 @@ Retry logic: exponential backoff (1s, 2s, 4s), 3 attempts
 - Improve test coverage to 80%+ (currently 58% API, 100% pricing engine)
 - Fix WCAG AA color contrast violations
 - Complete GraphQL resolvers (50% done)
-- Add seed data and CI/CD pipelines
+- ✅ **Seed data complete** (see SEEDING-GUIDE.md)
+- Add CI/CD pipelines

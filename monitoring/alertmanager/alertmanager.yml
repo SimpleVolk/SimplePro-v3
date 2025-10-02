@@ -1,0 +1,62 @@
+global:
+  resolve_timeout: 5m
+  slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'
+
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  routes:
+    - match:
+        severity: critical
+      receiver: 'critical'
+      continue: true
+    - match:
+        severity: warning
+      receiver: 'warning'
+      continue: true
+    - match:
+        component: business
+      receiver: 'business-metrics'
+
+receivers:
+  - name: 'default'
+    slack_configs:
+      - channel: '#simplepro-alerts'
+        title: 'SimplePro Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}'
+
+  - name: 'critical'
+    slack_configs:
+      - channel: '#simplepro-critical'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}'
+    email_configs:
+      - to: 'oncall@simplepro.com'
+        from: 'alerts@simplepro.com'
+        smarthost: 'smtp.gmail.com:587'
+        auth_username: 'alerts@simplepro.com'
+        auth_password: 'YOUR_EMAIL_PASSWORD'
+        headers:
+          Subject: '[CRITICAL] SimplePro Alert: {{ .GroupLabels.alertname }}'
+
+  - name: 'warning'
+    slack_configs:
+      - channel: '#simplepro-warnings'
+        title: '⚠️  WARNING: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}'
+
+  - name: 'business-metrics'
+    slack_configs:
+      - channel: '#simplepro-business'
+        title: 'ℹ️  Business Metric: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}'
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']

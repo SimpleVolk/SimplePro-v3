@@ -1,5 +1,10 @@
 import './global.css';
 
+// Force dynamic rendering for entire app (prevents static generation issues with auth context)
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
+
 export const metadata = {
   title: 'SimplePro - Moving Company Management',
   description: 'Professional moving company management system with deterministic pricing',

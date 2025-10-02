@@ -1,0 +1,112 @@
+groups:
+  - name: simplepro_alerts
+    interval: 30s
+    rules:
+      # API Availability
+      - alert: APIDown
+        expr: up{job="simplepro-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "SimplePro API is down"
+          description: "The SimplePro API has been down for more than 1 minute."
+
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(http_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High HTTP error rate detected"
+          description: "HTTP error rate is {{ $value }} errors/sec over the last 5 minutes."
+
+      # High Response Time
+      - alert: HighResponseTime
+        expr: http_request_duration_seconds > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API response time"
+          description: "Average response time is {{ $value }}s over the last 5 minutes."
+
+      # Database Connection
+      - alert: DatabaseDisconnected
+        expr: database_connected == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database connection lost"
+          description: "MongoDB connection has been lost for more than 1 minute."
+
+      # Memory Usage
+      - alert: HighMemoryUsage
+        expr: (process_memory_bytes{type="heap_used"} / process_memory_bytes{type="heap_total"}) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 90% for more than 5 minutes."
+
+      # System CPU
+      - alert: HighSystemCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High system CPU usage"
+          description: "CPU usage is above 80% on {{ $labels.instance }} for more than 5 minutes."
+
+      # Disk Space
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10% on {{ $labels.instance }}."
+
+      # Container Restarts
+      - alert: ContainerRestarting
+        expr: rate(container_last_seen[5m]) > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: docker
+        annotations:
+          summary: "Container restarting frequently"
+          description: "Container {{ $labels.name }} is restarting frequently."
+
+      # Business Metrics
+      - alert: NoRecentEstimates
+        expr: rate(business_estimates_created_total[1h]) == 0
+        for: 2h
+        labels:
+          severity: info
+          component: business
+        annotations:
+          summary: "No estimates created recently"
+          description: "No new estimates have been created in the last 2 hours during business hours."
+
+      - alert: NoRecentJobs
+        expr: rate(business_jobs_created_total[1h]) == 0
+        for: 4h
+        labels:
+          severity: info
+          component: business
+        annotations:
+          summary: "No jobs created recently"
+          description: "No new jobs have been created in the last 4 hours during business hours."

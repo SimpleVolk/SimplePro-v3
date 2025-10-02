@@ -45,18 +45,18 @@ export class AnalyticsResolver {
   ): Promise<any> {
     try {
       // Use analytics service if available
-      const overview = await this.analyticsService.getDashboardOverview();
+      const overview = await this.analyticsService.getDashboardMetrics();
 
       return {
-        totalRevenue: overview.revenue.totalRevenue,
-        averageJobValue: overview.revenue.averageJobValue,
+        totalRevenue: overview.totalRevenue,
+        averageJobValue: overview.averageJobValue,
         revenueByType: {
-          local: overview.revenue.totalRevenue * 0.6, // Example split
-          long_distance: overview.revenue.totalRevenue * 0.3,
-          storage: overview.revenue.totalRevenue * 0.1
+          local: overview.totalRevenue * 0.6, // Example split
+          long_distance: overview.totalRevenue * 0.3,
+          storage: overview.totalRevenue * 0.1
         },
         revenueByMonth: {},
-        projectedRevenue: overview.revenue.totalRevenue * 1.1
+        projectedRevenue: overview.totalRevenue * 1.1
       };
     } catch (error) {
       // Fallback to basic job stats
@@ -77,14 +77,14 @@ export class AnalyticsResolver {
   ): Promise<any> {
     try {
       // Use analytics service if available
-      const overview = await this.analyticsService.getDashboardOverview();
+      const overview = await this.analyticsService.getDashboardMetrics();
 
       return {
-        completionRate: overview.performance.completionRate,
-        onTimeRate: overview.performance.onTimeDeliveryRate,
-        customerSatisfaction: overview.performance.customerSatisfaction,
-        crewEfficiency: overview.performance.crewEfficiency,
-        averageJobDuration: overview.performance.averageJobDuration
+        completionRate: overview.performanceMetrics.jobCompletionRate,
+        onTimeRate: overview.onTimePerformance,
+        customerSatisfaction: overview.customerSatisfaction,
+        crewEfficiency: overview.performanceMetrics.averageCrewEfficiency,
+        averageJobDuration: overview.performanceMetrics.averageJobDuration
       };
     } catch (error) {
       // Fallback to basic calculations
@@ -117,7 +117,7 @@ export class CrewResolver {
 
   @Query('crewMembers')
   @Roles('admin', 'super_admin', 'dispatcher')
-  async getCrewMembers(@Args('filters') filters?: any) {
+  async getCrewMembers(@Args('filters') filters?: any): Promise<any[]> {
     // For now, return all crew members
     // In production, implement filtering logic
     return [];

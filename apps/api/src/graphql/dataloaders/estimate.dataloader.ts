@@ -33,7 +33,7 @@ export class EstimateDataLoader {
   }
 
   async loadMany(estimateIds: string[]): Promise<(Estimate | null)[]> {
-    return this.batchEstimates.loadMany(estimateIds);
+    return this.batchEstimates.loadMany(estimateIds) as Promise<(Estimate | null)[]>;
   }
 
   // Helper method to cache an estimate

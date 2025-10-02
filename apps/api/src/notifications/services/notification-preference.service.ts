@@ -24,7 +24,7 @@ export class NotificationPreferenceService {
     let preferences = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
 
     if (!preferences) {
-      preferences = await this.createDefaultPreferences(userId);
+      return await this.createDefaultPreferences(userId);
     }
 
     return preferences;
@@ -34,41 +34,39 @@ export class NotificationPreferenceService {
    * Update user notification preferences
    */
   async updatePreferences(userId: string, dto: UpdatePreferencesDto): Promise<NotificationPreferenceDocument> {
-    let preferences = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
+    let preferences: NotificationPreferenceDocument | null = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
 
     if (!preferences) {
       preferences = await this.createDefaultPreferences(userId);
     }
 
-    if (preferences) {
-      if (dto.preferences) {
-        preferences.preferences = { ...preferences.preferences, ...dto.preferences };
-      }
-
-      if (dto.quietHours) {
-        preferences.quietHours = {
-          enabled: dto.quietHours.enabled,
-          start: dto.quietHours.start || '22:00',
-          end: dto.quietHours.end || '07:00',
-        };
-      }
-
-      if (dto.digestMode) {
-        preferences.digestMode = dto.digestMode;
-      }
-
-      if (dto.soundEnabled !== undefined) {
-        preferences.soundEnabled = dto.soundEnabled;
-      }
-
-      if (dto.vibrationEnabled !== undefined) {
-        preferences.vibrationEnabled = dto.vibrationEnabled;
-      }
-
-      await preferences.save();
+    if (dto.preferences) {
+      preferences.preferences = { ...preferences.preferences, ...dto.preferences };
     }
 
-    return preferences!;
+    if (dto.quietHours) {
+      preferences.quietHours = {
+        enabled: dto.quietHours.enabled,
+        start: dto.quietHours.start || '22:00',
+        end: dto.quietHours.end || '07:00',
+      };
+    }
+
+    if (dto.digestMode) {
+      preferences.digestMode = dto.digestMode;
+    }
+
+    if (dto.soundEnabled !== undefined) {
+      preferences.soundEnabled = dto.soundEnabled;
+    }
+
+    if (dto.vibrationEnabled !== undefined) {
+      preferences.vibrationEnabled = dto.vibrationEnabled;
+    }
+
+    await preferences.save();
+
+    return preferences;
   }
 
   /**

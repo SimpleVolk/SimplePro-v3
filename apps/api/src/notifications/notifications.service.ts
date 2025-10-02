@@ -6,6 +6,7 @@ import { CreateNotificationDto, NotificationFiltersDto } from './dto';
 import { NotificationTemplateService } from './services/notification-template.service';
 import { NotificationPreferenceService } from './services/notification-preference.service';
 import { NotificationDeliveryService } from './services/notification-delivery.service';
+import { TransactionService } from '../database/transaction.service';
 
 @Injectable()
 export class NotificationsService {
@@ -17,6 +18,7 @@ export class NotificationsService {
     private preferenceService: NotificationPreferenceService,
     @Inject(forwardRef(() => NotificationDeliveryService))
     private deliveryService: NotificationDeliveryService,
+    private transactionService: TransactionService,
   ) {}
 
   /**
@@ -159,21 +161,33 @@ export class NotificationsService {
   }
 
   /**
-   * Mark all notifications as read for a user
+   * Mark all notifications as read for a user with transaction support
+   *
+   * This method uses a transaction to ensure atomicity when marking
+   * multiple notifications as read. This is important for analytics
+   * and ensures consistent state if the operation is interrupted.
    */
   async markAllAsRead(userId: string): Promise<void> {
-    await this.notificationModel.updateMany(
-      {
-        recipientId: new Types.ObjectId(userId),
-        isRead: false,
-      },
-      {
-        $set: {
-          isRead: true,
-          readAt: new Date(),
+    return this.transactionService.withTransaction(async (session) => {
+      // Update all unread notifications for the user
+      const result = await this.notificationModel.updateMany(
+        {
+          recipientId: new Types.ObjectId(userId),
+          isRead: false,
         },
-      },
-    );
+        {
+          $set: {
+            isRead: true,
+            readAt: new Date(),
+          },
+        },
+        { session }
+      );
+
+      this.logger.debug(
+        `Marked ${result.modifiedCount} notifications as read for user ${userId}`,
+      );
+    });
   }
 
   /**

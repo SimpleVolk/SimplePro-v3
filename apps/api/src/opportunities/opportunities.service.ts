@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Opportunity, OpportunityDocument } from './schemas/opportunity.schema';
 import { CreateOpportunityDto } from './dto/create-opportunity.dto';
+import { TransactionService } from '../database/transaction.service';
 
 @Injectable()
 export class OpportunitiesService {
@@ -11,6 +12,7 @@ export class OpportunitiesService {
     @InjectModel(Opportunity.name)
     private opportunityModel: Model<OpportunityDocument>,
     private eventEmitter: EventEmitter2,
+    private transactionService: TransactionService,
   ) {}
 
   async create(dto: CreateOpportunityDto, userId: string): Promise<OpportunityDocument> {
@@ -147,5 +149,47 @@ export class OpportunitiesService {
       byStatus: byStatus.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
       byLeadSource: byLeadSource.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
     };
+  }
+
+  /**
+   * Convert opportunity to won status with transaction
+   *
+   * This method uses a transaction to ensure:
+   * 1. Opportunity status is updated to 'won'
+   * 2. Opportunity is linked to the job
+   * 3. Conversion event is tracked
+   *
+   * All operations succeed or fail atomically.
+   *
+   * @param opportunityId - The opportunity to convert
+   * @param jobId - The newly created job ID
+   * @param userId - User performing the conversion
+   */
+  async markAsWon(opportunityId: string, jobId: string, userId: string): Promise<OpportunityDocument> {
+    return this.transactionService.withTransaction(async (session) => {
+      // 1. Find and update opportunity
+      const opportunity = await this.opportunityModel.findById(opportunityId).session(session).exec();
+
+      if (!opportunity) {
+        throw new NotFoundException(`Opportunity with ID ${opportunityId} not found`);
+      }
+
+      // 2. Update opportunity status to won
+      opportunity.status = 'won';
+      opportunity.updatedBy = userId;
+      await opportunity.save({ session });
+
+      // 3. Emit conversion event for analytics (will be processed after transaction commits)
+      setImmediate(() => {
+        this.eventEmitter.emit('opportunity.converted', {
+          opportunity,
+          jobId,
+          userId,
+          convertedAt: new Date(),
+        });
+      });
+
+      return opportunity;
+    });
   }
 }

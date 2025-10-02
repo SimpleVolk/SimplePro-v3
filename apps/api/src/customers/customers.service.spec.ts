@@ -115,7 +115,7 @@ describe('CustomersService', () => {
       };
       savedCustomers.set(id, customerDoc);
       return customerDoc;
-    }));
+    });
 
     // Add static methods with proper implementations
     mockConstructor.findOne = jest.fn((query) => {

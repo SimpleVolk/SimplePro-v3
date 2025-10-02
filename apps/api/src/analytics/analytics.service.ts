@@ -5,6 +5,7 @@ import { AnalyticsEvent, AnalyticsEventDocument } from './schemas/analytics-even
 import { Customer, CustomerDocument } from '../customers/schemas/customer.schema';
 import { Job, JobDocument } from '../jobs/schemas/job.schema';
 import { User, UserDocument } from '../auth/schemas/user.schema';
+import { CacheService } from '../cache/cache.service';
 
 export interface AnalyticsEventInput {
   eventType: string;
@@ -144,38 +145,56 @@ export class AnalyticsService {
   async getEventsByType(
     eventType: string,
     period: PeriodFilter,
-    limit: number = 100
-  ): Promise<AnalyticsEvent[]> {
-    return this.analyticsEventModel
-      .find({
-        eventType,
-        timestamp: {
-          $gte: period.startDate,
-          $lte: period.endDate
-        }
-      })
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .exec();
+    limit: number = 100,
+    skip: number = 0
+  ): Promise<{ events: AnalyticsEvent[]; total: number }> {
+    const query = {
+      eventType,
+      timestamp: {
+        $gte: period.startDate,
+        $lte: period.endDate
+      }
+    };
+
+    const [events, total] = await Promise.all([
+      this.analyticsEventModel
+        .find(query)
+        .sort({ timestamp: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.analyticsEventModel.countDocuments(query).exec()
+    ]);
+
+    return { events, total };
   }
 
   // Get events by category
   async getEventsByCategory(
     category: string,
     period: PeriodFilter,
-    limit: number = 100
-  ): Promise<AnalyticsEvent[]> {
-    return this.analyticsEventModel
-      .find({
-        category,
-        timestamp: {
-          $gte: period.startDate,
-          $lte: period.endDate
-        }
-      })
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .exec();
+    limit: number = 100,
+    skip: number = 0
+  ): Promise<{ events: AnalyticsEvent[]; total: number }> {
+    const query = {
+      category,
+      timestamp: {
+        $gte: period.startDate,
+        $lte: period.endDate
+      }
+    };
+
+    const [events, total] = await Promise.all([
+      this.analyticsEventModel
+        .find(query)
+        .sort({ timestamp: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.analyticsEventModel.countDocuments(query).exec()
+    ]);
+
+    return { events, total };
   }
 
   // Revenue analytics
@@ -291,7 +310,7 @@ export class AnalyticsService {
       },
       {
         $group: {
-          _id: null,
+          _id: null as null,
           totalRevenue: { $sum: '$revenue' },
           averageRevenue: { $avg: '$revenue' },
           count: { $sum: 1 }

@@ -1,0 +1,67 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'simplepro'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+
+# Scrape configurations
+scrape_configs:
+  # SimplePro API metrics
+  - job_name: 'simplepro-api'
+    static_configs:
+      - targets:
+          - 'host.docker.internal:3001'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # SimplePro Web metrics (if exposed)
+  - job_name: 'simplepro-web'
+    static_configs:
+      - targets:
+          - 'host.docker.internal:3009'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+
+  # Node Exporter - System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets:
+          - 'node-exporter:9100'
+
+  # cAdvisor - Container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets:
+          - 'cadvisor:8080'
+
+  # MongoDB (if exporter is installed)
+  - job_name: 'mongodb'
+    static_configs:
+      - targets:
+          - 'mongodb-exporter:9216'
+    scrape_interval: 30s
+
+  # Redis (if exporter is installed)
+  - job_name: 'redis'
+    static_configs:
+      - targets:
+          - 'redis-exporter:9121'
+    scrape_interval: 30s

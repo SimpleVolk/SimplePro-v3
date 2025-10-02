@@ -1,26 +1,18 @@
-// Global test setup for Jest
-// This file is referenced in jest configurations
+// Root Jest setup file
+// This file is referenced by jest.preset.js and provides base configuration
 
-// Mock global fetch if needed
-global.fetch = require('node-fetch');
-
-// Set up environment variables for testing
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-secret-key';
-process.env.MONGODB_URI = 'mongodb://localhost:27017/simplepro-test';
-
-// Suppress console.log in tests unless explicitly needed
-const originalConsoleLog = console.log;
-console.log = (...args) => {
-  if (process.env.JEST_VERBOSE === 'true') {
-    originalConsoleLog(...args);
-  }
+// Add any global test setup here
+global.console = {
+  ...console,
+  // Suppress console logs during tests (optional)
+  // log: jest.fn(),
+  // debug: jest.fn(),
+  // info: jest.fn(),
+  // warn: jest.fn(),
+  // error: jest.fn(),
 };
 
-// Mock crypto for Node.js environments where it might not be available
-if (typeof global.crypto === 'undefined') {
-  global.crypto = require('crypto');
+// Mock common global APIs if needed
+if (typeof global.fetch === 'undefined') {
+  global.fetch = jest.fn();
 }
-
-// Set longer timeout for integration tests
-jest.setTimeout(10000);

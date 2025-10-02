@@ -15,6 +15,7 @@ import { UpdateRuleDto } from './dto/update-rule.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthenticatedRequest } from '../types';
 
 @Controller('api/follow-up-rules')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -23,7 +24,7 @@ export class FollowUpRulesController {
 
   @Post()
   @Roles('super_admin', 'admin')
-  async createRule(@Body() createDto: CreateRuleDto, @Request() req) {
+  async createRule(@Body() createDto: CreateRuleDto, @Request() req: AuthenticatedRequest) {
     const rule = await this.rulesService.createRule(createDto, req.user.userId);
 
     return {
@@ -73,7 +74,7 @@ export class FollowUpRulesController {
   async updateRule(
     @Param('ruleId') ruleId: string,
     @Body() updateDto: UpdateRuleDto,
-    @Request() req
+    @Request() req: AuthenticatedRequest
   ) {
     const rule = await this.rulesService.updateRule(
       ruleId,

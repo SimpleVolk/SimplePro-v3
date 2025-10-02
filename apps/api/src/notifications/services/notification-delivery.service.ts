@@ -91,7 +91,7 @@ export class NotificationDeliveryService {
     }
 
     const deliveryFn = async () => {
-      const user = await this.authService.findById(notification.recipientId.toString());
+      const user = await this.authService.findOne(notification.recipientId.toString());
       if (!user || !user.email) {
         throw new Error('User email not found');
       }
@@ -165,7 +165,7 @@ export class NotificationDeliveryService {
     }
 
     const deliveryFn = async () => {
-      const user = await this.authService.findById(notification.recipientId.toString());
+      const user = await this.authService.findOne(notification.recipientId.toString());
       if (!user || !user.phoneNumber) {
         throw new Error('User phone number not found');
       }
@@ -242,7 +242,7 @@ export class NotificationDeliveryService {
     }
 
     const deliveryFn = async () => {
-      const user = await this.authService.findById(notification.recipientId.toString());
+      const user = await this.authService.findOne(notification.recipientId.toString());
       if (!user || !user.fcmTokens || user.fcmTokens.length === 0) {
         throw new Error('No FCM tokens registered for user');
       }

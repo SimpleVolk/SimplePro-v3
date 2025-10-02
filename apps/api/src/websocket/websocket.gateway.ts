@@ -35,10 +35,13 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   private userSockets = new Map<string, Set<string>>(); // userId -> socketIds
   private crewRooms = new Map<string, Set<string>>(); // crewId -> socketIds
   private connectionTimers = new Map<string, NodeJS.Timeout>(); // socketId -> timeout
+  private socketRooms = new Map<string, Set<string>>(); // socketId -> Set of room names for cleanup
+  private typingTimers = new Map<string, NodeJS.Timeout>(); // socketId:threadId -> timer
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private readonly CONNECTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
   private readonly HEARTBEAT_INTERVAL = 30 * 1000; // 30 seconds
   private readonly MAX_CONNECTIONS_PER_USER = 5; // Prevent connection spam
+  private readonly TYPING_TIMEOUT = 5000; // 5 seconds auto-clear typing
 
   constructor(
     private jwtService: JwtService,
@@ -54,6 +57,39 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.startHeartbeat();
   }
 
+  /**
+   * Track a room that a socket has joined for cleanup purposes
+   */
+  private trackRoom(socketId: string, roomName: string) {
+    if (!this.socketRooms.has(socketId)) {
+      this.socketRooms.set(socketId, new Set());
+    }
+    this.socketRooms.get(socketId)!.add(roomName);
+  }
+
+  /**
+   * Remove all room tracking for a socket
+   */
+  private clearRoomTracking(socketId: string) {
+    this.socketRooms.delete(socketId);
+  }
+
+  /**
+   * Clear all typing timers for a specific socket
+   */
+  private clearTypingTimers(socketId: string) {
+    const timersToDelete: string[] = [];
+
+    this.typingTimers.forEach((timer, key) => {
+      if (key.startsWith(`${socketId}:`)) {
+        clearTimeout(timer);
+        timersToDelete.push(key);
+      }
+    });
+
+    timersToDelete.forEach(key => this.typingTimers.delete(key));
+  }
+
   async onModuleDestroy() {
     this.logger.log('WebSocket Gateway shutting down...');
 
@@ -65,6 +101,10 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.connectionTimers.forEach((timer) => clearTimeout(timer));
     this.connectionTimers.clear();
 
+    // Clear all typing timers
+    this.typingTimers.forEach((timer) => clearTimeout(timer));
+    this.typingTimers.clear();
+
     // Disconnect all clients gracefully
     this.connectedClients.forEach((client) => {
       client.emit('serverShutdown', { message: 'Server is shutting down' });
@@ -75,6 +115,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.connectedClients.clear();
     this.userSockets.clear();
     this.crewRooms.clear();
+    this.socketRooms.clear();
 
     this.logger.log('WebSocket Gateway shutdown complete');
   }
@@ -109,7 +150,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       totalConnections: this.connectedClients.size,
       uniqueUsers: this.userSockets.size,
       activeCrews: this.crewRooms.size,
-      connectionTimers: this.connectionTimers.size
+      connectionTimers: this.connectionTimers.size,
+      typingTimers: this.typingTimers.size,
+      trackedRooms: this.socketRooms.size
     };
 
     this.logger.debug('Connection stats:', stats);
@@ -117,6 +160,16 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     // Alert if connection count is unusually high
     if (stats.totalConnections > 1000) {
       this.logger.warn(`High connection count detected: ${stats.totalConnections}`);
+    }
+
+    // Alert if typing timers are accumulating (potential memory leak)
+    if (stats.typingTimers > 100) {
+      this.logger.warn(`High typing timer count detected: ${stats.typingTimers} - potential memory leak`);
+    }
+
+    // Alert if room tracking is accumulating
+    if (stats.trackedRooms > stats.totalConnections * 2) {
+      this.logger.warn(`Room tracking exceeds expected ratio: ${stats.trackedRooms} rooms for ${stats.totalConnections} connections`);
     }
   }
 
@@ -184,11 +237,16 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       }
 
       // Join role-based rooms
-      await client.join(`role:${user.role.name}`);
+      const roleRoom = `role:${user.role.name}`;
+      await client.join(roleRoom);
+      this.trackRoom(client.id, roleRoom);
 
       // Join crew room if applicable
       if (user.crewId) {
-        await client.join(`crew:${user.crewId}`);
+        const crewRoom = `crew:${user.crewId}`;
+        await client.join(crewRoom);
+        this.trackRoom(client.id, crewRoom);
+
         if (!this.crewRooms.has(user.crewId)) {
           this.crewRooms.set(user.crewId, new Set());
         }
@@ -197,7 +255,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // Join user-specific room
       if (client.userId) {
-        await client.join(`user:${client.userId}`);
+        const userRoom = `user:${client.userId}`;
+        await client.join(userRoom);
+        this.trackRoom(client.id, userRoom);
       }
 
       this.logger.log(`Client ${client.id} connected as ${user.username} (${user.role.name})`);
@@ -228,16 +288,46 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   handleDisconnect(client: AuthenticatedSocket) {
     const { userId, crewId } = client;
 
-    // Clear connection timeout
+    this.logger.log(`Client ${client.id} disconnecting (User: ${userId})`);
+
+    // 1. Clear connection timeout timer
     const timer = this.connectionTimers.get(client.id);
     if (timer) {
       clearTimeout(timer);
       this.connectionTimers.delete(client.id);
     }
 
-    // Remove from tracking maps
+    // 2. Clear all typing timers for this socket
+    this.clearTypingTimers(client.id);
+
+    // 3. Cleanup typing indicators in database
+    if (userId) {
+      // Fire and forget - cleanup typing indicators for this user
+      this.typingService.stopTyping('*', userId).catch(err => {
+        this.logger.error(`Failed to cleanup typing indicators for user ${userId}: ${err.message}`);
+      });
+    }
+
+    // 4. Leave all tracked rooms explicitly
+    const rooms = this.socketRooms.get(client.id);
+    if (rooms && rooms.size > 0) {
+      rooms.forEach(roomName => {
+        try {
+          client.leave(roomName);
+        } catch (error) {
+          this.logger.warn(`Failed to leave room ${roomName}: ${error.message}`);
+        }
+      });
+      this.logger.debug(`Client ${client.id} left ${rooms.size} rooms`);
+    }
+
+    // 5. Clear room tracking for this socket
+    this.clearRoomTracking(client.id);
+
+    // 6. Remove from connected clients map
     this.connectedClients.delete(client.id);
 
+    // 7. Remove from user sockets tracking
     if (userId) {
       const userSocketSet = this.userSockets.get(userId);
       if (userSocketSet) {
@@ -248,6 +338,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       }
     }
 
+    // 8. Remove from crew rooms tracking
     if (crewId) {
       const crewSocketSet = this.crewRooms.get(crewId);
       if (crewSocketSet) {
@@ -258,9 +349,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       }
     }
 
-    this.logger.log(`Client ${client.id} disconnected (User: ${userId})`);
+    this.logger.log(`Client ${client.id} disconnected (User: ${userId}) - cleanup complete`);
 
-    // Broadcast user offline status if no more connections
+    // 9. Broadcast user offline status if no more connections
     if (userId && !this.userSockets.has(userId)) {
       this.server.to('role:admin').to('role:dispatcher').emit('userOffline', {
         userId,
@@ -280,7 +371,10 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     // Verify user has access to this job
     // In a real implementation, check job permissions
 
-    await client.join(`job:${jobId}`);
+    const jobRoom = `job:${jobId}`;
+    await client.join(jobRoom);
+    this.trackRoom(client.id, jobRoom);
+
     this.logger.log(`Client ${client.id} subscribed to job ${jobId}`);
 
     client.emit('jobSubscribed', {
@@ -296,7 +390,16 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @MessageBody() data: { jobId: string }
   ) {
     const { jobId } = data;
-    await client.leave(`job:${jobId}`);
+    const jobRoom = `job:${jobId}`;
+
+    await client.leave(jobRoom);
+
+    // Remove from room tracking
+    const rooms = this.socketRooms.get(client.id);
+    if (rooms) {
+      rooms.delete(jobRoom);
+    }
+
     this.logger.log(`Client ${client.id} unsubscribed from job ${jobId}`);
 
     client.emit('jobUnsubscribed', {
@@ -522,10 +625,14 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       return;
     }
 
-    await client.join('analytics:subscribers');
+    const baseRoom = 'analytics:subscribers';
+    await client.join(baseRoom);
+    this.trackRoom(client.id, baseRoom);
 
     if (data.dashboardType) {
-      await client.join(`analytics:${data.dashboardType}`);
+      const dashboardRoom = `analytics:${data.dashboardType}`;
+      await client.join(dashboardRoom);
+      this.trackRoom(client.id, dashboardRoom);
     }
 
     this.logger.log(`Client ${client.id} subscribed to analytics updates`);
@@ -542,10 +649,18 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: { dashboardType?: 'overview' | 'business' | 'revenue' | 'performance' }
   ) {
-    await client.leave('analytics:subscribers');
+    const baseRoom = 'analytics:subscribers';
+    await client.leave(baseRoom);
 
-    if (data.dashboardType) {
-      await client.leave(`analytics:${data.dashboardType}`);
+    const rooms = this.socketRooms.get(client.id);
+    if (rooms) {
+      rooms.delete(baseRoom);
+
+      if (data.dashboardType) {
+        const dashboardRoom = `analytics:${data.dashboardType}`;
+        await client.leave(dashboardRoom);
+        rooms.delete(dashboardRoom);
+      }
     }
 
     this.logger.log(`Client ${client.id} unsubscribed from analytics updates`);
@@ -603,8 +718,11 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       userSocketsSize: this.userSockets.size,
       crewRoomsSize: this.crewRooms.size,
       connectionTimersSize: this.connectionTimers.size,
+      typingTimersSize: this.typingTimers.size,
+      socketRoomsSize: this.socketRooms.size,
       totalMappedEntries: Array.from(this.userSockets.values()).reduce((sum, set) => sum + set.size, 0) +
-                          Array.from(this.crewRooms.values()).reduce((sum, set) => sum + set.size, 0)
+                          Array.from(this.crewRooms.values()).reduce((sum, set) => sum + set.size, 0),
+      totalTrackedRooms: Array.from(this.socketRooms.values()).reduce((sum, set) => sum + set.size, 0)
     };
   }
 
@@ -612,18 +730,25 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   forceCleanup() {
     this.logger.warn('Forcing WebSocket cleanup...');
 
+    // Clear all timers
     this.connectionTimers.forEach((timer) => clearTimeout(timer));
     this.connectionTimers.clear();
 
+    this.typingTimers.forEach((timer) => clearTimeout(timer));
+    this.typingTimers.clear();
+
+    // Disconnect all clients
     this.connectedClients.forEach((client) => {
       if (client && client.connected) {
         client.disconnect(true);
       }
     });
 
+    // Clear all tracking maps
     this.connectedClients.clear();
     this.userSockets.clear();
     this.crewRooms.clear();
+    this.socketRooms.clear();
 
     this.logger.warn('WebSocket cleanup completed');
   }
@@ -701,6 +826,23 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     try {
       await this.typingService.startTyping(payload.threadId, client.userId!);
 
+      // Clear any existing typing timer for this socket/thread combination
+      const timerKey = `${client.id}:${payload.threadId}`;
+      const existingTimer = this.typingTimers.get(timerKey);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      // Set auto-clear timer (5 seconds)
+      const timer = setTimeout(() => {
+        this.handleTypingStop(client, payload).catch(err => {
+          this.logger.error(`Failed to auto-clear typing: ${err.message}`);
+        });
+        this.typingTimers.delete(timerKey);
+      }, this.TYPING_TIMEOUT);
+
+      this.typingTimers.set(timerKey, timer);
+
       // Get thread to find other participants
       const thread = await this.messagesService.getThreadById(payload.threadId);
 
@@ -728,6 +870,14 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @MessageBody() payload: { threadId: string }
   ) {
     try {
+      // Clear the typing timer
+      const timerKey = `${client.id}:${payload.threadId}`;
+      const timer = this.typingTimers.get(timerKey);
+      if (timer) {
+        clearTimeout(timer);
+        this.typingTimers.delete(timerKey);
+      }
+
       await this.typingService.stopTyping(payload.threadId, client.userId!);
 
       // Get thread to find other participants
@@ -855,7 +1005,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         return;
       }
 
-      await client.join(`thread:${payload.threadId}`);
+      const threadRoom = `thread:${payload.threadId}`;
+      await client.join(threadRoom);
+      this.trackRoom(client.id, threadRoom);
 
       client.emit('thread.subscribed', {
         threadId: payload.threadId,
@@ -875,7 +1027,14 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @MessageBody() payload: { threadId: string }
   ) {
     try {
-      await client.leave(`thread:${payload.threadId}`);
+      const threadRoom = `thread:${payload.threadId}`;
+      await client.leave(threadRoom);
+
+      // Remove from room tracking
+      const rooms = this.socketRooms.get(client.id);
+      if (rooms) {
+        rooms.delete(threadRoom);
+      }
 
       client.emit('thread.unsubscribed', {
         threadId: payload.threadId,

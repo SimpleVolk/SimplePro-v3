@@ -48,7 +48,8 @@ export default defineConfig({
     commonjsOptions: { transformMixedEsModules: true },
     outDir: '../dist/apps/web',
     rollupOptions: {
-      plugins: [rollupPlugin([/react-native-vector-icons/])],
+      external: ['react-native-webview'],
+      plugins: [rollupPlugin([/react-native-vector-icons/, /react-native-signature-canvas/])],
     },
   },
   server: {

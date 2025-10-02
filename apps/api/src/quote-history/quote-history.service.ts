@@ -27,7 +27,7 @@ export class QuoteHistoryService {
   // CRUD operations
   async createQuoteHistory(
     dto: CreateQuoteHistoryDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quoteHistoryId = uuidv4();
 
     const quoteHistory = new this.quoteHistoryModel({
@@ -44,7 +44,7 @@ export class QuoteHistoryService {
     return quoteHistory.save();
   }
 
-  async findById(quoteHistoryId: string): Promise<QuoteHistory> {
+  async findById(quoteHistoryId: string): Promise<QuoteHistoryDocument> {
     const quote = await this.quoteHistoryModel
       .findOne({ quoteHistoryId })
       .exec();
@@ -58,7 +58,7 @@ export class QuoteHistoryService {
     return quote;
   }
 
-  async getByEstimateId(estimateId: string): Promise<QuoteHistory> {
+  async getByEstimateId(estimateId: string): Promise<QuoteHistoryDocument> {
     const quote = await this.quoteHistoryModel.findOne({ estimateId }).exec();
 
     if (!quote) {
@@ -73,7 +73,7 @@ export class QuoteHistoryService {
   async updateQuoteStatus(
     quoteHistoryId: string,
     dto: UpdateQuoteStatusDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quote = await this.findById(quoteHistoryId);
 
     quote.status = dto.status;
@@ -107,7 +107,7 @@ export class QuoteHistoryService {
   async addCustomerInteraction(
     quoteHistoryId: string,
     dto: AddInteractionDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quote = await this.findById(quoteHistoryId);
 
     const interaction = {
@@ -146,7 +146,7 @@ export class QuoteHistoryService {
   async addSalesActivity(
     quoteHistoryId: string,
     dto: AddSalesActivityDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quote = await this.findById(quoteHistoryId);
 
     const activity = {
@@ -171,7 +171,7 @@ export class QuoteHistoryService {
   async recordQuoteRevision(
     quoteHistoryId: string,
     dto: CreateRevisionDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quote = await this.findById(quoteHistoryId);
 
     const newVersion = quote.version + 1;
@@ -198,7 +198,7 @@ export class QuoteHistoryService {
   async markAsWon(
     quoteHistoryId: string,
     dto: MarkWonDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quote = await this.findById(quoteHistoryId);
 
     quote.status = QuoteStatus.ACCEPTED;
@@ -229,7 +229,7 @@ export class QuoteHistoryService {
   async markAsLost(
     quoteHistoryId: string,
     dto: MarkLostDto,
-  ): Promise<QuoteHistory> {
+  ): Promise<QuoteHistoryDocument> {
     const quote = await this.findById(quoteHistoryId);
 
     quote.status = QuoteStatus.REJECTED;

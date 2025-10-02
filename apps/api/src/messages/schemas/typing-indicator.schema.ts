@@ -29,8 +29,8 @@ TypingIndicatorSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 // Ensure virtuals are serialized
 TypingIndicatorSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret) {
-    ret.id = ret._id;
+  transform: function(_doc, ret: any) {
+    ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
     return ret;
@@ -39,8 +39,8 @@ TypingIndicatorSchema.set('toJSON', {
 
 TypingIndicatorSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret) {
-    ret.id = ret._id;
+  transform: function(_doc, ret: any) {
+    ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
     return ret;

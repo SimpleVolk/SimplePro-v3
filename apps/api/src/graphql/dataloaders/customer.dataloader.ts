@@ -34,7 +34,7 @@ export class CustomerDataLoader {
   }
 
   async loadMany(customerIds: string[]): Promise<(Customer | null)[]> {
-    return this.batchCustomers.loadMany(customerIds);
+    return this.batchCustomers.loadMany(customerIds) as Promise<(Customer | null)[]>;
   }
 
   private convertCustomerDocument(doc: any): Customer {

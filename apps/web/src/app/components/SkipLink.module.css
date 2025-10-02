@@ -1,0 +1,41 @@
+.skipLink {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 10000;
+  padding: 12px 20px;
+  background: var(--btn-primary-bg, #2563eb);
+  color: var(--btn-primary-text, #ffffff);
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: top 0.2s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.skipLink:focus {
+  top: 8px;
+  outline: 3px solid var(--focus-ring-color, #60a5fa);
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .skipLink {
+    background: #000000;
+    color: #ffff00;
+    border: 3px solid #ffff00;
+  }
+
+  .skipLink:focus {
+    outline: 3px solid #ffff00;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .skipLink {
+    transition: none;
+  }
+}

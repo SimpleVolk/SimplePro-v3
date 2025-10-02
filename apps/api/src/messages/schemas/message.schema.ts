@@ -77,8 +77,8 @@ MessageSchema.index({ content: 'text' });
 // Ensure virtuals are serialized
 MessageSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret) {
-    ret.id = ret._id;
+  transform: function(_doc, ret: any) {
+    ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
     return ret;
@@ -87,8 +87,8 @@ MessageSchema.set('toJSON', {
 
 MessageSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret) {
-    ret.id = ret._id;
+  transform: function(_doc, ret: any) {
+    ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
     return ret;
