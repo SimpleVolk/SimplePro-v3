@@ -18,6 +18,7 @@ export class Handicap {
 
   @Prop({
     required: true,
+    type: String,
     enum: Object.values(HandicapCategory),
     index: true
   })
@@ -25,6 +26,7 @@ export class Handicap {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['fixed_fee', 'percentage', 'per_unit']
   })
   type!: 'fixed_fee' | 'percentage' | 'per_unit';

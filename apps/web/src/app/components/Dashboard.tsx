@@ -10,6 +10,7 @@ import styles from './Dashboard.module.css';
 
 // Dynamic imports for heavy components
 const DashboardOverview = lazy(() => import('./DashboardOverview').then(mod => ({ default: mod.DashboardOverview })));
+const NewOpportunity = lazy(() => import('./NewOpportunity').then(mod => ({ default: mod.default })));
 const CustomerManagement = lazy(() => import('./CustomerManagement').then(mod => ({ default: mod.CustomerManagement })));
 const JobManagement = lazy(() => import('./JobManagement').then(mod => ({ default: mod.JobManagement })));
 const CalendarDispatch = lazy(() => import('./CalendarDispatch').then(mod => ({ default: mod.CalendarDispatch })));
@@ -26,6 +27,14 @@ export function Dashboard() {
         <div className={styles.content} role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
           <Suspense fallback={<LoadingSkeleton type="analytics" />}>
             <DashboardOverview />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'opportunities' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-opportunities" aria-labelledby="tab-opportunities">
+          <Suspense fallback={<LoadingSkeleton type="default" rows={8} />}>
+            <NewOpportunity />
           </Suspense>
         </div>
       )}

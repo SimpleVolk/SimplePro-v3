@@ -18,6 +18,7 @@ export class Material {
 
   @Prop({
     required: true,
+    type: String,
     enum: Object.values(MaterialCategory),
     index: true
   })

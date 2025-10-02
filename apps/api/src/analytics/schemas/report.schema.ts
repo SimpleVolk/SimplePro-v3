@@ -16,6 +16,7 @@ export class Report {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['revenue', 'performance', 'operations', 'crew', 'customer', 'custom'],
     index: true
   })
@@ -23,6 +24,7 @@ export class Report {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly', 'custom'],
     index: true
   })
@@ -46,6 +48,7 @@ export class Report {
   // Report status
   @Prop({
     required: true,
+    type: String,
     enum: ['pending', 'generating', 'completed', 'failed'],
     default: 'pending',
     index: true
@@ -67,6 +70,7 @@ export class Report {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['private', 'team', 'company'],
     default: 'private',
     index: true

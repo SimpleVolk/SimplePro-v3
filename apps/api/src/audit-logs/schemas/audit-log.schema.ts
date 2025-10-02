@@ -45,6 +45,7 @@ export class AuditLog {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['info', 'warning', 'error', 'critical'],
     index: true
   })

@@ -9,6 +9,7 @@ import { AppModule } from './app.module';
 import { SecurityMiddleware } from './common/middleware/security.middleware';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { CompanyService } from './company/company.service';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 
@@ -20,7 +21,7 @@ async function bootstrap() {
 
   // Initialize company settings on startup
   try {
-    const companyService = app.get('CompanyService');
+    const companyService = app.get(CompanyService);
     await companyService.getSettings(); // Will create defaults if not exists
     logger.log('✓ Company settings initialized');
   } catch (error) {

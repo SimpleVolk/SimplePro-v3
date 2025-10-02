@@ -65,12 +65,12 @@ The system emphasizes **deterministic calculations** - same input always produce
 ### Development
 
 ```bash
-# Start all services in development mode
+# Start all services in development mode (API + Web concurrently)
 npm run dev
 
 # Start specific service
-nx serve api
-nx dev web
+npm run dev:api          # API on port 3001
+npm run dev:web          # Web on port 3009
 
 # Install dependencies for the entire workspace
 npm install
@@ -79,7 +79,7 @@ npm install
 ### Building
 
 ```bash
-# Build all projects
+# Build all projects in parallel
 npm run build
 
 # Build specific project
@@ -91,17 +91,26 @@ nx build web
 ### Testing
 
 ```bash
-# Run all tests
+# Run all tests in parallel
 npm test
 
 # Test specific package
-nx test pricing-engine
+nx test pricing-engine           # 38 unit tests
+npm run test:api:unit           # API unit tests
+npm run test:api:integration    # API integration tests with MongoDB
+npm run test:web                # Web component tests
 
 # Run tests in watch mode
-cd packages/pricing-engine && npm run test:watch
+npm run test:watch
+cd packages/pricing-engine && npm test -- --watch
 
 # Run tests with coverage
-nx test pricing-engine --coverage
+npm run test:coverage           # All projects
+npm run test:coverage:api       # API only
+npm run test:coverage:pricing   # Pricing engine only
+
+# CI test mode (non-interactive)
+npm run test:ci
 ```
 
 ### Linting & Formatting
@@ -138,14 +147,12 @@ npm run docker:prod:logs
 ### Database Operations
 
 ```bash
-# Run database migrations
-npm run db:migrate
+# Start MongoDB via Docker (required for development)
+npm run docker:dev
 
-# Seed development data
-npm run db:seed
-
-# Validate seed data integrity
-npm run db:validate
+# Database operations (not yet implemented - use MongoDB Compass or mongo shell)
+# Future: npm run db:migrate
+# Future: npm run db:seed
 ```
 
 ### Production Deployment
@@ -157,38 +164,10 @@ npm run deploy:dev
 # Deploy to production environment
 npm run deploy:prod
 
-# Validate environment configuration
-npm run validate:env
-
-# Check system health
-npm run health
-npm run health:full
-```
-
-### Security & Secrets Management
-
-```bash
-# Setup secrets management
-npm run secrets:setup
-
-# Validate secrets configuration
-npm run secrets:validate
-
-# Rotate secrets (production)
-npm run secrets:rotate
-
-# Generate SSL certificates
-npm run ssl:generate
-```
-
-### Backup & Recovery
-
-```bash
-# Create system backup
-npm run backup:create
-
-# Clean old backups
-npm run backup:cleanup
+# Production Docker operations
+npm run docker:prod              # Start production stack
+npm run docker:prod:down         # Stop production stack
+npm run docker:prod:logs         # View production logs
 ```
 
 ## Key Architectural Concepts
@@ -215,6 +194,11 @@ const estimator = new DeterministicEstimator(
 
 const result = estimator.calculateEstimate(inputData, userId);
 ```
+
+**CRITICAL: Cross-Platform Compatibility**
+- The pricing engine must work in both Node.js (API) and browser (Web) environments
+- Uses fallback UUID generation: crypto.randomUUID → crypto.getRandomValues → Math.random
+- ES Module compatible with proper package.json configuration
 
 ### Rules Engine
 
@@ -277,19 +261,28 @@ All estimate calculations should flow through the DeterministicEstimator to ensu
 
 The API follows NestJS patterns with:
 
-- Module-based architecture (auth, customers, estimates, jobs, crews)
+- Module-based architecture (auth, customers, estimates, jobs, crews, analytics, pricing-rules, tariff-settings)
 - **MongoDB with Mongoose ODM** - Full database integration with schemas and indexes
 - **JWT Authentication** - Access tokens (1h) and refresh tokens (7d) with session management
 - **Role-Based Access Control (RBAC)** - Super admin, admin, dispatcher, crew roles with permissions
 - **Password Security** - bcrypt hashing with 12 rounds, secure password change workflows
 - **Session Management** - TTL indexes for automatic cleanup, multi-device session tracking
-- GraphQL + REST endpoints
-- Comprehensive input validation with class-validator
+- **WebSocket Gateway** - Real-time job updates and crew communication
+- REST endpoints (53+ routes) with comprehensive input validation using class-validator
+- GraphQL support (configured but not fully implemented)
 
 **Database Schemas:**
 - **User Schema** (`apps/api/src/auth/schemas/user.schema.ts`) - Complete user management with roles and permissions
 - **UserSession Schema** (`apps/api/src/auth/schemas/user-session.schema.ts`) - Session tracking with automatic expiration
-- **Job Schema** (`apps/api/src/jobs/schemas/job.schema.ts`) - Comprehensive job lifecycle management
+- **Job Schema** (`apps/api/src/jobs/schemas/job.schema.ts`) - Comprehensive job lifecycle management with compound indexes
+- **Customer Schema** (`apps/api/src/customers/schemas/customer.schema.ts`) - CRM with contact history
+- **TariffSettings Schema** (`apps/api/src/tariff-settings/schemas/tariff-settings.schema.ts`) - Dynamic pricing configuration
+
+**CRITICAL: Data Persistence Issue**
+- ⚠️ `customers.service.ts` and `jobs.service.ts` currently use **in-memory Map storage**
+- This is **temporary scaffolding** - data is lost on server restart
+- MongoDB schemas exist but services need migration to use `@InjectModel()` pattern
+- When fixing: Replace `private customers = new Map()` with Mongoose model injection
 
 ## Default Authentication Credentials
 
@@ -676,20 +669,98 @@ With the complete business management system now operational, the next prioritie
 ### Login Issues
 - **Problem**: "Invalid credentials" error
 - **Solution**: Use correct password `Admin123!` (case-sensitive with exclamation mark)
-- **Check**: Ensure API is running on port 3001 and MongoDB is connected
+- **Check**: Ensure API is running on port 3001 and MongoDB is connected via Docker
 
 ### Port Conflicts
 - **Problem**: Multiple services trying to use same ports
-- **Solution**: Kill conflicting Node.js processes with `TASKKILL /F /IM node.exe` (Windows)
-- **Check**: Use `netstat -ano | findstr :PORT_NUMBER` to identify processes
+- **Solution**: Kill conflicting Node.js processes
+  - Windows: `TASKKILL /F /IM node.exe`
+  - Linux/Mac: `killall node` or `lsof -ti:3001 | xargs kill -9`
+- **Check**: `netstat -ano | findstr :PORT_NUMBER` (Windows) or `lsof -i :PORT` (Mac/Linux)
+
+### MongoDB Connection Issues
+- **Problem**: "MongoServerError: Authentication failed"
+- **Solution**:
+  1. Ensure Docker containers are running: `npm run docker:dev`
+  2. Check MongoDB logs: `docker logs simplepro-mongodb-dev`
+  3. Verify credentials in `.env.local` match `docker-compose.dev.yml`
+- **Default MongoDB credentials**: `MONGODB_USERNAME=admin`, `MONGODB_PASSWORD=password123`
 
 ### Build Failures
 - **Problem**: TypeScript or dependency errors
-- **Solution**: Run `npm install` in root, then try `npm run build`
+- **Solution**:
+  1. Clear caches: `rm -rf node_modules package-lock.json`
+  2. Fresh install: `npm install`
+  3. Rebuild: `npm run build`
 - **Check**: Ensure Node.js >= 20.0.0 and npm >= 10.0.0
 
-### UI Layout Issues
-- **Problem**: Components not showing sidebar or modern layout
-- **Solution**: Ensure components are wrapped in `AppLayout` and using correct navigation pattern
-- **Check**: Verify `Dashboard.tsx` is using `AppLayout` wrapper and `activeTab` state management
-- Add remaining tasks to memory so we can pick up where we left off next session
+### TypeScript Type Errors in Pricing Engine
+- **Problem**: Type errors when importing pricing engine in web app
+- **Solution**: The pricing engine uses ES modules - ensure proper imports:
+  ```typescript
+  import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
+  // NOT: const { DeterministicEstimator } = require(...)
+  ```
+
+### CORS Errors in Development
+- **Problem**: Web app cannot connect to API
+- **Solution**: API is configured for ports 3009, 3010, 3000, 3004
+- **Check**: Verify web app is running on one of these ports
+- **Fix**: Update `apps/api/src/main.ts` allowedOrigins if using different port
+
+## Critical Known Issues & Production Blockers
+
+### 🔴 CRITICAL - Security Vulnerabilities (Fix Before Production)
+
+1. **Next.js Security Issues** - Running unstable canary build with 7 vulnerabilities
+   - **Current**: next@15.6.0-canary.39
+   - **Fix**: Downgrade to stable `next@14.2.32` or `next@15.5.4`
+   - **Action**: `npm install next@14.2.32 --save-exact`
+
+2. **Default Admin Password Logged to Console**
+   - **Location**: `apps/api/src/auth/auth.service.ts:158`
+   - **Issue**: Password appears in console logs (security risk)
+   - **Fix**: Remove password from console.warn, only log to `.secrets/` file
+
+3. **Weak Rate Limiting**
+   - **Current**: 100 login attempts per minute
+   - **Fix**: Change to 5 attempts per 15 minutes in `apps/api/src/app.module.ts`
+
+4. **Missing NoSQL Injection Protection**
+   - **Issue**: Query parameters not validated in customers/jobs controllers
+   - **Fix**: Add DTO validation for all query parameters
+
+### 🟠 HIGH - Data Loss Risk
+
+**In-Memory Storage Must Be Migrated to MongoDB:**
+- `apps/api/src/customers/customers.service.ts` - Uses `Map<string, Customer>`
+- `apps/api/src/jobs/jobs.service.ts` - Uses `Map<string, Job>`
+- **Impact**: All customer and job data lost on API restart
+- **Fix**: Use Mongoose models (schemas already exist in `/schemas` directories)
+
+### 🟡 MEDIUM - Accessibility & Testing
+
+1. **WCAG AA Violations** - Color contrast failures in sidebar and text
+   - **Fix**: Update `Sidebar.module.css` contrast ratios to meet 4.5:1 minimum
+
+2. **Test Coverage Insufficient** - Only 15% backend coverage, <10% frontend
+   - **Pricing Engine**: ✅ 38 tests passing
+   - **API**: ⚠️ Only 7 test files for 70+ source files
+   - **Web**: ⚠️ Only 4 test files for 45+ components
+   - **See**: `TEST_COVERAGE_ANALYSIS.md` for detailed test plan
+
+### Production Readiness Checklist
+
+Before deploying to production:
+- [ ] Fix Next.js security vulnerabilities
+- [ ] Migrate customers/jobs to MongoDB persistence
+- [ ] Remove password from console logging
+- [ ] Implement proper rate limiting (5/15min)
+- [ ] Add NoSQL injection protection
+- [ ] Achieve 80%+ test coverage
+- [ ] Fix WCAG accessibility violations
+- [ ] Enable TypeScript strict mode
+- [ ] Implement Redis distributed caching
+- [ ] Add database transaction support
+- [ ] Complete deployment automation (CI/CD)
+- [ ] Implement secrets management (not hardcoded)

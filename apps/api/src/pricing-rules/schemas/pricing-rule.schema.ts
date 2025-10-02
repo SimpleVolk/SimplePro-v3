@@ -8,7 +8,7 @@ export class PricingRuleCondition {
   @Prop({ required: true })
   field!: string;
 
-  @Prop({ required: true, enum: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'in', 'not_in', 'contains', 'starts_with', 'ends_with'] })
+  @Prop({ required: true, type: String, enum: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'in', 'not_in', 'contains', 'starts_with', 'ends_with'] })
   operator!: string;
 
   @Prop({ type: Object })
@@ -20,7 +20,7 @@ export class PricingRuleCondition {
 
 @Schema({ collection: 'pricing-rules' })
 export class PricingRuleAction {
-  @Prop({ required: true, enum: ['add_fixed', 'add_percentage', 'subtract_fixed', 'subtract_percentage', 'multiply', 'set_fixed', 'set_percentage'] })
+  @Prop({ required: true, type: String, enum: ['add_fixed', 'add_percentage', 'subtract_fixed', 'subtract_percentage', 'multiply', 'set_fixed', 'set_percentage'] })
   type!: string;
 
   @Prop({ required: true, min: 0 })

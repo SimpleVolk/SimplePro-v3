@@ -27,6 +27,7 @@ export class Job {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['local', 'long_distance', 'storage', 'packing_only'],
     index: true
   })
@@ -34,6 +35,7 @@ export class Job {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['scheduled', 'in_progress', 'completed', 'cancelled', 'on_hold'],
     default: 'scheduled',
     index: true
@@ -42,6 +44,7 @@ export class Job {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['low', 'normal', 'high', 'urgent'],
     default: 'normal',
     index: true

@@ -602,6 +602,48 @@ describe('AuthService', () => {
     it('should throw NotFoundException for invalid role', async () => {
       await expect(service.getRole('invalid_role')).rejects.toThrow(NotFoundException);
     });
+
+    it('should have permissions for all ResourceType values in super_admin role', async () => {
+      // This test prevents future permission omissions like the tariff_settings bug
+      const superAdminRole = await service.getRole('role_super_admin');
+
+      // All possible resource types from ResourceType enum
+      const allResourceTypes: string[] = [
+        'users',
+        'customers',
+        'estimates',
+        'jobs',
+        'crews',
+        'inventory',
+        'billing',
+        'reports',
+        'system_settings',
+        'pricing_rules',
+        'tariff_settings'
+      ];
+
+      // Check that super_admin has at least one permission for each resource type
+      const missingPermissions: string[] = [];
+      for (const resourceType of allResourceTypes) {
+        const hasPermission = superAdminRole.permissions.some(
+          (perm) => perm.resource === resourceType
+        );
+        if (!hasPermission) {
+          missingPermissions.push(resourceType);
+        }
+      }
+
+      // Assert no missing permissions
+      expect(missingPermissions).toEqual([]);
+
+      // Provide helpful error message if test fails
+      if (missingPermissions.length > 0) {
+        throw new Error(
+          `super_admin role is missing permissions for: ${missingPermissions.join(', ')}. ` +
+          `Please add these permissions in auth.service.ts DEFAULT_ROLES initialization.`
+        );
+      }
+    });
   });
 
   describe('session management', () => {

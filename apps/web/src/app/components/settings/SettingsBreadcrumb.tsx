@@ -10,20 +10,7 @@ interface SettingsBreadcrumbProps {
 }
 
 export function SettingsBreadcrumb({ currentPath, onNavigate }: SettingsBreadcrumbProps) {
-  const findRouteByPath = (routes: SettingsRoute[], path: string): SettingsRoute | null => {
-    for (const route of routes) {
-      if (route.path === path) {
-        return route;
-      }
-      if (route.children) {
-        const childRoute = findRouteByPath(route.children, path);
-        if (childRoute) {
-          return childRoute;
-        }
-      }
-    }
-    return null;
-  };
+  // Removed unused findRouteByPath function
 
   const buildBreadcrumbPath = (routes: SettingsRoute[], targetPath: string): SettingsRoute[] => {
     const path: SettingsRoute[] = [];

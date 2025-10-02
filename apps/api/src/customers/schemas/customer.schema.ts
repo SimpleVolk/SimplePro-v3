@@ -22,6 +22,7 @@ export class Customer {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['residential', 'commercial'],
     index: true
   })
@@ -29,6 +30,7 @@ export class Customer {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['lead', 'prospect', 'active', 'inactive'],
     default: 'lead',
     index: true
@@ -37,6 +39,7 @@ export class Customer {
 
   @Prop({
     required: true,
+    type: String,
     enum: ['website', 'referral', 'google', 'facebook', 'yelp', 'direct', 'other'],
     index: true
   })
@@ -98,7 +101,7 @@ export class Customer {
   @Prop()
   estimatedBudget?: number;
 
-  @Prop()
+  @Prop({ type: Object })
   emergencyContact?: {
     name: string;
     phone: string;

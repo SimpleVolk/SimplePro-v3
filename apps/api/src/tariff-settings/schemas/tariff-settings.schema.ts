@@ -52,6 +52,7 @@ export class TariffSettings {
 
   @Prop({
     required: true,
+    type: String,
     enum: Object.values(TariffStatus),
     default: TariffStatus.ACTIVE,
     index: true

@@ -108,7 +108,37 @@ export default function CompanySettings() {
 
         const result = await response.json();
         if (result.data) {
-          setCompanyInfo(result.data);
+          // Transform API data structure to match frontend format
+          const apiData = result.data;
+
+          setCompanyInfo(prev => ({
+            ...prev,
+            name: apiData.companyName || prev.name,
+            address: apiData.address || prev.address,
+            contact: {
+              phone: apiData.phone || prev.contact.phone,
+              email: apiData.email || prev.contact.email,
+              website: apiData.website || prev.contact.website
+            },
+            business: prev.business, // Keep frontend business data (not in API yet)
+            settings: {
+              timezone: apiData.preferences?.timezone || prev.settings.timezone,
+              currency: apiData.preferences?.currency || prev.settings.currency,
+              dateFormat: apiData.preferences?.dateFormat || prev.settings.dateFormat,
+              businessHours: apiData.businessHours
+                ? Object.fromEntries(
+                    Object.entries(apiData.businessHours).map(([day, hours]: [string, any]) => [
+                      day,
+                      {
+                        enabled: hours.isOpen ?? true,
+                        open: hours.openTime || '08:00',
+                        close: hours.closeTime || '18:00'
+                      }
+                    ])
+                  ) as CompanyInfo['settings']['businessHours']
+                : prev.settings.businessHours
+            }
+          }));
         }
       } catch (err) {
         console.error('Error fetching company settings:', err);
@@ -129,13 +159,43 @@ export default function CompanySettings() {
     try {
       const token = localStorage.getItem('access_token');
 
+      // Transform frontend data structure to match API schema
+      const apiPayload = {
+        companyName: companyInfo.name,
+        email: companyInfo.contact.email,
+        phone: companyInfo.contact.phone,
+        website: companyInfo.contact.website,
+        address: {
+          street: companyInfo.address.street,
+          city: companyInfo.address.city,
+          state: companyInfo.address.state,
+          zipCode: companyInfo.address.zipCode,
+          country: companyInfo.address.country || 'USA'
+        },
+        businessHours: Object.fromEntries(
+          Object.entries(companyInfo.settings.businessHours).map(([day, hours]) => [
+            day,
+            {
+              isOpen: hours.enabled,
+              openTime: hours.open,
+              closeTime: hours.close
+            }
+          ])
+        ),
+        preferences: {
+          timezone: companyInfo.settings.timezone,
+          currency: companyInfo.settings.currency,
+          dateFormat: companyInfo.settings.dateFormat
+        }
+      };
+
       const response = await fetch(getApiUrl('company/settings'), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(companyInfo),
+        body: JSON.stringify(apiPayload),
       });
 
       if (!response.ok) {
@@ -149,7 +209,37 @@ export default function CompanySettings() {
 
       const result = await response.json();
       if (result.data) {
-        setCompanyInfo(result.data);
+        // Transform API response to match frontend format
+        const apiData = result.data;
+
+        setCompanyInfo(prev => ({
+          ...prev,
+          name: apiData.companyName || prev.name,
+          address: apiData.address || prev.address,
+          contact: {
+            phone: apiData.phone || prev.contact.phone,
+            email: apiData.email || prev.contact.email,
+            website: apiData.website || prev.contact.website
+          },
+          business: prev.business,
+          settings: {
+            timezone: apiData.preferences?.timezone || prev.settings.timezone,
+            currency: apiData.preferences?.currency || prev.settings.currency,
+            dateFormat: apiData.preferences?.dateFormat || prev.settings.dateFormat,
+            businessHours: apiData.businessHours
+              ? Object.fromEntries(
+                  Object.entries(apiData.businessHours).map(([day, hours]: [string, any]) => [
+                    day,
+                    {
+                      enabled: hours.isOpen ?? true,
+                      open: hours.openTime || '08:00',
+                      close: hours.closeTime || '18:00'
+                    }
+                  ])
+                ) as CompanyInfo['settings']['businessHours']
+              : prev.settings.businessHours
+          }
+        }));
       }
 
       setSuccessMessage('Company settings updated successfully');
@@ -245,7 +335,7 @@ export default function CompanySettings() {
                 <input
                   id="companyName"
                   type="text"
-                  value={companyInfo.name}
+                  value={companyInfo.name || ''}
                   onChange={(e) => updateCompanyInfo(['name'], e.target.value)}
                   className={styles.input}
                 />
@@ -259,7 +349,7 @@ export default function CompanySettings() {
                 <input
                   id="street"
                   type="text"
-                  value={companyInfo.address.street}
+                  value={companyInfo.address.street || ''}
                   onChange={(e) => updateCompanyInfo(['address', 'street'], e.target.value)}
                   className={styles.input}
                 />
@@ -270,7 +360,7 @@ export default function CompanySettings() {
                 <input
                   id="city"
                   type="text"
-                  value={companyInfo.address.city}
+                  value={companyInfo.address.city || ''}
                   onChange={(e) => updateCompanyInfo(['address', 'city'], e.target.value)}
                   className={styles.input}
                 />
@@ -281,7 +371,7 @@ export default function CompanySettings() {
                 <input
                   id="state"
                   type="text"
-                  value={companyInfo.address.state}
+                  value={companyInfo.address.state || ''}
                   onChange={(e) => updateCompanyInfo(['address', 'state'], e.target.value)}
                   className={styles.input}
                 />
@@ -292,7 +382,7 @@ export default function CompanySettings() {
                 <input
                   id="zipCode"
                   type="text"
-                  value={companyInfo.address.zipCode}
+                  value={companyInfo.address.zipCode || ''}
                   onChange={(e) => updateCompanyInfo(['address', 'zipCode'], e.target.value)}
                   className={styles.input}
                 />
@@ -311,7 +401,7 @@ export default function CompanySettings() {
                 <input
                   id="phone"
                   type="tel"
-                  value={companyInfo.contact.phone}
+                  value={companyInfo.contact.phone || ''}
                   onChange={(e) => updateCompanyInfo(['contact', 'phone'], e.target.value)}
                   className={styles.input}
                 />
@@ -322,7 +412,7 @@ export default function CompanySettings() {
                 <input
                   id="email"
                   type="email"
-                  value={companyInfo.contact.email}
+                  value={companyInfo.contact.email || ''}
                   onChange={(e) => updateCompanyInfo(['contact', 'email'], e.target.value)}
                   className={styles.input}
                 />
@@ -333,7 +423,7 @@ export default function CompanySettings() {
                 <input
                   id="website"
                   type="url"
-                  value={companyInfo.contact.website}
+                  value={companyInfo.contact.website || ''}
                   onChange={(e) => updateCompanyInfo(['contact', 'website'], e.target.value)}
                   className={styles.input}
                 />
@@ -352,7 +442,7 @@ export default function CompanySettings() {
                 <input
                   id="licenseNumber"
                   type="text"
-                  value={companyInfo.business.licenseNumber}
+                  value={companyInfo.business.licenseNumber || ''}
                   onChange={(e) => updateCompanyInfo(['business', 'licenseNumber'], e.target.value)}
                   className={styles.input}
                 />
@@ -363,7 +453,7 @@ export default function CompanySettings() {
                 <input
                   id="insuranceInfo"
                   type="text"
-                  value={companyInfo.business.insuranceInfo}
+                  value={companyInfo.business.insuranceInfo || ''}
                   onChange={(e) => updateCompanyInfo(['business', 'insuranceInfo'], e.target.value)}
                   className={styles.input}
                 />
@@ -374,7 +464,7 @@ export default function CompanySettings() {
                 <input
                   id="dotNumber"
                   type="text"
-                  value={companyInfo.business.dotNumber}
+                  value={companyInfo.business.dotNumber || ''}
                   onChange={(e) => updateCompanyInfo(['business', 'dotNumber'], e.target.value)}
                   className={styles.input}
                 />
@@ -385,7 +475,7 @@ export default function CompanySettings() {
                 <input
                   id="mcNumber"
                   type="text"
-                  value={companyInfo.business.mcNumber}
+                  value={companyInfo.business.mcNumber || ''}
                   onChange={(e) => updateCompanyInfo(['business', 'mcNumber'], e.target.value)}
                   className={styles.input}
                 />
@@ -403,7 +493,7 @@ export default function CompanySettings() {
                 <label htmlFor="timezone">Timezone</label>
                 <select
                   id="timezone"
-                  value={companyInfo.settings.timezone}
+                  value={companyInfo.settings.timezone || 'America/Chicago'}
                   onChange={(e) => updateCompanyInfo(['settings', 'timezone'], e.target.value)}
                   className={styles.select}
                 >
@@ -418,7 +508,7 @@ export default function CompanySettings() {
                 <label htmlFor="currency">Currency</label>
                 <select
                   id="currency"
-                  value={companyInfo.settings.currency}
+                  value={companyInfo.settings.currency || 'USD'}
                   onChange={(e) => updateCompanyInfo(['settings', 'currency'], e.target.value)}
                   className={styles.select}
                 >
@@ -432,7 +522,7 @@ export default function CompanySettings() {
                 <label htmlFor="dateFormat">Date Format</label>
                 <select
                   id="dateFormat"
-                  value={companyInfo.settings.dateFormat}
+                  value={companyInfo.settings.dateFormat || 'MM/DD/YYYY'}
                   onChange={(e) => updateCompanyInfo(['settings', 'dateFormat'], e.target.value)}
                   className={styles.select}
                 >
@@ -453,7 +543,7 @@ export default function CompanySettings() {
                   <div className={styles.hourInputs}>
                     <input
                       type="time"
-                      value={hours.open}
+                      value={hours.open || '08:00'}
                       onChange={(e) => updateCompanyInfo(['settings', 'businessHours', day, 'open'], e.target.value)}
                       className={styles.timeInput}
                       disabled={!hours.enabled}
@@ -461,7 +551,7 @@ export default function CompanySettings() {
                     <span>to</span>
                     <input
                       type="time"
-                      value={hours.close}
+                      value={hours.close || '18:00'}
                       onChange={(e) => updateCompanyInfo(['settings', 'businessHours', day, 'close'], e.target.value)}
                       className={styles.timeInput}
                       disabled={!hours.enabled}
@@ -469,7 +559,7 @@ export default function CompanySettings() {
                     <label className={styles.checkboxLabel}>
                       <input
                         type="checkbox"
-                        checked={hours.enabled}
+                        checked={!!hours.enabled}
                         onChange={(e) => updateCompanyInfo(['settings', 'businessHours', day, 'enabled'], e.target.checked)}
                       />
                       Open

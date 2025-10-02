@@ -21,6 +21,12 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       roles: ['super_admin', 'admin', 'dispatcher']
     },
     {
+      id: 'opportunities',
+      label: 'New Opportunity',
+      icon: '✨',
+      roles: ['super_admin', 'admin', 'dispatcher']
+    },
+    {
       id: 'estimates',
       label: 'Estimates',
       icon: '📋',

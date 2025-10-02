@@ -9,6 +9,7 @@ import { PricingMethodType } from '../interfaces/tariff-settings.interface';
 export class PricingMethodDefault {
   @Prop({
     required: true,
+    type: String,
     enum: Object.values(PricingMethodType)
   })
   method!: PricingMethodType;

@@ -22,6 +22,15 @@ export const metadata = {
     index: false, // Internal application
     follow: false,
   },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon-192.png',
+    shortcut: '/favicon.ico',
+  },
+};
+
+export const viewport = {
+  themeColor: '#4caf50',
 };
 
 export default function RootLayout({
@@ -30,23 +39,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <meta name="theme-color" content="#4caf50" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="SimplePro" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-
-        {/* Preconnect to external domains for faster loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        {/* DNS prefetch for API domains */}
-        <link rel="dns-prefetch" href="//api.simplepro.com" />
-      </head>
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

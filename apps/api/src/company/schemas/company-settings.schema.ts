@@ -86,7 +86,7 @@ export class Preferences {
   @Prop({ required: false, default: 'MM/DD/YYYY' })
   dateFormat?: string;
 
-  @Prop({ required: false, default: '12h', enum: ['12h', '24h'] })
+  @Prop({ required: false, type: String, default: '12h', enum: ['12h', '24h'] })
   timeFormat?: '12h' | '24h';
 }
 

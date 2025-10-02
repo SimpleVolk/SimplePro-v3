@@ -18,8 +18,10 @@ const EstimateConfiguration = lazy(() => import('./estimates/EstimateConfigurati
 const ServiceTypes = lazy(() => import('./estimates/lists/ServiceTypes'));
 const PropertyTypes = lazy(() => import('./estimates/lists/PropertyTypes'));
 const InventoryItems = lazy(() => import('./estimates/lists/InventoryItems'));
+const MoveSizes = lazy(() => import('./estimates/MoveSizes'));
 
 const HourlyRates = lazy(() => import('./tariffs/HourlyRates'));
+const DistanceRates = lazy(() => import('./tariffs/DistanceRates'));
 const MaterialsPricing = lazy(() => import('./tariffs/MaterialsPricing'));
 const PackingRates = lazy(() => import('./tariffs/PackingRates'));
 const LocationHandicaps = lazy(() => import('./tariffs/LocationHandicaps'));
@@ -117,12 +119,26 @@ export function Settings({ initialPath = '/settings/company/details' }: Settings
           </Suspense>
         );
 
+      case '/settings/estimates/config/move-sizes':
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <MoveSizes />
+          </Suspense>
+        );
+
       // Tariffs & Pricing
       case '/settings/tariffs':
       case '/settings/tariffs/hourly-rates':
         return (
           <Suspense fallback={<LoadingFallback />}>
             <HourlyRates />
+          </Suspense>
+        );
+
+      case '/settings/tariffs/distance-rates':
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <DistanceRates />
           </Suspense>
         );
 
