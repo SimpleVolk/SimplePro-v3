@@ -1,8 +1,10 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { NotificationToast } from './notifications/NotificationToast';
 import styles from './AppLayout.module.css';
 
 interface AppLayoutProps {
@@ -12,6 +14,8 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children, activeTab, onTabChange }: AppLayoutProps) {
+  const router = useRouter();
+
   return (
     <div className={styles.appLayout}>
       <Sidebar activeTab={activeTab} onTabChange={onTabChange} />
@@ -21,6 +25,7 @@ export function AppLayout({ children, activeTab, onTabChange }: AppLayoutProps) 
           {children}
         </main>
       </div>
+      <NotificationToast onNavigate={(path) => router.push(path)} />
     </div>
   );
 }

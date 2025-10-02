@@ -1,0 +1,508 @@
+# GraphQL Schema for SimplePro-v3 Moving Company Management System
+
+# Scalar Types
+scalar DateTime
+scalar JSON
+
+# Enums
+enum JobType {
+  local
+  long_distance
+  storage
+  packing_only
+}
+
+enum JobStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  on_hold
+}
+
+enum JobPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum CustomerStatus {
+  lead
+  prospect
+  active
+  inactive
+}
+
+enum CustomerType {
+  residential
+  commercial
+}
+
+enum CrewMemberStatus {
+  assigned
+  checked_in
+  checked_out
+  unavailable
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+# Address Type
+type Address {
+  street: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String
+  accessNotes: String
+  contactPerson: String
+  contactPhone: String
+}
+
+# Crew Assignment Type
+type CrewAssignment {
+  crewMemberId: String!
+  crewMemberName: String
+  role: String!
+  status: CrewMemberStatus!
+  assignedAt: DateTime!
+  checkInTime: DateTime
+  checkOutTime: DateTime
+  hoursWorked: Float
+}
+
+# Inventory Item Type
+type InventoryItem {
+  id: String!
+  name: String!
+  description: String
+  quantity: Int!
+  weight: Float
+  volume: Float
+  condition: String
+  location: String
+}
+
+# Job Service Type
+type JobService {
+  name: String!
+  description: String
+  status: String!
+  cost: Float
+}
+
+# Job Milestone Type
+type JobMilestone {
+  id: String!
+  name: String!
+  description: String
+  status: String!
+  completedAt: DateTime
+  completedBy: String
+}
+
+# Job Photo Type
+type JobPhoto {
+  id: String!
+  url: String!
+  caption: String
+  uploadedBy: String!
+  uploadedAt: DateTime!
+}
+
+# Internal Note Type
+type InternalNote {
+  id: String!
+  content: String!
+  createdBy: String!
+  createdAt: DateTime!
+  isPinned: Boolean
+}
+
+# Customer Type
+type Customer {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  fullName: String
+  email: String!
+  phone: String!
+  alternatePhone: String
+  type: CustomerType!
+  status: CustomerStatus!
+  source: String!
+  companyName: String
+  preferredContactMethod: String!
+  address: Address!
+  assignedSalesRep: String
+  leadScore: Float
+  tags: [String!]
+  notes: String
+  estimates: [String!]
+  jobs: [Job!]
+  lastContactDate: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: String!
+}
+
+# Estimate Type
+type Estimate {
+  id: ID!
+  estimateId: String!
+  customerId: String
+  customer: Customer
+  finalPrice: Float!
+  breakdown: JSON
+  appliedRules: [JSON!]
+  metadata: JSON
+  createdAt: DateTime!
+}
+
+# Job Type
+type Job {
+  id: ID!
+  jobNumber: String!
+  title: String!
+  description: String
+  type: JobType!
+  status: JobStatus!
+  priority: JobPriority!
+  customerId: String!
+  customer: Customer
+  estimateId: String
+  estimate: Estimate
+  invoiceId: String
+  scheduledDate: DateTime!
+  scheduledStartTime: String!
+  scheduledEndTime: String!
+  estimatedDuration: Float!
+  actualStartTime: DateTime
+  actualEndTime: DateTime
+  pickupAddress: Address!
+  deliveryAddress: Address!
+  assignedCrew: [CrewAssignment!]
+  leadCrew: String
+  crewNotes: String
+  inventory: [InventoryItem!]
+  services: [JobService!]
+  specialInstructions: String
+  estimatedCost: Float!
+  actualCost: Float
+  laborCost: Float
+  materialsCost: Float
+  transportationCost: Float
+  milestones: [JobMilestone!]
+  photos: [JobPhoto!]
+  internalNotes: [InternalNote!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: String!
+  lastModifiedBy: String!
+}
+
+# Job with detailed relationships (for complex queries)
+type JobWithDetails {
+  id: ID!
+  jobNumber: String!
+  title: String!
+  description: String
+  type: JobType!
+  status: JobStatus!
+  priority: JobPriority!
+  customer: Customer!
+  estimate: Estimate
+  scheduledDate: DateTime!
+  scheduledStartTime: String!
+  scheduledEndTime: String!
+  estimatedDuration: Float!
+  actualStartTime: DateTime
+  actualEndTime: DateTime
+  pickupAddress: Address!
+  deliveryAddress: Address!
+  assignedCrew: [CrewMember!]
+  leadCrew: CrewMember
+  inventory: [InventoryItem!]
+  services: [JobService!]
+  estimatedCost: Float!
+  actualCost: Float
+  milestones: [JobMilestone!]
+  photos: [JobPhoto!]
+  internalNotes: [InternalNote!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Crew Member Type
+type CrewMember {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  fullName: String
+  email: String!
+  phone: String
+  role: String!
+  status: String!
+  skills: [String!]
+  certifications: [String!]
+  availability: JSON
+}
+
+# Analytics Types
+type JobStats {
+  total: Int!
+  byStatus: JSON!
+  byType: JSON!
+  byPriority: JSON!
+  scheduledToday: Int!
+  scheduledThisWeek: Int!
+  inProgress: Int!
+  overdue: Int!
+  averageDuration: Float!
+  totalRevenue: Float!
+}
+
+type RevenueMetrics {
+  totalRevenue: Float!
+  averageJobValue: Float!
+  revenueByType: JSON!
+  revenueByMonth: JSON!
+  projectedRevenue: Float!
+}
+
+type PerformanceMetrics {
+  completionRate: Float!
+  onTimeRate: Float!
+  customerSatisfaction: Float!
+  crewEfficiency: Float!
+  averageJobDuration: Float!
+}
+
+type Analytics {
+  jobStats: JobStats!
+  revenueMetrics: RevenueMetrics!
+  performanceMetrics: PerformanceMetrics!
+  generatedAt: DateTime!
+}
+
+# Pagination Types
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type JobEdge {
+  node: Job!
+  cursor: String!
+}
+
+type JobConnection {
+  edges: [JobEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CustomerEdge {
+  node: Customer!
+  cursor: String!
+}
+
+type CustomerConnection {
+  edges: [CustomerEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+# Input Types
+input AddressInput {
+  street: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String
+  accessNotes: String
+  contactPerson: String
+  contactPhone: String
+}
+
+input CrewAssignmentInput {
+  crewMemberId: String!
+  role: String!
+}
+
+input InventoryItemInput {
+  name: String!
+  description: String
+  quantity: Int!
+  weight: Float
+  volume: Float
+  condition: String
+  location: String
+}
+
+input JobServiceInput {
+  name: String!
+  description: String
+  cost: Float
+}
+
+input CreateJobInput {
+  title: String!
+  description: String
+  type: JobType!
+  priority: JobPriority
+  customerId: String!
+  estimateId: String
+  scheduledDate: DateTime!
+  scheduledStartTime: String!
+  scheduledEndTime: String!
+  estimatedDuration: Float!
+  pickupAddress: AddressInput!
+  deliveryAddress: AddressInput!
+  assignedCrew: [CrewAssignmentInput!]
+  inventory: [InventoryItemInput!]
+  services: [JobServiceInput!]
+  specialInstructions: String
+  estimatedCost: Float!
+}
+
+input UpdateJobInput {
+  title: String
+  description: String
+  type: JobType
+  status: JobStatus
+  priority: JobPriority
+  scheduledDate: DateTime
+  scheduledStartTime: String
+  scheduledEndTime: String
+  estimatedDuration: Float
+  pickupAddress: AddressInput
+  deliveryAddress: AddressInput
+  specialInstructions: String
+  estimatedCost: Float
+  actualCost: Float
+}
+
+input JobFilters {
+  status: JobStatus
+  type: JobType
+  priority: JobPriority
+  customerId: String
+  assignedCrew: String
+  scheduledAfter: DateTime
+  scheduledBefore: DateTime
+  createdAfter: DateTime
+  createdBefore: DateTime
+  search: String
+}
+
+input CustomerFilters {
+  status: CustomerStatus
+  type: CustomerType
+  source: String
+  assignedSalesRep: String
+  tags: [String!]
+  leadScoreMin: Float
+  leadScoreMax: Float
+  createdAfter: DateTime
+  createdBefore: DateTime
+  lastContactAfter: DateTime
+  lastContactBefore: DateTime
+  search: String
+}
+
+input SortBy {
+  field: String!
+  order: SortOrder!
+}
+
+# Queries
+type Query {
+  # Job Queries
+  job(id: ID!): Job
+  jobByNumber(jobNumber: String!): Job
+  jobs(
+    filters: JobFilters
+    sortBy: SortBy
+    first: Int
+    after: String
+  ): JobConnection!
+  jobsWithDetails(
+    filters: JobFilters
+    sortBy: SortBy
+    first: Int
+    after: String
+  ): [JobWithDetails!]!
+  jobsByDate(date: DateTime!): [Job!]!
+
+  # Customer Queries
+  customer(id: ID!): Customer
+  customerByEmail(email: String!): Customer
+  customers(
+    filters: CustomerFilters
+    sortBy: SortBy
+    first: Int
+    after: String
+  ): CustomerConnection!
+
+  # Crew Queries
+  crewMember(id: ID!): CrewMember
+  crewMembers(filters: JSON): [CrewMember!]!
+  availableCrew(date: DateTime!): [CrewMember!]!
+
+  # Analytics Queries
+  analytics(
+    startDate: DateTime
+    endDate: DateTime
+  ): Analytics!
+  jobStats: JobStats!
+  revenueMetrics(
+    startDate: DateTime
+    endDate: DateTime
+  ): RevenueMetrics!
+}
+
+# Mutations
+type Mutation {
+  # Job Mutations
+  createJob(input: CreateJobInput!): Job!
+  updateJob(id: ID!, input: UpdateJobInput!): Job!
+  updateJobStatus(id: ID!, status: JobStatus!): Job!
+  deleteJob(id: ID!): Boolean!
+
+  # Crew Assignment Mutations
+  assignCrew(jobId: ID!, crew: [CrewAssignmentInput!]!): Job!
+  updateCrewStatus(
+    jobId: ID!
+    crewMemberId: String!
+    status: CrewMemberStatus!
+  ): Job!
+
+  # Job Notes Mutations
+  addJobNote(
+    jobId: ID!
+    content: String!
+    isPinned: Boolean
+  ): Job!
+
+  # Milestone Mutations
+  updateMilestone(
+    jobId: ID!
+    milestoneId: String!
+    status: String!
+  ): Job!
+}
+
+# Subscriptions (for real-time updates)
+type Subscription {
+  jobUpdated(jobId: ID!): Job!
+  jobStatusChanged(jobId: ID!): Job!
+  crewAssigned(crewMemberId: String!): Job!
+}

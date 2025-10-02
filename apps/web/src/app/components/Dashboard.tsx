@@ -14,6 +14,12 @@ const NewOpportunity = lazy(() => import('./NewOpportunity').then(mod => ({ defa
 const CustomerManagement = lazy(() => import('./CustomerManagement').then(mod => ({ default: mod.CustomerManagement })));
 const JobManagement = lazy(() => import('./JobManagement').then(mod => ({ default: mod.JobManagement })));
 const CalendarDispatch = lazy(() => import('./CalendarDispatch').then(mod => ({ default: mod.CalendarDispatch })));
+const LeadActivities = lazy(() => import('./leads/LeadActivities').then(mod => ({ default: mod.LeadActivities })));
+const PartnerManagement = lazy(() => import('./partners/PartnerManagement').then(mod => ({ default: mod.PartnerManagement })));
+const DocumentUpload = lazy(() => import('./documents/DocumentUpload').then(mod => ({ default: mod.DocumentUpload })));
+const CrewSchedule = lazy(() => import('./crew/CrewSchedule').then(mod => ({ default: mod.CrewSchedule })));
+const NotificationCenter = lazy(() => import('./notifications/NotificationCenter').then(mod => ({ default: mod.NotificationCenter })));
+const ConversionDashboard = lazy(() => import('./conversion').then(mod => ({ default: mod.ConversionDashboard })));
 const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard').then(mod => ({ default: mod.AnalyticsDashboard })));
 const Settings = lazy(() => import('./settings/Settings').then(mod => ({ default: mod.Settings })));
 
@@ -80,6 +86,54 @@ export function Dashboard() {
         <div className={styles.content} role="tabpanel" id="tabpanel-calendar" aria-labelledby="tab-calendar">
           <Suspense fallback={<LoadingSkeleton type="default" rows={5} />}>
             <CalendarDispatch />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'leads' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-leads" aria-labelledby="tab-leads">
+          <Suspense fallback={<LoadingSkeleton type="default" rows={8} />}>
+            <LeadActivities />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'partners' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-partners" aria-labelledby="tab-partners">
+          <Suspense fallback={<LoadingSkeleton type="cards" rows={6} />}>
+            <PartnerManagement />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'documents' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-documents" aria-labelledby="tab-documents">
+          <Suspense fallback={<LoadingSkeleton type="default" rows={8} />}>
+            <DocumentUpload />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'crew' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-crew" aria-labelledby="tab-crew">
+          <Suspense fallback={<LoadingSkeleton type="table" rows={8} />}>
+            <CrewSchedule />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'notifications' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-notifications" aria-labelledby="tab-notifications">
+          <Suspense fallback={<LoadingSkeleton type="default" rows={8} />}>
+            <NotificationCenter />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'conversion' && (
+        <div className={styles.content} role="tabpanel" id="tabpanel-conversion" aria-labelledby="tab-conversion">
+          <Suspense fallback={<LoadingSkeleton type="analytics" />}>
+            <ConversionDashboard />
           </Suspense>
         </div>
       )}

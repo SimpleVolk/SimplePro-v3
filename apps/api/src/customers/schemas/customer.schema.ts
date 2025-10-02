@@ -40,13 +40,24 @@ export class Customer {
   @Prop({
     required: true,
     type: String,
-    enum: ['website', 'referral', 'google', 'facebook', 'yelp', 'direct', 'other'],
+    enum: ['website', 'referral', 'advertising', 'social_media', 'partner', 'other'],
     index: true
   })
-  source!: 'website' | 'referral' | 'google' | 'facebook' | 'yelp' | 'direct' | 'other';
+  source!: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
 
   @Prop()
   companyName?: string;
+
+  @Prop()
+  businessLicense?: string;
+
+  @Prop({
+    required: true,
+    type: String,
+    enum: ['email', 'phone', 'text'],
+    default: 'email'
+  })
+  preferredContactMethod!: 'email' | 'phone' | 'text';
 
   @Prop({ type: Object, required: true })
   address!: {
@@ -67,6 +78,7 @@ export class Customer {
   @Prop({ type: Object })
   referredBy?: {
     customerId?: string;
+    partnerId?: string;
     partnerName?: string;
     source: string;
   };
@@ -127,6 +139,7 @@ CustomerSchema.index({ tags: 1 });
 CustomerSchema.index({ status: 1, lastContactDate: -1 });
 CustomerSchema.index({ assignedSalesRep: 1, lastContactDate: -1 });
 CustomerSchema.index({ source: 1, status: 1, createdAt: -1 });
+CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true });
 
 // Text search index for comprehensive search
 CustomerSchema.index({

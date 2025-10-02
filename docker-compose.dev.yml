@@ -48,10 +48,10 @@ services:
     image: minio/minio:latest
     container_name: simplepro-minio
     restart: unless-stopped
-    # Expose MinIO console only in development for debugging
+    # Expose both API and console ports for development (API running on host needs access)
     ports:
+      - "9000:9000"  # API port for host access
       - "127.0.0.1:9001:9001"  # Console only accessible from localhost
-    # API port (9000) only accessible via internal network
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-simplepro_minio_2024}

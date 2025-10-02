@@ -1,0 +1,506 @@
+.leadActivities {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  color: #e5e7eb;
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #9ca3af;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #374151;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error button {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Statistics Dashboard */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.statCard:hover {
+  border-color: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.statCardWarning {
+  border-left: 4px solid #f59e0b;
+}
+
+.statCardSuccess {
+  border-left: 4px solid #10b981;
+}
+
+.statCardInfo {
+  border-left: 4px solid #3b82f6;
+}
+
+.statIcon {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e5e7eb;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Quick Actions */
+.quickActions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.quickActionButton {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quickActionButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem;
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.searchInput::placeholder {
+  color: #9ca3af;
+}
+
+.filterSelect {
+  padding: 0.75rem;
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  min-width: 140px;
+}
+
+/* Activity Timeline */
+.activityTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activityCard {
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.activityCard:hover {
+  border-color: #6b7280;
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.activityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.activityType {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.activityIcon {
+  font-size: 1.5rem;
+}
+
+.activityTypeLabel {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.activityBadges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusScheduled {
+  background: #3b82f6;
+  color: white;
+}
+
+.statusCompleted {
+  background: #10b981;
+  color: white;
+}
+
+.statusOverdue {
+  background: #ef4444;
+  color: white;
+}
+
+.statusCancelled {
+  background: #6b7280;
+  color: white;
+}
+
+.outcomeBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.outcomeSuccess {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.outcomeFailure {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.outcomeWarning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.outcomeNeutral {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.activityContent {
+  margin-bottom: 1rem;
+}
+
+.activitySubject {
+  color: #e5e7eb;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.activityCustomer {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0.25rem 0;
+}
+
+.activityDescription {
+  color: #d1d5db;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.activityNotes {
+  background: #4b5563;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  margin-top: 0.75rem;
+  color: #d1d5db;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.activityNotes strong {
+  color: #e5e7eb;
+}
+
+.activityMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #4b5563;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.activityDates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.activityDates span {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.dueDateOverdue {
+  color: #ef4444 !important;
+  font-weight: 600;
+}
+
+.activityAssignee {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.activityActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.completeButton,
+.editButton,
+.viewButton,
+.deleteButton {
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.primaryButton {
+  background: #3b82f6;
+  color: white;
+}
+
+.primaryButton:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.completeButton {
+  background: #10b981;
+  color: white;
+}
+
+.completeButton:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.editButton,
+.viewButton {
+  background: #6b7280;
+  color: white;
+}
+
+.editButton:hover,
+.viewButton:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.deleteButton {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.deleteButton:hover {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 4rem;
+  color: #9ca3af;
+}
+
+.emptyState p {
+  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .leadActivities {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .searchInput,
+  .filterSelect {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .quickActions {
+    flex-direction: column;
+  }
+
+  .quickActionButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .activityHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .activityMeta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .activityActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .activityActions button {
+    width: 100%;
+  }
+}

@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import {
   Job,
   CreateJobDto,
@@ -9,29 +11,46 @@ import {
   JobMilestone,
   InternalNote
 } from './interfaces/job.interface';
+import { Job as JobSchema, JobDocument } from './schemas/job.schema';
 import { RealtimeService } from '../websocket/realtime.service';
 
 @Injectable()
-export class JobsService {
-  private jobs = new Map<string, Job>();
-  private jobNumberCounter = 1;
-
+export class JobsService implements OnModuleInit {
   constructor(
+    @InjectModel(JobSchema.name) private jobModel: Model<JobDocument>,
     @Inject(forwardRef(() => RealtimeService))
     private realtimeService: RealtimeService
   ) {}
 
+  async onModuleInit() {
+    // Initialize job number counter from database
+    const latestJob = await this.jobModel
+      .findOne()
+      .sort({ createdAt: -1 })
+      .select('jobNumber')
+      .exec();
+
+    if (latestJob && latestJob.jobNumber) {
+      // Extract number from format "JOB-2025-0001"
+      const match = latestJob.jobNumber.match(/JOB-\d+-(\d+)/);
+      if (match) {
+        const lastNumber = parseInt(match[1], 10);
+        // Start from next number
+        this.jobNumberCounter = lastNumber + 1;
+      }
+    }
+  }
+
+  private jobNumberCounter = 1;
+
   async create(createJobDto: CreateJobDto, createdBy: string): Promise<Job> {
-    // Validate that customer exists (in a real app, this would be a DB query)
+    // Validate that customer exists
     if (!createJobDto.customerId) {
       throw new BadRequestException('Customer ID is required');
     }
 
     // Generate unique job number
     const jobNumber = this.generateJobNumber();
-
-    // Generate unique ID
-    const id = this.generateId();
 
     // Set up initial crew assignments
     const assignedCrew: CrewAssignment[] = createJobDto.assignedCrew?.map(crew => ({
@@ -43,8 +62,28 @@ export class JobsService {
     // Set up default milestones based on job type
     const milestones = this.createDefaultMilestones(createJobDto.type);
 
-    const job: Job = {
-      id,
+    // Prepare inventory items with generated IDs
+    const inventory = createJobDto.inventory?.map(item => ({
+      ...item,
+      id: this.generateId(),
+      condition: item.condition || 'good',
+      location: item.location || 'pickup',
+    })) || [];
+
+    // Prepare services with default status
+    const services = createJobDto.services?.map(service => ({
+      ...service,
+      status: 'pending' as const,
+    })) || [];
+
+    // Prepare equipment with default status
+    const equipment = createJobDto.equipment?.map(eq => ({
+      ...eq,
+      status: 'required' as const,
+    })) || [];
+
+    // Create job document
+    const job = new this.jobModel({
       jobNumber,
       title: createJobDto.title,
       description: createJobDto.description,
@@ -66,22 +105,9 @@ export class JobsService {
       assignedCrew,
       leadCrew: assignedCrew.find(c => c.role === 'lead')?.crewMemberId,
 
-      inventory: createJobDto.inventory?.map(item => ({
-        ...item,
-        id: this.generateId(),
-        condition: item.condition || 'good',
-        location: item.location || 'pickup',
-      })) || [],
-
-      services: createJobDto.services?.map(service => ({
-        ...service,
-        status: 'pending',
-      })) || [],
-
-      equipment: createJobDto.equipment?.map(eq => ({
-        ...eq,
-        status: 'required',
-      })) || [],
+      inventory,
+      services,
+      equipment,
 
       estimatedCost: createJobDto.estimatedCost,
       specialInstructions: createJobDto.specialInstructions,
@@ -93,201 +119,259 @@ export class JobsService {
       internalNotes: [],
       additionalCharges: [],
 
-      createdAt: new Date(),
-      updatedAt: new Date(),
       createdBy,
       lastModifiedBy: createdBy,
-    };
+    });
 
-    this.jobs.set(id, job);
-    return job;
+    await job.save();
+    return this.convertJobDocument(job);
   }
 
   async findAll(filters?: JobFilters): Promise<Job[]> {
-    let jobs = Array.from(this.jobs.values());
+    // Build MongoDB query object
+    const query: any = {};
 
     if (filters) {
-      if (filters.status) {
-        jobs = jobs.filter(job => job.status === filters.status);
-      }
-      if (filters.type) {
-        jobs = jobs.filter(job => job.type === filters.type);
-      }
-      if (filters.priority) {
-        jobs = jobs.filter(job => job.priority === filters.priority);
-      }
-      if (filters.customerId) {
-        jobs = jobs.filter(job => job.customerId === filters.customerId);
-      }
+      // Simple equality filters
+      if (filters.status) query.status = filters.status;
+      if (filters.type) query.type = filters.type;
+      if (filters.priority) query.priority = filters.priority;
+      if (filters.customerId) query.customerId = filters.customerId;
+
+      // Crew assignment filter (search within assignedCrew array)
       if (filters.assignedCrew) {
-        jobs = jobs.filter(job =>
-          job.assignedCrew.some(crew => crew.crewMemberId === filters.assignedCrew)
-        );
+        query['assignedCrew.crewMemberId'] = filters.assignedCrew;
       }
-      if (filters.scheduledAfter) {
-        jobs = jobs.filter(job => job.scheduledDate >= filters.scheduledAfter!);
+
+      // Date range filters
+      if (filters.scheduledAfter || filters.scheduledBefore) {
+        query.scheduledDate = {};
+        if (filters.scheduledAfter) query.scheduledDate.$gte = filters.scheduledAfter;
+        if (filters.scheduledBefore) query.scheduledDate.$lte = filters.scheduledBefore;
       }
-      if (filters.scheduledBefore) {
-        jobs = jobs.filter(job => job.scheduledDate <= filters.scheduledBefore!);
+
+      if (filters.createdAfter || filters.createdBefore) {
+        query.createdAt = {};
+        if (filters.createdAfter) query.createdAt.$gte = filters.createdAfter;
+        if (filters.createdBefore) query.createdAt.$lte = filters.createdBefore;
       }
-      if (filters.createdAfter) {
-        jobs = jobs.filter(job => job.createdAt >= filters.createdAfter!);
-      }
-      if (filters.createdBefore) {
-        jobs = jobs.filter(job => job.createdAt <= filters.createdBefore!);
-      }
+
+      // Text search using MongoDB text index
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        jobs = jobs.filter(job =>
-          job.title.toLowerCase().includes(searchLower) ||
-          job.description?.toLowerCase().includes(searchLower) ||
-          job.jobNumber.toLowerCase().includes(searchLower)
-        );
+        query.$text = { $search: filters.search };
       }
     }
 
-    // Sort by scheduled date (most recent first)
-    return jobs.sort((a, b) => b.scheduledDate.getTime() - a.scheduledDate.getTime());
+    // Execute query with sorting and use lean() for performance
+    const jobs = await this.jobModel
+      .find(query)
+      .sort({ scheduledDate: -1 })
+      .lean()
+      .exec();
+
+    return jobs.map(job => this.convertJobDocument(job as any));
   }
 
   async findOne(id: string): Promise<Job> {
-    const job = this.jobs.get(id);
+    const job = await this.jobModel.findById(id).exec();
     if (!job) {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
-    return job;
+    return this.convertJobDocument(job);
   }
 
   async findByJobNumber(jobNumber: string): Promise<Job | null> {
-    const job = Array.from(this.jobs.values())
-      .find(job => job.jobNumber === jobNumber);
-    return job || null;
+    const job = await this.jobModel.findOne({ jobNumber }).exec();
+    return job ? this.convertJobDocument(job) : null;
   }
 
   async update(id: string, updateJobDto: UpdateJobDto, updatedBy: string): Promise<Job> {
-    const job = await this.findOne(id);
+    // Check if job exists
+    const existingJob = await this.jobModel.findById(id).exec();
+    if (!existingJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
-    const updatedJob: Job = {
-      ...job,
-      ...updateJobDto,
-      // Ensure address fields are properly merged
-      pickupAddress: updateJobDto.pickupAddress
-        ? { ...job.pickupAddress, ...updateJobDto.pickupAddress }
-        : job.pickupAddress,
-      deliveryAddress: updateJobDto.deliveryAddress
-        ? { ...job.deliveryAddress, ...updateJobDto.deliveryAddress }
-        : job.deliveryAddress,
-      updatedAt: new Date(),
-      lastModifiedBy: updatedBy,
-    };
+    // Merge nested objects properly
+    const updateData: any = { ...updateJobDto };
 
-    this.jobs.set(id, updatedJob);
-    return updatedJob;
+    // Merge pickupAddress if provided
+    if (updateJobDto.pickupAddress) {
+      updateData.pickupAddress = {
+        ...existingJob.pickupAddress,
+        ...updateJobDto.pickupAddress,
+      };
+    }
+
+    // Merge deliveryAddress if provided
+    if (updateJobDto.deliveryAddress) {
+      updateData.deliveryAddress = {
+        ...existingJob.deliveryAddress,
+        ...updateJobDto.deliveryAddress,
+      };
+    }
+
+    // Update lastModifiedBy
+    updateData.lastModifiedBy = updatedBy;
+
+    // Use findByIdAndUpdate for atomic update
+    const updatedJob = await this.jobModel.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
+
+    return this.convertJobDocument(updatedJob);
   }
 
   async updateStatus(id: string, status: Job['status'], updatedBy: string): Promise<Job> {
-    const job = await this.findOne(id);
+    const existingJob = await this.jobModel.findById(id).exec();
+    if (!existingJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
     // Handle status-specific logic
-    const updates: Partial<Job> = {
+    const updates: any = {
       status,
       lastModifiedBy: updatedBy,
-      updatedAt: new Date(),
     };
 
-    if (status === 'in_progress' && !job.actualStartTime) {
+    if (status === 'in_progress' && !existingJob.actualStartTime) {
       updates.actualStartTime = new Date();
     }
 
-    if (status === 'completed' && !job.actualEndTime) {
+    if (status === 'completed' && !existingJob.actualEndTime) {
       updates.actualEndTime = new Date();
     }
 
-    const updatedJob: Job = { ...job, ...updates };
-    this.jobs.set(id, updatedJob);
+    // Atomic update
+    const updatedJob = await this.jobModel.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
     // Send real-time notifications
     if (this.realtimeService) {
       this.realtimeService.notifyJobStatusChange(id, status, updatedBy);
 
       // Send specific notifications for important status changes
-      if (status === 'completed' && job.assignedCrew.length > 0) {
-        const crewId = job.assignedCrew[0].crewMemberId;
+      if (status === 'completed' && updatedJob.assignedCrew.length > 0) {
+        const crewId = updatedJob.assignedCrew[0].crewMemberId;
         this.realtimeService.notifyJobCompletion(id, crewId, updatedBy);
       }
     }
 
-    return updatedJob;
+    return this.convertJobDocument(updatedJob);
   }
 
   async remove(id: string): Promise<void> {
-    const job = await this.findOne(id);
+    const job = await this.jobModel.findById(id).exec();
+    if (!job) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
     // Don't allow deletion of jobs that are in progress
     if (job.status === 'in_progress') {
       throw new BadRequestException('Cannot delete job that is in progress');
     }
 
-    this.jobs.delete(id);
+    await this.jobModel.findByIdAndDelete(id).exec();
   }
 
   async assignCrew(id: string, crewAssignments: Omit<CrewAssignment, 'assignedAt' | 'status'>[], assignedBy: string): Promise<Job> {
-    const job = await this.findOne(id);
+    const existingJob = await this.jobModel.findById(id).exec();
+    if (!existingJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
+    // Prepare new crew assignments
     const newAssignments: CrewAssignment[] = crewAssignments.map(assignment => ({
       ...assignment,
       assignedAt: new Date(),
-      status: 'assigned',
+      status: 'assigned' as const,
     }));
 
-    const updatedJob: Job = {
-      ...job,
-      assignedCrew: [...job.assignedCrew, ...newAssignments],
-      leadCrew: job.leadCrew || newAssignments.find(c => c.role === 'lead')?.crewMemberId,
-      updatedAt: new Date(),
-      lastModifiedBy: assignedBy,
-    };
+    // Determine lead crew
+    const leadCrew = existingJob.leadCrew || newAssignments.find(c => c.role === 'lead')?.crewMemberId;
 
-    this.jobs.set(id, updatedJob);
-    return updatedJob;
+    // Atomic update using $push to add new crew members
+    const updatedJob = await this.jobModel.findByIdAndUpdate(
+      id,
+      {
+        $push: { assignedCrew: { $each: newAssignments } },
+        $set: {
+          leadCrew,
+          lastModifiedBy: assignedBy
+        }
+      },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
+
+    return this.convertJobDocument(updatedJob);
   }
 
   async updateCrewStatus(id: string, crewMemberId: string, status: CrewAssignment['status'], updatedBy: string): Promise<Job> {
-    const job = await this.findOne(id);
+    const job = await this.jobModel.findById(id).exec();
+    if (!job) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
-    const updatedCrew = job.assignedCrew.map(crew => {
-      if (crew.crewMemberId === crewMemberId) {
-        const updates: Partial<CrewAssignment> = { status };
+    // Find the crew member index
+    const crewIndex = job.assignedCrew.findIndex(crew => crew.crewMemberId === crewMemberId);
+    if (crewIndex === -1) {
+      throw new NotFoundException(`Crew member ${crewMemberId} not found in job ${id}`);
+    }
 
-        if (status === 'checked_in') {
-          updates.checkInTime = new Date();
-        }
-        if (status === 'checked_out') {
-          updates.checkOutTime = new Date();
-          if (crew.checkInTime) {
-            updates.hoursWorked = (new Date().getTime() - crew.checkInTime.getTime()) / (1000 * 60 * 60);
-          }
-        }
-
-        return { ...crew, ...updates };
-      }
-      return crew;
-    });
-
-    const updatedJob: Job = {
-      ...job,
-      assignedCrew: updatedCrew,
-      updatedAt: new Date(),
-      lastModifiedBy: updatedBy,
+    // Build update object for the specific crew member
+    const updates: any = {
+      [`assignedCrew.${crewIndex}.status`]: status,
+      lastModifiedBy: updatedBy
     };
 
-    this.jobs.set(id, updatedJob);
-    return updatedJob;
+    if (status === 'checked_in') {
+      updates[`assignedCrew.${crewIndex}.checkInTime`] = new Date();
+    }
+
+    if (status === 'checked_out') {
+      const checkOutTime = new Date();
+      updates[`assignedCrew.${crewIndex}.checkOutTime`] = checkOutTime;
+
+      // Calculate hours worked if check-in time exists
+      const crew = job.assignedCrew[crewIndex];
+      if (crew.checkInTime) {
+        const hoursWorked = (checkOutTime.getTime() - crew.checkInTime.getTime()) / (1000 * 60 * 60);
+        updates[`assignedCrew.${crewIndex}.hoursWorked`] = hoursWorked;
+      }
+    }
+
+    // Atomic update
+    const updatedJob = await this.jobModel.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
+
+    return this.convertJobDocument(updatedJob);
   }
 
   async addNote(id: string, note: Omit<InternalNote, 'id' | 'createdAt'>, addedBy: string): Promise<Job> {
-    const job = await this.findOne(id);
-
     const newNote: InternalNote = {
       ...note,
       id: this.generateId(),
@@ -295,111 +379,131 @@ export class JobsService {
       createdBy: addedBy,
     };
 
-    const updatedJob: Job = {
-      ...job,
-      internalNotes: [...job.internalNotes, newNote],
-      updatedAt: new Date(),
-      lastModifiedBy: addedBy,
-    };
+    // Atomic update using $push
+    const updatedJob = await this.jobModel.findByIdAndUpdate(
+      id,
+      {
+        $push: { internalNotes: newNote },
+        $set: { lastModifiedBy: addedBy }
+      },
+      { new: true, runValidators: true }
+    ).exec();
 
-    this.jobs.set(id, updatedJob);
-    return updatedJob;
+    if (!updatedJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
+
+    return this.convertJobDocument(updatedJob);
   }
 
   async updateMilestone(id: string, milestoneId: string, status: JobMilestone['status'], completedBy?: string): Promise<Job> {
-    const job = await this.findOne(id);
+    const job = await this.jobModel.findById(id).exec();
+    if (!job) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
 
-    const updatedMilestones = job.milestones.map(milestone => {
-      if (milestone.id === milestoneId) {
-        const updates: Partial<JobMilestone> = { status };
-        if (status === 'completed') {
-          updates.completedAt = new Date();
-          updates.completedBy = completedBy;
-        }
-        return { ...milestone, ...updates };
-      }
-      return milestone;
-    });
+    // Find milestone index
+    const milestoneIndex = job.milestones.findIndex(m => m.id === milestoneId);
+    if (milestoneIndex === -1) {
+      throw new NotFoundException(`Milestone ${milestoneId} not found in job ${id}`);
+    }
 
-    const updatedJob: Job = {
-      ...job,
-      milestones: updatedMilestones,
-      updatedAt: new Date(),
-      lastModifiedBy: completedBy || 'system',
+    // Build update object
+    const updates: any = {
+      [`milestones.${milestoneIndex}.status`]: status,
+      lastModifiedBy: completedBy || 'system'
     };
 
-    this.jobs.set(id, updatedJob);
-    return updatedJob;
+    if (status === 'completed') {
+      updates[`milestones.${milestoneIndex}.completedAt`] = new Date();
+      if (completedBy) {
+        updates[`milestones.${milestoneIndex}.completedBy`] = completedBy;
+      }
+    }
+
+    // Atomic update
+    const updatedJob = await this.jobModel.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedJob) {
+      throw new NotFoundException(`Job with ID ${id} not found`);
+    }
+
+    return this.convertJobDocument(updatedJob);
   }
 
   async getJobStats(): Promise<JobStats> {
-    const jobs = Array.from(this.jobs.values());
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay());
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
+    // Use MongoDB aggregation for efficient stats calculation
+    const [
+      totalCount,
+      statusCounts,
+      typeCounts,
+      priorityCounts,
+      todayCount,
+      weekCount,
+      inProgressCount,
+      overdueCount,
+      durationStats,
+      revenueStats
+    ] = await Promise.all([
+      this.jobModel.countDocuments().exec(),
+      this.jobModel.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]).exec(),
+      this.jobModel.aggregate([{ $group: { _id: '$type', count: { $sum: 1 } } }]).exec(),
+      this.jobModel.aggregate([{ $group: { _id: '$priority', count: { $sum: 1 } } }]).exec(),
+      this.jobModel.countDocuments({ scheduledDate: { $gte: today, $lt: tomorrow } }).exec(),
+      this.jobModel.countDocuments({ scheduledDate: { $gte: weekStart } }).exec(),
+      this.jobModel.countDocuments({ status: 'in_progress' }).exec(),
+      this.jobModel.countDocuments({
+        scheduledDate: { $lt: today },
+        status: { $nin: ['completed', 'cancelled'] }
+      }).exec(),
+      this.jobModel.aggregate([
+        { $match: { actualStartTime: { $exists: true }, actualEndTime: { $exists: true } } },
+        {
+          $project: {
+            duration: {
+              $divide: [{ $subtract: ['$actualEndTime', '$actualStartTime'] }, 1000 * 60 * 60]
+            }
+          }
+        },
+        { $group: { _id: null, avgDuration: { $avg: '$duration' }, count: { $sum: 1 } } }
+      ]).exec(),
+      this.jobModel.aggregate([
+        {
+          $project: {
+            revenue: { $ifNull: ['$actualCost', { $cond: [{ $eq: ['$status', 'completed'] }, '$estimatedCost', 0] }] }
+          }
+        },
+        { $group: { _id: null, totalRevenue: { $sum: '$revenue' } } }
+      ]).exec()
+    ]);
 
     const stats: JobStats = {
-      total: jobs.length,
+      total: totalCount,
       byStatus: {},
       byType: {},
       byPriority: {},
-      scheduledToday: 0,
-      scheduledThisWeek: 0,
-      inProgress: 0,
-      overdue: 0,
-      averageDuration: 0,
-      totalRevenue: 0,
+      scheduledToday: todayCount,
+      scheduledThisWeek: weekCount,
+      inProgress: inProgressCount,
+      overdue: overdueCount,
+      averageDuration: durationStats[0]?.avgDuration || 0,
+      totalRevenue: revenueStats[0]?.totalRevenue || 0,
     };
 
-    let totalDuration = 0;
-    let completedJobs = 0;
-
-    for (const job of jobs) {
-      // Count by status
-      stats.byStatus[job.status] = (stats.byStatus[job.status] || 0) + 1;
-
-      // Count by type
-      stats.byType[job.type] = (stats.byType[job.type] || 0) + 1;
-
-      // Count by priority
-      stats.byPriority[job.priority] = (stats.byPriority[job.priority] || 0) + 1;
-
-      // Scheduled today
-      if (job.scheduledDate >= today && job.scheduledDate < new Date(today.getTime() + 24 * 60 * 60 * 1000)) {
-        stats.scheduledToday++;
-      }
-
-      // Scheduled this week
-      if (job.scheduledDate >= weekStart) {
-        stats.scheduledThisWeek++;
-      }
-
-      // In progress
-      if (job.status === 'in_progress') {
-        stats.inProgress++;
-      }
-
-      // Overdue (scheduled before today but not completed)
-      if (job.scheduledDate < today && job.status !== 'completed' && job.status !== 'cancelled') {
-        stats.overdue++;
-      }
-
-      // Revenue calculation
-      if (job.actualCost) {
-        stats.totalRevenue += job.actualCost;
-      } else if (job.status === 'completed') {
-        stats.totalRevenue += job.estimatedCost;
-      }
-
-      // Duration calculation
-      if (job.actualStartTime && job.actualEndTime) {
-        totalDuration += (job.actualEndTime.getTime() - job.actualStartTime.getTime()) / (1000 * 60 * 60);
-        completedJobs++;
-      }
-    }
-
-    stats.averageDuration = completedJobs > 0 ? totalDuration / completedJobs : 0;
+    // Convert aggregation results
+    statusCounts.forEach(({ _id, count }) => { stats.byStatus[_id] = count; });
+    typeCounts.forEach(({ _id, count }) => { stats.byType[_id] = count; });
+    priorityCounts.forEach(({ _id, count }) => { stats.byPriority[_id] = count; });
 
     return stats;
   }
@@ -408,9 +512,15 @@ export class JobsService {
     const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
-    return Array.from(this.jobs.values())
-      .filter(job => job.scheduledDate >= startOfDay && job.scheduledDate < endOfDay)
-      .sort((a, b) => a.scheduledStartTime.localeCompare(b.scheduledStartTime));
+    const jobs = await this.jobModel
+      .find({
+        scheduledDate: { $gte: startOfDay, $lt: endOfDay }
+      })
+      .sort({ scheduledStartTime: 1 })
+      .lean()
+      .exec();
+
+    return jobs.map(job => this.convertJobDocument(job as any));
   }
 
   private generateId(): string {
@@ -483,5 +593,53 @@ export class JobsService {
       ...milestone,
       id: this.generateId(),
     }));
+  }
+
+  // Helper method to convert Mongoose document to Job interface
+  private convertJobDocument(doc: JobDocument | any): Job {
+    const job = doc.toObject ? doc.toObject() : doc;
+
+    return {
+      id: job._id?.toString() || job.id,
+      jobNumber: job.jobNumber,
+      title: job.title,
+      description: job.description,
+      type: job.type,
+      status: job.status,
+      priority: job.priority,
+      customerId: job.customerId,
+      estimateId: job.estimateId,
+      invoiceId: job.invoiceId,
+      scheduledDate: job.scheduledDate,
+      scheduledStartTime: job.scheduledStartTime,
+      scheduledEndTime: job.scheduledEndTime,
+      estimatedDuration: job.estimatedDuration,
+      actualStartTime: job.actualStartTime,
+      actualEndTime: job.actualEndTime,
+      pickupAddress: job.pickupAddress,
+      deliveryAddress: job.deliveryAddress,
+      assignedCrew: job.assignedCrew,
+      leadCrew: job.leadCrew,
+      crewNotes: job.crewNotes,
+      inventory: job.inventory,
+      services: job.services,
+      specialInstructions: job.specialInstructions,
+      equipment: job.equipment,
+      estimatedCost: job.estimatedCost,
+      actualCost: job.actualCost,
+      laborCost: job.laborCost,
+      materialsCost: job.materialsCost,
+      transportationCost: job.transportationCost,
+      additionalCharges: job.additionalCharges,
+      milestones: job.milestones,
+      photos: job.photos,
+      documents: job.documents,
+      customerNotifications: job.customerNotifications,
+      internalNotes: job.internalNotes,
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt,
+      createdBy: job.createdBy,
+      lastModifiedBy: job.lastModifiedBy,
+    };
   }
 }

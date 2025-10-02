@@ -1,56 +1,32 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import {
   Customer,
   CreateCustomerDto,
   UpdateCustomerDto,
   CustomerFilters
 } from './interfaces/customer.interface';
-
-// Browser-compatible UUID generation (same as pricing engine)
-function generateUUID(): string {
-  try {
-    const crypto = require('crypto');
-    if (crypto && crypto.randomUUID) {
-      return crypto.randomUUID();
-    }
-  } catch (e) {
-    // crypto module not available in browser
-  }
-
-  // Fallback to crypto.getRandomValues for browsers
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = (window.crypto.getRandomValues(new Uint8Array(1))[0] & 15) | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
-
-  // Final fallback using Math.random
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
+import { Customer as CustomerSchema, CustomerDocument } from './schemas/customer.schema';
 
 @Injectable()
 export class CustomersService {
-  // In-memory storage for now - will be replaced with MongoDB
-  private customers: Map<string, Customer> = new Map();
+  constructor(
+    @InjectModel(CustomerSchema.name) private customerModel: Model<CustomerDocument>
+  ) {}
 
   async create(createCustomerDto: CreateCustomerDto, createdBy: string): Promise<Customer> {
-    // Check for duplicate email
-    const existingCustomer = Array.from(this.customers.values())
-      .find(customer => customer.email.toLowerCase() === createCustomerDto.email.toLowerCase());
+    // Check for duplicate email using case-insensitive query
+    const existingCustomer = await this.customerModel.findOne({
+      email: new RegExp(`^${createCustomerDto.email}$`, 'i')
+    });
 
     if (existingCustomer) {
       throw new ConflictException('Customer with this email already exists');
     }
 
-    const now = new Date();
-    const customer: Customer = {
-      id: generateUUID(),
+    // Create customer document
+    const customer = new this.customerModel({
       ...createCustomerDto,
       status: 'lead', // Default status for new customers
       communicationPreferences: createCustomerDto.communicationPreferences || {
@@ -60,201 +36,205 @@ export class CustomersService {
       },
       estimates: [],
       jobs: [],
-      createdAt: now,
-      updatedAt: now,
       createdBy,
-    };
+    });
 
-    this.customers.set(customer.id, customer);
-    return customer;
+    await customer.save();
+    return this.convertCustomerDocument(customer);
   }
 
   async findAll(filters?: CustomerFilters): Promise<Customer[]> {
-    let customers = Array.from(this.customers.values());
+    // Build MongoDB query object
+    const query: any = {};
 
     if (filters) {
-      customers = customers.filter(customer => {
-        // Status filter
-        if (filters.status && customer.status !== filters.status) {
-          return false;
-        }
+      // Simple equality filters
+      if (filters.status) query.status = filters.status;
+      if (filters.type) query.type = filters.type;
+      if (filters.source) query.source = filters.source;
+      if (filters.assignedSalesRep) query.assignedSalesRep = filters.assignedSalesRep;
 
-        // Type filter
-        if (filters.type && customer.type !== filters.type) {
-          return false;
-        }
+      // Tags filter (customer must have at least one of the specified tags)
+      if (filters.tags && filters.tags.length > 0) {
+        query.tags = { $in: filters.tags };
+      }
 
-        // Source filter
-        if (filters.source && customer.source !== filters.source) {
-          return false;
+      // Lead score range
+      if (filters.leadScoreMin !== undefined || filters.leadScoreMax !== undefined) {
+        query.leadScore = {};
+        if (filters.leadScoreMin !== undefined) {
+          query.leadScore.$gte = filters.leadScoreMin;
         }
+        if (filters.leadScoreMax !== undefined) {
+          query.leadScore.$lte = filters.leadScoreMax;
+        }
+      }
 
-        // Assigned sales rep filter
-        if (filters.assignedSalesRep && customer.assignedSalesRep !== filters.assignedSalesRep) {
-          return false;
-        }
+      // Date range filters
+      if (filters.createdAfter || filters.createdBefore) {
+        query.createdAt = {};
+        if (filters.createdAfter) query.createdAt.$gte = filters.createdAfter;
+        if (filters.createdBefore) query.createdAt.$lte = filters.createdBefore;
+      }
 
-        // Tags filter (customer must have at least one of the specified tags)
-        if (filters.tags && filters.tags.length > 0) {
-          if (!customer.tags || !filters.tags.some(tag => customer.tags!.includes(tag))) {
-            return false;
-          }
-        }
+      if (filters.lastContactAfter || filters.lastContactBefore) {
+        query.lastContactDate = {};
+        if (filters.lastContactAfter) query.lastContactDate.$gte = filters.lastContactAfter;
+        if (filters.lastContactBefore) query.lastContactDate.$lte = filters.lastContactBefore;
+      }
 
-        // Lead score range
-        if (filters.leadScoreMin !== undefined && (!customer.leadScore || customer.leadScore < filters.leadScoreMin)) {
-          return false;
-        }
-        if (filters.leadScoreMax !== undefined && (!customer.leadScore || customer.leadScore > filters.leadScoreMax)) {
-          return false;
-        }
-
-        // Date filters
-        if (filters.createdAfter && customer.createdAt < filters.createdAfter) {
-          return false;
-        }
-        if (filters.createdBefore && customer.createdAt > filters.createdBefore) {
-          return false;
-        }
-        if (filters.lastContactAfter && (!customer.lastContactDate || customer.lastContactDate < filters.lastContactAfter)) {
-          return false;
-        }
-        if (filters.lastContactBefore && (!customer.lastContactDate || customer.lastContactDate > filters.lastContactBefore)) {
-          return false;
-        }
-
-        // Search filter (name, email, phone, company)
-        if (filters.search) {
-          const searchTerm = filters.search.toLowerCase();
-          const searchableText = [
-            customer.firstName,
-            customer.lastName,
-            customer.email,
-            customer.phone,
-            customer.alternatePhone || '',
-            customer.companyName || ''
-          ].join(' ').toLowerCase();
-
-          if (!searchableText.includes(searchTerm)) {
-            return false;
-          }
-        }
-
-        return true;
-      });
+      // Text search using MongoDB text index
+      if (filters.search) {
+        query.$text = { $search: filters.search };
+      }
     }
 
-    // Sort by creation date (newest first)
-    return customers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    // Execute query with sorting (newest first) and use lean() for performance
+    const customers = await this.customerModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
+    return customers.map(customer => this.convertCustomerDocument(customer as any));
   }
 
   async findOne(id: string): Promise<Customer> {
-    const customer = this.customers.get(id);
+    const customer = await this.customerModel.findById(id).exec();
     if (!customer) {
       throw new NotFoundException(`Customer with ID ${id} not found`);
     }
-    return customer;
+    return this.convertCustomerDocument(customer);
   }
 
   async findByEmail(email: string): Promise<Customer | null> {
-    const customer = Array.from(this.customers.values())
-      .find(customer => customer.email.toLowerCase() === email.toLowerCase());
-    return customer || null;
+    const customer = await this.customerModel.findOne({
+      email: new RegExp(`^${email}$`, 'i')
+    }).exec();
+    return customer ? this.convertCustomerDocument(customer) : null;
   }
 
   async update(id: string, updateCustomerDto: UpdateCustomerDto, _updatedBy: string): Promise<Customer> {
-    const customer = await this.findOne(id);
+    // Check if customer exists
+    const existingCustomer = await this.customerModel.findById(id).exec();
+    if (!existingCustomer) {
+      throw new NotFoundException(`Customer with ID ${id} not found`);
+    }
 
     // Check for email conflicts if email is being updated
-    if (updateCustomerDto.email && updateCustomerDto.email !== customer.email) {
-      const existingCustomer = await this.findByEmail(updateCustomerDto.email);
-      if (existingCustomer && existingCustomer.id !== id) {
+    if (updateCustomerDto.email && updateCustomerDto.email !== existingCustomer.email) {
+      const duplicateCustomer = await this.customerModel.findOne({
+        email: new RegExp(`^${updateCustomerDto.email}$`, 'i'),
+        _id: { $ne: id }
+      }).exec();
+
+      if (duplicateCustomer) {
         throw new ConflictException('Customer with this email already exists');
       }
     }
 
+    // Merge nested objects properly
+    const updateData: any = { ...updateCustomerDto };
+
     // Merge address if provided
     if (updateCustomerDto.address) {
-      updateCustomerDto.address = {
-        ...customer.address,
+      updateData.address = {
+        ...existingCustomer.address,
         ...updateCustomerDto.address,
       };
     }
 
     // Merge communication preferences if provided
     if (updateCustomerDto.communicationPreferences) {
-      updateCustomerDto.communicationPreferences = {
-        ...customer.communicationPreferences,
+      updateData.communicationPreferences = {
+        ...existingCustomer.communicationPreferences,
         ...updateCustomerDto.communicationPreferences,
       };
     }
 
-    const updatedCustomer: Customer = {
-      ...customer,
-      ...updateCustomerDto,
-      // Ensure address fields are properly merged and required fields are present
-      address: {
-        ...customer.address,
-        ...updateCustomerDto.address,
-      },
-      // Ensure communicationPreferences are properly merged if provided
-      communicationPreferences: updateCustomerDto.communicationPreferences
-        ? {
-            allowMarketing: updateCustomerDto.communicationPreferences.allowMarketing ?? customer.communicationPreferences?.allowMarketing ?? false,
-            allowSms: updateCustomerDto.communicationPreferences.allowSms ?? customer.communicationPreferences?.allowSms ?? false,
-            allowEmail: updateCustomerDto.communicationPreferences.allowEmail ?? customer.communicationPreferences?.allowEmail ?? false,
-          }
-        : customer.communicationPreferences,
-      // Ensure referredBy is properly merged if provided
-      referredBy: updateCustomerDto.referredBy && updateCustomerDto.referredBy.source
-        ? {
-            customerId: updateCustomerDto.referredBy.customerId ?? customer.referredBy?.customerId,
-            partnerName: updateCustomerDto.referredBy.partnerName ?? customer.referredBy?.partnerName,
-            source: updateCustomerDto.referredBy.source,
-          }
-        : customer.referredBy,
-      updatedAt: new Date(),
-    };
+    // Merge referredBy if provided
+    if (updateCustomerDto.referredBy) {
+      updateData.referredBy = {
+        ...existingCustomer.referredBy,
+        ...updateCustomerDto.referredBy,
+      };
+    }
 
-    this.customers.set(id, updatedCustomer);
-    return updatedCustomer;
+    // Use findByIdAndUpdate for atomic update
+    const updatedCustomer = await this.customerModel.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!updatedCustomer) {
+      throw new NotFoundException(`Customer with ID ${id} not found`);
+    }
+
+    return this.convertCustomerDocument(updatedCustomer);
   }
 
   async remove(id: string): Promise<void> {
-    await this.findOne(id); // Verify customer exists
-    this.customers.delete(id);
+    const result = await this.customerModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Customer with ID ${id} not found`);
+    }
   }
 
   async addEstimate(customerId: string, estimateId: string): Promise<Customer> {
-    const customer = await this.findOne(customerId);
+    // Use $addToSet to avoid duplicates
+    const customer = await this.customerModel.findByIdAndUpdate(
+      customerId,
+      {
+        $addToSet: { estimates: estimateId },
+        $set: { updatedAt: new Date() }
+      },
+      { new: true, runValidators: true }
+    ).exec();
 
-    if (!customer.estimates!.includes(estimateId)) {
-      customer.estimates!.push(estimateId);
-      customer.updatedAt = new Date();
-      this.customers.set(customerId, customer);
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${customerId} not found`);
     }
 
-    return customer;
+    return this.convertCustomerDocument(customer);
   }
 
   async addJob(customerId: string, jobId: string): Promise<Customer> {
-    const customer = await this.findOne(customerId);
+    // Use $addToSet to avoid duplicates
+    const customer = await this.customerModel.findByIdAndUpdate(
+      customerId,
+      {
+        $addToSet: { jobs: jobId },
+        $set: { updatedAt: new Date() }
+      },
+      { new: true, runValidators: true }
+    ).exec();
 
-    if (!customer.jobs!.includes(jobId)) {
-      customer.jobs!.push(jobId);
-      customer.updatedAt = new Date();
-      this.customers.set(customerId, customer);
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${customerId} not found`);
     }
 
-    return customer;
+    return this.convertCustomerDocument(customer);
   }
 
   async updateLastContact(customerId: string): Promise<Customer> {
-    const customer = await this.findOne(customerId);
-    customer.lastContactDate = new Date();
-    customer.updatedAt = new Date();
-    this.customers.set(customerId, customer);
-    return customer;
+    const now = new Date();
+    const customer = await this.customerModel.findByIdAndUpdate(
+      customerId,
+      {
+        $set: {
+          lastContactDate: now,
+          updatedAt: now
+        }
+      },
+      { new: true, runValidators: true }
+    ).exec();
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${customerId} not found`);
+    }
+
+    return this.convertCustomerDocument(customer);
   }
 
   // Analytics methods
@@ -265,29 +245,78 @@ export class CustomersService {
     bySource: Record<string, number>;
     recentlyCreated: number; // Last 30 days
   }> {
-    const customers = Array.from(this.customers.values());
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+    // Use MongoDB aggregation for efficient stats calculation
+    const [totalCount, recentCount, statusCounts, typeCounts, sourceCounts] = await Promise.all([
+      this.customerModel.countDocuments().exec(),
+      this.customerModel.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }).exec(),
+      this.customerModel.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ]).exec(),
+      this.customerModel.aggregate([
+        { $group: { _id: '$type', count: { $sum: 1 } } }
+      ]).exec(),
+      this.customerModel.aggregate([
+        { $group: { _id: '$source', count: { $sum: 1 } } }
+      ]).exec()
+    ]);
+
     const stats = {
-      total: customers.length,
+      total: totalCount,
       byStatus: {} as Record<string, number>,
       byType: {} as Record<string, number>,
       bySource: {} as Record<string, number>,
-      recentlyCreated: customers.filter(c => c.createdAt > thirtyDaysAgo).length,
+      recentlyCreated: recentCount,
     };
 
-    customers.forEach(customer => {
-      // Count by status
-      stats.byStatus[customer.status] = (stats.byStatus[customer.status] || 0) + 1;
+    // Convert aggregation results to objects
+    statusCounts.forEach(({ _id, count }) => {
+      stats.byStatus[_id] = count;
+    });
 
-      // Count by type
-      stats.byType[customer.type] = (stats.byType[customer.type] || 0) + 1;
+    typeCounts.forEach(({ _id, count }) => {
+      stats.byType[_id] = count;
+    });
 
-      // Count by source
-      stats.bySource[customer.source] = (stats.bySource[customer.source] || 0) + 1;
+    sourceCounts.forEach(({ _id, count }) => {
+      stats.bySource[_id] = count;
     });
 
     return stats;
+  }
+
+  // Helper method to convert Mongoose document to Customer interface
+  private convertCustomerDocument(doc: CustomerDocument | any): Customer {
+    const customer = doc.toObject ? doc.toObject() : doc;
+
+    return {
+      id: customer._id?.toString() || customer.id,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phone: customer.phone,
+      alternatePhone: customer.alternatePhone,
+      address: customer.address,
+      type: customer.type,
+      status: customer.status,
+      source: customer.source,
+      companyName: customer.companyName,
+      businessLicense: customer.businessLicense,
+      preferredContactMethod: customer.preferredContactMethod,
+      communicationPreferences: customer.communicationPreferences,
+      notes: customer.notes,
+      leadScore: customer.leadScore,
+      tags: customer.tags,
+      assignedSalesRep: customer.assignedSalesRep,
+      referredBy: customer.referredBy,
+      createdAt: customer.createdAt,
+      updatedAt: customer.updatedAt,
+      createdBy: customer.createdBy,
+      lastContactDate: customer.lastContactDate,
+      estimates: customer.estimates,
+      jobs: customer.jobs,
+    };
   }
 }

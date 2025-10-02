@@ -1,0 +1,176 @@
+.container {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.funnel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.stage {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 5px 0;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.stage:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.stageHeader {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.stageName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.stageBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.stageMetrics {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.count {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.conversionRate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  margin-top: 5px;
+}
+
+.rateLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rateValue {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.connector {
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-top: 20px solid rgba(102, 126, 234, 0.3);
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.summary {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.summaryLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.summaryValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.loading,
+.error,
+.noData {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .funnel {
+    width: 100%;
+  }
+
+  .stage {
+    width: 90% !important;
+  }
+
+  .count {
+    font-size: 24px;
+  }
+
+  .value {
+    font-size: 14px;
+  }
+
+  .summary {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .summaryValue {
+    font-size: 20px;
+  }
+}

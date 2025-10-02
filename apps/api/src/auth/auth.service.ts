@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException, OnModuleInit } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -21,6 +21,7 @@ import { UserSession as UserSessionSchema, UserSessionDocument } from './schemas
 
 @Injectable()
 export class AuthService implements OnModuleInit {
+  private readonly logger = new Logger(AuthService.name);
   private roles = new Map<string, UserRole>();
   private tokenRefreshMutex = new Map<string, Promise<{ access_token: string; refresh_token?: string }>>(); // Prevent concurrent refreshes
   private readonly REFRESH_TOKEN_ROTATION_ENABLED = true; // Enable refresh token rotation for security
@@ -147,53 +148,46 @@ export class AuthService implements OnModuleInit {
 
     await adminUser.save();
 
-    // SECURITY FIX: Never log credentials to console in any environment
-    // Store the initial admin credentials securely
-    if (process.env.NODE_ENV !== 'production') {
-      // In development, store in environment variable and log for convenience
-      process.env.INITIAL_ADMIN_PASSWORD = password;
-      console.warn(`
-      ⚠️  SECURITY NOTICE: Default admin user created.
-      Username: admin
-      Password: ${password}
+    // SECURITY FIX: Never log credentials to console
+    // Store the initial admin credentials securely in .secrets directory
+    const fs = require('fs');
+    const path = require('path');
+    const secretsPath = path.join(process.cwd(), '.secrets');
 
-      ❗ DEVELOPMENT MODE: Using fixed password for easier testing.
-      ❗ This will be randomized in production environments.
-      `);
-    } else {
-      // In production, require external password initialization
-      console.error(`
-      🚨 CRITICAL: Admin user created but requires password initialization.
-      Run the password initialization script or contact system administrator.
-      System will not be fully functional until admin password is properly set.
-      `);
-
-      // Optionally, you could save the password to a secure file or require
-      // external initialization in production environments
-      const fs = require('fs');
-      const path = require('path');
-      const secretsPath = path.join(process.cwd(), '.secrets');
-
-      try {
-        if (!fs.existsSync(secretsPath)) {
-          fs.mkdirSync(secretsPath, { mode: 0o700 });
-        }
-
-        const credentialsFile = path.join(secretsPath, 'admin-init.json');
-        const credentials = {
-          username: 'admin',
-          temporaryPassword: password,
-          createdAt: new Date().toISOString(),
-          mustChangePassword: true,
-          note: 'This file should be deleted after password change'
-        };
-
-        fs.writeFileSync(credentialsFile, JSON.stringify(credentials, null, 2), { mode: 0o600 });
-        console.log(`🔐 Admin credentials stored securely in ${credentialsFile}`);
-        console.log(`🗑️  Remember to delete this file after setting the admin password.`);
-      } catch (error) {
-        console.error('Failed to store admin credentials securely:', error.message);
+    try {
+      // Create .secrets directory with restricted permissions
+      if (!fs.existsSync(secretsPath)) {
+        fs.mkdirSync(secretsPath, { recursive: true, mode: 0o700 });
       }
+
+      const credentialsFile = path.join(secretsPath, 'admin-password.txt');
+      const credentialContent = `
+SimplePro Admin Credentials
+============================
+Username: admin
+Email: admin@simplepro.com
+Password: ${password}
+
+Created: ${new Date().toISOString()}
+Environment: ${process.env.NODE_ENV || 'development'}
+
+⚠️  SECURITY WARNING:
+- Keep this file secure
+- Delete this file after setting a new password
+- Never commit this file to version control
+- Change the password immediately after first login
+============================
+`;
+
+      // Write credentials file with owner-only read permissions
+      fs.writeFileSync(credentialsFile, credentialContent, { mode: 0o600 });
+
+      this.logger.log('Default admin user created successfully');
+      this.logger.log(`Admin credentials stored securely in: ${credentialsFile}`);
+      this.logger.warn('IMPORTANT: Change the default admin password after first login!');
+    } catch (error) {
+      this.logger.error('Failed to store admin credentials securely:', error.message);
+      this.logger.error('Please set admin password manually');
     }
   }
 
@@ -664,6 +658,7 @@ export class AuthService implements OnModuleInit {
       profilePicture: doc.profilePicture,
       timezone: doc.timezone,
       preferences: doc.preferences,
+      fcmTokens: doc.fcmTokens || [],
       createdAt: (doc as any).createdAt,
       updatedAt: (doc as any).updatedAt,
       createdBy: doc.createdBy,
@@ -746,5 +741,56 @@ export class AuthService implements OnModuleInit {
     Array.from(this.tokenRefreshMutex.keys())
       .filter(key => key.includes(userId))
       .forEach(key => this.tokenRefreshMutex.delete(key));
+  }
+
+  /**
+   * Add FCM token for push notifications
+   */
+  async addFcmToken(userId: string, fcmToken: string): Promise<void> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if token already exists
+    if (!user.fcmTokens.includes(fcmToken)) {
+      user.fcmTokens.push(fcmToken);
+      await user.save();
+    }
+  }
+
+  /**
+   * Remove FCM token (e.g., on logout or when token becomes invalid)
+   */
+  async removeFcmToken(userId: string, fcmToken: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: { fcmTokens: fcmToken }
+      }
+    );
+  }
+
+  /**
+   * Remove multiple FCM tokens (e.g., when tokens are invalid)
+   */
+  async removeFcmTokens(userId: string, fcmTokens: string[]): Promise<void> {
+    await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pullAll: { fcmTokens: fcmTokens }
+      }
+    );
+  }
+
+  /**
+   * Get all FCM tokens for a user
+   */
+  async getFcmTokens(userId: string): Promise<string[]> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user.fcmTokens;
   }
 }

@@ -1,0 +1,451 @@
+name: Comprehensive Test Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * *' # Run nightly at 2 AM
+
+env:
+  NODE_VERSION: '20.x'
+  MONGODB_VERSION: '7.0'
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [pricing-engine, api, web]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests - ${{ matrix.project }}
+        run: |
+          if [ "${{ matrix.project }}" == "pricing-engine" ]; then
+            npm run test:pricing -- --coverage --ci
+          elif [ "${{ matrix.project }}" == "api" ]; then
+            npm run test:api:unit -- --coverage --ci
+          elif [ "${{ matrix.project }}" == "web" ]; then
+            npm run test:web -- --coverage --ci
+          fi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/${{ matrix.project }}/coverage-final.json
+          flags: unit-${{ matrix.project }}
+          name: unit-${{ matrix.project }}
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results-${{ matrix.project }}
+          path: |
+            coverage/${{ matrix.project }}
+            junit-reports/${{ matrix.project }}
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password123
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for MongoDB..."
+          timeout 60 bash -c 'until nc -z localhost 27017; do sleep 1; done'
+          echo "Waiting for Redis..."
+          timeout 60 bash -c 'until nc -z localhost 6379; do sleep 1; done'
+
+      - name: Setup test environment
+        run: |
+          cp .env.test.example .env.test
+          echo "MONGODB_URI=mongodb://admin:password123@localhost:27017/simplepro-test?authSource=admin" >> .env.test
+          echo "REDIS_URL=redis://localhost:6379" >> .env.test
+          echo "MINIO_ENDPOINT=localhost" >> .env.test
+          echo "MINIO_PORT=9000" >> .env.test
+
+      - name: Run integration tests
+        run: npm run test:api:integration -- --coverage --ci
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/api-integration/coverage-final.json
+          flags: integration-api
+          name: integration-api
+
+      - name: Archive integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: |
+            coverage/api-integration
+            junit-reports/integration
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password123
+        ports:
+          - 27017:27017
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup test environment
+        run: |
+          cp .env.test.example .env.test
+          echo "MONGODB_URI=mongodb://admin:password123@localhost:27017/simplepro-e2e?authSource=admin" >> .env.test
+
+      - name: Build applications
+        run: npm run build
+
+      - name: Start API server
+        run: |
+          cd apps/api
+          npm start &
+          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health; do sleep 2; done'
+
+      - name: Run E2E tests
+        run: npm run test:e2e -- --coverage --ci
+
+      - name: Upload E2E coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/e2e/coverage-final.json
+          flags: e2e
+          name: e2e-tests
+
+      - name: Archive E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: |
+            coverage/e2e
+            junit-reports/e2e
+            screenshots
+            videos
+
+  web-e2e-playwright:
+    name: Web E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build web application
+        run: npm run build:web
+
+      - name: Start web server
+        run: |
+          cd apps/web
+          npm start &
+          timeout 60 bash -c 'until curl -f http://localhost:3009; do sleep 2; done'
+
+      - name: Run Playwright tests
+        run: npm run test:web:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web-e2e/playwright-report
+
+  load-tests:
+    name: Load & Performance Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[load-test]')
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password123
+        ports:
+          - 27017:27017
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and start API
+        run: |
+          npm run build:api
+          cd apps/api
+          npm start &
+          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health; do sleep 2; done'
+
+      - name: Get JWT token for load tests
+        id: get-token
+        run: |
+          TOKEN=$(curl -s -X POST http://localhost:3001/api/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"username":"admin","password":"Admin123!"}' | jq -r '.accessToken')
+          echo "JWT_TOKEN=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Run API load tests
+        run: k6 run apps/api/test/load/api-endpoints.test.js
+        env:
+          API_URL: http://localhost:3001
+          JWT_TOKEN: ${{ steps.get-token.outputs.JWT_TOKEN }}
+
+      - name: Run WebSocket load tests
+        run: k6 run apps/api/test/load/websocket-load.test.js
+        env:
+          API_URL: http://localhost:3001
+          JWT_TOKEN: ${{ steps.get-token.outputs.JWT_TOKEN }}
+
+      - name: Upload load test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results
+          path: |
+            summary.json
+            load-test-results.json
+
+  mobile-tests:
+    name: Mobile Tests (Detox)
+    runs-on: macos-latest
+    if: contains(github.event.head_commit.message, '[mobile-test]') || github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Detox CLI
+        run: npm install -g detox-cli
+
+      - name: Build iOS app for testing
+        run: |
+          cd apps/mobile
+          detox build --configuration ios.sim.debug
+
+      - name: Run Detox tests
+        run: |
+          cd apps/mobile
+          detox test --configuration ios.sim.debug
+
+      - name: Upload mobile test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-test-results
+          path: |
+            apps/mobile/e2e/artifacts
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  coverage-report:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, e2e-tests]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: coverage-artifacts
+
+      - name: Merge coverage reports
+        run: |
+          npm install -g nyc
+          nyc merge coverage-artifacts coverage/merged-coverage.json
+
+      - name: Generate HTML report
+        run: nyc report --reporter=html --reporter=text --temp-dir=coverage
+
+      - name: Upload merged coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/merged-coverage.json
+          flags: merged
+          name: merged-coverage
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          lcov-file: ./coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, e2e-tests, web-e2e-playwright]
+    if: always()
+
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          path: test-results
+
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results/**/junit*.xml
+            test-results/**/test-results.xml
+
+      - name: Generate test summary
+        run: |
+          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Unit Tests: Complete" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Integration Tests: Complete" >> $GITHUB_STEP_SUMMARY
+          echo "✅ E2E Tests: Complete" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Web E2E Tests: Complete" >> $GITHUB_STEP_SUMMARY

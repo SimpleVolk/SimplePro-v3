@@ -11,6 +11,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import {
   CreateUserDto,
@@ -36,6 +37,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } }) // 5 login attempts per minute
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Req() req: any) {

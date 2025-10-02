@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getModelToken } from '@nestjs/mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { RealtimeService } from '../websocket/realtime.service';
+import { Job as JobSchema } from './schemas/job.schema';
 import {
   Job,
   CreateJobDto,
@@ -21,6 +23,27 @@ describe('JobsService', () => {
     notifyJobCompletion: jest.fn(),
     // Add other methods as needed
   };
+
+  // Create mock Job model
+  const createMockJobModel = () => {
+    const mockConstructor: any = jest.fn().mockImplementation((data) => ({
+      ...data,
+      _id: `job_${Math.random().toString(36).substr(2, 9)}`,
+      save: jest.fn().mockResolvedValue({ ...data, _id: `job_${Math.random().toString(36).substr(2, 9)}` })
+    }));
+
+    // Add static methods
+    mockConstructor.find = jest.fn();
+    mockConstructor.findById = jest.fn();
+    mockConstructor.findByIdAndUpdate = jest.fn();
+    mockConstructor.findOne = jest.fn();
+    mockConstructor.countDocuments = jest.fn();
+    mockConstructor.aggregate = jest.fn();
+
+    return mockConstructor;
+  };
+
+  let mockJobModel: any;
 
   const mockCreateJobDto: CreateJobDto = {
     title: 'Residential Move',
@@ -99,9 +122,16 @@ describe('JobsService', () => {
   };
 
   beforeEach(async () => {
+    // Create fresh mock model for each test
+    mockJobModel = createMockJobModel();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JobsService,
+        {
+          provide: getModelToken(JobSchema.name),
+          useValue: mockJobModel
+        },
         {
           provide: RealtimeService,
           useValue: mockRealtimeServiceImplementation
@@ -111,10 +141,6 @@ describe('JobsService', () => {
 
     service = module.get<JobsService>(JobsService);
     mockRealtimeService = module.get(RealtimeService) as jest.Mocked<RealtimeService>;
-
-    // Clear any existing data
-    (service as any).jobs.clear();
-    (service as any).jobNumberCounter = 1;
 
     // Reset all mocks
     jest.clearAllMocks();

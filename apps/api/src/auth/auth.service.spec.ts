@@ -78,28 +78,42 @@ describe('AuthService', () => {
     save: jest.fn()
   };
 
-  const mockUserModel = {
-    findOne: jest.fn(),
-    findById: jest.fn(),
-    find: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    constructor: jest.fn().mockImplementation(() => ({
+  // Create mock model as constructor function
+  const createMockUserModel = () => {
+    const mockConstructor: any = jest.fn().mockImplementation((data) => ({
       ...mockUser,
-      save: jest.fn().mockResolvedValue(mockUser)
-    }))
+      ...data,
+      save: jest.fn().mockResolvedValue({ ...mockUser, ...data })
+    }));
+
+    // Add static methods
+    mockConstructor.findOne = jest.fn();
+    mockConstructor.findById = jest.fn();
+    mockConstructor.find = jest.fn();
+    mockConstructor.findByIdAndUpdate = jest.fn();
+
+    return mockConstructor;
   };
 
-  const mockSessionModel = {
-    findOne: jest.fn(),
-    findOneAndUpdate: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    updateMany: jest.fn(),
-    find: jest.fn(),
-    constructor: jest.fn().mockImplementation(() => ({
+  const createMockSessionModel = () => {
+    const mockConstructor: any = jest.fn().mockImplementation((data) => ({
       ...mockSession,
-      save: jest.fn().mockResolvedValue(mockSession)
-    }))
+      ...data,
+      save: jest.fn().mockResolvedValue({ ...mockSession, ...data })
+    }));
+
+    // Add static methods
+    mockConstructor.findOne = jest.fn();
+    mockConstructor.findOneAndUpdate = jest.fn();
+    mockConstructor.findByIdAndUpdate = jest.fn();
+    mockConstructor.updateMany = jest.fn();
+    mockConstructor.find = jest.fn();
+
+    return mockConstructor;
   };
+
+  let mockUserModel: any;
+  let mockSessionModel: any;
 
   const mockJwtService = {
     sign: jest.fn(),
@@ -109,6 +123,11 @@ describe('AuthService', () => {
   beforeEach(async () => {
     // Reset all mocks
     jest.clearAllMocks();
+
+    // Create fresh mock models for each test
+    mockUserModel = createMockUserModel();
+    mockSessionModel = createMockSessionModel();
+
     mockBcrypt.hash.mockImplementation((password: string) => Promise.resolve(`hashed_${password}`));
     mockBcrypt.compare.mockImplementation((password: string, hash: string) =>
       Promise.resolve(hash === `hashed_${password}`)
@@ -171,12 +190,6 @@ describe('AuthService', () => {
       });
       mockBcrypt.compare.mockResolvedValue(true);
 
-      const mockNewSession = {
-        ...mockSession,
-        save: jest.fn().mockResolvedValue(mockSession)
-      };
-      mockSessionModel.constructor = jest.fn().mockReturnValue(mockNewSession);
-
       const result = await service.login(loginDto);
 
       expect(result).toEqual({
@@ -232,12 +245,6 @@ describe('AuthService', () => {
         save: jest.fn().mockResolvedValue(mockUser)
       });
       mockBcrypt.compare.mockResolvedValue(true);
-
-      const mockNewSession = {
-        ...mockSession,
-        save: jest.fn().mockResolvedValue(mockSession)
-      };
-      mockSessionModel.constructor = jest.fn().mockReturnValue(mockNewSession);
 
       const result = await service.login(emailLoginDto);
 
@@ -405,13 +412,6 @@ describe('AuthService', () => {
 
     it('should create user successfully', async () => {
       mockUserModel.findOne.mockResolvedValue(null); // No existing user
-      const mockNewUser = {
-        ...mockUser,
-        username: 'newuser',
-        email: 'newuser@example.com',
-        save: jest.fn().mockResolvedValue(mockUser)
-      };
-      mockUserModel.constructor = jest.fn().mockReturnValue(mockNewUser);
 
       const result = await service.create(createUserDto, 'admin123');
 

@@ -11,6 +11,7 @@ import {
   HttpCode,
   UseGuards,
   Req,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { JobsService } from './jobs.service';
@@ -27,6 +28,7 @@ import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/interfaces/user.interface';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { JobQueryFiltersDto } from '../common/dto/query-filters.dto';
 
 @Controller('jobs')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -77,7 +79,7 @@ export class JobsController {
   @Get()
   @RequirePermissions({ resource: 'jobs', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
-  async findAll(@Query() query: any) {
+  async findAll(@Query(ValidationPipe) query: JobQueryFiltersDto) {
     // Parse query parameters into filters
     const filters: JobFilters = {
       status: query.status,

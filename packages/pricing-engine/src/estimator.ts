@@ -127,7 +127,7 @@ export class DeterministicEstimator {
     const inputHash = this.createDeterministicHash(input);
 
     // Start with base price calculation
-    let basePrice = this.calculateBasePrice(input);
+    const basePrice = this.calculateBasePrice(input);
     let currentPrice = basePrice;
 
     // Apply pricing rules in priority order

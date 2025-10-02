@@ -1,10 +1,13 @@
 'use client';
 
 import { useAuth } from '../contexts/AuthContext';
+import { NotificationBell } from './notifications/NotificationBell';
+import { useRouter } from 'next/navigation';
 import styles from './TopBar.module.css';
 
 export function TopBar() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const getUserRoleDisplayName = (role?: { name: string; displayName: string }) => {
     return role?.displayName || role?.name || 'Unknown Role';
@@ -18,6 +21,8 @@ export function TopBar() {
         </div>
 
         <div className={styles.rightSection}>
+          <NotificationBell onNavigate={(path) => router.push(path)} />
+
           <div className={styles.userInfo}>
             <div className={styles.userDetails}>
               <span className={styles.userName} aria-label={`Current user: ${user?.firstName} ${user?.lastName}`}>

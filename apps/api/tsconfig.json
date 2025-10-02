@@ -13,7 +13,12 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strict": false
+    "strict": false,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]

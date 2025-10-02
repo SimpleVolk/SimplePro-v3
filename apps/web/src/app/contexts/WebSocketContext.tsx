@@ -102,6 +102,37 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       window.dispatchEvent(new CustomEvent('jobUpdate', { detail: data }));
     });
 
+    // Notification event handlers (for real-time notifications)
+    newSocket.on('notification.created', (data) => {
+      console.log('Notification created:', data);
+      setLastUpdate(Date.now());
+
+      // Dispatch custom event for components to listen to
+      window.dispatchEvent(new CustomEvent('notificationCreated', { detail: data }));
+    });
+
+    newSocket.on('notification.updated', (data) => {
+      console.log('Notification updated:', data);
+      setLastUpdate(Date.now());
+
+      // Dispatch custom event for components to listen to
+      window.dispatchEvent(new CustomEvent('notificationUpdated', { detail: data }));
+    });
+
+    // Message event handlers (for real-time messaging)
+    newSocket.on('message.created', (data) => {
+      console.log('Message created:', data);
+      setLastUpdate(Date.now());
+
+      // Dispatch custom event for components to listen to
+      window.dispatchEvent(new CustomEvent('messageCreated', { detail: data }));
+    });
+
+    newSocket.on('user.typing', (data) => {
+      // Dispatch custom event for typing indicators
+      window.dispatchEvent(new CustomEvent('userTyping', { detail: data }));
+    });
+
     setSocket(newSocket);
 
     return () => {

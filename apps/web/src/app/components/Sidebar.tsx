@@ -51,6 +51,42 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       roles: ['super_admin', 'admin', 'dispatcher']
     },
     {
+      id: 'leads',
+      label: 'Leads & Follow-up',
+      icon: '🎯',
+      roles: ['super_admin', 'admin', 'dispatcher']
+    },
+    {
+      id: 'partners',
+      label: 'Partners',
+      icon: '🤝',
+      roles: ['super_admin', 'admin']
+    },
+    {
+      id: 'documents',
+      label: 'Documents',
+      icon: '📁',
+      roles: ['super_admin', 'admin', 'dispatcher']
+    },
+    {
+      id: 'crew',
+      label: 'Crew Schedule',
+      icon: '👷',
+      roles: ['super_admin', 'admin', 'dispatcher']
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: '🔔',
+      roles: ['super_admin', 'admin', 'dispatcher', 'crew']
+    },
+    {
+      id: 'conversion',
+      label: 'Conversion Analytics',
+      icon: '📊',
+      roles: ['super_admin', 'admin']
+    },
+    {
       id: 'reports',
       label: 'Reports',
       icon: '📈',

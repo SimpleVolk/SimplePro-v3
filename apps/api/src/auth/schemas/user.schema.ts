@@ -33,6 +33,9 @@ export class User {
   @Prop()
   phoneNumber?: string;
 
+  @Prop({ type: [String], default: [] })
+  fcmTokens!: string[]; // Firebase Cloud Messaging tokens for push notifications
+
   @Prop({ default: true, index: true })
   isActive!: boolean;
 

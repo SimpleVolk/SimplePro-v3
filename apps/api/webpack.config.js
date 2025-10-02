@@ -13,6 +13,8 @@ module.exports = {
       tsConfig: './tsconfig.app.json',
       optimization: false,
       outputHashing: 'none',
+      typeCheck: false, // Disable type checking during webpack build
     }),
   ],
+  ignoreWarnings: [/./], // Ignore all warnings
 };

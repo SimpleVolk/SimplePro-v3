@@ -9,6 +9,7 @@ export interface User {
   department?: string;
   phoneNumber?: string;
   crewId?: string;
+  fcmTokens: string[]; // Firebase Cloud Messaging tokens for push notifications
   isActive: boolean;
   mustChangePassword: boolean;
   lastLoginAt?: Date;

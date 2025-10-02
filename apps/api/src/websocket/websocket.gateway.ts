@@ -9,9 +9,11 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, OnModuleDestroy } from '@nestjs/common';
+import { Logger, OnModuleDestroy, Inject, forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
+import { MessagesService } from '../messages/messages.service';
+import { TypingService } from '../messages/typing.service';
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -40,7 +42,11 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   constructor(
     private jwtService: JwtService,
-    private authService: AuthService
+    private authService: AuthService,
+    @Inject(forwardRef(() => MessagesService))
+    private messagesService: MessagesService,
+    @Inject(forwardRef(() => TypingService))
+    private typingService: TypingService
   ) {}
 
   afterInit(_server: Server) {
@@ -638,5 +644,255 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         }
       });
     return Object.fromEntries(crewStatus);
+  }
+
+  // ==================== Message Event Handlers ====================
+
+  @SubscribeMessage('message.send')
+  async handleSendMessage(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: {
+      threadId: string;
+      content: string;
+      messageType?: string;
+      attachments?: any[];
+      location?: any;
+      replyToId?: string;
+    }
+  ) {
+    try {
+      const message = await this.messagesService.sendMessage(
+        {
+          threadId: payload.threadId,
+          content: payload.content,
+          messageType: payload.messageType,
+          attachments: payload.attachments,
+          location: payload.location,
+          replyToId: payload.replyToId,
+        },
+        client.userId!
+      );
+
+      // Get thread to find all participants
+      const thread = await this.messagesService.getThreadById(payload.threadId);
+
+      // Emit to all thread participants
+      thread.participants.forEach((participant: any) => {
+        const participantId = participant._id?.toString() || participant.toString();
+        this.server.to(`user:${participantId}`).emit('message.created', {
+          message,
+          threadId: payload.threadId,
+          timestamp: new Date().toISOString(),
+        });
+      });
+
+      this.logger.log(`Message sent in thread ${payload.threadId} by user ${client.userId}`);
+    } catch (error) {
+      this.logger.error(`Failed to send message: ${error.message}`);
+      client.emit('error', { message: 'Failed to send message', error: error.message });
+    }
+  }
+
+  @SubscribeMessage('typing.start')
+  async handleTypingStart(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { threadId: string }
+  ) {
+    try {
+      await this.typingService.startTyping(payload.threadId, client.userId!);
+
+      // Get thread to find other participants
+      const thread = await this.messagesService.getThreadById(payload.threadId);
+
+      // Emit to other thread participants (not the sender)
+      thread.participants.forEach((participant: any) => {
+        const participantId = participant._id?.toString() || participant.toString();
+        if (participantId !== client.userId) {
+          this.server.to(`user:${participantId}`).emit('user.typing', {
+            threadId: payload.threadId,
+            userId: client.userId,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      });
+
+      this.logger.debug(`User ${client.userId} started typing in thread ${payload.threadId}`);
+    } catch (error) {
+      this.logger.error(`Failed to handle typing start: ${error.message}`);
+    }
+  }
+
+  @SubscribeMessage('typing.stop')
+  async handleTypingStop(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { threadId: string }
+  ) {
+    try {
+      await this.typingService.stopTyping(payload.threadId, client.userId!);
+
+      // Get thread to find other participants
+      const thread = await this.messagesService.getThreadById(payload.threadId);
+
+      // Emit to other thread participants (not the sender)
+      thread.participants.forEach((participant: any) => {
+        const participantId = participant._id?.toString() || participant.toString();
+        if (participantId !== client.userId) {
+          this.server.to(`user:${participantId}`).emit('user.stopped_typing', {
+            threadId: payload.threadId,
+            userId: client.userId,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      });
+
+      this.logger.debug(`User ${client.userId} stopped typing in thread ${payload.threadId}`);
+    } catch (error) {
+      this.logger.error(`Failed to handle typing stop: ${error.message}`);
+    }
+  }
+
+  @SubscribeMessage('message.read')
+  async handleMessageRead(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { threadId: string; messageId: string }
+  ) {
+    try {
+      await this.messagesService.markAsRead(payload.threadId, client.userId!, payload.messageId);
+
+      // Get the message to find the sender
+      const message = await this.messagesService.getMessageById(payload.messageId);
+
+      // Emit read receipt to sender
+      const senderId = message.senderId.toString();
+      this.server.to(`user:${senderId}`).emit('message.read_receipt', {
+        messageId: payload.messageId,
+        threadId: payload.threadId,
+        readBy: client.userId,
+        readAt: new Date().toISOString(),
+      });
+
+      this.logger.debug(`Message ${payload.messageId} marked as read by ${client.userId}`);
+    } catch (error) {
+      this.logger.error(`Failed to handle message read: ${error.message}`);
+    }
+  }
+
+  @SubscribeMessage('message.edit')
+  async handleMessageEdit(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { messageId: string; content: string }
+  ) {
+    try {
+      const updatedMessage = await this.messagesService.editMessage(
+        payload.messageId,
+        payload.content,
+        client.userId!
+      );
+
+      // Get thread to find all participants
+      const thread = await this.messagesService.getThreadById(updatedMessage.threadId.toString());
+
+      // Emit to all thread participants
+      thread.participants.forEach((participant: any) => {
+        const participantId = participant._id?.toString() || participant.toString();
+        this.server.to(`user:${participantId}`).emit('message.edited', {
+          message: updatedMessage,
+          timestamp: new Date().toISOString(),
+        });
+      });
+
+      this.logger.log(`Message ${payload.messageId} edited by user ${client.userId}`);
+    } catch (error) {
+      this.logger.error(`Failed to edit message: ${error.message}`);
+      client.emit('error', { message: 'Failed to edit message', error: error.message });
+    }
+  }
+
+  @SubscribeMessage('message.delete')
+  async handleMessageDelete(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { messageId: string; threadId: string }
+  ) {
+    try {
+      await this.messagesService.deleteMessage(payload.messageId, client.userId!);
+
+      // Get thread to find all participants
+      const thread = await this.messagesService.getThreadById(payload.threadId);
+
+      // Emit to all thread participants
+      thread.participants.forEach((participant: any) => {
+        const participantId = participant._id?.toString() || participant.toString();
+        this.server.to(`user:${participantId}`).emit('message.deleted', {
+          messageId: payload.messageId,
+          threadId: payload.threadId,
+          timestamp: new Date().toISOString(),
+        });
+      });
+
+      this.logger.log(`Message ${payload.messageId} deleted by user ${client.userId}`);
+    } catch (error) {
+      this.logger.error(`Failed to delete message: ${error.message}`);
+      client.emit('error', { message: 'Failed to delete message', error: error.message });
+    }
+  }
+
+  @SubscribeMessage('thread.subscribe')
+  async handleThreadSubscribe(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { threadId: string }
+  ) {
+    try {
+      // Verify user has access to this thread
+      const thread = await this.messagesService.getThreadById(payload.threadId);
+
+      const hasAccess = thread.participants.some((participant: any) => {
+        const participantId = participant._id?.toString() || participant.toString();
+        return participantId === client.userId;
+      });
+
+      if (!hasAccess) {
+        client.emit('error', { message: 'You do not have access to this thread' });
+        return;
+      }
+
+      await client.join(`thread:${payload.threadId}`);
+
+      client.emit('thread.subscribed', {
+        threadId: payload.threadId,
+        timestamp: new Date().toISOString(),
+      });
+
+      this.logger.debug(`Client ${client.id} subscribed to thread ${payload.threadId}`);
+    } catch (error) {
+      this.logger.error(`Failed to subscribe to thread: ${error.message}`);
+      client.emit('error', { message: 'Failed to subscribe to thread', error: error.message });
+    }
+  }
+
+  @SubscribeMessage('thread.unsubscribe')
+  async handleThreadUnsubscribe(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { threadId: string }
+  ) {
+    try {
+      await client.leave(`thread:${payload.threadId}`);
+
+      client.emit('thread.unsubscribed', {
+        threadId: payload.threadId,
+        timestamp: new Date().toISOString(),
+      });
+
+      this.logger.debug(`Client ${client.id} unsubscribed from thread ${payload.threadId}`);
+    } catch (error) {
+      this.logger.error(`Failed to unsubscribe from thread: ${error.message}`);
+    }
+  }
+
+  // Public method for broadcasting message updates from external services
+  broadcastMessageUpdate(threadId: string, event: string, data: any) {
+    this.server.to(`thread:${threadId}`).emit(event, {
+      ...data,
+      timestamp: new Date().toISOString(),
+    });
   }
 }
