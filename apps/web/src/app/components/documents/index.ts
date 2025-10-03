@@ -8,6 +8,8 @@ export { DocumentUpload } from './DocumentUpload';
 export { DocumentViewer } from './DocumentViewer';
 export { DocumentGallery } from './DocumentGallery';
 export { ShareDialog } from './ShareDialog';
+export { SharedDocumentAccess } from './SharedDocumentAccess';
+export { RateLimitNotification } from './RateLimitNotification';
 
 export type {
   Document,
@@ -15,4 +17,8 @@ export type {
   UploadProgress,
   DocumentFilters,
   CreateShareLinkDto,
+  AccessSharedDocumentRequest,
+  AccessSharedDocumentResponse,
 } from './types';
+
+export { RateLimitError, DocumentAccessError } from './types';

@@ -99,10 +99,58 @@ export class Notification {
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);
 
-// Compound indexes for efficient queries
-NotificationSchema.index({ recipientId: 1, isRead: 1, createdAt: -1 });
-NotificationSchema.index({ recipientId: 1, type: 1 });
-NotificationSchema.index({ recipientId: 1, priority: 1 });
+// Foreign key validation middleware
+NotificationSchema.pre('save', async function (next) {
+  try {
+    // Validate recipientId reference (required)
+    if (this.recipientId) {
+      const User = mongoose.model('User');
+      const recipientExists = await User.exists({ _id: this.recipientId });
+      if (!recipientExists) {
+        throw new Error(`Referenced User (recipientId) not found: ${this.recipientId}`);
+      }
+    }
+
+    // Validate relatedEntityId if present
+    if (this.relatedEntityId && this.relatedEntityType) {
+      let modelName: string;
+      switch (this.relatedEntityType) {
+        case 'customer':
+          modelName = 'Customer';
+          break;
+        case 'job':
+          modelName = 'Job';
+          break;
+        case 'estimate':
+          modelName = 'Estimate';
+          break;
+        case 'message':
+          modelName = 'Message';
+          break;
+        case 'user':
+          modelName = 'User';
+          break;
+        default:
+          return next(); // Skip validation for system or unknown types
+      }
+
+      const Model = mongoose.model(modelName);
+      const entityExists = await Model.exists({ _id: this.relatedEntityId });
+      if (!entityExists) {
+        throw new Error(`Referenced ${modelName} not found: ${this.relatedEntityId}`);
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+// Compound indexes for efficient queries (OPTIMIZED)
+NotificationSchema.index({ recipientId: 1, isRead: 1, createdAt: -1 }); // Unread notifications
+NotificationSchema.index({ recipientId: 1, type: 1 }); // Notifications by type
+NotificationSchema.index({ recipientId: 1, priority: 1 }); // Priority notifications
 NotificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7776000 }); // Auto-delete after 90 days
 
 // Ensure virtuals are serialized

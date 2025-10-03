@@ -11,6 +11,10 @@ import {
   InternalNote,
   AdditionalCharge,
 } from '../interfaces/job.interface';
+import {
+  createSizeMonitoringMiddleware,
+  createArraySizeMonitoringMiddleware,
+} from '../../database/document-size-monitoring.middleware';
 
 export type JobDocument = Job & Document;
 
@@ -174,26 +178,115 @@ export class Job {
 
 export const JobSchema = SchemaFactory.createForClass(Job);
 
-// Add indexes for optimal performance
-JobSchema.index({ jobNumber: 1 }, { unique: true });
-JobSchema.index({ customerId: 1 });
-JobSchema.index({ status: 1 });
-JobSchema.index({ type: 1 });
-JobSchema.index({ priority: 1 });
-JobSchema.index({ scheduledDate: 1 });
-JobSchema.index({ 'assignedCrew.crewMemberId': 1 });
-JobSchema.index({ leadCrew: 1 });
-JobSchema.index({ estimateId: 1 });
-JobSchema.index({ invoiceId: 1 });
-JobSchema.index({ createdAt: 1 });
-JobSchema.index({ updatedAt: 1 });
-JobSchema.index({ createdBy: 1 });
+// Document size monitoring middleware (prevent 16MB limit issues)
+JobSchema.pre('save', createSizeMonitoringMiddleware({
+  maxSizeMB: 10,
+  warnThresholdPercent: 70,
+  logWarnings: true,
+  throwOnExceed: true,
+}));
 
-// Compound indexes for common queries
-JobSchema.index({ customerId: 1, status: 1 });
-JobSchema.index({ scheduledDate: 1, status: 1 });
-JobSchema.index({ type: 1, status: 1 });
-JobSchema.index({ 'assignedCrew.crewMemberId': 1, status: 1 });
+// Array size monitoring middleware (warn about unbounded arrays)
+JobSchema.pre('save', createArraySizeMonitoringMiddleware(
+  ['assignedCrew', 'inventory', 'services', 'equipment', 'milestones', 'photos', 'documents', 'customerNotifications', 'internalNotes', 'additionalCharges'],
+  500 // Maximum 500 items per array
+));
+
+// Foreign key validation middleware
+JobSchema.pre('save', async function (next) {
+  try {
+    // Validate customerId reference (required)
+    if (this.customerId) {
+      const Customer = mongoose.model('Customer');
+      const customerExists = await Customer.exists({ _id: this.customerId });
+      if (!customerExists) {
+        throw new Error(`Referenced Customer not found: ${this.customerId}`);
+      }
+    }
+
+    // Validate estimateId reference (optional)
+    if (this.estimateId) {
+      const Estimate = mongoose.model('Estimate');
+      const estimateExists = await Estimate.exists({ _id: this.estimateId });
+      if (!estimateExists) {
+        throw new Error(`Referenced Estimate not found: ${this.estimateId}`);
+      }
+    }
+
+    // Validate invoiceId reference (optional)
+    if (this.invoiceId) {
+      const Invoice = mongoose.model('Invoice');
+      const invoiceExists = await Invoice.exists({ _id: this.invoiceId });
+      if (!invoiceExists) {
+        throw new Error(`Referenced Invoice not found: ${this.invoiceId}`);
+      }
+    }
+
+    // Validate leadCrew reference (optional)
+    if (this.leadCrew) {
+      const User = mongoose.model('User');
+      const leadCrewExists = await User.exists({ _id: this.leadCrew });
+      if (!leadCrewExists) {
+        throw new Error(`Referenced User (leadCrew) not found: ${this.leadCrew}`);
+      }
+    }
+
+    // Validate assignedCrew references
+    if (this.assignedCrew && this.assignedCrew.length > 0) {
+      const User = mongoose.model('User');
+      for (const assignment of this.assignedCrew) {
+        if (assignment.crewMemberId) {
+          const crewExists = await User.exists({ _id: assignment.crewMemberId });
+          if (!crewExists) {
+            throw new Error(`Referenced User (crewMemberId) not found: ${assignment.crewMemberId}`);
+          }
+        }
+      }
+    }
+
+    // Validate createdBy reference (required)
+    if (this.createdBy) {
+      const User = mongoose.model('User');
+      const creatorExists = await User.exists({ _id: this.createdBy });
+      if (!creatorExists) {
+        throw new Error(`Referenced User (createdBy) not found: ${this.createdBy}`);
+      }
+    }
+
+    // Validate lastModifiedBy reference (required)
+    if (this.lastModifiedBy) {
+      const User = mongoose.model('User');
+      const modifierExists = await User.exists({ _id: this.lastModifiedBy });
+      if (!modifierExists) {
+        throw new Error(`Referenced User (lastModifiedBy) not found: ${this.lastModifiedBy}`);
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+// Add indexes for optimal performance (OPTIMIZED - removed redundant indexes)
+JobSchema.index({ jobNumber: 1 }, { unique: true });
+JobSchema.index({ customerId: 1 }); // Frequently used for job lookups by customer
+JobSchema.index({ status: 1 }); // Used for status-based queries (dashboard, reports)
+JobSchema.index({ type: 1 }); // Used for filtering by job type
+JobSchema.index({ priority: 1 }); // Used for priority-based sorting
+JobSchema.index({ scheduledDate: 1 }); // Used for calendar and scheduling queries
+JobSchema.index({ 'assignedCrew.crewMemberId': 1 }); // Used for crew member job lookups
+JobSchema.index({ leadCrew: 1 }); // Used for filtering by lead crew
+JobSchema.index({ estimateId: 1 }); // Used for estimate to job linking
+JobSchema.index({ invoiceId: 1 }); // Used for invoice to job linking
+JobSchema.index({ createdBy: 1 }); // Used for filtering by creator
+
+// Compound indexes for common queries (OPTIMIZED - removed redundant ones)
+JobSchema.index({ type: 1, status: 1 }); // Used for filtering by type and status
+JobSchema.index({ 'assignedCrew.crewMemberId': 1, status: 1 }); // Used for crew member active jobs
+JobSchema.index({ status: 1, scheduledDate: -1 }); // PERFORMANCE: Dashboard queries (active jobs by date)
+JobSchema.index({ customerId: 1, status: 1 }); // PERFORMANCE: Customer job history
+JobSchema.index({ createdBy: 1, createdAt: -1 }); // PERFORMANCE: Sales performance analytics
 
 // Text index for search functionality
 JobSchema.index({
@@ -207,5 +300,6 @@ JobSchema.index({
     title: 5,
     description: 2,
     specialInstructions: 1
-  }
+  },
+  name: 'job_text_search'
 });

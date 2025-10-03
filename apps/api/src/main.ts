@@ -51,7 +51,19 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   // Security middleware
-  app.use(compression()); // Enable gzip compression
+  // OPTIMIZED: Enhanced compression configuration (1KB threshold, level 6)
+  app.use(compression({
+    filter: (req, res) => {
+      // Don't compress responses with x-no-compression header
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      // Use compression filter (defaults to text, json, xml, etc.)
+      return compression.filter(req, res);
+    },
+    threshold: 1024, // Only compress responses > 1KB
+    level: 6, // Compression level 1-9 (6 is good balance between speed/compression)
+  }));
   app.use(cookieParser()); // Parse cookies securely
   app.use(new SecurityMiddleware().use.bind(new SecurityMiddleware()));
   app.use(new LoggingMiddleware().use.bind(new LoggingMiddleware()));

@@ -2,6 +2,17 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
+export interface IndexInfo {
+  name: string;
+  usageCount: number;
+  usageDate: Date | null;
+  spec: Record<string, any>;
+}
+
+export interface IndexUsageResult {
+  [collectionName: string]: IndexInfo[];
+}
+
 @Injectable()
 export class IndexOptimizationService implements OnModuleInit {
   private readonly logger = new Logger(IndexOptimizationService.name);
@@ -256,9 +267,9 @@ export class IndexOptimizationService implements OnModuleInit {
   }
 
   // Index analysis and monitoring
-  async analyzeIndexUsage(): Promise<any> {
+  async analyzeIndexUsage(): Promise<IndexUsageResult> {
     const collections = ['users', 'jobs', 'customers', 'analytics_events', 'sessions'];
-    const results: any = {};
+    const results: IndexUsageResult = {};
 
     for (const collectionName of collections) {
       try {

@@ -1,0 +1,118 @@
+# Root .dockerignore - optimizes Docker build context
+
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+azure-pipelines.yml
+
+# Documentation
+*.md
+!README.md
+docs
+CHANGELOG.md
+LICENSE
+CONTRIBUTING.md
+
+# Testing
+**/__tests__
+**/__mocks__
+**/test
+**/tests
+**/*.test.ts
+**/*.test.tsx
+**/*.test.js
+**/*.test.jsx
+**/*.spec.ts
+**/*.spec.tsx
+**/*.spec.js
+**/*.spec.jsx
+coverage
+.nyc_output
+jest.config.*
+jest-*.config.*
+playwright.config.*
+vitest.config.*
+test-setup.*
+cypress
+cypress.json
+
+# Build artifacts
+dist
+build
+.next
+.nx/cache
+tmp
+temp
+out
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+.editorconfig
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+.secrets
+
+# Cache
+.cache
+.turbo
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
+
+# Development files
+nodemon.json
+docker-compose.dev.yml
+docker-compose.dev-secure.yml
+Dockerfile.dev
+
+# Misc
+*.tgz
+.husky
+.commitlintrc.json
+.prettierrc
+.prettierignore
+.eslintignore
+audit-results.json
+dependencies-tree.json
+outdated-results.json
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,47 @@
+# Web .dockerignore - optimizes Web Docker build
+
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Testing
+__tests__
+specs
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage
+jest.config.ts
+test-setup.tsx
+
+# Development
+.env.local
+.env.development
+.env.test
+
+# Build artifacts
+.next
+dist
+build
+out
+*.tsbuildinfo
+
+# Documentation
+*.md
+!README.md
+ENVIRONMENT_SETUP.md
+
+# IDE
+.vscode
+.idea
+
+# Logs
+logs
+*.log
+
+# Misc
+.eslintrc.json
+.prettierrc
+next-env.d.ts
+public/test-*

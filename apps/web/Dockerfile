@@ -1,8 +1,14 @@
-# Multi-stage build for Next.js web app
+# Multi-stage build for Next.js web app using standalone mode
+# Stage 1: Dependencies
 FROM node:20-alpine AS dependencies
 
+# Build arguments for versioning
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION=1.0.0
+
 # Install build dependencies
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ libc6-compat
 
 # Set working directory
 WORKDIR /app
@@ -15,11 +21,11 @@ COPY tsconfig.base.json ./
 # Install all dependencies
 RUN npm ci --legacy-peer-deps && npm cache clean --force
 
-# Builder stage
+# Stage 2: Builder
 FROM node:20-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ libc6-compat
 
 WORKDIR /app
 
@@ -37,54 +43,75 @@ COPY packages ./packages
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the application
-RUN npx nx build web --prod
+# Build the application with NX
+RUN npx nx build web --configuration=production
 
-# Production stage
-FROM nginx:alpine AS production
+# Verify standalone build output
+RUN ls -la /app/apps/web/.next/standalone || echo "Standalone output not found, checking dist..."
+RUN ls -la /app/dist/apps/web || echo "Build output verification"
 
-# Install curl for health checks and tini for signal handling
-RUN apk add --no-cache curl tini
+# Stage 3: Production
+FROM node:20-alpine AS production
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+# Build arguments for metadata
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION=1.0.0
+ARG NEXT_PUBLIC_API_URL=http://localhost:3001
 
-# Copy custom nginx config
-COPY docker/nginx/web.conf /etc/nginx/conf.d/default.conf
+# Install runtime dependencies
+RUN apk add --no-cache curl tini ca-certificates tzdata && \
+    rm -rf /var/cache/apk/*
 
-# Copy built application
-COPY --from=builder /app/dist/apps/web /usr/share/nginx/html
+# Set timezone to UTC
+ENV TZ=UTC
 
-# Create non-root user for nginx
-RUN addgroup -g 1001 -S nginx-user && \
-    adduser -S nginx-user -u 1001 -G nginx-user
+# Create app directory
+WORKDIR /app
 
-# Set proper permissions
-RUN chown -R nginx-user:nginx-user /usr/share/nginx/html && \
-    chown -R nginx-user:nginx-user /var/cache/nginx && \
-    chown -R nginx-user:nginx-user /var/log/nginx && \
-    chown -R nginx-user:nginx-user /etc/nginx/conf.d
+# Create non-root user with specific UID/GID
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 -G nodejs
 
-# Create nginx.pid file with proper permissions
-RUN touch /var/run/nginx.pid && \
-    chown -R nginx-user:nginx-user /var/run/nginx.pid
+# Copy built Next.js standalone output
+# Next.js creates a standalone folder with minimal dependencies
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+
+# Set proper ownership
+RUN chown -R nextjs:nodejs /app
+
+# Set environment variables
+ENV NODE_ENV=production \
+    PORT=3009 \
+    HOSTNAME="0.0.0.0" \
+    NEXT_TELEMETRY_DISABLED=1
 
 # Switch to non-root user
-USER nginx-user
+USER nextjs
 
-# Expose port
-EXPOSE 3000
+# Expose port (using 3009 to match development setup)
+EXPOSE 3009
 
-# Add security labels
-LABEL security.non-root=true
-LABEL security.no-new-privileges=true
+# Add comprehensive metadata labels
+LABEL org.opencontainers.image.title="SimplePro Web" \
+      org.opencontainers.image.description="SimplePro Moving Company Management Web Dashboard" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.vendor="Simple Moves" \
+      org.opencontainers.image.licenses="PROPRIETARY" \
+      security.non-root="true" \
+      security.no-new-privileges="true" \
+      maintainer="Simple Moves DevOps <devops@simplemoves.com>"
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+# Health check - verify web app is responding
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:3009/ || exit 1
 
-# Use tini as init process
+# Use tini as init process for proper signal handling
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start Next.js server using standalone mode
+CMD ["node", "apps/web/server.js"]

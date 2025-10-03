@@ -10,6 +10,7 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  UseInterceptors,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
@@ -30,9 +31,12 @@ import { User } from '../auth/interfaces/user.interface';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { JobQueryFiltersDto } from '../common/dto/query-filters.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { CacheListInterceptor } from '../cache/interceptors/cache-list.interceptor';
+import { CacheTTL } from '../cache/decorators/cache-ttl.decorator';
 
 @Controller('jobs')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(CacheListInterceptor) // PERFORMANCE: Automatic caching for GET requests
 export class JobsController {
   constructor(
     private readonly jobsService: JobsService,
@@ -78,6 +82,7 @@ export class JobsController {
   }
 
   @Get()
+  @CacheTTL(120) // PERFORMANCE: Cache for 2 minutes
   @RequirePermissions({ resource: 'jobs', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
   async findAll(

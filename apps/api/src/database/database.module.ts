@@ -39,9 +39,9 @@ import { loadSecrets } from '../config/secrets.config';
         }
       })(),
       {
-        // Connection pooling settings
-        maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '20', 10),
-        minPoolSize: parseInt(process.env.MONGODB_MIN_POOL_SIZE || '5', 10),
+        // Connection pooling settings - optimized for replica set
+        maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '100', 10),
+        minPoolSize: parseInt(process.env.MONGODB_MIN_POOL_SIZE || '10', 10),
         maxIdleTimeMS: parseInt(process.env.MONGODB_MAX_IDLE_TIME || '300000', 10), // 5 minutes
 
         // Connection timeout settings
@@ -49,20 +49,29 @@ import { loadSecrets } from '../config/secrets.config';
         socketTimeoutMS: parseInt(process.env.MONGODB_SOCKET_TIMEOUT || '45000', 10),
         connectTimeoutMS: parseInt(process.env.MONGODB_CONNECT_TIMEOUT || '10000', 10),
 
-        // Write concern for data safety (required for transactions)
+        // Write concern for data safety in replica set (required for transactions)
         retryWrites: true,
         writeConcern: {
-          w: 'majority',
-          j: true,
+          w: 'majority', // Ensure writes are replicated to majority of nodes
+          j: true, // Ensure writes are journaled for durability
           wtimeout: parseInt(process.env.MONGODB_WRITE_TIMEOUT || '10000', 10)
         },
 
-        // Read preferences for performance (transactions require 'primary' or 'primaryPreferred')
-        readPreference: (process.env.MONGODB_READ_PREFERENCE as any) || 'primary',
-        readConcern: { level: 'majority' },
+        // Read preferences for replica set
+        // Options: primary, primaryPreferred, secondary, secondaryPreferred, nearest
+        // Use secondaryPreferred for better read scaling (falls back to primary if secondaries unavailable)
+        // Use primary or primaryPreferred for transactions
+        readPreference: (process.env.MONGODB_READ_PREFERENCE as any) || 'secondaryPreferred',
+        readConcern: { level: 'majority' }, // Ensure reads return committed data
+
+        // Replica set specific settings
+        replicaSet: process.env.MONGODB_REPLICA_SET || 'simplepro-rs',
 
         // Network and performance settings
         family: 4, // Use IPv4, skip trying IPv6
+
+        // Heartbeat frequency for replica set monitoring
+        heartbeatFrequencyMS: 10000, // Check replica set health every 10 seconds
 
         // Authentication and SSL
         authSource: process.env.MONGODB_AUTH_SOURCE || 'admin',
@@ -72,9 +81,18 @@ import { loadSecrets } from '../config/secrets.config';
         appName: 'SimplePro-v3-API',
 
         // Additional performance settings
-        // maxStalenessSeconds is only valid for secondary read preferences
-        // Removed as we're using primary read preference
-        localThresholdMS: 15, // Latency window for server selection
+        // maxStalenessSeconds: Only valid for secondary read preferences
+        // Defines maximum replication lag acceptable for reads from secondaries
+        ...(process.env.MONGODB_READ_PREFERENCE !== 'primary' && {
+          maxStalenessSeconds: 90 // Accept up to 90 seconds of replication lag
+        }),
+        localThresholdMS: 15, // Latency window for server selection (15ms)
+
+        // Automatic server discovery and monitoring
+        serverSelectionRetryMS: 30000, // Retry server selection for 30 seconds
+
+        // Connection monitoring
+        serverMonitoringMode: 'auto' as any, // Automatic monitoring mode
       }
     ),
   ],

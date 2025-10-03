@@ -6,8 +6,12 @@ This directory contains operational scripts for SimplePro-v3 deployment, mainten
 
 ### Deployment Scripts
 
-| `deploy-prod.sh` | Production deployment with validation | `./deploy-prod.sh [deploy|health|help]` |
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `deploy-production.sh` | Production deployment with health checks | `./deploy-production.sh` |
+| `deploy-prod.sh` | Advanced production deployment with validation | `./deploy-prod.sh [deploy|health|help]` |
 | `deploy-dev.sh` | Development environment setup | `./deploy-dev.sh` |
+| `build-docker-images.sh` | Build Docker images with versioning | `./build-docker-images.sh [api|web|all]` |
 | `validate-environment.sh` | Environment validation and checks | `./validate-environment.sh` |
 
 ### Security and Secrets Management
@@ -24,6 +28,73 @@ This directory contains operational scripts for SimplePro-v3 deployment, mainten
 | `validate-seed-data.js` | Validate seeded data integrity | `node validate-seed-data.js` |
 
 ## Detailed Script Documentation
+
+### Docker Image Building (`build-docker-images.sh`)
+
+Build production-ready Docker images with proper versioning and metadata.
+
+**Features:**
+
+- Multi-architecture support (amd64, arm64)
+- Automatic version tagging from git
+- Image size verification
+- Registry tagging and pushing
+- Colored output for clarity
+
+**Usage Examples:**
+
+```bash
+# Build all services
+./scripts/build-docker-images.sh all
+
+# Build specific service
+./scripts/build-docker-images.sh api
+./scripts/build-docker-images.sh web
+
+# Build with custom version
+VERSION=1.2.3 ./scripts/build-docker-images.sh all
+
+# Build and push to registry
+REGISTRY=ghcr.io/yourorg/simplepro PUSH=true ./scripts/build-docker-images.sh all
+```
+
+**Environment Variables:**
+
+- `VERSION`: Version tag (default: git describe)
+- `REGISTRY`: Container registry (default: ghcr.io/simplepro)
+- `PUSH`: Push to registry after build (default: false)
+- `PLATFORMS`: Target platforms (default: linux/amd64)
+
+### Simple Production Deployment (`deploy-production.sh`)
+
+Simplified production deployment with comprehensive health checks and rollback capability.
+
+**Features:**
+
+- Prerequisites validation
+- Pre-deployment backup
+- Staged service deployment
+- Health check verification
+- Interactive confirmation
+- Status reporting
+
+**Usage:**
+
+```bash
+./scripts/deploy-production.sh
+```
+
+**Deployment Flow:**
+
+1. Check Docker, Docker Compose, .env.production
+2. Create data directories
+3. Backup current deployment
+4. Deploy infrastructure (MongoDB, Redis, MinIO)
+5. Deploy API with health check
+6. Deploy Web with health check
+7. Deploy monitoring services
+8. Verify all health checks
+9. Display service URLs
 
 ### Production Deployment (`deploy-prod.sh`)
 

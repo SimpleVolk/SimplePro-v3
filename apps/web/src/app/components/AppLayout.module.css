@@ -3,6 +3,7 @@
   min-height: 100vh;
   background: #1a1a1a;
   color: #fff;
+  position: relative;
 }
 
 .mainContainer {
@@ -21,16 +22,88 @@
   width: 100%;
 }
 
+/* Mobile Hamburger Menu Button */
+.mobileMenuButton {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1100;
+  background: #1e40af;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  min-width: 44px;
+  min-height: 44px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.mobileMenuButton:hover {
+  background: #1e3a8a;
+  transform: scale(1.05);
+}
+
+.mobileMenuButton:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.mobileMenuButton:active {
+  transform: scale(0.98);
+}
+
+.hamburgerIcon {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+  display: block;
+}
+
+/* Backdrop overlay */
+.backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Mobile responsive design */
 @media (max-width: 768px) {
+  .mobileMenuButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .backdrop {
+    display: block;
+  }
+
   .content {
-    padding: 16px 12px;
+    padding: 72px 16px 16px 16px; /* Extra top padding for hamburger button */
   }
 }
 
 @media (max-width: 480px) {
   .content {
-    padding: 12px;
+    padding: 72px 12px 12px 12px;
   }
 }
 
@@ -38,5 +111,14 @@
 @media (min-width: 1600px) {
   .content {
     max-width: 1600px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mobileMenuButton,
+  .backdrop {
+    animation: none;
+    transition: none;
   }
 }

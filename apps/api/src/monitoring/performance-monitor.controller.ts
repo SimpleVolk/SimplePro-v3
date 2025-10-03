@@ -4,7 +4,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { DatabasePerformanceService } from '../database/database-performance.service';
 import { CacheService } from '../cache/cache.service';
-import { IndexOptimizationService } from '../database/index-optimization.service';
+import { IndexOptimizationService, IndexInfo } from '../database/index-optimization.service';
 
 @Controller('admin/performance')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -127,14 +127,14 @@ export class PerformanceMonitorController {
     const slowQueries = this.dbPerformanceService.getSlowQueries(100);
 
     // Calculate index efficiency
-    const totalIndexes: number = Object.values(indexUsage).reduce(
-      (total: number, collection: any) => total + collection.length,
+    const totalIndexes: number = Object.values(indexUsage).reduce<number>(
+      (total: number, collection: IndexInfo[]) => total + collection.length,
       0
     );
 
-    const usedIndexes: number = Object.values(indexUsage).reduce(
-      (used: number, collection: any) =>
-        used + collection.filter((index: any) => index.usageCount > 0).length,
+    const usedIndexes: number = Object.values(indexUsage).reduce<number>(
+      (used: number, collection: IndexInfo[]) =>
+        used + collection.filter((index: IndexInfo) => index.usageCount > 0).length,
       0
     );
 

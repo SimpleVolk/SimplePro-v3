@@ -57,3 +57,30 @@ export interface CreateShareLinkDto {
   expiresAt?: string;
   password?: string;
 }
+
+export interface AccessSharedDocumentRequest {
+  password: string;
+}
+
+export interface AccessSharedDocumentResponse {
+  documentUrl: string;
+  expiresAt?: string;
+  documentName: string;
+  documentType: string;
+  mimeType: string;
+  size: number;
+}
+
+export class RateLimitError extends Error {
+  constructor(public retryAfter: string | null) {
+    super('Rate limit exceeded');
+    this.name = 'RateLimitError';
+  }
+}
+
+export class DocumentAccessError extends Error {
+  constructor(public statusCode: number, message?: string) {
+    super(message || `Document access failed with status ${statusCode}`);
+    this.name = 'DocumentAccessError';
+  }
+}

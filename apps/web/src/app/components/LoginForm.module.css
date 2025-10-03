@@ -65,8 +65,8 @@
 
 .field input:focus {
   outline: none;
-  border-color: #0070f3;
-  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .field input:disabled {
@@ -76,7 +76,7 @@
 
 .submitButton {
   padding: 14px;
-  background: #0070f3;
+  background: #2563eb;
   border: none;
   border-radius: 8px;
   color: white;
@@ -84,11 +84,17 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
+  min-height: 44px;
 }
 
 .submitButton:hover:not(:disabled) {
-  background: #0051cc;
+  background: #1d4ed8;
   transform: translateY(-1px);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 .submitButton:disabled {

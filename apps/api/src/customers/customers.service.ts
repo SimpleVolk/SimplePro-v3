@@ -104,15 +104,16 @@ export class CustomersService {
       }
     }
 
-    // Execute count and find queries in parallel for performance
+    // OPTIMIZED: Execute count and find queries in parallel with projections
     const [total, customers] = await Promise.all([
       this.customerModel.countDocuments(query).exec(),
       this.customerModel
         .find(query)
+        .select('firstName lastName email phone address type status source leadScore tags assignedSalesRep lastContactDate createdAt updatedAt') // Only select needed fields
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .lean()
+        .lean() // Return plain JS objects for better performance
         .exec(),
     ]);
 
@@ -203,6 +204,9 @@ export class CustomersService {
       throw new NotFoundException(`Customer with ID ${id} not found`);
     }
 
+    // PERFORMANCE: Invalidate customer caches on update
+    await this.cacheService.clearCustomerCaches();
+
     return this.convertCustomerDocument(updatedCustomer);
   }
 
@@ -253,6 +257,9 @@ export class CustomersService {
         opportunitiesDeleted: opportunityDeleteResult.deletedCount,
         documentsArchived: documentArchiveResult.modifiedCount,
       });
+
+      // PERFORMANCE: Invalidate customer caches on delete
+      await this.cacheService.clearCustomerCaches();
     });
   }
 

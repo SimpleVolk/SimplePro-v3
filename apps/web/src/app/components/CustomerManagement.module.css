@@ -221,7 +221,7 @@
 }
 
 .primaryButton {
-  background: #3b82f6;
+  background: #2563eb;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -230,11 +230,17 @@
   font-weight: 500;
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .primaryButton:hover {
-  background: #2563eb;
+  background: #1d4ed8;
   transform: translateY(-1px);
+}
+
+.primaryButton:focus-visible {
+  outline: 3px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 .secondaryButton {
@@ -358,8 +364,8 @@
 .formGroup select:focus,
 .formGroupFull textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .modalActions {

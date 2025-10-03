@@ -314,7 +314,7 @@
 
 .primaryButton {
   padding: 12px 24px;
-  background: #0070f3;
+  background: #2563eb;
   border: none;
   border-radius: 6px;
   color: white;
@@ -322,10 +322,16 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  min-height: 44px;
 }
 
 .primaryButton:hover {
-  background: #0056b3;
+  background: #1d4ed8;
+}
+
+.primaryButton:focus-visible {
+  outline: 3px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 .secondaryButton {

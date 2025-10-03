@@ -1,15 +1,17 @@
 'use client';
 
 import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Sidebar.module.css';
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tabId: string) => void;
+  isMobileOpen: boolean;
+  onMobileToggle: () => void;
 }
 
-export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }: SidebarProps) {
   const { user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -104,9 +106,31 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     item.roles.includes(user?.role?.name || '')
   );
 
+  // Handle navigation item click - close mobile menu
+  const handleNavItemClick = (tabId: string) => {
+    onTabChange(tabId);
+    // Close mobile menu after navigation on mobile
+    if (window.innerWidth < 768) {
+      onMobileToggle();
+    }
+  };
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (isMobileOpen && window.innerWidth < 768) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
+
   return (
     <aside
-      className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''}`}
+      className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''} ${isMobileOpen ? styles.open : ''}`}
       role="navigation"
       aria-label="Main navigation"
     >
@@ -129,7 +153,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         {availableItems.map((item, index) => (
           <button
             key={item.id}
-            onClick={() => onTabChange(item.id)}
+            onClick={() => handleNavItemClick(item.id)}
             className={`${styles.navItem} ${
               activeTab === item.id ? styles.navItemActive : ''
             }`}
@@ -144,7 +168,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
                 e.preventDefault();
                 const direction = e.key === 'ArrowUp' ? -1 : 1;
                 const newIndex = (index + direction + availableItems.length) % availableItems.length;
-                onTabChange(availableItems[newIndex].id);
+                handleNavItemClick(availableItems[newIndex].id);
                 document.getElementById(`tab-${availableItems[newIndex].id}`)?.focus();
               }
             }}

@@ -72,7 +72,11 @@ jobs:
           labels: ${{ steps.meta-${{ matrix.service }}.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ github.ref_name }}
 
       - name: Image digest
         run: echo "Image pushed with digest ${{ steps.meta-${{ matrix.service }}.outputs.digest }}"
@@ -136,20 +140,34 @@ jobs:
           ssh ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'ENDSSH'
             cd /opt/simplepro
 
+            # Login to container registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
             # Pull latest images
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:staging
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:staging
 
-            # Update docker-compose with new images
-            export API_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:staging
-            export WEB_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:staging
+            # Tag images for docker-compose
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:staging simplepro-api:staging
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:staging simplepro-web:staging
 
-            # Rolling update
-            docker-compose -f docker-compose.staging.yml up -d --no-deps api web
+            # Backup current deployment
+            docker-compose -f docker-compose.prod.yml ps > deployment-backup-$(date +%Y%m%d-%H%M%S).txt
 
-            # Wait for health checks
-            sleep 10
-            docker-compose -f docker-compose.staging.yml ps
+            # Rolling update with health checks
+            docker-compose -f docker-compose.prod.yml up -d --no-deps --force-recreate api
+            sleep 30
+            docker-compose -f docker-compose.prod.yml exec -T api curl -f http://localhost:4000/api/health || exit 1
+
+            docker-compose -f docker-compose.prod.yml up -d --no-deps --force-recreate web
+            sleep 15
+            docker-compose -f docker-compose.prod.yml exec -T web curl -f http://localhost:3009/ || exit 1
+
+            # Cleanup old images
+            docker image prune -af --filter "until=168h"
+
+            # Show deployment status
+            docker-compose -f docker-compose.prod.yml ps
           ENDSSH
 
       - name: Run smoke tests
@@ -222,22 +240,64 @@ jobs:
           ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} << 'ENDSSH'
             cd /opt/simplepro
 
+            # Login to container registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
             # Pull latest images
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:latest
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:latest
 
-            # Update docker-compose with new images
-            export API_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:latest
-            export WEB_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:latest
+            # Tag images for docker-compose
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:latest simplepro-api:latest
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:latest simplepro-web:latest
 
-            # Blue-green deployment
-            docker-compose -f docker-compose.prod.yml up -d --no-deps --scale api=2 --scale web=2 api web
+            # Capture current container IDs for rollback
+            API_OLD_CONTAINER=$(docker-compose -f docker-compose.prod.yml ps -q api)
+            WEB_OLD_CONTAINER=$(docker-compose -f docker-compose.prod.yml ps -q web)
+            echo "API_OLD_CONTAINER=$API_OLD_CONTAINER" >> /tmp/deployment-state
+            echo "WEB_OLD_CONTAINER=$WEB_OLD_CONTAINER" >> /tmp/deployment-state
 
-            # Wait for new containers to be healthy
+            # Create new containers alongside old ones (blue-green deployment)
+            docker-compose -f docker-compose.prod.yml up -d --no-deps --scale api=2 api
+            sleep 30
+
+            # Verify new API container is healthy
+            docker-compose -f docker-compose.prod.yml ps api
+            NEW_API_HEALTHY=$(docker-compose -f docker-compose.prod.yml exec -T api curl -sf http://localhost:4000/api/health && echo "true" || echo "false")
+
+            if [ "$NEW_API_HEALTHY" != "true" ]; then
+              echo "New API container failed health check, rolling back..."
+              docker-compose -f docker-compose.prod.yml up -d --no-deps --scale api=1 api
+              exit 1
+            fi
+
+            # Scale down to single API instance (removes old container)
+            docker-compose -f docker-compose.prod.yml up -d --no-deps --scale api=1 api
+
+            # Deploy web with same blue-green strategy
+            docker-compose -f docker-compose.prod.yml up -d --no-deps --scale web=2 web
             sleep 20
 
-            # Remove old containers
-            docker-compose -f docker-compose.prod.yml up -d --no-deps --scale api=1 --scale web=1 api web
+            # Verify new web container is healthy
+            NEW_WEB_HEALTHY=$(docker-compose -f docker-compose.prod.yml exec -T web curl -sf http://localhost:3009/ && echo "true" || echo "false")
+
+            if [ "$NEW_WEB_HEALTHY" != "true" ]; then
+              echo "New web container failed health check, rolling back..."
+              docker-compose -f docker-compose.prod.yml up -d --no-deps --scale web=1 web
+              exit 1
+            fi
+
+            # Scale down to single web instance
+            docker-compose -f docker-compose.prod.yml up -d --no-deps --scale web=1 web
+
+            # Cleanup old images (keep last 3 versions)
+            docker image prune -af --filter "until=168h"
+
+            # Show final deployment status
+            docker-compose -f docker-compose.prod.yml ps
+
+            # Log deployment
+            echo "$(date): Deployed API:${{ github.sha }} WEB:${{ github.sha }}" >> /var/log/simplepro-deployments.log
           ENDSSH
 
       - name: Run comprehensive health checks

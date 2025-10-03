@@ -5,12 +5,23 @@ import { CacheService } from './cache.service';
 import { CacheWarmerService } from './cache-warmer.service';
 import { CacheMetricsService } from './cache-metrics.service';
 import { CacheController } from './cache.controller';
+import { CacheListInterceptor } from './interceptors/cache-list.interceptor';
 
 @Global()
 @Module({
   imports: [ConfigModule, ScheduleModule.forRoot()],
   controllers: [CacheController],
-  providers: [CacheService, CacheWarmerService, CacheMetricsService],
-  exports: [CacheService, CacheWarmerService, CacheMetricsService],
+  providers: [
+    CacheService,
+    CacheWarmerService,
+    CacheMetricsService,
+    CacheListInterceptor,
+  ],
+  exports: [
+    CacheService,
+    CacheWarmerService,
+    CacheMetricsService,
+    CacheListInterceptor,
+  ],
 })
 export class CacheModule {}

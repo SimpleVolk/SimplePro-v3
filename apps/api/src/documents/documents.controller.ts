@@ -14,6 +14,7 @@ import {
   Res,
   BadRequestException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -26,6 +27,7 @@ import {
   CreateShareLinkDto,
   DocumentFiltersDto,
   UpdateDocumentDto,
+  AccessSharedDocumentDto,
 } from './dto';
 import { MAX_FILE_SIZE } from './interfaces/document.interface';
 
@@ -173,17 +175,21 @@ export class DocumentsController {
 
   /**
    * Access a shared document (public endpoint)
-   * GET /api/documents/shared/:token
+   * POST /api/documents/shared/:token/access
+   *
+   * SECURITY: Rate limited to 5 attempts per hour per IP to prevent brute force attacks
+   * Password is now in POST body instead of URL query parameter for security
    */
-  @Get('shared/:token')
+  @Post('shared/:token/access')
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 3600000 } }) // 5 attempts per hour
   async accessSharedDocument(
     @Param('token') token: string,
-    @Query('password') password?: string,
+    @Body() dto: AccessSharedDocumentDto,
   ) {
     const document = await this.documentsService.accessSharedDocument(
       token,
-      password,
+      dto.password,
     );
 
     return {
@@ -194,18 +200,22 @@ export class DocumentsController {
 
   /**
    * Download a shared document (public endpoint)
-   * GET /api/documents/shared/:token/download
+   * POST /api/documents/shared/:token/download
+   *
+   * SECURITY: Rate limited to 5 attempts per hour per IP to prevent brute force attacks
+   * Password is now in POST body instead of URL query parameter for security
    */
-  @Get('shared/:token/download')
+  @Post('shared/:token/download')
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 3600000 } }) // 5 attempts per hour
   async downloadSharedDocument(
     @Param('token') token: string,
-    @Query('password') password: string,
+    @Body() dto: AccessSharedDocumentDto,
     @Res() res: Response,
   ) {
     const document = await this.documentsService.accessSharedDocument(
       token,
-      password,
+      dto.password,
     );
 
     const { buffer } = await this.documentsService.downloadDocument(

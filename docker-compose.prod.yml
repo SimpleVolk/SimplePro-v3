@@ -60,23 +60,36 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-2025-10-02}
+        VCS_REF: ${VCS_REF:-latest}
+        VERSION: ${VERSION:-1.0.0}
     container_name: simplepro-api-prod
     restart: unless-stopped
     ports:
-      - "4000:4000"
+      - "3001:4000"
     environment:
       NODE_ENV: production
       PORT: 4000
-      DATABASE_URL: mongodb://${MONGODB_USERNAME:-admin}:${MONGODB_PASSWORD}@mongodb:27017/simplepro_prod?authSource=admin
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      MONGODB_URI: mongodb://${MONGODB_USERNAME:-admin}:${MONGODB_PASSWORD}@mongodb:27017/simplepro_prod?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3009,http://localhost:3000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
     depends_on:
       mongodb:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     networks:
       - simplepro-network
@@ -90,40 +103,54 @@ services:
       resources:
         limits:
           memory: 1G
+          cpus: '2.0'
         reservations:
           memory: 512M
+          cpus: '1.0'
     volumes:
-      - ./logs:/app/logs
+      - api_logs:/app/logs
+      - api_uploads:/app/uploads
 
   # SimplePro Web Application
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-2025-10-02}
+        VCS_REF: ${VCS_REF:-latest}
+        VERSION: ${VERSION:-1.0.0}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     container_name: simplepro-web-prod
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3009:3009"
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api}
+      PORT: 3009
+      HOSTNAME: "0.0.0.0"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:3001}
+      NEXT_TELEMETRY_DISABLED: 1
     depends_on:
       api:
         condition: service_healthy
     networks:
       - simplepro-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3009/"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 40s
     deploy:
       resources:
         limits:
           memory: 512M
+          cpus: '1.0'
         reservations:
           memory: 256M
+          cpus: '0.5'
 
   # Nginx Reverse Proxy
   nginx:
@@ -305,16 +332,38 @@ services:
 volumes:
   mongodb_data:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/mongodb
   redis_data:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/redis
   minio_data:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/minio
   prometheus_data:
     driver: local
   grafana_data:
     driver: local
   nginx_logs:
     driver: local
+  api_logs:
+    driver: local
+  api_uploads:
+    driver: local
+  backup_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./backups
 
 networks:
   simplepro-network:

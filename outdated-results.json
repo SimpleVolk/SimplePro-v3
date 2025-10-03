@@ -1,0 +1,654 @@
+{
+  "@apollo/server": {
+    "current": "4.12.2",
+    "wanted": "4.12.2",
+    "latest": "5.0.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@apollo\\server"
+  },
+  "@commitlint/cli": {
+    "current": "19.8.1",
+    "wanted": "19.8.1",
+    "latest": "20.1.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@commitlint\\cli"
+  },
+  "@commitlint/config-conventional": {
+    "current": "19.8.1",
+    "wanted": "19.8.1",
+    "latest": "20.0.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@commitlint\\config-conventional"
+  },
+  "@nestjs/apollo": {
+    "current": "12.2.2",
+    "wanted": "12.2.2",
+    "latest": "13.2.1",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nestjs\\apollo"
+  },
+  "@nestjs/graphql": {
+    "current": "12.2.2",
+    "wanted": "12.2.2",
+    "latest": "13.2.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nestjs\\graphql"
+  },
+  "@nx/devkit": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\devkit"
+  },
+  "@nx/eslint": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\eslint"
+  },
+  "@nx/eslint-plugin": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\eslint-plugin"
+  },
+  "@nx/jest": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\jest"
+  },
+  "@nx/js": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\js"
+  },
+  "@nx/nest": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\nest"
+  },
+  "@nx/next": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\next"
+  },
+  "@nx/node": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\node"
+  },
+  "@nx/playwright": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\playwright"
+  },
+  "@nx/react": [
+    {
+      "current": "21.5.3",
+      "wanted": "21.5.3",
+      "latest": "21.6.3",
+      "dependent": "api",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\react"
+    },
+    {
+      "current": "21.5.3",
+      "wanted": "21.5.3",
+      "latest": "21.6.3",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\react"
+    }
+  ],
+  "@nx/vite": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\vite"
+  },
+  "@nx/web": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\web"
+  },
+  "@nx/webpack": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\webpack"
+  },
+  "@nx/workspace": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@nx\\workspace"
+  },
+  "@swc-node/register": {
+    "current": "1.9.2",
+    "wanted": "1.9.2",
+    "latest": "1.11.1",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@swc-node\\register"
+  },
+  "@swc/core": {
+    "current": "1.5.29",
+    "wanted": "1.5.29",
+    "latest": "1.13.5",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@swc\\core"
+  },
+  "@types/express": {
+    "current": "4.17.23",
+    "wanted": "4.17.23",
+    "latest": "5.0.3",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\express"
+  },
+  "@types/jest": [
+    {
+      "current": "29.5.14",
+      "wanted": "29.5.14",
+      "latest": "30.0.0",
+      "dependent": "api",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\jest"
+    },
+    {
+      "current": "29.5.14",
+      "wanted": "29.5.14",
+      "latest": "30.0.0",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\jest"
+    },
+    {
+      "current": "29.5.14",
+      "wanted": "29.5.14",
+      "latest": "30.0.0",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\jest"
+    }
+  ],
+  "@types/multer": {
+    "current": "1.4.13",
+    "wanted": "1.4.13",
+    "latest": "2.0.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\multer"
+  },
+  "@types/node": [
+    {
+      "current": "20.19.17",
+      "wanted": "20.19.19",
+      "latest": "24.6.2",
+      "dependent": "api",
+      "location": "D:\\Claude\\SimplePro-v3\\apps\\api\\node_modules\\@types\\node"
+    },
+    {
+      "current": "20.19.17",
+      "wanted": "20.19.19",
+      "latest": "24.6.2",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\packages\\pricing-engine\\node_modules\\@types\\node"
+    },
+    {
+      "current": "20.19.9",
+      "wanted": "20.19.9",
+      "latest": "24.6.2",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\node"
+    }
+  ],
+  "@types/nodemailer": {
+    "current": "6.4.20",
+    "wanted": "6.4.20",
+    "latest": "7.0.2",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\nodemailer"
+  },
+  "@types/react": {
+    "current": "18.3.12",
+    "wanted": "18.3.25",
+    "latest": "19.2.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\react"
+  },
+  "@types/react-dom": {
+    "current": "18.3.1",
+    "wanted": "18.3.7",
+    "latest": "19.2.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\react-dom"
+  },
+  "@types/supertest": {
+    "current": "2.0.16",
+    "wanted": "2.0.16",
+    "latest": "6.0.3",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\supertest"
+  },
+  "@types/uuid": {
+    "current": "9.0.8",
+    "wanted": "9.0.8",
+    "latest": "10.0.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@types\\uuid"
+  },
+  "@typescript-eslint/eslint-plugin": [
+    {
+      "current": "7.18.0",
+      "wanted": "7.18.0",
+      "latest": "8.45.0",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@typescript-eslint\\eslint-plugin"
+    },
+    {
+      "current": "7.18.0",
+      "wanted": "7.18.0",
+      "latest": "8.45.0",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@typescript-eslint\\eslint-plugin"
+    }
+  ],
+  "@typescript-eslint/parser": [
+    {
+      "current": "7.18.0",
+      "wanted": "7.18.0",
+      "latest": "8.45.0",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@typescript-eslint\\parser"
+    },
+    {
+      "current": "7.18.0",
+      "wanted": "7.18.0",
+      "latest": "8.45.0",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@typescript-eslint\\parser"
+    }
+  ],
+  "@vitejs/plugin-react": {
+    "current": "4.7.0",
+    "wanted": "4.7.0",
+    "latest": "5.0.4",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\@vitejs\\plugin-react"
+  },
+  "babel-jest": {
+    "current": "29.7.0",
+    "wanted": "29.7.0",
+    "latest": "30.2.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\babel-jest"
+  },
+  "bcryptjs": {
+    "current": "2.4.3",
+    "wanted": "2.4.3",
+    "latest": "3.0.2",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\bcryptjs"
+  },
+  "cache-manager": {
+    "current": "6.4.3",
+    "wanted": "6.4.3",
+    "latest": "7.2.3",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\cache-manager"
+  },
+  "dotenv": {
+    "current": "17.2.2",
+    "wanted": "17.2.3",
+    "latest": "17.2.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\dotenv"
+  },
+  "eslint": [
+    {
+      "current": "8.57.1",
+      "wanted": "8.57.1",
+      "latest": "9.36.0",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint"
+    },
+    {
+      "current": "8.57.1",
+      "wanted": "8.57.1",
+      "latest": "9.36.0",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint"
+    }
+  ],
+  "eslint-config-next": {
+    "current": "14.2.18",
+    "wanted": "14.2.33",
+    "latest": "15.5.4",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint-config-next"
+  },
+  "eslint-plugin-import": {
+    "current": "2.30.0",
+    "wanted": "2.30.0",
+    "latest": "2.32.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint-plugin-import"
+  },
+  "eslint-plugin-playwright": {
+    "current": "1.8.3",
+    "wanted": "1.8.3",
+    "latest": "2.2.2",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint-plugin-playwright"
+  },
+  "eslint-plugin-react": {
+    "current": "7.35.0",
+    "wanted": "7.35.0",
+    "latest": "7.37.5",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint-plugin-react"
+  },
+  "eslint-plugin-react-hooks": {
+    "current": "4.6.2",
+    "wanted": "4.6.2",
+    "latest": "6.1.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\eslint-plugin-react-hooks"
+  },
+  "express-rate-limit": {
+    "current": "7.5.1",
+    "wanted": "7.5.1",
+    "latest": "8.1.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\express-rate-limit"
+  },
+  "helmet": {
+    "current": "7.2.0",
+    "wanted": "7.2.0",
+    "latest": "8.1.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\helmet"
+  },
+  "jest": [
+    {
+      "current": "29.7.0",
+      "wanted": "29.7.0",
+      "latest": "30.2.0",
+      "dependent": "api",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\jest"
+    },
+    {
+      "current": "29.7.0",
+      "wanted": "29.7.0",
+      "latest": "30.2.0",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\jest"
+    },
+    {
+      "current": "29.7.0",
+      "wanted": "29.7.0",
+      "latest": "30.2.0",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\jest"
+    }
+  ],
+  "jest-environment-jsdom": {
+    "current": "29.7.0",
+    "wanted": "29.7.0",
+    "latest": "30.2.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\jest-environment-jsdom"
+  },
+  "jiti": {
+    "current": "2.4.2",
+    "wanted": "2.4.2",
+    "latest": "2.6.1",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\jiti"
+  },
+  "joi": {
+    "current": "17.13.3",
+    "wanted": "17.13.3",
+    "latest": "18.0.1",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\joi"
+  },
+  "jsdom": {
+    "current": "22.1.0",
+    "wanted": "22.1.0",
+    "latest": "27.0.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\jsdom"
+  },
+  "lint-staged": {
+    "current": "15.5.2",
+    "wanted": "15.5.2",
+    "latest": "16.2.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\lint-staged"
+  },
+  "metro-config": {
+    "current": "0.82.5",
+    "wanted": "0.83.3",
+    "latest": "0.83.3",
+    "dependent": "mobile",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\metro-config"
+  },
+  "mongoose": {
+    "current": "8.18.2",
+    "wanted": "8.19.0",
+    "latest": "8.19.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\mongoose"
+  },
+  "multer": {
+    "current": "1.4.5-lts.2",
+    "wanted": "1.4.5-lts.2",
+    "latest": "2.0.2",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\multer"
+  },
+  "next": {
+    "current": "14.2.33",
+    "wanted": "14.2.33",
+    "latest": "15.5.4",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\next"
+  },
+  "nodemailer": {
+    "current": "6.10.1",
+    "wanted": "6.10.1",
+    "latest": "7.0.6",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\nodemailer"
+  },
+  "nx": {
+    "current": "21.5.3",
+    "wanted": "21.5.3",
+    "latest": "21.6.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\nx"
+  },
+  "pino-http": {
+    "current": "9.0.0",
+    "wanted": "9.0.0",
+    "latest": "10.5.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\pino-http"
+  },
+  "pino-pretty": {
+    "current": "10.3.1",
+    "wanted": "10.3.1",
+    "latest": "13.1.1",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\pino-pretty"
+  },
+  "react": [
+    {
+      "current": "18.3.1",
+      "wanted": "19.2.0",
+      "latest": "19.2.0",
+      "dependent": "mobile",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react"
+    },
+    {
+      "current": "18.3.1",
+      "wanted": "18.3.1",
+      "latest": "19.2.0",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react"
+    }
+  ],
+  "react-dom": {
+    "current": "18.3.1",
+    "wanted": "18.3.1",
+    "latest": "19.2.0",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react-dom"
+  },
+  "react-native": [
+    {
+      "current": "0.79.6",
+      "wanted": "0.81.4",
+      "latest": "0.81.4",
+      "dependent": "mobile",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react-native"
+    },
+    {
+      "current": "0.79.6",
+      "wanted": "0.79.6",
+      "latest": "0.81.4",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react-native"
+    }
+  ],
+  "react-native-maps": {
+    "current": "1.26.13",
+    "wanted": "1.26.14",
+    "latest": "1.26.14",
+    "dependent": "mobile",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react-native-maps"
+  },
+  "react-native-web": {
+    "current": "0.20.0",
+    "wanted": "0.20.0",
+    "latest": "0.21.1",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\react-native-web"
+  },
+  "redis": {
+    "current": "5.8.2",
+    "wanted": "5.8.3",
+    "latest": "5.8.3",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\redis"
+  },
+  "reflect-metadata": {
+    "current": "0.1.14",
+    "wanted": "0.1.14",
+    "latest": "0.2.2",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\reflect-metadata"
+  },
+  "rimraf": [
+    {
+      "current": "5.0.10",
+      "wanted": "5.0.10",
+      "latest": "6.0.1",
+      "dependent": "api",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\rimraf"
+    },
+    {
+      "current": "5.0.10",
+      "wanted": "5.0.10",
+      "latest": "6.0.1",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\rimraf"
+    }
+  ],
+  "sharp": {
+    "current": "0.33.5",
+    "wanted": "0.33.5",
+    "latest": "0.34.4",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\sharp"
+  },
+  "stripe": {
+    "current": "14.25.0",
+    "wanted": "14.25.0",
+    "latest": "19.0.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\stripe"
+  },
+  "supertest": {
+    "current": "6.3.4",
+    "wanted": "6.3.4",
+    "latest": "7.1.4",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\supertest"
+  },
+  "ts-node": {
+    "current": "10.9.1",
+    "wanted": "10.9.1",
+    "latest": "10.9.2",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\ts-node"
+  },
+  "twilio": {
+    "current": "4.23.0",
+    "wanted": "4.23.0",
+    "latest": "5.10.2",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\twilio"
+  },
+  "typescript": [
+    {
+      "current": "5.9.2",
+      "wanted": "5.9.3",
+      "latest": "5.9.3",
+      "dependent": "api",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\typescript"
+    },
+    {
+      "current": "5.9.2",
+      "wanted": "5.9.3",
+      "latest": "5.9.3",
+      "dependent": "pricing-engine",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\typescript"
+    },
+    {
+      "current": "5.9.2",
+      "wanted": "5.9.3",
+      "latest": "5.9.3",
+      "dependent": "SimplePro-v3",
+      "location": "D:\\Claude\\SimplePro-v3\\node_modules\\typescript"
+    }
+  ],
+  "uuid": {
+    "current": "9.0.1",
+    "wanted": "9.0.1",
+    "latest": "13.0.0",
+    "dependent": "api",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\uuid"
+  },
+  "vite": {
+    "current": "7.1.7",
+    "wanted": "7.1.8",
+    "latest": "7.1.8",
+    "dependent": "SimplePro-v3",
+    "location": "D:\\Claude\\SimplePro-v3\\node_modules\\vite"
+  }
+}

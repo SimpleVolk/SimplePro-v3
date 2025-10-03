@@ -190,22 +190,46 @@
     top: 0;
     left: 0;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     z-index: 1000;
+    width: 280px !important; /* Override collapsed width on mobile */
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
 
+  /* Don't allow collapse on mobile - always full width when open */
   .sidebar.collapsed {
-    width: 280px;
+    width: 280px !important;
     transform: translateX(-100%);
   }
 
   .sidebar.collapsed.open {
     transform: translateX(0);
+  }
+
+  /* Hide collapse button on mobile */
+  .collapseButton {
+    display: none;
+  }
+
+  /* Ensure logo is always full on mobile */
+  .collapsed .logo h1 {
+    font-size: 24px;
+  }
+
+  /* Ensure nav items show labels on mobile */
+  .collapsed .navLabel {
+    display: inline;
+  }
+
+  .collapsed .navItem {
+    justify-content: flex-start;
+    padding: 16px 20px;
   }
 }
 

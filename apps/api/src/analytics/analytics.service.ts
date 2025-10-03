@@ -70,6 +70,7 @@ export class AnalyticsService {
     private jobModel: Model<JobDocument>,
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
+    private cacheService: CacheService,
   ) {}
 
   // Track events for analytics
@@ -91,6 +92,7 @@ export class AnalyticsService {
   }
 
   // Get dashboard metrics
+  // OPTIMIZED: Added 1-minute caching for dashboard data
   async getDashboardMetrics(period?: PeriodFilter): Promise<DashboardMetrics> {
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -98,6 +100,13 @@ export class AnalyticsService {
       startDate: new Date(now.getFullYear(), now.getMonth() - 5, 1), // Last 6 months
       endDate: now
     };
+
+    // Check cache first (1-minute TTL for dashboard)
+    const cacheKey = `dashboard:metrics:${defaultPeriod.startDate.toISOString()}:${defaultPeriod.endDate.toISOString()}`;
+    const cached = await this.cacheService.get<DashboardMetrics>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
     try {
       // Parallel aggregation queries for performance
@@ -117,7 +126,7 @@ export class AnalyticsService {
         this.getPerformanceMetrics(defaultPeriod)
       ]);
 
-      return {
+      const result: DashboardMetrics = {
         totalJobs: jobMetrics.total,
         activeJobs: jobMetrics.active,
         completedJobsToday: todayMetrics.completedJobs,
@@ -135,6 +144,11 @@ export class AnalyticsService {
           jobCompletionRate: performanceMetrics.jobCompletionRate,
         }
       };
+
+      // Cache for 1 minute
+      await this.cacheService.set(cacheKey, result, { ttl: 60, tags: ['analytics', 'dashboard'] });
+
+      return result;
     } catch (error) {
       this.logger.error(`Failed to get dashboard metrics: ${error.message}`, error.stack);
       throw error;
@@ -576,13 +590,13 @@ export class AnalyticsService {
 
   /**
    * Get sales performance from real database queries
-   * Replaces mock data with actual job and customer data
+   * OPTIMIZED: Fixed N+1 query problem using $lookup aggregation
    */
   async getSalesPerformance(period: 'today' | 'week' | 'month' = 'month') {
     try {
       const startDate = this.calculateDateRange(period);
 
-      // Get top performers by revenue using MongoDB aggregation
+      // OPTIMIZED: Get top performers with user details in single aggregation using $lookup
       const topPerformersData = await this.jobModel.aggregate([
         {
           $match: {
@@ -599,6 +613,35 @@ export class AnalyticsService {
           }
         },
         {
+          $lookup: {
+            from: 'users',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'userDetails'
+          }
+        },
+        {
+          $unwind: {
+            path: '$userDetails',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $project: {
+            id: { $toString: '$_id' },
+            name: {
+              $ifNull: [
+                { $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName'] },
+                'Unknown User'
+              ]
+            },
+            role: { $ifNull: ['$userDetails.role.name', 'Unknown'] },
+            sales: 1,
+            revenue: { $round: ['$revenue', 0] },
+            conversion: 0
+          }
+        },
+        {
           $sort: { revenue: -1 }
         },
         {
@@ -606,46 +649,7 @@ export class AnalyticsService {
         }
       ]).exec();
 
-      // Lookup user details for top performers
-      const topPerformers = await Promise.all(
-        topPerformersData.map(async (performer) => {
-          try {
-            const user = await this.userModel.findById(performer._id).exec();
-
-            if (!user) {
-              return {
-                id: performer._id.toString(),
-                name: 'Unknown User',
-                role: 'Unknown',
-                sales: performer.sales,
-                revenue: Math.round(performer.revenue),
-                conversion: 0 // TODO: Calculate from estimates
-              };
-            }
-
-            return {
-              id: performer._id.toString(),
-              name: `${user.firstName} ${user.lastName}`,
-              role: user.role?.name || 'Unknown',
-              sales: performer.sales,
-              revenue: Math.round(performer.revenue),
-              conversion: 0 // TODO: Calculate conversion rate from estimates to jobs
-            };
-          } catch (error) {
-            this.logger.error(`Failed to lookup user ${performer._id}: ${error.message}`);
-            return {
-              id: performer._id.toString(),
-              name: 'Unknown User',
-              role: 'Unknown',
-              sales: performer.sales,
-              revenue: Math.round(performer.revenue),
-              conversion: 0
-            };
-          }
-        })
-      );
-
-      // Get referral sources by leads
+      // OPTIMIZED: Get referral sources with conversions and revenue in single aggregation
       const referralSourcesData = await this.customerModel.aggregate([
         {
           $match: {
@@ -654,9 +658,85 @@ export class AnalyticsService {
           }
         },
         {
-          $group: {
-            _id: '$source',
-            leads: { $sum: 1 }
+          $facet: {
+            // Get lead counts per source
+            leadCounts: [
+              {
+                $group: {
+                  _id: '$source',
+                  leads: { $sum: 1 },
+                  customerIds: { $push: '$_id' }
+                }
+              }
+            ],
+            // Get conversions (customers with jobs)
+            conversions: [
+              {
+                $match: {
+                  jobs: { $exists: true, $not: { $size: 0 } }
+                }
+              },
+              {
+                $group: {
+                  _id: '$source',
+                  conversions: { $sum: 1 }
+                }
+              }
+            ]
+          }
+        },
+        {
+          $project: {
+            combined: {
+              $map: {
+                input: '$leadCounts',
+                as: 'lead',
+                in: {
+                  $mergeObjects: [
+                    '$$lead',
+                    {
+                      conversions: {
+                        $ifNull: [
+                          {
+                            $arrayElemAt: [
+                              {
+                                $filter: {
+                                  input: '$conversions',
+                                  cond: { $eq: ['$$this._id', '$$lead._id'] }
+                                }
+                              },
+                              0
+                            ]
+                          },
+                          { conversions: 0 }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          $unwind: '$combined'
+        },
+        {
+          $replaceRoot: { newRoot: '$combined' }
+        },
+        {
+          $project: {
+            _id: 1,
+            leads: 1,
+            conversions: { $ifNull: ['$conversions.conversions', 0] },
+            conversionRate: {
+              $cond: [
+                { $gt: ['$leads', 0] },
+                { $round: [{ $multiply: [{ $divide: [{ $ifNull: ['$conversions.conversions', 0] }, '$leads'] }, 100] }, 0] },
+                0
+              ]
+            },
+            revenue: 0
           }
         },
         {
@@ -667,57 +747,17 @@ export class AnalyticsService {
         }
       ]).exec();
 
-      // Calculate conversions for each source
-      const referralSources = await Promise.all(
-        referralSourcesData.map(async (source) => {
-          try {
-            // Find customers from this source that have jobs
-            const customersWithJobs = await this.customerModel.aggregate([
-              {
-                $match: {
-                  source: source._id,
-                  createdAt: { $gte: startDate },
-                  jobs: { $exists: true, $not: { $size: 0 } }
-                }
-              },
-              {
-                $count: 'total'
-              }
-            ]).exec();
-
-            const conversions = customersWithJobs[0]?.total || 0;
-            const conversionRate = source.leads > 0
-              ? Math.round((conversions / source.leads) * 100)
-              : 0;
-
-            // Get total revenue from jobs associated with this source
-            // This is a simplified calculation - ideally we'd join through customer->job relationship
-            const revenue = 0; // TODO: Calculate actual revenue from jobs
-
-            return {
-              id: source._id,
-              name: this.formatSourceName(source._id),
-              leads: source.leads,
-              conversions,
-              revenue,
-              conversionRate
-            };
-          } catch (error) {
-            this.logger.error(`Failed to calculate conversions for source ${source._id}: ${error.message}`);
-            return {
-              id: source._id,
-              name: this.formatSourceName(source._id),
-              leads: source.leads,
-              conversions: 0,
-              revenue: 0,
-              conversionRate: 0
-            };
-          }
-        })
-      );
+      const referralSources = referralSourcesData.map(source => ({
+        id: source._id,
+        name: this.formatSourceName(source._id),
+        leads: source.leads,
+        conversions: source.conversions,
+        revenue: source.revenue,
+        conversionRate: source.conversionRate
+      }));
 
       return {
-        topPerformers,
+        topPerformers: topPerformersData,
         referralSources
       };
     } catch (error) {

@@ -100,12 +100,72 @@ export class DocumentEntity {
 
 export const DocumentSchema = SchemaFactory.createForClass(DocumentEntity);
 
-// Compound indexes
-DocumentSchema.index({ entityType: 1, entityId: 1, isDeleted: 1 });
-DocumentSchema.index({ uploadedBy: 1, createdAt: -1 });
-DocumentSchema.index({ shareToken: 1 });
-DocumentSchema.index({ documentType: 1 });
-DocumentSchema.index({ tags: 1 });
+// Foreign key validation middleware
+DocumentSchema.pre('save', async function (next) {
+  try {
+    // Validate uploadedBy reference (required)
+    if (this.uploadedBy) {
+      const User = mongoose.model('User');
+      const uploaderExists = await User.exists({ _id: this.uploadedBy });
+      if (!uploaderExists) {
+        throw new Error(`Referenced User (uploadedBy) not found: ${this.uploadedBy}`);
+      }
+    }
+
+    // Validate deletedBy reference (optional)
+    if (this.deletedBy) {
+      const User = mongoose.model('User');
+      const deleterExists = await User.exists({ _id: this.deletedBy });
+      if (!deleterExists) {
+        throw new Error(`Referenced User (deletedBy) not found: ${this.deletedBy}`);
+      }
+    }
+
+    // Validate entityId reference based on entityType
+    if (this.entityId && this.entityType) {
+      let modelName: string;
+      switch (this.entityType) {
+        case EntityType.CUSTOMER:
+          modelName = 'Customer';
+          break;
+        case EntityType.JOB:
+          modelName = 'Job';
+          break;
+        case EntityType.ESTIMATE:
+          modelName = 'Estimate';
+          break;
+        case EntityType.OPPORTUNITY:
+          modelName = 'Opportunity';
+          break;
+        case EntityType.INVOICE:
+          modelName = 'Invoice';
+          break;
+        case EntityType.CREW:
+          modelName = 'Crew';
+          break;
+        default:
+          return next();
+      }
+
+      const Model = mongoose.model(modelName);
+      const entityExists = await Model.exists({ _id: this.entityId });
+      if (!entityExists) {
+        throw new Error(`Referenced ${modelName} not found: ${this.entityId}`);
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+// Compound indexes (OPTIMIZED)
+DocumentSchema.index({ entityType: 1, entityId: 1, isDeleted: 1 }); // Entity documents
+DocumentSchema.index({ uploadedBy: 1, createdAt: -1 }); // User uploads
+DocumentSchema.index({ shareToken: 1 }); // Shared document lookups
+DocumentSchema.index({ documentType: 1 }); // Filter by document type
+DocumentSchema.index({ tags: 1 }); // Tag-based filtering
 
 // Text index for search
 DocumentSchema.index({
@@ -113,7 +173,7 @@ DocumentSchema.index({
   originalName: 'text',
   description: 'text',
   tags: 'text',
-});
+}, { name: 'document_text_search' });
 
 // Ensure toJSON and toObject transformations
 DocumentSchema.set('toJSON', {

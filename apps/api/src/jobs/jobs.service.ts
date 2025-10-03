@@ -171,21 +171,28 @@ export class JobsService implements OnModuleInit {
       }
     }
 
-    // Execute count and find queries in parallel for performance
+    // OPTIMIZED: Execute count and find queries in parallel with projections
     const [total, jobs] = await Promise.all([
       this.jobModel.countDocuments(query).exec(),
       this.jobModel
         .find(query)
+        .select('jobNumber title status type priority customerId scheduledDate estimatedDuration estimatedCost assignedCrew leadCrew pickupAddress deliveryAddress createdAt updatedAt') // Only select needed fields
+        .populate('customerId', 'firstName lastName email phone') // Only populate needed customer fields
+        .populate('assignedCrew.crewMemberId', 'firstName lastName profilePicture') // Only populate needed crew fields
         .sort({ scheduledDate: -1 })
         .skip(skip)
         .limit(limit)
-        .lean()
+        .lean() // Return plain JS objects for better performance
         .exec(),
     ]);
 
     const data = jobs.map(job => this.convertJobDocument(job as any));
     const page = Math.floor(skip / limit) + 1;
     const totalPages = Math.ceil(total / limit);
+
+    // PERFORMANCE: Cache list results
+    const cacheKey = `jobs:list:${JSON.stringify(query)}:${skip}:${limit}`;
+    await this.cacheService.set(cacheKey, { data, pagination: { page, limit, total, totalPages } }, { ttl: 120, tags: ['jobs'] });
 
     return {
       data,

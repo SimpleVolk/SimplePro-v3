@@ -65,14 +65,63 @@ export class Message {
 
 export const MessageSchema = SchemaFactory.createForClass(Message);
 
-// Compound indexes for efficient queries
-MessageSchema.index({ threadId: 1, createdAt: -1 });
-MessageSchema.index({ threadId: 1, isDeleted: 1, createdAt: -1 });
-MessageSchema.index({ senderId: 1, createdAt: -1 });
-MessageSchema.index({ 'readBy.userId': 1 });
+// Foreign key validation middleware
+MessageSchema.pre('save', async function (next) {
+  try {
+    // Validate threadId reference (required)
+    if (this.threadId) {
+      const MessageThread = mongoose.model('MessageThread');
+      const threadExists = await MessageThread.exists({ _id: this.threadId });
+      if (!threadExists) {
+        throw new Error(`Referenced MessageThread not found: ${this.threadId}`);
+      }
+    }
+
+    // Validate senderId reference (required)
+    if (this.senderId) {
+      const User = mongoose.model('User');
+      const senderExists = await User.exists({ _id: this.senderId });
+      if (!senderExists) {
+        throw new Error(`Referenced User (senderId) not found: ${this.senderId}`);
+      }
+    }
+
+    // Validate replyToId reference (optional)
+    if (this.replyToId) {
+      const Message = mongoose.model('Message');
+      const replyToExists = await Message.exists({ _id: this.replyToId });
+      if (!replyToExists) {
+        throw new Error(`Referenced Message (replyToId) not found: ${this.replyToId}`);
+      }
+    }
+
+    // Validate readBy user references
+    if (this.readBy && this.readBy.length > 0) {
+      const User = mongoose.model('User');
+      for (const receipt of this.readBy) {
+        if (receipt.userId) {
+          const userExists = await User.exists({ _id: receipt.userId });
+          if (!userExists) {
+            throw new Error(`Referenced User in readBy not found: ${receipt.userId}`);
+          }
+        }
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+// Compound indexes for efficient queries (OPTIMIZED)
+MessageSchema.index({ threadId: 1, createdAt: -1 }); // Thread messages chronological
+MessageSchema.index({ threadId: 1, isDeleted: 1, createdAt: -1 }); // Non-deleted messages
+MessageSchema.index({ senderId: 1, createdAt: -1 }); // Messages by sender
+MessageSchema.index({ 'readBy.userId': 1 }); // Read receipts lookup
 
 // Text search index for message content
-MessageSchema.index({ content: 'text' });
+MessageSchema.index({ content: 'text' }, { name: 'message_content_search' });
 
 // Ensure virtuals are serialized
 MessageSchema.set('toJSON', {

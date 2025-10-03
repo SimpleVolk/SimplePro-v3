@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import {
+  createSizeMonitoringMiddleware,
+  createArraySizeMonitoringMiddleware,
+} from '../../database/document-size-monitoring.middleware';
 
 export type CustomerDocument = Customer & Document;
 
@@ -123,23 +127,39 @@ export class Customer {
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
 
-// Optimize indexes for performance
-CustomerSchema.index({ email: 1 }, { unique: true });
-CustomerSchema.index({ firstName: 1, lastName: 1 });
-CustomerSchema.index({ status: 1, type: 1 });
-CustomerSchema.index({ source: 1, createdAt: -1 });
-CustomerSchema.index({ assignedSalesRep: 1, status: 1 });
-CustomerSchema.index({ leadScore: -1 });
-CustomerSchema.index({ lastContactDate: -1 });
-CustomerSchema.index({ 'address.zipCode': 1 });
-CustomerSchema.index({ 'address.state': 1, 'address.city': 1 });
-CustomerSchema.index({ tags: 1 });
+// Document size monitoring middleware (prevent 16MB limit issues)
+CustomerSchema.pre('save', createSizeMonitoringMiddleware({
+  maxSizeMB: 5,
+  warnThresholdPercent: 70,
+  logWarnings: true,
+  throwOnExceed: true,
+}));
 
-// Compound indexes for common query patterns
-CustomerSchema.index({ status: 1, lastContactDate: -1 });
-CustomerSchema.index({ assignedSalesRep: 1, lastContactDate: -1 });
-CustomerSchema.index({ source: 1, status: 1, createdAt: -1 });
-CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true });
+// Array size monitoring middleware
+CustomerSchema.pre('save', createArraySizeMonitoringMiddleware(
+  ['estimates', 'jobs', 'tags'],
+  1000 // Maximum 1000 items per array
+));
+
+// Optimize indexes for performance (OPTIMIZED - removed redundant indexes)
+CustomerSchema.index({ email: 1 }, { unique: true }); // Unique email lookup
+CustomerSchema.index({ firstName: 1, lastName: 1 }); // Name-based search
+CustomerSchema.index({ status: 1 }); // Status filtering
+CustomerSchema.index({ type: 1 }); // Type filtering (residential/commercial)
+CustomerSchema.index({ assignedSalesRep: 1 }); // Sales rep assignments
+CustomerSchema.index({ leadScore: -1 }); // Lead scoring queries
+CustomerSchema.index({ lastContactDate: -1 }); // Recent contact tracking
+CustomerSchema.index({ 'address.zipCode': 1 }); // Geographic queries
+CustomerSchema.index({ 'address.state': 1, 'address.city': 1 }); // Location-based filtering
+CustomerSchema.index({ tags: 1 }); // Tag-based filtering
+CustomerSchema.index({ createdBy: 1 }); // Filter by creator
+
+// Compound indexes for common query patterns (OPTIMIZED)
+CustomerSchema.index({ status: 1, lastContactDate: -1 }); // Active customers by contact
+CustomerSchema.index({ assignedSalesRep: 1, lastContactDate: -1 }); // Sales rep follow-ups
+CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true }); // Partner referrals
+CustomerSchema.index({ source: 1, createdAt: -1 }); // PERFORMANCE: Referral source analytics
+CustomerSchema.index({ status: 1, createdAt: -1 }); // PERFORMANCE: Lead pipeline reports
 
 // Text search index for comprehensive search
 CustomerSchema.index({

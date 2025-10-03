@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import {
+  createSizeMonitoringMiddleware,
+  createArraySizeMonitoringMiddleware,
+} from '../../database/document-size-monitoring.middleware';
 
 export type OpportunityDocument = Opportunity & Document & {
   createdAt: Date;
@@ -165,12 +169,98 @@ export class Opportunity {
 
 export const OpportunitySchema = SchemaFactory.createForClass(Opportunity);
 
-// Indexes for efficient queries
-OpportunitySchema.index({ customerId: 1, status: 1 });
-OpportunitySchema.index({ moveDate: 1 });
-OpportunitySchema.index({ leadSource: 1, status: 1 });
-OpportunitySchema.index({ createdBy: 1 });
-OpportunitySchema.index({ assignedSalesRep: 1 });
-OpportunitySchema.index({ createdAt: -1 });
-OpportunitySchema.index({ referralId: 1 });
-OpportunitySchema.index({ partnerId: 1, status: 1 });
+// Document size monitoring middleware (prevent 16MB limit issues)
+OpportunitySchema.pre('save', createSizeMonitoringMiddleware({
+  maxSizeMB: 5,
+  warnThresholdPercent: 70,
+  logWarnings: true,
+  throwOnExceed: true,
+}));
+
+// Array size monitoring middleware
+OpportunitySchema.pre('save', createArraySizeMonitoringMiddleware(
+  ['rooms'],
+  100 // Maximum 100 rooms per opportunity
+));
+
+// Foreign key validation middleware
+OpportunitySchema.pre('save', async function (next) {
+  try {
+    // Validate customerId reference (required)
+    if (this.customerId) {
+      const Customer = mongoose.model('Customer');
+      const customerExists = await Customer.exists({ _id: this.customerId });
+      if (!customerExists) {
+        throw new Error(`Referenced Customer not found: ${this.customerId}`);
+      }
+    }
+
+    // Validate referralId reference (optional)
+    if (this.referralId) {
+      const Referral = mongoose.model('Referral');
+      const referralExists = await Referral.exists({ _id: this.referralId });
+      if (!referralExists) {
+        throw new Error(`Referenced Referral not found: ${this.referralId}`);
+      }
+    }
+
+    // Validate partnerId reference (optional)
+    if (this.partnerId) {
+      const Partner = mongoose.model('Partner');
+      const partnerExists = await Partner.exists({ _id: this.partnerId });
+      if (!partnerExists) {
+        throw new Error(`Referenced Partner not found: ${this.partnerId}`);
+      }
+    }
+
+    // Validate assignedSalesRep reference (optional)
+    if (this.assignedSalesRep) {
+      const User = mongoose.model('User');
+      const userExists = await User.exists({ _id: this.assignedSalesRep });
+      if (!userExists) {
+        throw new Error(`Referenced User (assignedSalesRep) not found: ${this.assignedSalesRep}`);
+      }
+    }
+
+    // Validate createdBy reference (required)
+    if (this.createdBy) {
+      const User = mongoose.model('User');
+      const creatorExists = await User.exists({ _id: this.createdBy });
+      if (!creatorExists) {
+        throw new Error(`Referenced User (createdBy) not found: ${this.createdBy}`);
+      }
+    }
+
+    // Validate updatedBy reference (optional)
+    if (this.updatedBy) {
+      const User = mongoose.model('User');
+      const updaterExists = await User.exists({ _id: this.updatedBy });
+      if (!updaterExists) {
+        throw new Error(`Referenced User (updatedBy) not found: ${this.updatedBy}`);
+      }
+    }
+
+    // Validate estimateId reference (optional)
+    if (this.estimateId) {
+      const Estimate = mongoose.model('Estimate');
+      const estimateExists = await Estimate.exists({ _id: this.estimateId });
+      if (!estimateExists) {
+        throw new Error(`Referenced Estimate not found: ${this.estimateId}`);
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+// Indexes for efficient queries (OPTIMIZED)
+OpportunitySchema.index({ customerId: 1, status: 1 }); // Common query pattern
+OpportunitySchema.index({ moveDate: 1 }); // Used for scheduling
+OpportunitySchema.index({ leadSource: 1, status: 1 }); // Lead source analysis
+OpportunitySchema.index({ createdBy: 1 }); // Created by filter
+OpportunitySchema.index({ assignedSalesRep: 1 }); // Sales rep assignments
+OpportunitySchema.index({ createdAt: -1 }); // Recent opportunities
+OpportunitySchema.index({ referralId: 1 }); // Referral tracking
+OpportunitySchema.index({ partnerId: 1, status: 1 }); // Partner opportunities

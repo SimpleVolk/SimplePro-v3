@@ -37,11 +37,14 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   private connectionTimers = new Map<string, NodeJS.Timeout>(); // socketId -> timeout
   private socketRooms = new Map<string, Set<string>>(); // socketId -> Set of room names for cleanup
   private typingTimers = new Map<string, NodeJS.Timeout>(); // socketId:threadId -> timer
+  private eventRateLimiter = new Map<string, { count: number; resetTime: number }>(); // socketId -> rate limit state
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private readonly CONNECTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
   private readonly HEARTBEAT_INTERVAL = 30 * 1000; // 30 seconds
   private readonly MAX_CONNECTIONS_PER_USER = 5; // Prevent connection spam
   private readonly TYPING_TIMEOUT = 5000; // 5 seconds auto-clear typing
+  private readonly EVENT_RATE_LIMIT = 100; // Max events per window
+  private readonly EVENT_RATE_WINDOW = 60 * 1000; // 1 minute window
 
   constructor(
     private jwtService: JwtService,
@@ -65,6 +68,43 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       this.socketRooms.set(socketId, new Set());
     }
     this.socketRooms.get(socketId)!.add(roomName);
+  }
+
+  /**
+   * SECURITY: Rate limit WebSocket events to prevent flooding
+   * Returns true if rate limit exceeded, false if within limits
+   */
+  private checkEventRateLimit(socketId: string): boolean {
+    const now = Date.now();
+    const limiterState = this.eventRateLimiter.get(socketId);
+
+    if (!limiterState || now > limiterState.resetTime) {
+      // Reset or initialize rate limiter
+      this.eventRateLimiter.set(socketId, {
+        count: 1,
+        resetTime: now + this.EVENT_RATE_WINDOW
+      });
+      return false;
+    }
+
+    limiterState.count++;
+
+    if (limiterState.count > this.EVENT_RATE_LIMIT) {
+      this.logger.warn(
+        `Event rate limit exceeded for socket ${socketId} ` +
+        `(${limiterState.count}/${this.EVENT_RATE_LIMIT} in ${this.EVENT_RATE_WINDOW}ms window)`
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Clear event rate limiter for a socket
+   */
+  private clearEventRateLimiter(socketId: string) {
+    this.eventRateLimiter.delete(socketId);
   }
 
   /**
@@ -174,67 +214,96 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   async handleConnection(client: AuthenticatedSocket) {
+    const ipAddress = client.handshake.address;
+    const socketId = client.id;
+
     try {
-      // Rate limiting: Check for too many connections from same user
-      const existingConnections = Array.from(this.connectedClients.values())
-        .filter(c => c.handshake.address === client.handshake.address).length;
-
-      if (existingConnections >= this.MAX_CONNECTIONS_PER_USER) {
-        this.logger.warn(`Connection limit exceeded for IP: ${client.handshake.address}`);
-        client.emit('error', { message: 'Too many connections from this IP' });
-        client.disconnect();
-        return;
-      }
-
+      // SECURITY FIX: Authenticate FIRST before any other checks
+      // This prevents unauthenticated connections from consuming resources
       const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.replace('Bearer ', '');
 
       if (!token) {
-        this.logger.warn(`Client ${client.id} connected without token`);
+        this.logger.warn(`Connection rejected: No authentication token provided from IP ${ipAddress}`);
+        client.emit('error', { message: 'Authentication required' });
         client.disconnect();
         return;
       }
 
-      const payload = this.jwtService.verify(token);
+      // Verify JWT token and extract user info
+      let payload: any;
+      try {
+        payload = this.jwtService.verify(token);
+      } catch (error) {
+        this.logger.warn(`Connection rejected: Invalid JWT token from IP ${ipAddress} - ${error.message}`);
+        client.emit('error', { message: 'Invalid authentication token' });
+        client.disconnect();
+        return;
+      }
+
+      // Validate user exists and is active
       const user = await this.authService.findOne(payload.sub);
-
       if (!user || !user.isActive) {
-        this.logger.warn(`Invalid user for client ${client.id}`);
+        this.logger.warn(`Connection rejected: User ${payload.sub} not found or inactive from IP ${ipAddress}`);
+        client.emit('error', { message: 'Invalid token or user deactivated' });
         client.disconnect();
         return;
       }
 
-      // Attach user info to socket
+      // Attach authenticated user info to socket
       client.userId = user.id.toString();
       client.userRole = user.role.name;
       client.crewId = user.crewId;
 
-      // Track connected clients
-      this.connectedClients.set(client.id, client);
-
-      // Set connection timeout
-      const timeout = setTimeout(() => {
-        this.logger.warn(`Connection timeout for client ${client.id}`);
-        this.handleDisconnect(client);
-        client.disconnect();
-      }, this.CONNECTION_TIMEOUT);
-      this.connectionTimers.set(client.id, timeout);
-
-      // Track user sockets with connection limit per user
-      if (client.userId) {
-        if (!this.userSockets.has(client.userId)) {
-          this.userSockets.set(client.userId, new Set());
-        }
-
+      // SECURITY: Check per-user connection limit BEFORE allowing connection
+      // This prevents a single user from opening unlimited connections
+      if (this.userSockets.has(client.userId)) {
         const userConnections = this.userSockets.get(client.userId)!;
         if (userConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
-          this.logger.warn(`User ${client.userId} exceeded connection limit`);
-          client.emit('error', { message: 'Maximum connections per user exceeded' });
+          this.logger.warn(
+            `Connection rejected: User ${client.userId} exceeded connection limit ` +
+            `(${userConnections.size}/${this.MAX_CONNECTIONS_PER_USER}) from IP ${ipAddress}`
+          );
+          client.emit('error', {
+            message: 'Maximum connections per user exceeded',
+            limit: this.MAX_CONNECTIONS_PER_USER,
+            current: userConnections.size
+          });
           client.disconnect();
           return;
         }
-
-        userConnections.add(client.id);
       }
+
+      // SECURITY: Check per-IP connection limit as secondary defense
+      // This prevents IP-based flooding attacks
+      const ipConnections = Array.from(this.connectedClients.values())
+        .filter(c => c.handshake.address === ipAddress).length;
+
+      if (ipConnections >= this.MAX_CONNECTIONS_PER_USER * 2) { // Allow 2x per IP for multiple users
+        this.logger.warn(
+          `Connection rejected: IP ${ipAddress} exceeded connection limit ` +
+          `(${ipConnections}/${this.MAX_CONNECTIONS_PER_USER * 2})`
+        );
+        client.emit('error', { message: 'Too many connections from this IP address' });
+        client.disconnect();
+        return;
+      }
+
+      // Track connected client (only after all security checks pass)
+      this.connectedClients.set(socketId, client);
+
+      // Track user sockets for per-user limits
+      if (!this.userSockets.has(client.userId)) {
+        this.userSockets.set(client.userId, new Set());
+      }
+      this.userSockets.get(client.userId)!.add(socketId);
+
+      // Set connection timeout to prevent abandoned connections
+      const timeout = setTimeout(() => {
+        this.logger.warn(`Connection timeout for client ${socketId} (user: ${client.userId})`);
+        this.handleDisconnect(client);
+        client.disconnect();
+      }, this.CONNECTION_TIMEOUT);
+      this.connectionTimers.set(socketId, timeout);
 
       // Join role-based rooms
       const roleRoom = `role:${user.role.name}`;
@@ -297,10 +366,13 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       this.connectionTimers.delete(client.id);
     }
 
-    // 2. Clear all typing timers for this socket
+    // 2. Clear event rate limiter for this socket
+    this.clearEventRateLimiter(client.id);
+
+    // 3. Clear all typing timers for this socket
     this.clearTypingTimers(client.id);
 
-    // 3. Cleanup typing indicators in database
+    // 4. Cleanup typing indicators in database
     if (userId) {
       // Fire and forget - cleanup typing indicators for this user
       this.typingService.stopTyping('*', userId).catch(err => {
@@ -308,7 +380,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       });
     }
 
-    // 4. Leave all tracked rooms explicitly
+    // 5. Leave all tracked rooms explicitly
     const rooms = this.socketRooms.get(client.id);
     if (rooms && rooms.size > 0) {
       rooms.forEach(roomName => {
@@ -321,13 +393,13 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       this.logger.debug(`Client ${client.id} left ${rooms.size} rooms`);
     }
 
-    // 5. Clear room tracking for this socket
+    // 6. Clear room tracking for this socket
     this.clearRoomTracking(client.id);
 
-    // 6. Remove from connected clients map
+    // 7. Remove from connected clients map
     this.connectedClients.delete(client.id);
 
-    // 7. Remove from user sockets tracking
+    // 8. Remove from user sockets tracking
     if (userId) {
       const userSocketSet = this.userSockets.get(userId);
       if (userSocketSet) {
@@ -338,7 +410,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       }
     }
 
-    // 8. Remove from crew rooms tracking
+    // 9. Remove from crew rooms tracking
     if (crewId) {
       const crewSocketSet = this.crewRooms.get(crewId);
       if (crewSocketSet) {
@@ -351,7 +423,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     this.logger.log(`Client ${client.id} disconnected (User: ${userId}) - cleanup complete`);
 
-    // 9. Broadcast user offline status if no more connections
+    // 10. Broadcast user offline status if no more connections
     if (userId && !this.userSockets.has(userId)) {
       this.server.to('role:admin').to('role:dispatcher').emit('userOffline', {
         userId,
@@ -421,6 +493,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       jobId?: string;
     }
   ) {
+    // SECURITY: Check event rate limit
+    if (this.checkEventRateLimit(client.id)) {
+      client.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      return;
+    }
+
     if (!client.userRole || client.userRole !== 'crew') {
       client.emit('error', { message: 'Unauthorized: Only crew can send location updates' });
       return;
@@ -497,6 +575,11 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       priority?: 'low' | 'normal' | 'high' | 'urgent';
     }
   ) {
+    // SECURITY: Check event rate limit
+    if (this.checkEventRateLimit(client.id)) {
+      client.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      return;
+    }
     const messageData = {
       from: {
         userId: client.userId,
@@ -785,6 +868,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       replyToId?: string;
     }
   ) {
+    // SECURITY: Check event rate limit
+    if (this.checkEventRateLimit(client.id)) {
+      client.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      return;
+    }
+
     try {
       const message = await this.messagesService.sendMessage(
         {

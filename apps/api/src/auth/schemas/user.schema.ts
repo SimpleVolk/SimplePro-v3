@@ -71,10 +71,10 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Additional indexes (basic indexes already defined in @Prop decorators)
-UserSchema.index({ 'role.name': 1 });
-UserSchema.index({ createdAt: 1 });
-UserSchema.index({ lastLoginAt: 1 });
+// Additional indexes (OPTIMIZED - removed redundant indexes)
+UserSchema.index({ 'role.name': 1 }); // Role-based filtering
+UserSchema.index({ department: 1 }); // Department filtering
+UserSchema.index({ crewId: 1 }); // Crew member lookups
 
 // Add virtual for full name
 UserSchema.virtual('fullName').get(function(this: UserDocument) {

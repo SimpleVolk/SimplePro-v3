@@ -1,0 +1,193 @@
+# Prometheus Alert Rules for MongoDB Replica Set
+# These rules define alerts for monitoring MongoDB health and performance
+
+groups:
+  - name: mongodb_replica_set
+    interval: 30s
+    rules:
+      # Replica Set Availability
+      - alert: MongoDBReplicaSetMemberDown
+        expr: mongodb_rs_members_health{state!="PRIMARY",state!="SECONDARY",state!="ARBITER"} == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "MongoDB replica set member is down"
+          description: "MongoDB replica set member {{ $labels.name }} is in state {{ $labels.state }} (not PRIMARY/SECONDARY/ARBITER)"
+          action: "Check logs with: docker logs {{ $labels.instance }}"
+
+      - alert: MongoDBNoPrimary
+        expr: sum(mongodb_rs_members_health{state="PRIMARY"}) == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "MongoDB replica set has no primary"
+          description: "No PRIMARY node found in replica set. Election may be in progress."
+          action: "Check replica set status: ./scripts/mongodb/check-replica-health.sh"
+
+      # Replication Lag
+      - alert: MongoDBHighReplicationLag
+        expr: mongodb_rs_members_optimeDate{state="SECONDARY"} > 30
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High replication lag detected"
+          description: "Secondary {{ $labels.name }} is lagging {{ $value }} seconds behind primary"
+          action: "Check secondary performance and network connectivity"
+
+      - alert: MongoDBCriticalReplicationLag
+        expr: mongodb_rs_members_optimeDate{state="SECONDARY"} > 300
+        for: 5m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Critical replication lag (>5 minutes)"
+          description: "Secondary {{ $labels.name }} is lagging {{ $value }} seconds behind primary"
+          action: "Immediate investigation required. Check: docker logs {{ $labels.instance }}"
+
+      # Connection Pool
+      - alert: MongoDBHighConnections
+        expr: mongodb_connections{state="current"} > 800
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High number of MongoDB connections"
+          description: "Current connections: {{ $value }} (threshold: 800)"
+          action: "Review connection pool settings and check for connection leaks"
+
+      - alert: MongoDBConnectionPoolExhausted
+        expr: mongodb_connections{state="current"} / mongodb_connections{state="available"} > 0.9
+        for: 2m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "MongoDB connection pool nearly exhausted"
+          description: "Connection pool utilization: {{ $value | humanizePercentage }}"
+          action: "Increase pool size or investigate connection leaks"
+
+      # Performance
+      - alert: MongoDBSlowQueries
+        expr: rate(mongodb_op_latencies_latency_total{type="reads"}[5m]) / rate(mongodb_op_latencies_ops_total{type="reads"}[5m]) > 100000
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "MongoDB queries are slow"
+          description: "Average read latency: {{ $value | humanizeDuration }}"
+          action: "Enable profiling and analyze slow queries"
+
+      - alert: MongoDBHighMemoryUsage
+        expr: mongodb_memory{type="resident"} / 1024 / 1024 > 3072
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High MongoDB memory usage"
+          description: "Resident memory: {{ $value }} MB (threshold: 3072 MB)"
+          action: "Review WiredTiger cache settings and query patterns"
+
+      # Disk Space
+      - alert: MongoDBLowDiskSpace
+        expr: node_filesystem_avail_bytes{mountpoint="/data/db"} / node_filesystem_size_bytes{mountpoint="/data/db"} < 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "MongoDB disk space running low"
+          description: "Available disk space: {{ $value | humanizePercentage }}"
+          action: "Clean up old data or expand disk"
+
+      - alert: MongoDBCriticalDiskSpace
+        expr: node_filesystem_avail_bytes{mountpoint="/data/db"} / node_filesystem_size_bytes{mountpoint="/data/db"} < 0.1
+        for: 2m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "MongoDB disk space critically low (<10%)"
+          description: "Available disk space: {{ $value | humanizePercentage }}"
+          action: "Immediate action required. Compact collections or expand disk."
+
+      # Operations
+      - alert: MongoDBHighInsertRate
+        expr: rate(mongodb_op_counters_total{type="insert"}[5m]) > 1000
+        for: 10m
+        labels:
+          severity: info
+          component: database
+        annotations:
+          summary: "High MongoDB insert rate"
+          description: "Insert rate: {{ $value }} inserts/sec"
+          action: "Monitor for performance impact"
+
+      - alert: MongoDBHighErrorRate
+        expr: rate(mongodb_asserts_total{type="msg"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High MongoDB error rate"
+          description: "Error rate: {{ $value }} errors/sec"
+          action: "Check MongoDB logs for error details"
+
+      # Cache Performance
+      - alert: MongoDBLowCacheHitRatio
+        expr: rate(mongodb_wiredtiger_cache_pages_read_total[5m]) / (rate(mongodb_wiredtiger_cache_pages_read_total[5m]) + rate(mongodb_wiredtiger_cache_pages_requested_from_cache_total[5m])) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Low MongoDB cache hit ratio"
+          description: "Cache miss rate: {{ $value | humanizePercentage }}"
+          action: "Consider increasing WiredTiger cache size"
+
+      # Backup Health
+      - alert: MongoDBBackupNotRecent
+        expr: (time() - mongodb_backup_last_success_timestamp_seconds) > 86400
+        for: 5m
+        labels:
+          severity: critical
+          component: backup
+        annotations:
+          summary: "MongoDB backup is not recent"
+          description: "Last successful backup was {{ $value | humanizeDuration }} ago"
+          action: "Check backup script and cron schedule"
+
+  - name: mongodb_oplog
+    interval: 1m
+    rules:
+      - alert: MongoDBOplogWindowSmall
+        expr: mongodb_oplog_stats_window_seconds < 86400
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "MongoDB oplog window is small"
+          description: "Oplog window: {{ $value | humanizeDuration }} (threshold: 24h)"
+          action: "Consider increasing oplog size"
+
+      - alert: MongoDBOplogWindowCritical
+        expr: mongodb_oplog_stats_window_seconds < 3600
+        for: 2m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "MongoDB oplog window critically small (<1 hour)"
+          description: "Oplog window: {{ $value | humanizeDuration }}"
+          action: "Increase oplog size immediately to prevent sync issues"

@@ -101,7 +101,17 @@
       "Bash(npx react-native bundle:*)",
       "Bash(node -e \"console.log(''Faker installed:'', require(''@faker-js/faker'') ? ''yes'' : ''no'')\")",
       "Bash(chmod:*)",
-      "Bash(icacls:*)"
+      "Bash(icacls:*)",
+      "Bash(cd:*)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(npx npm-check-updates:*)",
+      "Bash(npx jest:*)",
+      "Bash(npx nx test:*)",
+      "Bash(npm run test:*)",
+      "Bash(node:*)",
+      "Bash(bash scripts/setup-staging.sh:*)",
+      "Bash(curl:*)",
+      "Bash(if exist docsoperations dir docsoperations /b)"
     ],
     "deny": [],
     "ask": []

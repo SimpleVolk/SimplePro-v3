@@ -341,8 +341,11 @@ export class DocumentsService {
     token: string,
     password?: string,
   ): Promise<IDocument> {
+    const startTime = Date.now();
+    let document: any = null;
+
     try {
-      const document = await this.documentModel
+      document = await this.documentModel
         .findOne({
           shareToken: token,
           isShared: true,
@@ -352,22 +355,38 @@ export class DocumentsService {
         .exec();
 
       if (!document) {
+        // SECURITY AUDIT: Log failed access attempt with invalid token
+        this.logger.warn(
+          `Document share access failed: Invalid or expired token '${token.substring(0, 8)}...'`
+        );
         throw new NotFoundException('Shared link not found or expired');
       }
 
       // Check expiration
       if (document.shareExpiresAt && new Date() > document.shareExpiresAt) {
+        // SECURITY AUDIT: Log access attempt with expired token
+        this.logger.warn(
+          `Document share access failed: Expired link for document ${document._id} (token: ${token.substring(0, 8)}...)`
+        );
         throw new UnauthorizedException('Share link has expired');
       }
 
       // Check password if required
       if (document.sharePassword) {
         if (!password) {
+          // SECURITY AUDIT: Log access attempt without required password
+          this.logger.warn(
+            `Document share access failed: Password required but not provided for document ${document._id} (token: ${token.substring(0, 8)}...)`
+          );
           throw new UnauthorizedException('Password required to access this document');
         }
 
         const isPasswordValid = await bcrypt.compare(password, document.sharePassword);
         if (!isPasswordValid) {
+          // SECURITY AUDIT: Log failed password attempt
+          this.logger.warn(
+            `Document share access failed: Invalid password for document ${document._id} (token: ${token.substring(0, 8)}...)`
+          );
           throw new UnauthorizedException('Invalid password');
         }
       }
@@ -375,7 +394,16 @@ export class DocumentsService {
       // Increment access count
       await this.documentModel.updateOne(
         { _id: document._id },
-        { $inc: { shareAccessCount: 1 } },
+        {
+          $inc: { shareAccessCount: 1 },
+          $set: { lastAccessedAt: new Date() }
+        },
+      );
+
+      // SECURITY AUDIT: Log successful document access
+      const duration = Date.now() - startTime;
+      this.logger.log(
+        `Document share access successful: Document ${document._id} accessed via token (duration: ${duration}ms, total accesses: ${document.shareAccessCount + 1})`
       );
 
       return document as unknown as IDocument;
