@@ -19,21 +19,19 @@ import { Logger } from '@nestjs/common';
 const logger = new Logger('EnvironmentValidation');
 
 // Custom validators
-const isStrongSecret = (value: string, context: z.RefinementCtx, minLength: number = 32) => {
+const isStrongSecret = (value: string, context: z.RefinementCtx, minLength: number = 32): void => {
   if (value.length < minLength) {
     context.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Secret must be at least ${minLength} characters long`,
     });
-    return false;
   }
-  return true;
 };
 
-const isProductionSecret = (value: string, context: z.RefinementCtx, secretName: string) => {
+const isProductionSecret = (value: string, context: z.RefinementCtx, secretName: string): void => {
   const isProduction = process.env.NODE_ENV === 'production';
 
-  if (!isProduction) return true;
+  if (!isProduction) return;
 
   // Production-specific requirements
   if (value.length < 64) {
@@ -41,7 +39,7 @@ const isProductionSecret = (value: string, context: z.RefinementCtx, secretName:
       code: z.ZodIssueCode.custom,
       message: `${secretName} must be at least 64 characters long in production`,
     });
-    return false;
+    return;
   }
 
   // Check for development patterns
@@ -54,14 +52,12 @@ const isProductionSecret = (value: string, context: z.RefinementCtx, secretName:
         code: z.ZodIssueCode.custom,
         message: `${secretName} appears to contain development placeholder text: "${pattern}"`,
       });
-      return false;
+      return;
     }
   }
-
-  return true;
 };
 
-const isSecurePassword = (value: string, context: z.RefinementCtx, fieldName: string) => {
+const isSecurePassword = (value: string, context: z.RefinementCtx, fieldName: string): void => {
   const unsafePatterns = ['admin', 'password', '123', 'test', 'root', 'default', 'changeme'];
   const lowerValue = value.toLowerCase();
 
@@ -71,7 +67,7 @@ const isSecurePassword = (value: string, context: z.RefinementCtx, fieldName: st
         code: z.ZodIssueCode.custom,
         message: `${fieldName} contains unsafe pattern: "${pattern}". Use a strong, randomly generated password.`,
       });
-      return false;
+      return;
     }
   }
 
@@ -80,10 +76,7 @@ const isSecurePassword = (value: string, context: z.RefinementCtx, fieldName: st
       code: z.ZodIssueCode.custom,
       message: `${fieldName} must be at least 12 characters long`,
     });
-    return false;
   }
-
-  return true;
 };
 
 // Base environment schema - common to all environments

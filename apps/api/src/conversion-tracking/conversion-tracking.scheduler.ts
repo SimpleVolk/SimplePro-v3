@@ -34,7 +34,9 @@ export class ConversionTrackingScheduler {
       );
       this.logger.debug(`Metrics ID: ${metrics.metricsId}`);
     } catch (error) {
-      this.logger.error('Failed to calculate daily metrics', error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error('Failed to calculate daily metrics', errorMessage, errorStack);
     }
   }
 
@@ -61,7 +63,9 @@ export class ConversionTrackingScheduler {
       );
       this.logger.debug(`Metrics ID: ${metrics.metricsId}`);
     } catch (error) {
-      this.logger.error('Failed to calculate weekly metrics', error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error('Failed to calculate weekly metrics', errorMessage, errorStack);
     }
   }
 
@@ -91,7 +95,9 @@ export class ConversionTrackingScheduler {
       );
       this.logger.debug(`Metrics ID: ${metrics.metricsId}`);
     } catch (error) {
-      this.logger.error('Failed to calculate monthly metrics', error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error('Failed to calculate monthly metrics', errorMessage, errorStack);
     }
   }
 
@@ -127,7 +133,9 @@ export class ConversionTrackingScheduler {
         `Successfully updated ${expiredQuotes.length} expired quotes`,
       );
     } catch (error) {
-      this.logger.error('Failed to update expired quotes', error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error('Failed to update expired quotes', errorMessage, errorStack);
     }
   }
 
@@ -175,7 +183,9 @@ export class ConversionTrackingScheduler {
         );
       });
     } catch (error) {
-      this.logger.error('Failed to send follow-up reminders', error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error('Failed to send follow-up reminders', errorMessage, errorStack);
     }
   }
 
@@ -197,7 +207,9 @@ export class ConversionTrackingScheduler {
 
       this.logger.log('Old events cleanup completed');
     } catch (error) {
-      this.logger.error('Failed to cleanup old events', error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error('Failed to cleanup old events', errorMessage, errorStack);
     }
   }
 }
