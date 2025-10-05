@@ -413,7 +413,7 @@ export class ReportsService {
         { id: report.id },
         {
           status: 'failed',
-          error: error.message
+          error: errorMessage
         }
       ).exec();
     }

@@ -12,8 +12,7 @@ import {
   UpdateUserDto,
   LoginDto,
   ChangePasswordDto,
-  JwtPayload,
-  DEFAULT_ROLES
+  JwtPayload
 } from './interfaces/user.interface';
 
 // Mock bcrypt
@@ -22,9 +21,6 @@ const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userModel: any;
-  let sessionModel: any;
-  let jwtService: jest.Mocked<JwtService>;
 
   const mockUser = {
     _id: 'user123',
@@ -152,9 +148,6 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    userModel = module.get(getModelToken(UserSchema.name));
-    sessionModel = module.get(getModelToken(UserSessionSchema.name));
-    jwtService = module.get(JwtService);
   });
 
   describe('initialization', () => {
@@ -175,7 +168,7 @@ describe('AuthService', () => {
     };
 
     beforeEach(() => {
-      mockJwtService.sign.mockImplementation((payload, options?) => {
+      mockJwtService.sign.mockImplementation((_payload: any, options?: any) => {
         if (options?.expiresIn === '1h') return 'access_token';
         if (options?.expiresIn === '7d') return 'refresh_token';
         return 'mock_token';
@@ -188,7 +181,7 @@ describe('AuthService', () => {
         lastLoginAt: undefined,
         save: jest.fn().mockResolvedValue(mockUser)
       });
-      mockBcrypt.compare.mockResolvedValue(true);
+      mockBcrypt.compare.mockResolvedValue(true as never);
 
       const result = await service.login(loginDto);
 
@@ -220,7 +213,7 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException for invalid password', async () => {
       mockUserModel.findOne.mockResolvedValue(mockUser);
-      mockBcrypt.compare.mockResolvedValue(false);
+      mockBcrypt.compare.mockResolvedValue(false as never);
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
       expect(mockBcrypt.compare).toHaveBeenCalledWith('testpassword', 'hashedpassword');
@@ -231,7 +224,7 @@ describe('AuthService', () => {
         ...mockUser,
         mustChangePassword: true
       });
-      mockBcrypt.compare.mockResolvedValue(true);
+      mockBcrypt.compare.mockResolvedValue(true as never);
 
       await expect(service.login(loginDto)).rejects.toThrow(
         new UnauthorizedException('Password change required. Please change your password before continuing.')
@@ -244,7 +237,7 @@ describe('AuthService', () => {
         ...mockUser,
         save: jest.fn().mockResolvedValue(mockUser)
       });
-      mockBcrypt.compare.mockResolvedValue(true);
+      mockBcrypt.compare.mockResolvedValue(true as never);
 
       const result = await service.login(emailLoginDto);
 
@@ -270,7 +263,7 @@ describe('AuthService', () => {
         ...mockSession,
         _id: 'session123'
       });
-      mockJwtService.sign.mockImplementation((payload, options?) => {
+      mockJwtService.sign.mockImplementation((_payload: any, options?: any) => {
         if (options?.expiresIn === '1h') return 'new_access_token';
         if (options?.expiresIn === '7d') return 'new_refresh_token';
         return 'mock_token';
@@ -496,8 +489,8 @@ describe('AuthService', () => {
         save: jest.fn().mockResolvedValue(mockUser)
       };
       mockUserModel.findById.mockResolvedValue(mockUpdatableUser);
-      mockBcrypt.compare.mockResolvedValue(true);
-      mockBcrypt.hash.mockResolvedValue('hashed_newpassword');
+      mockBcrypt.compare.mockResolvedValue(true as never);
+      mockBcrypt.hash.mockResolvedValue('hashed_newpassword' as never);
 
       await service.changePassword('user123', changePasswordDto);
 
@@ -508,7 +501,7 @@ describe('AuthService', () => {
 
     it('should throw BadRequestException for incorrect current password', async () => {
       mockUserModel.findById.mockResolvedValue(mockUser);
-      mockBcrypt.compare.mockResolvedValue(false);
+      mockBcrypt.compare.mockResolvedValue(false as never);
 
       await expect(service.changePassword('user123', changePasswordDto)).rejects.toThrow(
         new BadRequestException('Current password is incorrect')
@@ -521,7 +514,7 @@ describe('AuthService', () => {
         confirmPassword: 'differentpassword'
       };
       mockUserModel.findById.mockResolvedValue(mockUser);
-      mockBcrypt.compare.mockResolvedValue(true);
+      mockBcrypt.compare.mockResolvedValue(true as never);
 
       await expect(service.changePassword('user123', mismatchDto)).rejects.toThrow(
         new BadRequestException('New password and confirmation do not match')

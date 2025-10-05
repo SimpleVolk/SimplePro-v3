@@ -52,7 +52,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       this.logger.debug(`JWT validation successful for user: ${payload.sub}`);
       return user;
     } catch (error) {
-      this.logger.error(`JWT validation error for user ${payload.sub}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`JWT validation error for user ${payload.sub}:`, errorMessage);
       throw error;
     }
   }
