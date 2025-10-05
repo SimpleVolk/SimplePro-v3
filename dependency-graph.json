@@ -1,0 +1,955 @@
+{
+  "graph": {
+    "nodes": {
+      "pricing-engine": {
+        "name": "pricing-engine",
+        "type": "lib",
+        "data": {
+          "root": "packages/pricing-engine",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "packages/pricing-engine/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ]
+            },
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "metadata": {
+                "scriptContent": "rimraf dist",
+                "runCommand": "pnpm run clean"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "prepublishOnly": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "prepublishOnly"
+              },
+              "metadata": {
+                "scriptContent": "npm run clean && npm run build",
+                "runCommand": "pnpm run prepublishOnly"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/packages/pricing-engine",
+                "main": "packages/pricing-engine/src/index.ts",
+                "tsConfig": "packages/pricing-engine/tsconfig.json",
+                "assets": [
+                  "packages/pricing-engine/README.md",
+                  "packages/pricing-engine/package.json",
+                  "packages/pricing-engine/src/data/*.json"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/packages/pricing-engine"
+              ],
+              "options": {
+                "jestConfig": "packages/pricing-engine/jest.config.js",
+                "passWithNoTests": true
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "^production",
+                "{workspaceRoot}/jest.preset.js"
+              ]
+            },
+            "test:watch": {
+              "executor": "@nx/jest:jest",
+              "options": {
+                "jestConfig": "packages/pricing-engine/jest.config.js",
+                "watch": true
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:coverage": {
+              "executor": "@nx/jest:jest",
+              "options": {
+                "jestConfig": "packages/pricing-engine/jest.config.js",
+                "coverage": true,
+                "coverageReporters": [
+                  "text",
+                  "html",
+                  "lcov"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "pricing-engine",
+          "tags": [
+            "npm:public",
+            "npm:pricing",
+            "npm:estimates",
+            "npm:moving",
+            "npm:deterministic",
+            "npm:rules-engine",
+            "scope:pricing",
+            "type:lib"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "clean",
+                "prepublishOnly"
+              ]
+            },
+            "description": "Deterministic pricing engine for SimplePro moving estimates",
+            "js": {
+              "packageName": "@simplepro/pricing-engine",
+              "packageMain": "dist/index.js",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "packages/pricing-engine/src",
+          "projectType": "library",
+          "implicitDependencies": []
+        }
+      },
+      "web-e2e": {
+        "name": "web-e2e",
+        "type": "lib",
+        "data": {
+          "root": "apps/web-e2e",
+          "metadata": {
+            "targetGroups": {
+              "E2E (CI)": [
+                "e2e-ci--src/example.spec.ts",
+                "e2e-ci--src/opportunity-workflow.spec.ts",
+                "e2e-ci"
+              ]
+            }
+          },
+          "targets": {
+            "e2e": {
+              "options": {
+                "cwd": "apps/web-e2e",
+                "command": "playwright test"
+              },
+              "metadata": {
+                "technologies": [
+                  "playwright"
+                ],
+                "description": "Runs Playwright Tests",
+                "help": {
+                  "command": "pnpm exec playwright test --help",
+                  "example": {
+                    "options": {
+                      "workers": 1
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                {
+                  "projects": [
+                    "web"
+                  ],
+                  "target": "serve-static"
+                }
+              ],
+              "cache": true,
+              "inputs": [
+                "default",
+                "^production"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/test-output",
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/playwright-report"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "e2e-ci--src/example.spec.ts": {
+              "options": {
+                "cwd": "apps/web-e2e",
+                "env": {
+                  "PLAYWRIGHT_HTML_OUTPUT_DIR": "..\\..\\dist\\.playwright\\apps\\web-e2e\\playwright-report\\src-example-spec-ts",
+                  "PLAYWRIGHT_HTML_REPORT": "..\\..\\dist\\.playwright\\apps\\web-e2e\\playwright-report\\src-example-spec-ts"
+                },
+                "command": "playwright test src/example.spec.ts --output=..\\..\\dist\\.playwright\\apps\\web-e2e\\test-output\\src-example-spec-ts"
+              },
+              "metadata": {
+                "technologies": [
+                  "playwright"
+                ],
+                "description": "Runs Playwright Tests in src/example.spec.ts in CI",
+                "help": {
+                  "command": "pnpm exec playwright test --help",
+                  "example": {
+                    "options": {
+                      "workers": 1
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true,
+              "inputs": [
+                "default",
+                "^production",
+                {
+                  "externalDependencies": [
+                    "@playwright/test"
+                  ]
+                }
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/test-output/src-example-spec-ts",
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/playwright-report/src-example-spec-ts"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "e2e-ci--src/opportunity-workflow.spec.ts": {
+              "options": {
+                "cwd": "apps/web-e2e",
+                "env": {
+                  "PLAYWRIGHT_HTML_OUTPUT_DIR": "..\\..\\dist\\.playwright\\apps\\web-e2e\\playwright-report\\src-opportunity-workflow-spec-ts",
+                  "PLAYWRIGHT_HTML_REPORT": "..\\..\\dist\\.playwright\\apps\\web-e2e\\playwright-report\\src-opportunity-workflow-spec-ts"
+                },
+                "command": "playwright test src/opportunity-workflow.spec.ts --output=..\\..\\dist\\.playwright\\apps\\web-e2e\\test-output\\src-opportunity-workflow-spec-ts"
+              },
+              "metadata": {
+                "technologies": [
+                  "playwright"
+                ],
+                "description": "Runs Playwright Tests in src/opportunity-workflow.spec.ts in CI",
+                "help": {
+                  "command": "pnpm exec playwright test --help",
+                  "example": {
+                    "options": {
+                      "workers": 1
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true,
+              "inputs": [
+                "default",
+                "^production",
+                {
+                  "externalDependencies": [
+                    "@playwright/test"
+                  ]
+                }
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/test-output/src-opportunity-workflow-spec-ts",
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/playwright-report/src-opportunity-workflow-spec-ts"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "e2e-ci": {
+              "executor": "nx:noop",
+              "cache": true,
+              "inputs": [
+                "default",
+                "^production",
+                {
+                  "externalDependencies": [
+                    "@playwright/test"
+                  ]
+                }
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/test-output",
+                "{workspaceRoot}/dist/.playwright/apps/web-e2e/playwright-report"
+              ],
+              "dependsOn": [
+                {
+                  "target": "e2e-ci--src/example.spec.ts",
+                  "projects": "self",
+                  "params": "forward"
+                },
+                {
+                  "target": "e2e-ci--src/opportunity-workflow.spec.ts",
+                  "projects": "self",
+                  "params": "forward"
+                }
+              ],
+              "metadata": {
+                "technologies": [
+                  "playwright"
+                ],
+                "description": "Runs Playwright Tests in CI",
+                "nonAtomizedTarget": "e2e",
+                "help": {
+                  "command": "pnpm exec playwright test --help",
+                  "example": {
+                    "options": {
+                      "workers": 1
+                    }
+                  }
+                }
+              },
+              "configurations": {},
+              "options": {},
+              "parallelism": true
+            },
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "apps/web-e2e",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "metadata": {
+                "technologies": [
+                  "eslint"
+                ],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "web-e2e",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/web-e2e/src",
+          "tags": [],
+          "implicitDependencies": [
+            "web"
+          ]
+        }
+      },
+      "mobile": {
+        "name": "mobile",
+        "type": "app",
+        "data": {
+          "root": "apps/mobile",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "apps/mobile/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ]
+            },
+            "start": {
+              "executor": "@nx/react-native:start",
+              "options": {
+                "port": 8081
+              },
+              "configurations": {},
+              "parallelism": true,
+              "continuous": true
+            },
+            "run-ios": {
+              "executor": "@nx/react-native:run-ios",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "continuous": true
+            },
+            "bundle-ios": {
+              "executor": "@nx/react-native:bundle",
+              "outputs": [
+                "{options.bundleOutput}"
+              ],
+              "options": {
+                "platform": "ios",
+                "entryFile": "src/main.tsx",
+                "bundleOutput": "dist/apps/mobile/ios/main.jsbundle"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "run-android": {
+              "executor": "@nx/react-native:run-android",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "continuous": true
+            },
+            "bundle-android": {
+              "executor": "@nx/react-native:bundle",
+              "outputs": [
+                "{options.bundleOutput}"
+              ],
+              "options": {
+                "platform": "android",
+                "entryFile": "src/main.tsx",
+                "bundleOutput": "dist/apps/mobile/android/main.jsbundle"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build-ios": {
+              "executor": "@nx/react-native:build-ios",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/mobile/ios"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build-android": {
+              "executor": "@nx/react-native:build-android",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/mobile/android",
+                "apkPath": "android/app/build/outputs/apk/release/app-release.apk"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/mobile/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "coverageReporters": [
+                    "text"
+                  ]
+                }
+              },
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "^production",
+                "{workspaceRoot}/jest.preset.js"
+              ]
+            }
+          },
+          "name": "mobile",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "mobile",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/mobile/src",
+          "projectType": "application",
+          "implicitDependencies": []
+        }
+      },
+      "api": {
+        "name": "api",
+        "type": "app",
+        "data": {
+          "root": "apps/api",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "apps/api/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ]
+            },
+            "prebuild": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "prebuild"
+              },
+              "metadata": {
+                "scriptContent": "rimraf dist",
+                "runCommand": "pnpm run prebuild"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "nest start",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start:dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start:dev"
+              },
+              "metadata": {
+                "scriptContent": "nest start --watch",
+                "runCommand": "pnpm run start:dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start:debug": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start:debug"
+              },
+              "metadata": {
+                "scriptContent": "nest start --debug --watch",
+                "runCommand": "pnpm run start:debug"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start:prod": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start:prod"
+              },
+              "metadata": {
+                "scriptContent": "node dist/main",
+                "runCommand": "pnpm run start:prod"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:watch": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:watch"
+              },
+              "metadata": {
+                "scriptContent": "jest --watch",
+                "runCommand": "pnpm run test:watch"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:cov": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:cov"
+              },
+              "metadata": {
+                "scriptContent": "jest --coverage",
+                "runCommand": "pnpm run test:cov"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:debug": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:debug"
+              },
+              "metadata": {
+                "scriptContent": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+                "runCommand": "pnpm run test:debug"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:e2e": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:e2e"
+              },
+              "metadata": {
+                "scriptContent": "jest --config ./test/jest-e2e.json",
+                "runCommand": "pnpm run test:e2e"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:integration": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:integration"
+              },
+              "metadata": {
+                "scriptContent": "jest --config jest.integration.config.ts",
+                "runCommand": "pnpm run test:integration"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:unit": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:unit"
+              },
+              "metadata": {
+                "scriptContent": "jest",
+                "runCommand": "pnpm run test:unit"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/webpack:webpack",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "target": "node",
+                "outputPath": "dist/apps/api",
+                "main": "apps/api/src/main.ts",
+                "tsConfig": "apps/api/tsconfig.app.json",
+                "webpackConfig": "apps/api/webpack.config.js"
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "inspect": false,
+                  "fileReplacements": [
+                    {
+                      "replace": "apps/api/src/environments/environment.ts",
+                      "with": "apps/api/src/environments/environment.prod.ts"
+                    }
+                  ]
+                }
+              },
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            },
+            "serve": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "node dist/apps/api/main.js",
+                "cwd": ""
+              },
+              "dependsOn": [
+                "build"
+              ],
+              "configurations": {},
+              "parallelism": true
+            },
+            "dev": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "npx nodemon --watch apps/api/src --ext ts --exec \"npx ts-node --project apps/api/tsconfig.app.json apps/api/src/main.ts\"",
+                "cwd": ""
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/apps/api"
+              ],
+              "options": {
+                "jestConfig": "apps/api/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "^production",
+                "{workspaceRoot}/jest.preset.js"
+              ]
+            }
+          },
+          "name": "api",
+          "tags": [
+            "npm:private",
+            "scope:api",
+            "type:app"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "prebuild",
+                "start",
+                "start:dev",
+                "start:debug",
+                "start:prod",
+                "test:watch",
+                "test:cov",
+                "test:debug",
+                "test:e2e",
+                "test:integration",
+                "test:unit"
+              ]
+            },
+            "description": "SimplePro API - NestJS Backend",
+            "js": {
+              "packageName": "@simplepro/api",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/api/src",
+          "projectType": "application",
+          "implicitDependencies": []
+        }
+      },
+      "web": {
+        "name": "web",
+        "type": "app",
+        "data": {
+          "root": "apps/web",
+          "targets": {
+            "build": {
+              "options": {
+                "cwd": "apps/web",
+                "tty": false,
+                "command": "next build"
+              },
+              "dependsOn": [
+                "^build"
+              ],
+              "cache": true,
+              "inputs": [
+                "production",
+                "^production"
+              ],
+              "outputs": [
+                "{workspaceRoot}/apps/web/.next/!(cache)/**/*",
+                "{workspaceRoot}/apps/web/.next/!(cache)"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "dev": {
+              "continuous": true,
+              "options": {
+                "cwd": "apps/web",
+                "command": "next dev"
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "start": {
+              "continuous": true,
+              "options": {
+                "cwd": "apps/web",
+                "command": "next start"
+              },
+              "dependsOn": [
+                "build"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "serve-static": {
+              "continuous": true,
+              "options": {
+                "cwd": "apps/web",
+                "command": "next start"
+              },
+              "dependsOn": [
+                "build"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "build-deps": {
+              "dependsOn": [
+                "^build"
+              ],
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "executor": "nx:noop"
+            },
+            "watch-deps": {
+              "continuous": true,
+              "dependsOn": [
+                "build-deps"
+              ],
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm exec nx watch --projects web --includeDependentProjects -- pnpm exec nx build-deps web"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "apps/web",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "metadata": {
+                "technologies": [
+                  "eslint"
+                ],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/web/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "^production",
+                "{workspaceRoot}/jest.preset.js"
+              ]
+            }
+          },
+          "name": "web",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/web",
+          "projectType": "application",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      }
+    },
+    "dependencies": {
+      "pricing-engine": [],
+      "web-e2e": [
+        {
+          "source": "web-e2e",
+          "target": "web",
+          "type": "implicit"
+        }
+      ],
+      "mobile": [],
+      "api": [
+        {
+          "source": "api",
+          "target": "pricing-engine",
+          "type": "static"
+        }
+      ],
+      "web": [
+        {
+          "source": "web",
+          "target": "pricing-engine",
+          "type": "static"
+        }
+      ]
+    }
+  }
+}

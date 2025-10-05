@@ -111,9 +111,14 @@
       "Bash(node:*)",
       "Bash(bash scripts/setup-staging.sh:*)",
       "Bash(curl:*)",
-      "Bash(if exist docsoperations dir docsoperations /b)"
+      "Bash(if exist docsoperations dir docsoperations /b)",
+      "Bash(npx nx dep-graph:*)",
+      "Bash(cloc:*)",
+      "Bash(npx depcheck:*)",
+      "Bash(do echo -n \"$dir%/: \")"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "outputStyle": "default"
 }

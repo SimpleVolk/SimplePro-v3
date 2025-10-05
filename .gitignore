@@ -43,6 +43,7 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.production
+.env.staging 
 
 # Production secrets directory - NEVER commit secrets to version control
 .secrets/
