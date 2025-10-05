@@ -5,13 +5,10 @@ import { JobsService } from './jobs.service';
 import { RealtimeService } from '../websocket/realtime.service';
 import { Job as JobSchema } from './schemas/job.schema';
 import {
-  Job,
   CreateJobDto,
   UpdateJobDto,
   JobFilters,
-  CrewAssignment,
   InternalNote,
-  JobMilestone
 } from './interfaces/job.interface';
 
 describe('JobsService', () => {
@@ -467,7 +464,7 @@ describe('JobsService', () => {
     });
 
     it('should send job completion notification when completed', async () => {
-      const result = await service.updateStatus(jobId, 'completed', 'dispatcher123');
+      await service.updateStatus(jobId, 'completed', 'dispatcher123');
 
       expect(mockRealtimeService.notifyJobCompletion).toHaveBeenCalledWith(
         jobId,
@@ -643,7 +640,7 @@ describe('JobsService', () => {
         estimatedCost: 1500
       }, 'user123');
 
-      const job3 = await service.create({
+      await service.create({
         ...mockCreateJobDto,
         title: 'Overdue Job',
         scheduledDate: yesterday,

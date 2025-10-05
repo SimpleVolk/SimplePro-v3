@@ -15,7 +15,7 @@ import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const DashboardScreen = ({ navigation }: any) => {
   const { user, logout } = useAuth();
-  const { jobs, isLoading, fetchJobs, selectJob, syncOfflineData } = useJobs();
+  const { jobs, fetchJobs, selectJob, syncOfflineData } = useJobs();
   const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
   const { isOnline } = useNetworkStatus();
   const [refreshing, setRefreshing] = useState(false);

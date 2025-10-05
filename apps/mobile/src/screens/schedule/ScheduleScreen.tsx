@@ -15,7 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchShifts, setSelectedDate } from '../../store/slices/shiftsSlice';
+import { fetchShifts } from '../../store/slices/shiftsSlice';
 
 export const ScheduleScreen = ({ navigation }: any) => {
   const dispatch = useAppDispatch();

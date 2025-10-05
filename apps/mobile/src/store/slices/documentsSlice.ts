@@ -6,7 +6,6 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { documentsApi } from '../../api/documents.api';
-import { queueAction } from './offlineSlice';
 import { RootState } from '../store';
 
 interface Document {

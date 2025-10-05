@@ -1,9 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TariffSettings } from '../schemas/tariff-settings.schema';
 import {
-  seedDefaultTariffSettings,
   validateSeededTariff,
   getTariffStatistics,
 } from './seed-tariff-settings';

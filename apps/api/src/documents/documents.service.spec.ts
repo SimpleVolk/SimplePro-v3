@@ -115,7 +115,6 @@ describe('DocumentsService', () => {
 
     it('should upload document successfully', async () => {
       const file = createMockFile();
-      const mockDoc = createMockDocument();
 
       const result = await service.uploadDocument(file, validDto, mockUserId);
 

@@ -657,7 +657,7 @@ describe('AutoAssignmentService', () => {
 
       mockCrewAssignmentModel.findById.mockResolvedValue(mockAssignment);
 
-      const result = await service.confirmAssignment(assignmentId, 'crew-001');
+      await service.confirmAssignment(assignmentId, 'crew-001');
 
       expect(mockAssignment.confirmedBy).toContain('crew-001');
       expect(mockAssignment.save).toHaveBeenCalled();
@@ -675,7 +675,7 @@ describe('AutoAssignmentService', () => {
 
       mockCrewAssignmentModel.findById.mockResolvedValue(mockAssignment);
 
-      const result = await service.confirmAssignment(assignmentId, 'crew-002');
+      await service.confirmAssignment(assignmentId, 'crew-002');
 
       expect(mockAssignment.confirmedBy).toHaveLength(2);
       expect(mockAssignment.isConfirmed).toBe(true);

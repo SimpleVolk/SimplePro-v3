@@ -9,8 +9,6 @@ import {
   tariffWithMoveSizes,
   tariffWithHandicaps,
   tariffWithDistanceRates,
-  inactiveTariffSettings,
-  draftTariffSettings,
   createMockTariffSettings,
   materialDtos,
   handicapDtos,
@@ -150,7 +148,6 @@ describe('TariffSettingsService', () => {
   describe('create', () => {
     it('should create new tariff settings', async () => {
       tariffSettingsModel.findOne.mockResolvedValue(null);
-      const mockSaved = createMockTariffSettings();
 
       const result = await service.create(baseTariffSettings, userId);
 

@@ -11,10 +11,6 @@ import { HealthCheckLevel } from './interfaces/health-check.interface';
 describe('HealthService', () => {
   let service: HealthService;
   let healthCheckService: jest.Mocked<HealthCheckService>;
-  let databaseHealthIndicator: jest.Mocked<DatabaseHealthIndicator>;
-  let redisHealthIndicator: jest.Mocked<RedisHealthIndicator>;
-  let memoryHealthIndicator: jest.Mocked<MemoryHealthIndicator>;
-  let diskHealthIndicator: jest.Mocked<DiskHealthIndicator>;
   let externalServiceHealthIndicator: jest.Mocked<ExternalServiceHealthIndicator>;
 
   beforeEach(async () => {

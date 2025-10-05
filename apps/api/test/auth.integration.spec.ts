@@ -6,7 +6,6 @@ import {
   cleanupDatabase,
   TestDataFactories,
   createTestUser,
-  loginTestUser,
   createAuthenticatedTestUser,
   authenticatedRequest,
   ResponseAssertions,
@@ -413,7 +412,7 @@ describe('Authentication Integration Tests', () => {
         ResponseAssertions.assertSuccessResponse(response);
 
         // Verify old password no longer works
-        const oldLoginResponse = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post('/auth/login')
           .send({
             email: authData.user.email,

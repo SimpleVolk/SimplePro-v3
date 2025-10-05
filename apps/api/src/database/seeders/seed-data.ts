@@ -27,7 +27,6 @@ import { PartnerSchema } from '../../partners/schemas/partner.schema';
 import { MessageSchema } from '../../messages/schemas/message.schema';
 import { MessageThreadSchema } from '../../messages/schemas/message-thread.schema';
 import { NotificationSchema } from '../../notifications/schemas/notification.schema';
-import { TariffSettingsSchema } from '../../tariff-settings/schemas/tariff-settings.schema';
 
 // Seed data generators
 import { seedUsers } from './seeders/users.seeder';

@@ -4,7 +4,6 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { Customer as CustomerSchema } from './schemas/customer.schema';
 import {
-  Customer,
   CreateCustomerDto,
   UpdateCustomerDto,
   CustomerFilters
@@ -14,75 +13,6 @@ describe('CustomersService', () => {
   let service: CustomersService;
   let mockCustomerModel: any;
 
-  const mockCustomer: Customer = {
-    id: 'customer123',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '(555) 123-4567',
-    alternatePhone: '(555) 987-6543',
-    address: {
-      street: '123 Main St',
-      city: 'Springfield',
-      state: 'IL',
-      zipCode: '62701',
-      country: 'USA'
-    },
-    type: 'residential',
-    status: 'lead',
-    source: 'website',
-    preferredContactMethod: 'email',
-    communicationPreferences: {
-      allowMarketing: true,
-      allowSms: true,
-      allowEmail: true
-    },
-    notes: 'Interested in moving services',
-    leadScore: 75,
-    tags: ['hot-lead', 'long-distance'],
-    assignedSalesRep: 'sales123',
-    referredBy: {
-      partnerName: 'Moving Partners LLC',
-      source: 'partner'
-    },
-    createdAt: new Date('2024-01-15T10:00:00Z'),
-    updatedAt: new Date('2024-01-15T10:00:00Z'),
-    createdBy: 'user123',
-    lastContactDate: new Date('2024-01-20T14:30:00Z'),
-    estimates: ['estimate123'],
-    jobs: ['job123']
-  };
-
-  const mockCommercialCustomer: Customer = {
-    id: 'commercial123',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    email: 'jane.smith@company.com',
-    phone: '(555) 111-2222',
-    address: {
-      street: '456 Business Blvd',
-      city: 'Chicago',
-      state: 'IL',
-      zipCode: '60601'
-    },
-    type: 'commercial',
-    status: 'active',
-    source: 'referral',
-    companyName: 'Smith Enterprises',
-    businessLicense: 'BL123456',
-    preferredContactMethod: 'phone',
-    communicationPreferences: {
-      allowMarketing: false,
-      allowSms: false,
-      allowEmail: true
-    },
-    leadScore: 90,
-    createdAt: new Date('2024-01-10T09:00:00Z'),
-    updatedAt: new Date('2024-01-10T09:00:00Z'),
-    createdBy: 'user123',
-    estimates: [],
-    jobs: []
-  };
 
   // Create chainable query mock
   const createMockQuery = (returnValue: any = []) => ({
@@ -135,7 +65,7 @@ describe('CustomersService', () => {
       return createMockQuery(customer || null);
     });
 
-    mockConstructor.find = jest.fn((query = {}) => {
+    mockConstructor.find = jest.fn(() => {
       const results = Array.from(savedCustomers.values());
       return createMockQuery(results);
     });

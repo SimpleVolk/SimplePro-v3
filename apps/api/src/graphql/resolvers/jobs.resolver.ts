@@ -166,7 +166,7 @@ export class JobsResolver {
   async addJobNote(
     @Args('jobId') jobId: string,
     @Args('content') content: string,
-    @Args('isPinned') isPinned: boolean = false,
+    @Args('isPinned') _isPinned: boolean = false,
     @Request() req: any
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';

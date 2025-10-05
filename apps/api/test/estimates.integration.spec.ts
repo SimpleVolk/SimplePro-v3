@@ -5,10 +5,7 @@ import {
   teardownTestApp,
   cleanupDatabase,
   TestDataFactories,
-  createAuthenticatedTestUser,
-  authenticatedRequest,
   ResponseAssertions,
-  TestAuthData,
 } from './integration-setup';
 
 /**
@@ -37,24 +34,9 @@ import {
 
 describe('Estimates Integration Tests', () => {
   let app: INestApplication;
-  let adminAuth: TestAuthData;
-  let dispatcherAuth: TestAuthData;
 
   beforeAll(async () => {
     app = await setupTestApp();
-
-    // Create test users for estimate access
-    adminAuth = await createAuthenticatedTestUser({
-      email: 'admin@example.com',
-      role: 'admin',
-      permissions: ['read:all', 'write:all', 'calculate:estimates'],
-    });
-
-    dispatcherAuth = await createAuthenticatedTestUser({
-      email: 'dispatcher@example.com',
-      role: 'dispatcher',
-      permissions: ['read:estimates', 'calculate:estimates'],
-    });
   });
 
   afterAll(async () => {

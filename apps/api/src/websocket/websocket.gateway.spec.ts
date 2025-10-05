@@ -14,9 +14,6 @@ interface AuthenticatedSocket extends Socket {
 
 describe('WebSocketGateway Memory Leak Fixes', () => {
   let gateway: WebSocketGateway;
-  let jwtService: JwtService;
-  let authService: AuthService;
-  let messagesService: MessagesService;
   let typingService: TypingService;
 
   const mockUser = {
@@ -222,7 +219,7 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       }).then(() => {
         // Wait for auto-clear timeout (5 seconds + buffer)
         setTimeout(() => {
-          const stats = gateway.getMemoryStats();
+          gateway.getMemoryStats();
           // Timer should be auto-cleared
           expect(typingService.stopTyping).toHaveBeenCalled();
           done();

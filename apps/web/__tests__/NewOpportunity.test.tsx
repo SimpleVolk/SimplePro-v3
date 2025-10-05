@@ -4,10 +4,9 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import NewOpportunity from '../src/app/components/NewOpportunity';
-import { AuthProvider } from '../src/app/contexts/AuthContext';
 
 // Mock AuthContext
 jest.mock('../src/app/contexts/AuthContext', () => ({

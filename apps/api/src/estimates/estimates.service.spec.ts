@@ -7,8 +7,6 @@ import {
   peakSeasonEstimateDto,
   minimalEstimateDto,
   difficultAccessEstimateDto,
-  invalidEstimateDto,
-  mockEstimateResult,
   offSeasonEstimateDto,
 } from '../../test/fixtures/estimates.fixture';
 

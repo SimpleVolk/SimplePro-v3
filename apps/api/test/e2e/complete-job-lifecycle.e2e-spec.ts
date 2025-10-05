@@ -7,7 +7,6 @@ import { io, Socket } from 'socket.io-client';
 describe('Complete Moving Job Lifecycle (E2E)', () => {
   let app: INestApplication;
   let authToken: string;
-  let adminUserId: string;
   let customerId: string;
   let opportunityId: string;
   let estimateId: string;

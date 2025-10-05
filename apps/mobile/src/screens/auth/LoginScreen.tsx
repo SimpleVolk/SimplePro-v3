@@ -13,14 +13,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { login } from '../../store/slices/authSlice';
 
-export const LoginScreen = ({ navigation }: any) => {
+export const LoginScreen = () => {
   const [employeeId, setEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();

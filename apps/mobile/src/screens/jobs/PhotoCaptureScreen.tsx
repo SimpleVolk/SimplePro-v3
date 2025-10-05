@@ -24,7 +24,7 @@ export const PhotoCaptureScreen = ({ route, navigation }: any) => {
   const [photos, setPhotos] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
   const dispatch = useAppDispatch();
-  const { isOnline, pendingActions } = useAppSelector((state) => state.offline);
+  const { isOnline } = useAppSelector((state) => state.offline);
   const { pendingUploads } = useAppSelector((state) => state.documents);
 
   const getPhotoTypeLabel = (type: string) => {

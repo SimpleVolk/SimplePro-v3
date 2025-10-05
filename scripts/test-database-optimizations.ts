@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import { Job, JobSchema } from '../apps/api/src/jobs/schemas/job.schema';
-import { Customer, CustomerSchema } from '../apps/api/src/customers/schemas/customer.schema';
-import { User, UserSchema } from '../apps/api/src/auth/schemas/user.schema';
+import { JobSchema } from '../apps/api/src/jobs/schemas/job.schema';
+import { CustomerSchema } from '../apps/api/src/customers/schemas/customer.schema';
+import { UserSchema } from '../apps/api/src/auth/schemas/user.schema';
 import { getDocumentSizeInfo } from '../apps/api/src/database/document-size-monitoring.middleware';
 
 /**

@@ -402,7 +402,7 @@ export class TestDataSeeder {
     return jobs;
   }
 
-  async seedOpportunities(customers: any[]) {
+  async seedOpportunities() {
     // Opportunities seeding would go here
     // For now, return empty array as opportunity schema may not exist yet
     return [];

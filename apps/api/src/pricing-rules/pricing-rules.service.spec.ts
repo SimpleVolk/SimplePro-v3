@@ -7,20 +7,13 @@ import { RuleHistory } from './schemas/rule-history.schema';
 import {
   basePricingRule,
   weightBasedRule,
-  distanceBasedRule,
-  specialItemsRule,
-  seasonalRule,
-  stairsHandicapRule,
-  crewSizeRule,
-  inactiveRule,
   invalidRule,
   mockPricingRules,
   testRuleData,
   ruleFilters,
   mockRuleHistory,
-  mockRuleBackup,
 } from '../../test/fixtures/pricing-rules.fixture';
-import { createMockModel, createMockQueryChain } from '../../test/mocks/model.factory';
+import { createMockModel } from '../../test/mocks/model.factory';
 
 describe('PricingRulesService', () => {
   let service: PricingRulesService;
@@ -207,7 +200,6 @@ describe('PricingRulesService', () => {
   describe('createRule', () => {
     it('should create a new rule successfully', async () => {
       pricingRuleModel.findOne.mockResolvedValue(null);
-      const mockSave = jest.fn().mockResolvedValue(basePricingRule);
 
       const result = await service.createRule(basePricingRule);
 
@@ -232,7 +224,6 @@ describe('PricingRulesService', () => {
 
     it('should log rule creation in history', async () => {
       pricingRuleModel.findOne.mockResolvedValue(null);
-      const mockSave = jest.fn().mockResolvedValue(basePricingRule);
 
       await service.createRule(basePricingRule);
 
@@ -242,7 +233,6 @@ describe('PricingRulesService', () => {
     it('should set version to 1.0.0 by default', async () => {
       pricingRuleModel.findOne.mockResolvedValue(null);
       const ruleWithoutVersion = { ...basePricingRule, version: undefined };
-      const mockSave = jest.fn().mockResolvedValue({ ...ruleWithoutVersion, version: '1.0.0' });
 
       const result = await service.createRule(ruleWithoutVersion as any);
 
@@ -282,7 +272,7 @@ describe('PricingRulesService', () => {
       pricingRuleModel.findOne.mockResolvedValue(mockExisting);
       pricingRuleModel.findOneAndUpdate.mockResolvedValue({ ...basePricingRule, version: '1.0.1' });
 
-      const result = await service.updateRule('rule_weekend_surcharge', { description: 'Updated' });
+      await service.updateRule('rule_weekend_surcharge', { description: 'Updated' });
 
       expect(pricingRuleModel.findOneAndUpdate).toHaveBeenCalledWith(
         expect.anything(),
@@ -460,7 +450,6 @@ describe('PricingRulesService', () => {
 
     it('should import rules successfully', async () => {
       pricingRuleModel.updateMany.mockResolvedValue({ modifiedCount: 0 });
-      const mockSave = jest.fn().mockResolvedValue({});
 
       const result = await service.importRules(importData);
 

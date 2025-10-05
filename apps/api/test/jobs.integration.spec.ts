@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import {
   setupTestApp,
   teardownTestApp,
@@ -9,7 +8,6 @@ import {
   authenticatedRequest,
   ResponseAssertions,
   TestAuthData,
-  waitForCondition,
 } from './integration-setup';
 
 /**
@@ -763,7 +761,7 @@ describe('Job Management Integration Tests', () => {
 
       it('should validate crew size limits', async () => {
         const largeCrew = {
-          crewMembers: Array.from({ length: 10 }, (_, i) => ({
+          crewMembers: Array.from({ length: 10 }, () => ({
             userId: crewAuth.user.id,
             role: 'helper',
             hourlyRate: 20.00,

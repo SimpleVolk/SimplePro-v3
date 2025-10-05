@@ -506,7 +506,7 @@ describe('WebSocket Real-time Updates & Messaging (Integration)', () => {
 
       let subscriptionsCount = 0;
 
-      crewSocket.on('job.subscribed', (data) => {
+      crewSocket.on('job.subscribed', () => {
         subscriptionsCount++;
         if (subscriptionsCount === 3) {
           expect(subscriptionsCount).toBe(3);

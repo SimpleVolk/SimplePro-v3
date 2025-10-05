@@ -10,13 +10,11 @@ import {
 } from 'react-native';
 import { useJobs } from '../contexts/JobContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../hooks/useAuth';
 
 const JobDetailScreen = ({ route, navigation }: any) => {
   const { jobId } = route.params;
   const { currentJob, updateJobStatus, updateNotes } = useJobs();
   const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
-  const { user } = useAuth();
   const [notes, setNotes] = useState(currentJob?.notes || '');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 

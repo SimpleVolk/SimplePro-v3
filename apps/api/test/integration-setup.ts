@@ -7,7 +7,6 @@ process.env.JWT_REFRESH_EXPIRATION = '7d';
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';

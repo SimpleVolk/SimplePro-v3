@@ -5,13 +5,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Dimensions,
 } from 'react-native';
 import SignatureScreen from 'react-native-signature-canvas';
 import { useJobs } from '../contexts/JobContext';
 import { useTheme } from '../contexts/ThemeContext';
-
-const { width, height } = Dimensions.get('window');
 
 const SignatureCaptureScreen = ({ route, navigation }: any) => {
   const { jobId } = route.params;

@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import {
   setupTestApp,
   teardownTestApp,
@@ -9,7 +8,6 @@ import {
   authenticatedRequest,
   ResponseAssertions,
   TestAuthData,
-  waitForCondition,
 } from './integration-setup';
 
 /**

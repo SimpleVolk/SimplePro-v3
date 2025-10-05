@@ -23,7 +23,7 @@ export interface MockModel<T = any> {
   insertMany: jest.Mock;
 }
 
-export interface MockDocument<T = any> extends Record<string, any> {
+export interface MockDocument extends Record<string, any> {
   _id: string;
   save: jest.Mock;
   remove: jest.Mock;

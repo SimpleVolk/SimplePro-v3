@@ -63,7 +63,7 @@ describe('OpportunitiesService', () => {
 
   describe('create', () => {
     it('should create a new opportunity successfully', async () => {
-      const mockDoc = createMockOpportunity({ ...baseOpportunityDto, createdBy: userId });
+      createMockOpportunity({ ...baseOpportunityDto, createdBy: userId });
 
       const result = await service.create(baseOpportunityDto, userId);
 
@@ -76,7 +76,7 @@ describe('OpportunitiesService', () => {
     });
 
     it('should set status to open by default', async () => {
-      const mockDoc = createMockOpportunity({ ...baseOpportunityDto, status: 'open', createdBy: userId });
+      createMockOpportunity({ ...baseOpportunityDto, status: 'open', createdBy: userId });
 
       const result = await service.create(baseOpportunityDto, userId);
 
@@ -84,7 +84,7 @@ describe('OpportunitiesService', () => {
     });
 
     it('should assign the creating user', async () => {
-      const mockDoc = createMockOpportunity({ ...baseOpportunityDto, createdBy: userId });
+      createMockOpportunity({ ...baseOpportunityDto, createdBy: userId });
 
       const result = await service.create(baseOpportunityDto, userId);
 
@@ -92,7 +92,7 @@ describe('OpportunitiesService', () => {
     });
 
     it('should create high-value opportunity', async () => {
-      const mockDoc = createMockOpportunity({ ...highValueOpportunityDto, createdBy: userId });
+      createMockOpportunity({ ...highValueOpportunityDto, createdBy: userId });
 
       const result = await service.create(highValueOpportunityDto, userId);
 
@@ -101,7 +101,7 @@ describe('OpportunitiesService', () => {
     });
 
     it('should create low-probability opportunity', async () => {
-      const mockDoc = createMockOpportunity({ ...lowProbabilityOpportunityDto, createdBy: userId });
+      createMockOpportunity({ ...lowProbabilityOpportunityDto, createdBy: userId });
 
       const result = await service.create(lowProbabilityOpportunityDto, userId);
 
@@ -110,7 +110,7 @@ describe('OpportunitiesService', () => {
     });
 
     it('should emit event with correct lead source', async () => {
-      const mockDoc = createMockOpportunity({ ...baseOpportunityDto, leadSource: 'referral', createdBy: userId });
+      createMockOpportunity({ ...baseOpportunityDto, leadSource: 'referral', createdBy: userId });
 
       await service.create({ ...baseOpportunityDto, leadSource: 'referral' }, userId);
 
@@ -135,7 +135,7 @@ describe('OpportunitiesService', () => {
       const openOpps = mockOpportunitiesList.filter(o => o.status === 'open');
       opportunityModel.find.mockReturnValue(createMockQueryChain(openOpps));
 
-      const result = await service.findAll(opportunityQueryFilters.byStatus);
+      await service.findAll(opportunityQueryFilters.byStatus);
 
       expect(opportunityModel.find).toHaveBeenCalledWith(expect.objectContaining({
         status: 'open',
@@ -498,7 +498,7 @@ describe('OpportunitiesService', () => {
         status: 'open',
       };
 
-      const mockDoc = createMockOpportunity(minimalDto);
+      createMockOpportunity(minimalDto);
 
       const result = await service.create(minimalDto as any, userId);
 
@@ -512,7 +512,7 @@ describe('OpportunitiesService', () => {
         estimatedValue: 1000000,
       };
 
-      const mockDoc = createMockOpportunity(highValueDto);
+      createMockOpportunity(highValueDto);
 
       const result = await service.create(highValueDto, userId);
 
@@ -525,7 +525,7 @@ describe('OpportunitiesService', () => {
         probability: 0,
       };
 
-      const mockDoc = createMockOpportunity(zeroProbDto);
+      createMockOpportunity(zeroProbDto);
 
       const result = await service.create(zeroProbDto, userId);
 
@@ -538,7 +538,7 @@ describe('OpportunitiesService', () => {
         probability: 100,
       };
 
-      const mockDoc = createMockOpportunity(certainDto);
+      createMockOpportunity(certainDto);
 
       const result = await service.create(certainDto, userId);
 

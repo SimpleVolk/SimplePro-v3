@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import {
   setupTestApp,
   teardownTestApp,
@@ -534,7 +533,7 @@ describe('Customer Management Integration Tests', () => {
         const otherCustomerData = TestDataFactories.createCustomerData({
           email: 'other@example.com',
         });
-        const otherResponse = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
           .send(otherCustomerData);
 
         // Try to update first customer with second customer's email

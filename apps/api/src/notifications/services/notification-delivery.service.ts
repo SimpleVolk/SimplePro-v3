@@ -57,13 +57,14 @@ export class NotificationDeliveryService {
 
       this.logger.log(`In-app notification sent to user ${notification.recipientId}`);
     } catch (error) {
-      this.logger.error('Failed to send in-app notification:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error('Failed to send in-app notification:', errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.inApp': {
             sent: false,
-            error: error.message,
+            error: errorMessage,
           },
         },
       });
@@ -132,14 +133,15 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      this.logger.error(`Failed to send email notification after ${this.MAX_RETRIES} retries:`, error.message);
+      const errorMessage = error instanceof Error ? errorMessage : String(error);
+      this.logger.error(`Failed to send email notification after ${this.MAX_RETRIES} retries:`, errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.email': {
             sent: false,
             sentAt: new Date(),
-            error: error.message,
+            error: errorMessage,
           },
         },
       });
@@ -209,14 +211,15 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      this.logger.error(`Failed to send SMS notification after ${this.MAX_RETRIES} retries:`, error.message);
+      const errorMessage = error instanceof Error ? errorMessage : String(error);
+      this.logger.error(`Failed to send SMS notification after ${this.MAX_RETRIES} retries:`, errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.sms': {
             sent: false,
             sentAt: new Date(),
-            error: error.message,
+            error: errorMessage,
           },
         },
       });
@@ -312,14 +315,15 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      this.logger.error(`Failed to send push notification after ${this.MAX_RETRIES} retries:`, error.message);
+      const errorMessage = error instanceof Error ? errorMessage : String(error);
+      this.logger.error(`Failed to send push notification after ${this.MAX_RETRIES} retries:`, errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.push': {
             sent: false,
             sentAt: new Date(),
-            error: error.message,
+            error: errorMessage,
           },
         },
       });
@@ -344,7 +348,7 @@ export class NotificationDeliveryService {
 
         // Exponential backoff: 1s, 2s, 4s, 8s, etc.
         const delay = this.INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-        this.logger.warn(`Delivery attempt ${attempt} failed, retrying in ${delay}ms...`, error.message);
+        this.logger.warn(`Delivery attempt ${attempt} failed, retrying in ${delay}ms...`, errorMessage);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }

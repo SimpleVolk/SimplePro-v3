@@ -53,8 +53,9 @@ export class WorkloadCronService {
           successCount++;
         } catch (error) {
           errorCount++;
+          const errorMessage = error instanceof Error ? error.message : String(error);
           this.logger.error(
-            `Error calculating workload for crew ${crew._id}: ${error.message}`,
+            `Error calculating workload for crew ${crew._id}: ${errorMessage}`,
           );
         }
       }
@@ -63,9 +64,11 @@ export class WorkloadCronService {
         `Daily workload calculation completed. Success: ${successCount}, Errors: ${errorCount}`,
       );
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to calculate daily workloads: ${error.message}`,
-        error.stack,
+        `Failed to calculate daily workloads: ${errorMessage}`,
+        errorStack,
       );
     }
   }
@@ -109,8 +112,9 @@ export class WorkloadCronService {
           successCount++;
         } catch (error) {
           errorCount++;
+          const errorMessage = error instanceof Error ? error.message : String(error);
           this.logger.error(
-            `Error preparing workload for crew ${crew._id}: ${error.message}`,
+            `Error preparing workload for crew ${crew._id}: ${errorMessage}`,
           );
         }
       }
@@ -119,9 +123,11 @@ export class WorkloadCronService {
         `Next week workload preparation completed. Success: ${successCount}, Errors: ${errorCount}`,
       );
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to prepare next week workloads: ${error.message}`,
-        error.stack,
+        `Failed to prepare next week workloads: ${errorMessage}`,
+        errorStack,
       );
     }
   }
@@ -158,9 +164,11 @@ export class WorkloadCronService {
         this.logger.log('No overloaded crew members found');
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to check overloaded crew: ${error.message}`,
-        error.stack,
+        `Failed to check overloaded crew: ${errorMessage}`,
+        errorStack,
       );
     }
   }
@@ -210,9 +218,11 @@ export class WorkloadCronService {
 
       // TODO: Send weekly report to admins/dispatchers via email
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to generate weekly workload report: ${error.message}`,
-        error.stack,
+        `Failed to generate weekly workload report: ${errorMessage}`,
+        errorStack,
       );
     }
   }
