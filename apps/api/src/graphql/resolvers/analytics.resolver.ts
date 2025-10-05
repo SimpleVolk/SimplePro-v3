@@ -40,8 +40,8 @@ export class AnalyticsResolver {
   @Query('revenueMetrics')
   @Roles('admin', 'super_admin')
   async getRevenueMetrics(
-    @Args('startDate') startDate?: Date,
-    @Args('endDate') endDate?: Date
+    @Args('startDate') _startDate?: Date,
+    @Args('endDate') _endDate?: Date
   ): Promise<any> {
     try {
       // Use analytics service if available
@@ -72,8 +72,8 @@ export class AnalyticsResolver {
   }
 
   private async getPerformanceMetrics(
-    startDate?: Date,
-    endDate?: Date
+    _startDate?: Date,
+    _endDate?: Date
   ): Promise<any> {
     try {
       // Use analytics service if available
@@ -117,7 +117,7 @@ export class CrewResolver {
 
   @Query('crewMembers')
   @Roles('admin', 'super_admin', 'dispatcher')
-  async getCrewMembers(@Args('filters') filters?: any): Promise<any[]> {
+  async getCrewMembers(@Args('filters') _filters?: any): Promise<any[]> {
     // For now, return all crew members
     // In production, implement filtering logic
     return [];
@@ -125,7 +125,7 @@ export class CrewResolver {
 
   @Query('availableCrew')
   @Roles('admin', 'super_admin', 'dispatcher')
-  async getAvailableCrew(@Args('date') date: Date) {
+  async getAvailableCrew(@Args('date') _date: Date) {
     return this.crewDataLoader.loadAvailableCrew(date);
   }
 }

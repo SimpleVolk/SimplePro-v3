@@ -34,7 +34,7 @@ export class MessageNotificationService {
     }
   }
 
-  async sendReadReceiptNotification(messageId: string, senderId: string, readBy: string): Promise<void> {
+  async sendReadReceiptNotification(messageId: string, _senderId: string, readBy: string): Promise<void> {
     try {
       this.logger.debug(`Read receipt: Message ${messageId} read by ${readBy}`);
       // Placeholder for future implementation
@@ -45,7 +45,7 @@ export class MessageNotificationService {
     }
   }
 
-  async sendTypingNotification(threadId: string, userId: string, recipients: string[]): Promise<void> {
+  async sendTypingNotification(threadId: string, userId: string, _recipients: string[]): Promise<void> {
     try {
       this.logger.debug(`User ${userId} is typing in thread ${threadId}`);
       // Placeholder for future implementation

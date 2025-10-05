@@ -11,8 +11,6 @@ export async function seedCustomers(
   const customers: any[] = [];
   const salesReps = users.filter((u) => u.department === 'Sales');
   const customerCount = faker.number.int({ min: 25, max: 35 });
-
-  const statuses = ['lead', 'prospect', 'active', 'inactive'];
   const types = ['residential', 'commercial'];
   const sources = ['website', 'referral', 'advertising', 'social_media', 'partner', 'other'];
   const contactMethods = ['email', 'phone', 'text'];

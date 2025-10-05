@@ -17,8 +17,6 @@ export async function seedPartners(PartnerModel: any, users: any[]): Promise<any
     'other',
   ];
 
-  const statuses = ['active', 'inactive', 'pending', 'suspended'];
-
   for (let i = 0; i < partnerCount; i++) {
     const companyName = faker.company.name();
     const email = faker.internet.email({ provider: companyName.toLowerCase().replace(/\s+/g, '') + '.com' });

@@ -12,9 +12,7 @@ export async function seedJobs(
   const jobs: any[] = [];
   const jobCount = faker.number.int({ min: 35, max: 50 });
 
-  const statuses = ['scheduled', 'in_progress', 'completed', 'cancelled', 'on_hold'];
   const types = ['local', 'long_distance', 'storage', 'packing_only'];
-  const priorities = ['low', 'normal', 'high', 'urgent'];
 
   // Get crew members and dispatchers
   const crewMembers = users.filter((u) => u.role.name === 'crew');

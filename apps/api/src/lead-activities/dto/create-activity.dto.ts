@@ -7,7 +7,7 @@ import {
   IsObject,
   IsUUID,
 } from 'class-validator';
-import { ActivityType, ActivityOutcome } from '../schemas/lead-activity.schema';
+import { ActivityType } from '../schemas/lead-activity.schema';
 
 export class CreateActivityDto {
   @IsUUID()

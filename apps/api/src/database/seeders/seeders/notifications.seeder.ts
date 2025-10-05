@@ -25,8 +25,6 @@ export async function seedNotifications(
     'document_uploaded',
   ];
 
-  const priorities = ['low', 'normal', 'high', 'urgent'];
-
   // Create 3-8 notifications per user
   for (const user of users) {
     const notificationCount = faker.number.int({ min: 3, max: 8 });

@@ -34,7 +34,8 @@
     "incremental": true,
     "paths": {
       "@simplepro/pricing-engine": ["packages/pricing-engine/src/index.ts"],
-      "@simplepro/pricing-engine/*": ["packages/pricing-engine/src/*"]
+      "@simplepro/pricing-engine/*": ["packages/pricing-engine/src/*"],
+      "@/*": ["apps/web/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist", ".next", "out"]

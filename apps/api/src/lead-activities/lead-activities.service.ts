@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   LeadActivity,
   LeadActivityDocument,
-  ActivityOutcome,
 } from './schemas/lead-activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { CompleteActivityDto } from './dto/complete-activity.dto';

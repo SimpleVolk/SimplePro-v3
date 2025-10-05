@@ -10,7 +10,7 @@ import {
   UpdateAvailabilityDto,
   RecurringAvailabilityDto,
 } from '../dto';
-import { startOfDay, endOfDay, parseISO, addDays, format } from 'date-fns';
+import { startOfDay, endOfDay, parseISO, addDays } from 'date-fns';
 
 export interface Conflict {
   crewMemberId: string;
@@ -177,7 +177,7 @@ export class CrewScheduleService {
     }
   }
 
-  async checkConflicts(jobId: string): Promise<Conflict[]> {
+  async checkConflicts(_jobId: string): Promise<Conflict[]> {
     // This will be implemented once we integrate with JobsModule
     // For now, return empty array
     return [];

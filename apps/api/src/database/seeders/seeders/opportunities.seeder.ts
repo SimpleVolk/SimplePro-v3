@@ -16,7 +16,6 @@ export async function seedOpportunities(
   const buildingTypes = ['apartment', 'house', 'condo', 'office', 'warehouse', 'storage'];
   const accessDifficulties = ['easy', 'moderate', 'difficult', 'very_difficult'];
   const flexibilities = ['exact', 'week', 'month'];
-  const statuses = ['open', 'contacted', 'quoted', 'negotiating', 'won', 'lost', 'cancelled'];
   const leadSources = ['website', 'phone', 'referral', 'partner', 'walkin', 'other'];
   const priorities = ['low', 'medium', 'high', 'urgent'];
 

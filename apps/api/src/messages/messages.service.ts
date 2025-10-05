@@ -193,8 +193,6 @@ export class MessagesService {
         throw new NotFoundException(`Thread ${threadId} not found`);
       }
 
-      const userObjectId = new Types.ObjectId(userId);
-
       // Check if user is a participant
       if (!thread.participants.some(p => p.toString() === userId)) {
         throw new ForbiddenException('You are not a participant in this thread');

@@ -5,7 +5,7 @@ import {
   CrewWorkload,
   CrewWorkloadDocument,
 } from '../schemas/crew-workload.schema';
-import { startOfWeek, endOfWeek, addWeeks } from 'date-fns';
+import { startOfWeek, addWeeks } from 'date-fns';
 
 export interface WorkloadDistribution {
   weekStartDate: Date;

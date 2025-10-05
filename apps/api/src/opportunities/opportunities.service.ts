@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Opportunity, OpportunityDocument } from './schemas/opportunity.schema';
 import { CreateOpportunityDto } from './dto/create-opportunity.dto';

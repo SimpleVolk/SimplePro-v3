@@ -32,7 +32,7 @@ export class MessagesController {
   // ==================== Thread Endpoints ====================
 
   @Post('threads')
-  async createThread(@Body() dto: CreateThreadDto, @Request() req: any) {
+  async createThread(@Body() dto: CreateThreadDto, @Request() _req: any) {
     return this.messagesService.createThread(dto);
   }
 

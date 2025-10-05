@@ -75,7 +75,7 @@ export class DocumentsController {
    * GET /api/documents
    */
   @Get()
-  async findAll(@Query() filters: DocumentFiltersDto, @Request() req: any) {
+  async findAll(@Query() filters: DocumentFiltersDto, @Request() _req: any) {
     const documents = await this.documentsService.findAll(filters);
 
     return {

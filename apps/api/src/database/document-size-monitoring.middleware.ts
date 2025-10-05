@@ -67,7 +67,6 @@ export function createSizeMonitoringMiddleware(
   return async function (this: any, next: Function) {
     try {
       const docSizeBytes = calculateDocumentSize(this);
-      const sizeMB = docSizeBytes / (1024 * 1024);
 
       // Check if exceeds limit
       if (docSizeBytes > maxSizeBytes) {

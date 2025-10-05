@@ -14,7 +14,6 @@
 import { config } from 'dotenv';
 import * as mongoose from 'mongoose';
 import * as path from 'path';
-import { faker } from '@faker-js/faker';
 
 // Load environment variables
 config({ path: path.resolve(__dirname, '../../../../../.env') });
@@ -77,7 +76,6 @@ async function main() {
     const MessageModel = mongoose.models.Message || mongoose.model('Message', MessageSchema);
     const MessageThreadModel = mongoose.models.MessageThread || mongoose.model('MessageThread', MessageThreadSchema);
     const NotificationModel = mongoose.models.Notification || mongoose.model('Notification', NotificationSchema);
-    const TariffModel = mongoose.models.TariffSettings || mongoose.model('TariffSettings', TariffSettingsSchema);
 
     // Clear existing data if requested
     if (shouldClear) {

@@ -5,7 +5,6 @@ import {
   CrewAssignment,
   CrewAssignmentDocument,
 } from '../schemas/crew-assignment.schema';
-import { AutoAssignDto } from '../dto';
 import { WorkloadService } from './workload.service';
 import { TimeOffService } from './time-off.service';
 import { parseISO, startOfDay } from 'date-fns';
@@ -58,8 +57,8 @@ export class AutoAssignmentService {
   ) {}
 
   async suggestCrew(
-    jobId: string,
-    requirements: JobRequirements,
+    _jobId: string,
+    _requirements: JobRequirements,
   ): Promise<CrewSuggestion[]> {
     // Get all crew members (this will be replaced with actual user query)
     // For now, return empty array - will be implemented when integrated with AuthModule
@@ -199,7 +198,7 @@ export class AutoAssignmentService {
   async checkAvailabilityForJob(
     crewId: string,
     jobDate: Date,
-    duration: number,
+    _duration: number,
   ): Promise<boolean> {
     // Check if crew member is on time off
     const isOnTimeOff = await this.timeOffService.isOnTimeOff(

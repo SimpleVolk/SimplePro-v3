@@ -232,7 +232,6 @@ export class FollowUpRulesService {
   ): Promise<void> {
     const opportunityId = eventData.opportunity?._id || eventData.opportunity?.id;
     const customerId = eventData.opportunity?.customerId || eventData.customerId;
-    const userId = eventData.userId || eventData.createdBy || 'system';
 
     if (!opportunityId || !customerId) {
       this.logger.warn('Missing opportunityId or customerId for CREATE_ACTIVITY action');
@@ -264,13 +263,13 @@ export class FollowUpRulesService {
     );
   }
 
-  private async sendEmailAction(action: any, eventData: any): Promise<void> {
+  private async sendEmailAction(action: any, _eventData: any): Promise<void> {
     // Placeholder for email sending logic
     this.logger.log(`Email action triggered with template: ${action.template}`);
     // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
   }
 
-  private async sendNotificationAction(action: any, eventData: any): Promise<void> {
+  private async sendNotificationAction(_action: any, _eventData: any): Promise<void> {
     // Placeholder for notification logic
     this.logger.log(`Notification action triggered`);
     // TODO: Integrate with notification service (WebSocket, Push, etc.)

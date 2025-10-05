@@ -56,7 +56,7 @@ export class CrewDataLoader {
     return this.batchCrewMembers.loadMany(crewMemberIds) as Promise<(CrewMember | null)[]>;
   }
 
-  async loadAvailableCrew(date: Date): Promise<CrewMember[]> {
+  async loadAvailableCrew(_date: Date): Promise<CrewMember[]> {
     // This could be optimized with a separate query
     // For now, we'll fetch all crew members
     const users = await this.userModel
