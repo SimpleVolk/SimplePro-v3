@@ -3,7 +3,16 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { JwtPayload, User } from '../interfaces/user.interface';
-import { loadSecrets } from '../../config/secrets.config';
+
+// Dynamic import to handle missing secrets.config gracefully
+let loadSecrets: (() => any) | undefined;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  loadSecrets = require('../../config/secrets.config').loadSecrets;
+} catch {
+  // Secrets config not available, will use env vars
+  loadSecrets = undefined;
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,26 +24,30 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: (() => {
         try {
-          const secrets = loadSecrets();
-          return secrets.jwt.secret;
+          if (loadSecrets) {
+            const secrets = loadSecrets();
+            return secrets.jwt.secret;
+          }
         } catch (error) {
-          // Fallback to environment variable for development
-          const secret = process.env.JWT_SECRET;
-          if (!secret) {
-            throw new Error(
-              'JWT_SECRET configuration failed. ' +
-              'For production: ensure secrets are configured via production-secrets.sh script. ' +
-              'For development: set JWT_SECRET environment variable.'
-            );
-          }
-          if (secret.length < 32) {
-            throw new Error(
-              'JWT_SECRET must be at least 32 characters long for security. ' +
-              'Please use a strong, randomly generated secret key.'
-            );
-          }
-          return secret;
+          // Fallback to environment variable
         }
+
+        // Fallback to environment variable for development
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+          throw new Error(
+            'JWT_SECRET configuration failed. ' +
+            'For production: ensure secrets are configured via production-secrets.sh script. ' +
+            'For development: set JWT_SECRET environment variable.'
+          );
+        }
+        if (secret.length < 32) {
+          throw new Error(
+            'JWT_SECRET must be at least 32 characters long for security. ' +
+            'Please use a strong, randomly generated secret key.'
+          );
+        }
+        return secret;
       })(),
     });
   }
