@@ -88,9 +88,6 @@ import { loadSecrets } from '../config/secrets.config';
         }),
         localThresholdMS: 15, // Latency window for server selection (15ms)
 
-        // Automatic server discovery and monitoring
-        serverSelectionRetryMS: 30000, // Retry server selection for 30 seconds
-
         // Connection monitoring
         serverMonitoringMode: 'auto' as any, // Automatic monitoring mode
       }

@@ -2,7 +2,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import DataLoader from 'dataloader';
 
 // Placeholder type for Estimate until we have a proper schema
-interface Estimate {
+export interface Estimate {
   id: string;
   estimateId: string;
   customerId?: string;

@@ -5,7 +5,7 @@ import DataLoader from 'dataloader';
 import { User, UserDocument } from '../../auth/schemas/user.schema';
 
 // Crew member type (based on User schema)
-interface CrewMember {
+export interface CrewMember {
   id: string;
   userId: string;
   firstName: string;

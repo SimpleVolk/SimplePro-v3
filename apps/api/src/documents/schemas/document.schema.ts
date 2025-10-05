@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document as MongooseDocument, Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 
 export type DocumentDocument = DocumentEntity & MongooseDocument;
 

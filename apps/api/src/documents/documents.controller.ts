@@ -29,7 +29,7 @@ import type {
   UpdateDocumentDto,
   AccessSharedDocumentDto,
 } from './dto';
-import type { MAX_FILE_SIZE } from './interfaces/document.interface';
+import { MAX_FILE_SIZE } from './interfaces/document.interface';
 
 @Controller('documents')
 @UseGuards(JwtAuthGuard, RolesGuard)

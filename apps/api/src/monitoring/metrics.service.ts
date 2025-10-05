@@ -10,7 +10,7 @@ interface Metric {
   timestamp: number;
 }
 
-interface HealthMetrics {
+export interface HealthMetrics {
   uptime: number;
   memory: {
     used: number;
