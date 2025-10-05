@@ -39,10 +39,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 
   // Cache TTL constants (in seconds)
   private readonly DEFAULT_TTL = 300; // 5 minutes
-  private readonly SHORT_TTL = 60; // 1 minute
+  // private readonly SHORT_TTL = 60; // 1 minute
   private readonly MEDIUM_TTL = 300; // 5 minutes
   private readonly LONG_TTL = 3600; // 1 hour
-  private readonly EXTRA_LONG_TTL = 86400; // 24 hours
+  // private readonly EXTRA_LONG_TTL = 86400; // 24 hours
 
   // Fallback in-memory cache
   private memoryCache = new Map<string, { value: any; expires: number; tags?: string[] }>();

@@ -4,7 +4,6 @@ import { CacheService } from './cache.service';
 
 describe('CacheService', () => {
   let service: CacheService;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
