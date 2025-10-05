@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import {
+import type {
   CreateUserDto,
   UpdateUserDto,
   LoginDto,
@@ -69,6 +69,7 @@ export class AuthController {
         message: 'Login successful',
       };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       // Log failed login attempt
       await this.auditLogsService.createLog({
         timestamp: new Date(),
@@ -80,7 +81,7 @@ export class AuthController {
         ipAddress: req.ip || 'unknown',
         userAgent: req.headers['user-agent'],
         outcome: 'failure',
-        errorMessage: error.message,
+        errorMessage,
       });
 
       throw error;

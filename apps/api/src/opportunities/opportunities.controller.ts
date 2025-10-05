@@ -13,11 +13,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { OpportunitiesService } from './opportunities.service';
-import { CreateOpportunityDto } from './dto/create-opportunity.dto';
+import type { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../auth/interfaces/user.interface';
+import type { User } from '../auth/interfaces/user.interface';
 
 @Controller('opportunities')
 @UseGuards(JwtAuthGuard, RolesGuard)

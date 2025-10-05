@@ -32,7 +32,9 @@ export class TypingService {
 
       this.logger.debug(`User ${userId} started typing in thread ${threadId}`);
     } catch (error) {
-      this.logger.error(`Failed to start typing indicator: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to start typing indicator: ${errorMessage}`);
       throw error;
     }
   }
@@ -55,7 +57,9 @@ export class TypingService {
         this.logger.debug(`User ${userId} stopped typing in thread ${threadId}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to stop typing indicator: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to stop typing indicator: ${errorMessage}`);
       throw error;
     }
   }
@@ -70,7 +74,9 @@ export class TypingService {
 
       return typingIndicators.map(indicator => indicator.userId.toString());
     } catch (error) {
-      this.logger.error(`Failed to get typing users: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get typing users: ${errorMessage}`);
       throw error;
     }
   }
@@ -85,7 +91,9 @@ export class TypingService {
         this.logger.debug(`Cleaned up ${result.deletedCount} expired typing indicators`);
       }
     } catch (error) {
-      this.logger.error(`Failed to cleanup expired indicators: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to cleanup expired indicators: ${errorMessage}`);
     }
   }
 }

@@ -27,7 +27,9 @@ export class MessageNotificationService {
         this.logger.debug(`Notification queued for user ${recipientId}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to send message notification: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to send message notification: ${errorMessage}`);
       // Don't throw - notifications are non-critical
     }
   }
@@ -37,7 +39,9 @@ export class MessageNotificationService {
       this.logger.debug(`Read receipt: Message ${messageId} read by ${readBy}`);
       // Placeholder for future implementation
     } catch (error) {
-      this.logger.error(`Failed to send read receipt notification: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to send read receipt notification: ${errorMessage}`);
     }
   }
 
@@ -46,7 +50,9 @@ export class MessageNotificationService {
       this.logger.debug(`User ${userId} is typing in thread ${threadId}`);
       // Placeholder for future implementation
     } catch (error) {
-      this.logger.error(`Failed to send typing notification: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to send typing notification: ${errorMessage}`);
     }
   }
 }

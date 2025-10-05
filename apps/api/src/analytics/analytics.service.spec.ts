@@ -33,7 +33,7 @@ describe('AnalyticsService', () => {
     save: jest.fn()
   };
 
-  const mockEventModel = jest.fn().mockImplementation(() => ({
+  const mockEventModel: any = jest.fn().mockImplementation(() => ({
     ...mockAnalyticsEvent,
     save: jest.fn().mockResolvedValue(mockAnalyticsEvent)
   }));

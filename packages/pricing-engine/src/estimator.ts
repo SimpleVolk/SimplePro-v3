@@ -5,6 +5,7 @@ function generateUUID(): string {
   try {
     // Node.js environment - try crypto.randomUUID first (Node.js 15.6.0+)
     if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const crypto = require('crypto');
       if (crypto && typeof crypto.randomUUID === 'function') {
         uuid = crypto.randomUUID();
@@ -159,7 +160,7 @@ export class DeterministicEstimator {
           handicapId: handicap.id,
           name: handicap.name,
           description: handicap.description,
-          type: this.getHandicapType(handicap, input),
+          type: this.getHandicapType(handicap),
           priceImpact: handicapImpact.impact
         };
 
@@ -242,6 +243,7 @@ export class DeterministicEstimator {
 
     // Try to use Node.js crypto module if available
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const crypto = require('crypto');
       if (crypto && crypto.createHash) {
         return crypto.createHash('sha256').update(inputString).digest('hex');
@@ -301,26 +303,30 @@ export class DeterministicEstimator {
    */
   private calculateBasePriceLegacy(input: EstimateInput): number {
     switch (input.service) {
-      case 'local':
+      case 'local': {
         // Base rate is typically per hour, multiply by estimated duration and crew size
         const baseHourlyRate = 150; // $150 for 2-person crew
         const crewAdjustment = input.crewSize > 2 ? (input.crewSize - 2) * 75 : 0;
         return (baseHourlyRate + crewAdjustment) * input.estimatedDuration;
+      }
 
-      case 'long_distance':
+      case 'long_distance': {
         // Base rate is per pound for long distance
         const basePerPoundRate = 1.25;
         return input.totalWeight * basePerPoundRate;
+      }
 
-      case 'storage':
+      case 'storage': {
         // Base rate per cubic foot per month
         const storageRate = 8.0;
         return input.totalVolume * storageRate;
+      }
 
-      case 'packing_only':
+      case 'packing_only': {
         // Hourly rate for packing services
         const packingRate = 85;
         return packingRate * input.estimatedDuration;
+      }
 
       default:
         throw new Error(`Unknown service type: ${input.service}`);
@@ -563,15 +569,17 @@ export class DeterministicEstimator {
           }
           break;
 
-        case 'set_minimum':
+        case 'set_minimum': {
           const difference = action.amount - currentPrice;
           totalImpact += Math.max(0, difference);
           break;
+        }
 
-        case 'set_maximum':
+        case 'set_maximum': {
           const excess = currentPrice - action.amount;
           totalImpact -= Math.max(0, excess);
           break;
+        }
 
         case 'replace':
           totalImpact = action.amount - currentPrice;
@@ -689,7 +697,7 @@ export class DeterministicEstimator {
   /**
    * Determine handicap type based on conditions
    */
-  private getHandicapType(handicap: LocationHandicap, _input: EstimateInput): 'pickup' | 'delivery' | 'both' {
+  private getHandicapType(handicap: LocationHandicap): 'pickup' | 'delivery' | 'both' {
     const hasPickupConditions = handicap.conditions.some(c => c.field.startsWith('pickup'));
     const hasDeliveryConditions = handicap.conditions.some(c => c.field.startsWith('delivery'));
 
@@ -704,13 +712,15 @@ export class DeterministicEstimator {
    */
   private getRuleCalculationDetails(rule: PricingRule, input: EstimateInput, impact: number): string {
     switch (rule.id) {
-      case 'crew_size_adjustment':
+      case 'crew_size_adjustment': {
         const extraCrew = Math.max(0, input.crewSize - 2);
         return `${extraCrew} extra crew × $75/hour × ${input.estimatedDuration} hours = $${impact}`;
+      }
 
-      case 'fragile_items_surcharge':
+      case 'fragile_items_surcharge': {
         const extraFragile = Math.max(0, input.specialItems.fragileItems - 5);
         return `${extraFragile} fragile items over 5 × $25 = $${impact}`;
+      }
 
       case 'weight_heavy_surcharge':
         return `15% surcharge on shipments over 8,000 lbs (${input.totalWeight} lbs)`;

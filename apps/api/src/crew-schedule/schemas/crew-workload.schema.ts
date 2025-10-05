@@ -6,34 +6,34 @@ export type CrewWorkloadDocument = CrewWorkload & Document;
 @Schema({ timestamps: true })
 export class CrewWorkload {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  crewMemberId: Types.ObjectId;
+  crewMemberId!: Types.ObjectId;
 
   @Prop({ required: true, type: Date })
-  weekStartDate: Date; // Monday of the week
+  weekStartDate!: Date; // Monday of the week
 
   @Prop({ default: 0 })
-  totalJobs: number;
+  totalJobs!: number;
 
   @Prop({ default: 0 })
-  scheduledJobs: number;
+  scheduledJobs!: number;
 
   @Prop({ default: 0 })
-  inProgressJobs: number;
+  inProgressJobs!: number;
 
   @Prop({ default: 0 })
-  completedJobs: number;
+  completedJobs!: number;
 
   @Prop({ default: 0 })
-  hoursWorked: number;
+  hoursWorked!: number;
 
   @Prop({ default: 0 })
-  utilizationRate: number; // percentage
+  utilizationRate!: number; // percentage
 
   @Prop({ default: false })
-  isOverloaded: boolean; // >5 jobs per week
+  isOverloaded!: boolean; // >5 jobs per week
 
   @Prop({ type: Date, default: Date.now })
-  lastUpdated: Date;
+  lastUpdated!: Date;
 }
 
 export const CrewWorkloadSchema = SchemaFactory.createForClass(CrewWorkload);

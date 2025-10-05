@@ -111,7 +111,11 @@ export class DocumentsService {
 
       return document.toObject() as IDocument;
     } catch (error) {
-      this.logger.error(`Error uploading document: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error uploading document: ${errorMessage}`, errorStack);
 
       if (error instanceof BadRequestException) {
         throw error;
@@ -175,7 +179,11 @@ export class DocumentsService {
 
       return documents as unknown as IDocument[];
     } catch (error) {
-      this.logger.error(`Error finding documents: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error finding documents: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to retrieve documents');
     }
   }
@@ -200,7 +208,11 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error finding document by ID: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error finding document by ID: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to retrieve document');
     }
   }
@@ -223,7 +235,11 @@ export class DocumentsService {
 
       return documents as unknown as IDocument[];
     } catch (error) {
-      this.logger.error(`Error finding documents by entity: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error finding documents by entity: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to retrieve documents');
     }
   }
@@ -245,7 +261,11 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error downloading document: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error downloading document: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to download document');
     }
   }
@@ -275,7 +295,11 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error deleting document: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error deleting document: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to delete document');
     }
   }
@@ -329,7 +353,11 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error creating share link: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error creating share link: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to create share link');
     }
   }
@@ -414,7 +442,11 @@ export class DocumentsService {
       ) {
         throw error;
       }
-      this.logger.error(`Error accessing shared document: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error accessing shared document: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to access shared document');
     }
   }
@@ -454,7 +486,11 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`Error updating document: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error updating document: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to update document');
     }
   }
@@ -525,7 +561,11 @@ export class DocumentsService {
 
       return result;
     } catch (error) {
-      this.logger.error(`Error getting storage statistics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error getting storage statistics: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to get storage statistics');
     }
   }

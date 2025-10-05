@@ -234,7 +234,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       try {
         payload = this.jwtService.verify(token);
       } catch (error) {
-        this.logger.warn(`Connection rejected: Invalid JWT token from IP ${ipAddress} - ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        this.logger.warn(`Connection rejected: Invalid JWT token from IP ${ipAddress} - ${errorMessage}`);
         client.emit('error', { message: 'Invalid authentication token' });
         client.disconnect();
         return;
@@ -387,7 +389,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         try {
           client.leave(roomName);
         } catch (error) {
-          this.logger.warn(`Failed to leave room ${roomName}: ${error.message}`);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          this.logger.warn(`Failed to leave room ${roomName}: ${errorMessage}`);
         }
       });
       this.logger.debug(`Client ${client.id} left ${rooms.size} rooms`);
@@ -902,7 +906,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.log(`Message sent in thread ${payload.threadId} by user ${client.userId}`);
     } catch (error) {
-      this.logger.error(`Failed to send message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to send message: ${errorMessage}`);
       client.emit('error', { message: 'Failed to send message', error: error.message });
     }
   }
@@ -949,7 +955,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.debug(`User ${client.userId} started typing in thread ${payload.threadId}`);
     } catch (error) {
-      this.logger.error(`Failed to handle typing start: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to handle typing start: ${errorMessage}`);
     }
   }
 
@@ -986,7 +994,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.debug(`User ${client.userId} stopped typing in thread ${payload.threadId}`);
     } catch (error) {
-      this.logger.error(`Failed to handle typing stop: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to handle typing stop: ${errorMessage}`);
     }
   }
 
@@ -1012,7 +1022,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.debug(`Message ${payload.messageId} marked as read by ${client.userId}`);
     } catch (error) {
-      this.logger.error(`Failed to handle message read: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to handle message read: ${errorMessage}`);
     }
   }
 
@@ -1042,7 +1054,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.log(`Message ${payload.messageId} edited by user ${client.userId}`);
     } catch (error) {
-      this.logger.error(`Failed to edit message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to edit message: ${errorMessage}`);
       client.emit('error', { message: 'Failed to edit message', error: error.message });
     }
   }
@@ -1070,7 +1084,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.log(`Message ${payload.messageId} deleted by user ${client.userId}`);
     } catch (error) {
-      this.logger.error(`Failed to delete message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to delete message: ${errorMessage}`);
       client.emit('error', { message: 'Failed to delete message', error: error.message });
     }
   }
@@ -1105,7 +1121,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.debug(`Client ${client.id} subscribed to thread ${payload.threadId}`);
     } catch (error) {
-      this.logger.error(`Failed to subscribe to thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to subscribe to thread: ${errorMessage}`);
       client.emit('error', { message: 'Failed to subscribe to thread', error: error.message });
     }
   }
@@ -1132,7 +1150,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       this.logger.debug(`Client ${client.id} unsubscribed from thread ${payload.threadId}`);
     } catch (error) {
-      this.logger.error(`Failed to unsubscribe from thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to unsubscribe from thread: ${errorMessage}`);
     }
   }
 

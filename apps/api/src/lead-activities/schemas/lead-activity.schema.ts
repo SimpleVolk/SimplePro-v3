@@ -25,26 +25,26 @@ export enum ActivityOutcome {
 @Schema({ timestamps: true })
 export class LeadActivity {
   @Prop({ required: true, unique: true })
-  activityId: string;
+  activityId!: string;
 
   @Prop({ required: true })
-  opportunityId: string;
+  opportunityId!: string;
 
   @Prop({ required: true })
-  customerId: string;
+  customerId!: string;
 
   @Prop({
     type: String,
     enum: Object.values(ActivityType),
     required: true
   })
-  activityType: ActivityType;
+  activityType!: ActivityType;
 
   @Prop({ required: true })
-  subject: string;
+  subject!: string;
 
   @Prop()
-  description: string;
+  description!: string;
 
   @Prop({
     type: String,
@@ -62,13 +62,13 @@ export class LeadActivity {
   dueDate?: Date;
 
   @Prop({ required: true })
-  assignedTo: string;
+  assignedTo!: string;
 
   @Prop()
   completedBy?: string;
 
   @Prop({ type: Object, default: {} })
-  metadata: {
+  metadata!: {
     phoneDuration?: number;
     emailOpened?: boolean;
     quoteValue?: number;
@@ -78,7 +78,7 @@ export class LeadActivity {
   };
 
   @Prop({ required: true })
-  createdBy: string;
+  createdBy!: string;
 
   @Prop()
   updatedBy?: string;

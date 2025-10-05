@@ -15,14 +15,14 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { AuthenticatedRequest } from '../types';
+import type { AuthenticatedRequest } from '../types';
 import {
   CrewScheduleService,
   TimeOffService,
   AutoAssignmentService,
   WorkloadService,
 } from './services';
-import {
+import type {
   SetAvailabilityDto,
   UpdateAvailabilityDto,
   RecurringAvailabilityDto,

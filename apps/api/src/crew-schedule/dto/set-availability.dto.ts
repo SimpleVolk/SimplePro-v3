@@ -9,23 +9,23 @@ import {
 
 export class SetAvailabilityDto {
   @IsMongoId()
-  crewMemberId: string;
+  crewMemberId!: string;
 
   @IsDateString()
-  date: string;
+  date!: string;
 
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'startTime must be in HH:mm format',
   })
-  startTime: string;
+  startTime!: string;
 
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'endTime must be in HH:mm format',
   })
-  endTime: string;
+  endTime!: string;
 
   @IsEnum(['available', 'busy', 'time_off'])
-  status: string;
+  status!: string;
 
   @IsString()
   @IsOptional()
@@ -56,7 +56,7 @@ export class UpdateAvailabilityDto {
 
 export class RecurringAvailabilityDto {
   @IsMongoId()
-  crewMemberId: string;
+  crewMemberId!: string;
 
   @IsEnum([
     'monday',
@@ -67,28 +67,28 @@ export class RecurringAvailabilityDto {
     'saturday',
     'sunday',
   ])
-  recurringDay: string;
+  recurringDay!: string;
 
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'startTime must be in HH:mm format',
   })
-  startTime: string;
+  startTime!: string;
 
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'endTime must be in HH:mm format',
   })
-  endTime: string;
+  endTime!: string;
 
   @IsEnum(['available', 'busy', 'time_off'])
-  status: string;
+  status!: string;
 
   @IsString()
   @IsOptional()
   notes?: string;
 
   @IsDateString()
-  effectiveFrom: string;
+  effectiveFrom!: string;
 
   @IsDateString()
-  effectiveUntil: string;
+  effectiveUntil!: string;
 }

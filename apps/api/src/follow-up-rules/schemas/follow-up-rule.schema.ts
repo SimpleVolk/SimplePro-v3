@@ -46,28 +46,28 @@ export interface RuleAction {
 @Schema({ timestamps: true })
 export class FollowUpRule {
   @Prop({ required: true, unique: true })
-  ruleId: string;
+  ruleId!: string;
 
   @Prop({ required: true })
-  name: string;
+  name!: string;
 
   @Prop()
-  description: string;
+  description!: string;
 
   @Prop({ type: Object, required: true })
-  trigger: RuleTrigger;
+  trigger!: RuleTrigger;
 
   @Prop({ type: [Object], required: true })
-  actions: RuleAction[];
+  actions!: RuleAction[];
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: 0 })
-  priority: number;
+  priority!: number;
 
   @Prop({ required: true })
-  createdBy: string;
+  createdBy!: string;
 
   @Prop()
   updatedBy?: string;

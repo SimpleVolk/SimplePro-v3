@@ -6,29 +6,29 @@ export type CrewAvailabilityDocument = CrewAvailability & Document;
 @Schema({ timestamps: true })
 export class CrewAvailability {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  crewMemberId: Types.ObjectId;
+  crewMemberId!: Types.ObjectId;
 
   @Prop({ required: true, type: Date })
-  date: Date; // YYYY-MM-DD
+  date!: Date; // YYYY-MM-DD
 
   @Prop({ required: true })
-  startTime: string; // HH:mm format
+  startTime!: string; // HH:mm format
 
   @Prop({ required: true })
-  endTime: string; // HH:mm format
+  endTime!: string; // HH:mm format
 
   @Prop({
     required: true,
     enum: ['available', 'busy', 'time_off'],
     default: 'available',
   })
-  status: string;
+  status!: string;
 
   @Prop()
   notes?: string;
 
   @Prop({ default: false })
-  isRecurring: boolean;
+  isRecurring!: boolean;
 
   @Prop({
     type: String,

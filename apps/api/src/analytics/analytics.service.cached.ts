@@ -33,7 +33,6 @@ export async function getDashboardMetricsCached(this: any) {
   const now = new Date();
   const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const thisYear = new Date(now.getFullYear(), 0, 1);
 
   const [
     totalJobs,
@@ -154,8 +153,8 @@ export async function getRevenueAnalysisCached(
     byStatus,
     byMonth,
     topCustomers,
-    totalRevenue: byStatus.reduce((sum, item) => sum + item.revenue, 0),
-    totalJobs: byStatus.reduce((sum, item) => sum + item.count, 0),
+    totalRevenue: byStatus.reduce((sum: number, item: any) => sum + item.revenue, 0),
+    totalJobs: byStatus.reduce((sum: number, item: any) => sum + item.count, 0),
   };
 
   // Cache for 10 minutes

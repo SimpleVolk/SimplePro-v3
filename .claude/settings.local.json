@@ -115,7 +115,11 @@
       "Bash(npx nx dep-graph:*)",
       "Bash(cloc:*)",
       "Bash(npx depcheck:*)",
-      "Bash(do echo -n \"$dir%/: \")"
+      "Bash(do echo -n \"$dir%/: \")",
+      "Bash(gh workflow:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(cut:*)"
     ],
     "deny": [],
     "ask": []

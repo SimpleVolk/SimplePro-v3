@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CustomerDataLoader } from '../dataloaders/customer.dataloader';
 import { EstimateDataLoader } from '../dataloaders/estimate.dataloader';
 import { CrewDataLoader } from '../dataloaders/crew.dataloader';
-import {
+import type {
   Job,
   CreateJobDto,
   UpdateJobDto,

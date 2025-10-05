@@ -12,19 +12,19 @@ import {
 export class AutoAssignDto {
   @IsArray()
   @IsString({ each: true })
-  requiredSkills: string[];
+  requiredSkills!: string[];
 
   @IsInt()
   @Min(1)
   @Max(10)
-  crewSize: number;
+  crewSize!: number;
 
   @IsDateString()
-  jobDate: string;
+  jobDate!: string;
 
   @IsInt()
   @Min(1)
-  estimatedDuration: number; // hours
+  estimatedDuration!: number; // hours
 
   @IsMongoId()
   @IsOptional()
@@ -39,7 +39,7 @@ export class AutoAssignDto {
 export class ManualAssignDto {
   @IsArray()
   @IsMongoId({ each: true })
-  crewMemberIds: string[];
+  crewMemberIds!: string[];
 
   @IsMongoId()
   @IsOptional()

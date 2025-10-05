@@ -2,13 +2,13 @@ import { IsString, IsDateString, IsEnum, IsOptional } from 'class-validator';
 
 export class TimeOffRequestDto {
   @IsDateString()
-  startDate: string;
+  startDate!: string;
 
   @IsDateString()
-  endDate: string;
+  endDate!: string;
 
   @IsEnum(['vacation', 'sick', 'personal', 'other'])
-  type: string;
+  type!: string;
 
   @IsString()
   @IsOptional()
@@ -17,7 +17,7 @@ export class TimeOffRequestDto {
 
 export class ReviewTimeOffDto {
   @IsEnum(['approved', 'denied'])
-  decision: 'approved' | 'denied';
+  decision!: 'approved' | 'denied';
 
   @IsString()
   @IsOptional()

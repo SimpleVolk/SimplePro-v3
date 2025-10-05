@@ -4,15 +4,15 @@ import { QuoteStatus } from '../schemas/quote-history.schema';
 export class CreateQuoteHistoryDto {
   @IsString()
   @IsNotEmpty()
-  estimateId: string;
+  estimateId!: string;
 
   @IsString()
   @IsNotEmpty()
-  opportunityId: string;
+  opportunityId!: string;
 
   @IsString()
   @IsNotEmpty()
-  customerId: string;
+  customerId!: string;
 
   @IsNumber()
   @IsOptional()
@@ -20,7 +20,7 @@ export class CreateQuoteHistoryDto {
 
   @IsString()
   @IsNotEmpty()
-  quoteNumber: string;
+  quoteNumber!: string;
 
   @IsEnum(QuoteStatus)
   @IsOptional()
@@ -28,7 +28,7 @@ export class CreateQuoteHistoryDto {
 
   @IsObject()
   @IsNotEmpty()
-  quoteData: {
+  quoteData!: {
     totalPrice: number;
     breakdown?: Record<string, any>;
     validUntil?: Date;
@@ -42,13 +42,13 @@ export class CreateQuoteHistoryDto {
 
   @IsString()
   @IsNotEmpty()
-  createdBy: string;
+  createdBy!: string;
 }
 
 export class UpdateQuoteStatusDto {
   @IsEnum(QuoteStatus)
   @IsNotEmpty()
-  status: QuoteStatus;
+  status!: QuoteStatus;
 
   @IsString()
   @IsOptional()
@@ -58,7 +58,7 @@ export class UpdateQuoteStatusDto {
 export class AddInteractionDto {
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type!: string;
 
   @IsObject()
   @IsOptional()
@@ -72,11 +72,11 @@ export class AddInteractionDto {
 export class AddSalesActivityDto {
   @IsString()
   @IsNotEmpty()
-  activityType: string;
+  activityType!: string;
 
   @IsString()
   @IsNotEmpty()
-  performedBy: string;
+  performedBy!: string;
 
   @IsString()
   @IsOptional()
@@ -90,15 +90,15 @@ export class AddSalesActivityDto {
 export class CreateRevisionDto {
   @IsString()
   @IsNotEmpty()
-  revisedBy: string;
+  revisedBy!: string;
 
   @IsNumber()
   @IsNotEmpty()
-  priceChange: number;
+  priceChange!: number;
 
   @IsString()
   @IsNotEmpty()
-  changeReason: string;
+  changeReason!: string;
 
   @IsString()
   @IsOptional()
@@ -106,7 +106,7 @@ export class CreateRevisionDto {
 
   @IsObject()
   @IsNotEmpty()
-  newQuoteData: {
+  newQuoteData!: {
     totalPrice: number;
     breakdown?: Record<string, any>;
     validUntil?: Date;
@@ -118,7 +118,7 @@ export class CreateRevisionDto {
 export class MarkWonDto {
   @IsString()
   @IsNotEmpty()
-  winReason: string;
+  winReason!: string;
 
   @IsString()
   @IsOptional()
@@ -140,7 +140,7 @@ export class MarkWonDto {
 export class MarkLostDto {
   @IsString()
   @IsNotEmpty()
-  lostReason: string;
+  lostReason!: string;
 
   @IsString()
   @IsOptional()
@@ -166,9 +166,9 @@ export class MarkLostDto {
 export class DateRangeDto {
   @IsDateString()
   @IsNotEmpty()
-  startDate: string;
+  startDate!: string;
 
   @IsDateString()
   @IsNotEmpty()
-  endDate: string;
+  endDate!: string;
 }

@@ -45,7 +45,11 @@ export class MinioService implements OnModuleInit {
         this.logger.log(`Bucket already exists: ${this.bucket}`);
       }
     } catch (error) {
-      this.logger.error(`Error ensuring bucket exists: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error ensuring bucket exists: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to initialize MinIO storage');
     }
   }
@@ -117,7 +121,11 @@ export class MinioService implements OnModuleInit {
       this.logger.log(`File uploaded: ${storageKey} (${file.length} bytes)`);
       return storageKey;
     } catch (error) {
-      this.logger.error(`Error uploading file: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error uploading file: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to upload file to storage');
     }
   }
@@ -138,7 +146,11 @@ export class MinioService implements OnModuleInit {
         stream.on('error', (error) => reject(error));
       });
     } catch (error) {
-      this.logger.error(`Error downloading file: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error downloading file: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to download file from storage');
     }
   }
@@ -152,7 +164,11 @@ export class MinioService implements OnModuleInit {
       await this.minioClient.removeObject(this.bucket, storageKey);
       this.logger.log(`File deleted: ${storageKey}`);
     } catch (error) {
-      this.logger.error(`Error deleting file: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error deleting file: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to delete file from storage');
     }
   }
@@ -175,7 +191,11 @@ export class MinioService implements OnModuleInit {
       );
       return url;
     } catch (error) {
-      this.logger.error(`Error generating presigned URL: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error generating presigned URL: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to generate download link');
     }
   }
@@ -200,7 +220,11 @@ export class MinioService implements OnModuleInit {
         stream.on('error', (error) => reject(error));
       });
     } catch (error) {
-      this.logger.error(`Error listing files: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error listing files: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to list files');
     }
   }
@@ -214,7 +238,11 @@ export class MinioService implements OnModuleInit {
     try {
       return await this.minioClient.statObject(this.bucket, storageKey);
     } catch (error) {
-      this.logger.error(`Error getting file stats: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Error getting file stats: ${errorMessage}`, errorStack);
       throw new InternalServerErrorException('Failed to get file information');
     }
   }

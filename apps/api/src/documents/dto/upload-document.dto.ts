@@ -10,13 +10,13 @@ import { DocumentType, EntityType } from '../schemas/document.schema';
 
 export class UploadDocumentDto {
   @IsEnum(DocumentType)
-  documentType: DocumentType;
+  documentType!: DocumentType;
 
   @IsEnum(EntityType)
-  entityType: EntityType;
+  entityType!: EntityType;
 
   @IsMongoId()
-  entityId: string;
+  entityId!: string;
 
   @IsArray()
   @IsString({ each: true })

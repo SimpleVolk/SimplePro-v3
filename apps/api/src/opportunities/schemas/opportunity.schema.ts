@@ -13,10 +13,10 @@ export type OpportunityDocument = Opportunity & Document & {
 @Schema({ timestamps: true })
 export class Opportunity {
   @Prop({ required: true })
-  customerId: string;
+  customerId!: string;
 
   @Prop({ type: String, enum: ['existing', 'new'], default: 'existing' })
-  customerType: string;
+  customerType!: string;
 
   @Prop({ type: Object })
   newCustomer?: {
@@ -35,19 +35,19 @@ export class Opportunity {
   };
 
   @Prop({ type: String, enum: ['local', 'long_distance', 'storage', 'packing_only'], required: true })
-  service: string;
+  service!: string;
 
   @Prop({ required: true })
-  moveDate: Date;
+  moveDate!: Date;
 
   @Prop({ type: String, enum: ['studio', '1br', '2br', '3br', '4br', '5br', 'custom'] })
-  moveSize: string;
+  moveSize!: string;
 
   @Prop({ type: String, enum: ['exact', 'week', 'month'], default: 'exact' })
-  flexibility: string;
+  flexibility!: string;
 
   @Prop({ type: Object, required: true })
-  pickup: {
+  pickup!: {
     address: string;
     buildingType: string;
     floorLevel: number;
@@ -61,7 +61,7 @@ export class Opportunity {
   };
 
   @Prop({ type: Object, required: true })
-  delivery: {
+  delivery!: {
     address: string;
     buildingType: string;
     floorLevel: number;
@@ -75,7 +75,7 @@ export class Opportunity {
   };
 
   @Prop({ type: Array, default: [] })
-  rooms: Array<{
+  rooms!: Array<{
     id: string;
     type: string;
     description: string;
@@ -86,13 +86,13 @@ export class Opportunity {
   }>;
 
   @Prop({ required: true })
-  totalWeight: number;
+  totalWeight!: number;
 
   @Prop({ required: true })
-  totalVolume: number;
+  totalVolume!: number;
 
   @Prop({ type: Object })
-  specialItems: {
+  specialItems!: {
     piano: boolean;
     poolTable: boolean;
     safe: boolean;
@@ -103,7 +103,7 @@ export class Opportunity {
   };
 
   @Prop({ type: Object })
-  additionalServices: {
+  additionalServices!: {
     packing: string;
     unpacking: boolean;
     assembly: boolean;
@@ -113,7 +113,7 @@ export class Opportunity {
   };
 
   @Prop({ type: String, enum: ['website', 'phone', 'referral', 'partner', 'walkin', 'other'], default: 'website' })
-  leadSource: string;
+  leadSource!: string;
 
   @Prop({ index: true })
   referralId?: string;
@@ -125,31 +125,31 @@ export class Opportunity {
   assignedSalesRep?: string;
 
   @Prop({ type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' })
-  priority: string;
+  priority!: string;
 
   @Prop()
-  internalNotes: string;
+  internalNotes!: string;
 
   @Prop()
   followUpDate?: Date;
 
   @Prop({ required: true })
-  distance: number;
+  distance!: number;
 
   @Prop({ required: true })
-  estimatedDuration: number;
+  estimatedDuration!: number;
 
   @Prop({ required: true })
-  crewSize: number;
+  crewSize!: number;
 
   @Prop({ default: false })
-  isWeekend: boolean;
+  isWeekend!: boolean;
 
   @Prop({ default: false })
-  isHoliday: boolean;
+  isHoliday!: boolean;
 
   @Prop({ type: String, enum: ['peak', 'standard', 'off_peak'], default: 'standard' })
-  seasonalPeriod: string;
+  seasonalPeriod!: string;
 
   @Prop()
   estimateId?: string;
@@ -158,10 +158,10 @@ export class Opportunity {
   estimatedPrice?: number;
 
   @Prop({ type: String, enum: ['open', 'contacted', 'quoted', 'negotiating', 'won', 'lost', 'cancelled'], default: 'open' })
-  status: string;
+  status!: string;
 
   @Prop({ required: true })
-  createdBy: string;
+  createdBy!: string;
 
   @Prop()
   updatedBy?: string;

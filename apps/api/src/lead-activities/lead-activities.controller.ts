@@ -11,13 +11,13 @@ import {
   Request,
 } from '@nestjs/common';
 import { LeadActivitiesService } from './lead-activities.service';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { CompleteActivityDto } from './dto/complete-activity.dto';
-import { ActivityQueryDto } from './dto/activity-query.dto';
+import type { CreateActivityDto } from './dto/create-activity.dto';
+import type { CompleteActivityDto } from './dto/complete-activity.dto';
+import type { ActivityQueryDto } from './dto/activity-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { AuthenticatedRequest } from '../types';
+import type { AuthenticatedRequest } from '../types';
 
 @Controller('api/lead-activities')
 @UseGuards(JwtAuthGuard, RolesGuard)

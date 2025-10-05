@@ -16,35 +16,35 @@ import { EventType, ActionType, RuleTrigger, RuleAction } from '../schemas/follo
 class TriggerDto implements RuleTrigger {
   @IsEnum(EventType)
   @IsNotEmpty()
-  eventType: EventType;
+  eventType!: EventType;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ConditionDto)
-  conditions: ConditionDto[];
+  conditions!: ConditionDto[];
 }
 
 class ConditionDto {
   @IsString()
   @IsNotEmpty()
-  field: string;
+  field!: string;
 
   @IsString()
   @IsNotEmpty()
-  operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'in' | 'not_in';
+  operator!: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'in' | 'not_in';
 
   @IsNotEmpty()
-  value: any;
+  value!: any;
 }
 
 class ActionDto implements RuleAction {
   @IsEnum(ActionType)
   @IsNotEmpty()
-  actionType: ActionType;
+  actionType!: ActionType;
 
   @IsNumber()
   @IsNotEmpty()
-  delay: number;
+  delay!: number;
 
   @IsString()
   @IsOptional()
@@ -78,7 +78,7 @@ export class CreateRuleDto {
 
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @IsString()
   @IsOptional()
@@ -87,13 +87,13 @@ export class CreateRuleDto {
   @ValidateNested()
   @Type(() => TriggerDto)
   @IsNotEmpty()
-  trigger: TriggerDto;
+  trigger!: TriggerDto;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ActionDto)
   @IsNotEmpty()
-  actions: ActionDto[];
+  actions!: ActionDto[];
 
   @IsBoolean()
   @IsOptional()

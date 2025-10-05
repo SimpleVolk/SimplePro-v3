@@ -16,20 +16,20 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { DocumentsService } from './documents.service';
-import {
+import type {
   UploadDocumentDto,
   CreateShareLinkDto,
   DocumentFiltersDto,
   UpdateDocumentDto,
   AccessSharedDocumentDto,
 } from './dto';
-import { MAX_FILE_SIZE } from './interfaces/document.interface';
+import type { MAX_FILE_SIZE } from './interfaces/document.interface';
 
 @Controller('documents')
 @UseGuards(JwtAuthGuard, RolesGuard)

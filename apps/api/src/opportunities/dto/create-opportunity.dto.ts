@@ -4,22 +4,22 @@ import { Type } from 'class-transformer';
 class NewCustomerDto {
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  lastName!: string;
 
   @IsString()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
   @IsString()
   @IsNotEmpty()
-  phone: string;
+  phone!: string;
 
   @IsObject()
-  address: {
+  address!: {
     street: string;
     city: string;
     state: string;
@@ -28,7 +28,7 @@ class NewCustomerDto {
 
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type!: string;
 
   @IsString()
   @IsOptional()
@@ -38,33 +38,33 @@ class NewCustomerDto {
 class LocationDto {
   @IsString()
   @IsNotEmpty()
-  address: string;
+  address!: string;
 
   @IsString()
   @IsNotEmpty()
-  buildingType: string;
+  buildingType!: string;
 
   @IsNumber()
-  floorLevel: number;
+  floorLevel!: number;
 
   @IsBoolean()
-  elevatorAccess: boolean;
+  elevatorAccess!: boolean;
 
   @IsNumber()
-  stairsCount: number;
+  stairsCount!: number;
 
   @IsBoolean()
-  longCarry: boolean;
+  longCarry!: boolean;
 
   @IsNumber()
-  parkingDistance: number;
+  parkingDistance!: number;
 
   @IsString()
   @IsNotEmpty()
-  accessDifficulty: string;
+  accessDifficulty!: string;
 
   @IsBoolean()
-  narrowHallways: boolean;
+  narrowHallways!: boolean;
 
   @IsString()
   @IsOptional()
@@ -74,81 +74,81 @@ class LocationDto {
 class RoomDto {
   @IsString()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type!: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
   @IsArray()
-  items: any[];
+  items!: any[];
 
   @IsBoolean()
-  packingRequired: boolean;
+  packingRequired!: boolean;
 
   @IsNumber()
-  totalWeight: number;
+  totalWeight!: number;
 
   @IsNumber()
-  totalVolume: number;
+  totalVolume!: number;
 }
 
 class SpecialItemsDto {
   @IsBoolean()
-  piano: boolean;
+  piano!: boolean;
 
   @IsBoolean()
-  poolTable: boolean;
+  poolTable!: boolean;
 
   @IsBoolean()
-  safe: boolean;
+  safe!: boolean;
 
   @IsBoolean()
-  antiques: boolean;
+  antiques!: boolean;
 
   @IsBoolean()
-  artwork: boolean;
+  artwork!: boolean;
 
   @IsNumber()
-  fragileItems: number;
+  fragileItems!: number;
 
   @IsNumber()
-  valuableItems: number;
+  valuableItems!: number;
 }
 
 class AdditionalServicesDto {
   @IsString()
   @IsNotEmpty()
-  packing: string;
+  packing!: string;
 
   @IsBoolean()
-  unpacking: boolean;
+  unpacking!: boolean;
 
   @IsBoolean()
-  assembly: boolean;
+  assembly!: boolean;
 
   @IsBoolean()
-  storage: boolean;
+  storage!: boolean;
 
   @IsNumber()
   @IsOptional()
   storageDuration?: number;
 
   @IsBoolean()
-  cleaning: boolean;
+  cleaning!: boolean;
 }
 
 export class CreateOpportunityDto {
   @IsString()
   @IsNotEmpty()
-  customerId: string;
+  customerId!: string;
 
   @IsEnum(['existing', 'new'])
-  customerType: 'existing' | 'new';
+  customerType!: 'existing' | 'new';
 
   @ValidateNested()
   @Type(() => NewCustomerDto)
@@ -156,54 +156,54 @@ export class CreateOpportunityDto {
   newCustomer?: NewCustomerDto;
 
   @IsEnum(['local', 'long_distance', 'storage', 'packing_only'])
-  service: string;
+  service!: string;
 
   @IsDate()
   @Type(() => Date)
-  moveDate: Date;
+  moveDate!: Date;
 
   @IsEnum(['studio', '1br', '2br', '3br', '4br', '5br', 'custom'])
-  moveSize: string;
+  moveSize!: string;
 
   @IsEnum(['exact', 'week', 'month'])
-  flexibility: string;
+  flexibility!: string;
 
   @ValidateNested()
   @Type(() => LocationDto)
-  pickup: LocationDto;
+  pickup!: LocationDto;
 
   @ValidateNested()
   @Type(() => LocationDto)
-  delivery: LocationDto;
+  delivery!: LocationDto;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RoomDto)
-  rooms: RoomDto[];
+  rooms!: RoomDto[];
 
   @IsNumber()
-  totalWeight: number;
+  totalWeight!: number;
 
   @IsNumber()
-  totalVolume: number;
+  totalVolume!: number;
 
   @ValidateNested()
   @Type(() => SpecialItemsDto)
-  specialItems: SpecialItemsDto;
+  specialItems!: SpecialItemsDto;
 
   @ValidateNested()
   @Type(() => AdditionalServicesDto)
-  additionalServices: AdditionalServicesDto;
+  additionalServices!: AdditionalServicesDto;
 
   @IsEnum(['website', 'phone', 'referral', 'partner', 'walkin', 'other'])
-  leadSource: string;
+  leadSource!: string;
 
   @IsString()
   @IsOptional()
   assignedSalesRep?: string;
 
   @IsEnum(['low', 'medium', 'high', 'urgent'])
-  priority: string;
+  priority!: string;
 
   @IsString()
   @IsOptional()
@@ -215,22 +215,22 @@ export class CreateOpportunityDto {
   followUpDate?: Date;
 
   @IsNumber()
-  distance: number;
+  distance!: number;
 
   @IsNumber()
-  estimatedDuration: number;
+  estimatedDuration!: number;
 
   @IsNumber()
-  crewSize: number;
+  crewSize!: number;
 
   @IsBoolean()
-  isWeekend: boolean;
+  isWeekend!: boolean;
 
   @IsBoolean()
-  isHoliday: boolean;
+  isHoliday!: boolean;
 
   @IsEnum(['peak', 'standard', 'off_peak'])
-  seasonalPeriod: string;
+  seasonalPeriod!: string;
 
   @IsString()
   @IsOptional()

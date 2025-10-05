@@ -16,19 +16,19 @@ export class CreateActivityDto {
 
   @IsString()
   @IsNotEmpty()
-  opportunityId: string;
+  opportunityId!: string;
 
   @IsString()
   @IsNotEmpty()
-  customerId: string;
+  customerId!: string;
 
   @IsEnum(ActivityType)
   @IsNotEmpty()
-  activityType: ActivityType;
+  activityType!: ActivityType;
 
   @IsString()
   @IsNotEmpty()
-  subject: string;
+  subject!: string;
 
   @IsString()
   @IsOptional()
@@ -44,7 +44,7 @@ export class CreateActivityDto {
 
   @IsString()
   @IsNotEmpty()
-  assignedTo: string;
+  assignedTo!: string;
 
   @IsObject()
   @IsOptional()

@@ -62,7 +62,11 @@ export class MetricsService {
       await this.analyticsService.trackEvent(event);
       this.logger.debug(`Tracked metric: ${metric.name} = ${metric.value}`);
     } catch (error) {
-      this.logger.error(`Failed to track metric ${metric.name}: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to track metric ${metric.name}: ${errorMessage}`, errorStack);
     }
   }
 
@@ -157,7 +161,11 @@ export class MetricsService {
 
       this.logger.log(`Tracked job metrics for job ${jobData.jobId}`);
     } catch (error) {
-      this.logger.error(`Failed to track job metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to track job metrics: ${errorMessage}`, errorStack);
     }
   }
 
@@ -190,7 +198,11 @@ export class MetricsService {
       await this.analyticsService.trackEvent(event);
       this.logger.debug(`Tracked crew metrics for crew ${crewData.crewId}`);
     } catch (error) {
-      this.logger.error(`Failed to track crew metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to track crew metrics: ${errorMessage}`, errorStack);
     }
   }
 
@@ -216,7 +228,11 @@ export class MetricsService {
       await this.analyticsService.trackEvent(event);
       this.logger.log(`Tracked customer acquisition: ${customerData.customerId}`);
     } catch (error) {
-      this.logger.error(`Failed to track customer acquisition: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to track customer acquisition: ${errorMessage}`, errorStack);
     }
   }
 
@@ -302,7 +318,11 @@ export class MetricsService {
       await Promise.all(events.map(event => this.analyticsService.trackEvent(event)));
       this.logger.log(`Tracked estimate metrics for estimate ${estimateData.estimateId}`);
     } catch (error) {
-      this.logger.error(`Failed to track estimate metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to track estimate metrics: ${errorMessage}`, errorStack);
     }
   }
 
@@ -343,7 +363,11 @@ export class MetricsService {
         costPerJob: dashboardMetrics.averageJobValue * 0.65 // Mock cost ratio
       };
     } catch (error) {
-      this.logger.error(`Failed to get business metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to get business metrics: ${errorMessage}`, errorStack);
       throw error;
     }
   }

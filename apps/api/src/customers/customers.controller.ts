@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { CustomersService } from './customers.service';
-import {
+import type {
   CreateCustomerDto,
   UpdateCustomerDto,
   CustomerFilters,
@@ -25,10 +25,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../auth/interfaces/user.interface';
+import type { User } from '../auth/interfaces/user.interface';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
-import { CustomerQueryFiltersDto } from '../common/dto/query-filters.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import type { CustomerQueryFiltersDto } from '../common/dto/query-filters.dto';
+import type { PaginationDto } from '../common/dto/pagination.dto';
 import { CacheListInterceptor } from '../cache/interceptors/cache-list.interceptor';
 import { CacheTTL } from '../cache/decorators/cache-ttl.decorator';
 

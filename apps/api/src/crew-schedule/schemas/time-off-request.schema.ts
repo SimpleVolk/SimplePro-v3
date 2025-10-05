@@ -6,19 +6,19 @@ export type TimeOffRequestDocument = TimeOffRequest & Document;
 @Schema({ timestamps: true })
 export class TimeOffRequest {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  crewMemberId: Types.ObjectId;
+  crewMemberId!: Types.ObjectId;
 
   @Prop({ required: true, type: Date })
-  startDate: Date;
+  startDate!: Date;
 
   @Prop({ required: true, type: Date })
-  endDate: Date;
+  endDate!: Date;
 
   @Prop({
     required: true,
     enum: ['vacation', 'sick', 'personal', 'other'],
   })
-  type: string;
+  type!: string;
 
   @Prop()
   reason?: string;
@@ -28,7 +28,7 @@ export class TimeOffRequest {
     enum: ['pending', 'approved', 'denied'],
     default: 'pending',
   })
-  status: string;
+  status!: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   reviewedBy?: Types.ObjectId;

@@ -49,7 +49,9 @@ export class MessagesService {
       this.logger.log(`Created new ${dto.threadType} thread: ${thread._id}`);
       return thread;
     } catch (error) {
-      this.logger.error(`Failed to create thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to create thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -75,7 +77,9 @@ export class MessagesService {
 
       return thread;
     } catch (error) {
-      this.logger.error(`Failed to find or create direct thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to find or create direct thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -103,7 +107,9 @@ export class MessagesService {
 
       return thread;
     } catch (error) {
-      this.logger.error(`Failed to find or create job thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to find or create job thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -151,7 +157,9 @@ export class MessagesService {
 
       return threads;
     } catch (error) {
-      this.logger.error(`Failed to get threads: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get threads: ${errorMessage}`);
       throw error;
     }
   }
@@ -170,7 +178,9 @@ export class MessagesService {
 
       return thread;
     } catch (error) {
-      this.logger.error(`Failed to get thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -202,7 +212,9 @@ export class MessagesService {
         this.logger.log(`Removed user ${userId} from thread ${threadId}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to delete thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to delete thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -228,7 +240,9 @@ export class MessagesService {
         this.logger.log(`User ${userId} archived thread ${threadId}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to archive thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to archive thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -275,7 +289,9 @@ export class MessagesService {
         prevCursor: resultMessages.length > 0 ? resultMessages[0]._id.toString() : undefined,
       };
     } catch (error) {
-      this.logger.error(`Failed to get messages: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get messages: ${errorMessage}`);
       throw error;
     }
   }
@@ -317,7 +333,9 @@ export class MessagesService {
       this.logger.log(`Message sent by ${senderId} in thread ${dto.threadId}`);
       return message;
     } catch (error) {
-      this.logger.error(`Failed to send message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to send message: ${errorMessage}`);
       throw error;
     }
   }
@@ -348,7 +366,9 @@ export class MessagesService {
       this.logger.log(`Message ${messageId} edited by ${userId}`);
       return message;
     } catch (error) {
-      this.logger.error(`Failed to edit message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to edit message: ${errorMessage}`);
       throw error;
     }
   }
@@ -372,7 +392,9 @@ export class MessagesService {
 
       this.logger.log(`Message ${messageId} deleted by ${userId}`);
     } catch (error) {
-      this.logger.error(`Failed to delete message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to delete message: ${errorMessage}`);
       throw error;
     }
   }
@@ -403,7 +425,9 @@ export class MessagesService {
 
       this.logger.debug(`Marked ${result.modifiedCount} messages as read in thread ${threadId}`);
     } catch (error) {
-      this.logger.error(`Failed to mark messages as read: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to mark messages as read: ${errorMessage}`);
       throw error;
     }
   }
@@ -429,7 +453,9 @@ export class MessagesService {
 
       return count;
     } catch (error) {
-      this.logger.error(`Failed to get unread count: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get unread count: ${errorMessage}`);
       throw error;
     }
   }
@@ -445,7 +471,9 @@ export class MessagesService {
 
       return count;
     } catch (error) {
-      this.logger.error(`Failed to get unread count for thread: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get unread count for thread: ${errorMessage}`);
       throw error;
     }
   }
@@ -469,7 +497,9 @@ export class MessagesService {
 
       return messages;
     } catch (error) {
-      this.logger.error(`Failed to search messages: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to search messages: ${errorMessage}`);
       throw error;
     }
   }
@@ -487,7 +517,9 @@ export class MessagesService {
 
       return message;
     } catch (error) {
-      this.logger.error(`Failed to get message: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.error(`Failed to get message: ${errorMessage}`);
       throw error;
     }
   }

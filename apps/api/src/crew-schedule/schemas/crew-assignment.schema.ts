@@ -6,28 +6,28 @@ export type CrewAssignmentDocument = CrewAssignment & Document;
 @Schema({ timestamps: true })
 export class CrewAssignment {
   @Prop({ required: true, type: Types.ObjectId, ref: 'Job' })
-  jobId: Types.ObjectId;
+  jobId!: Types.ObjectId;
 
   @Prop({ required: true, type: [{ type: Types.ObjectId, ref: 'User' }] })
-  crewMembers: Types.ObjectId[];
+  crewMembers!: Types.ObjectId[];
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   crewLeadId?: Types.ObjectId;
 
   @Prop({ required: true, type: Date })
-  assignedDate: Date;
+  assignedDate!: Date;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  assignedBy: Types.ObjectId;
+  assignedBy!: Types.ObjectId;
 
   @Prop({ enum: ['manual', 'auto'], default: 'manual' })
-  assignmentMethod: string;
+  assignmentMethod!: string;
 
   @Prop({ type: Object })
   autoAssignmentScores?: Record<string, number>; // crewMemberId -> score
 
   @Prop({ default: false })
-  isConfirmed: boolean;
+  isConfirmed!: boolean;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
   confirmedBy?: Types.ObjectId[];

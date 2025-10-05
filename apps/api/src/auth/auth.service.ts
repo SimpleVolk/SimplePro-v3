@@ -186,7 +186,8 @@ Environment: ${process.env.NODE_ENV || 'development'}
       this.logger.log(`Admin credentials stored securely in: ${credentialsFile}`);
       this.logger.warn('IMPORTANT: Change the default admin password after first login!');
     } catch (error) {
-      this.logger.error('Failed to store admin credentials securely:', error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error('Failed to store admin credentials securely:', errorMessage);
       this.logger.error('Please set admin password manually');
     }
   }
@@ -384,7 +385,8 @@ Environment: ${process.env.NODE_ENV || 'development'}
         throw error;
       }
       // Log security-relevant errors
-      console.error('Token refresh error:', error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Token refresh error:', errorMessage);
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

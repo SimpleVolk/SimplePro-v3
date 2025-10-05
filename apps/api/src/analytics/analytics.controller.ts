@@ -14,8 +14,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AnalyticsService, PeriodFilter } from './analytics.service';
-import { ReportsService, CreateReportDto } from './reports.service';
-import { MetricsService, MetricEvent } from './metrics.service';
+import { ReportsService } from './reports.service';
+import type { CreateReportDto } from './reports.service';
+import { MetricsService } from './metrics.service';
+import type { MetricEvent } from './metrics.service';
 
 @Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -319,7 +321,7 @@ export class AnalyticsController {
     try {
       return await this.reportsService.getReportById(reportId, req.user.id);
     } catch (error) {
-      throw new NotFoundException(error.message);
+      throw new NotFoundException(error instanceof Error ? error.message : 'Report not found');
     }
   }
 

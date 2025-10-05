@@ -11,16 +11,16 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AuditLogsService } from './audit-logs.service';
-import { CreateAuditLogDto } from './dto/create-audit-log.dto';
-import { QueryAuditLogDto, ExportFormat } from './dto/query-audit-log.dto';
+import type { CreateAuditLogDto } from './dto/create-audit-log.dto';
+import type { QueryAuditLogDto, ExportFormat } from './dto/query-audit-log.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../auth/interfaces/user.interface';
+import type { User } from '../auth/interfaces/user.interface';
 
 /**
  * Audit Logs Controller

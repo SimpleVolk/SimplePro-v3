@@ -121,7 +121,11 @@ export class ReportsService {
       this.logger.log(`Created report: ${createReportDto.name} (${reportId})`);
       return savedReport;
     } catch (error) {
-      this.logger.error(`Failed to create report: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to create report: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -248,7 +252,11 @@ export class ReportsService {
         topCustomers
       };
     } catch (error) {
-      this.logger.error(`Failed to generate revenue report: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to generate revenue report: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -315,7 +323,11 @@ export class ReportsService {
         serviceTypePerformance
       };
     } catch (error) {
-      this.logger.error(`Failed to generate performance report: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to generate performance report: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -391,7 +403,11 @@ export class ReportsService {
 
       this.logger.log(`Completed report generation: ${report.id}`);
     } catch (error) {
-      this.logger.error(`Failed to generate report ${report.id}: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      this.logger.error(`Failed to generate report ${report.id}: ${errorMessage}`, errorStack);
 
       await this.reportModel.updateOne(
         { id: report.id },

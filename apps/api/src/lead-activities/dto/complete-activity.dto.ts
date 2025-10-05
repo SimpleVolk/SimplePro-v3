@@ -3,7 +3,7 @@ import { ActivityOutcome } from '../schemas/lead-activity.schema';
 
 export class CompleteActivityDto {
   @IsEnum(ActivityOutcome)
-  outcome: ActivityOutcome;
+  outcome!: ActivityOutcome;
 
   @IsDateString()
   @IsOptional()

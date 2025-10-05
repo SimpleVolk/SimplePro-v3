@@ -1,6 +1,9 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "npmScope": "simplepro",
+  "cli": {
+    "packageManager": "npm"
+  },
   "affected": {
     "defaultBase": "main"
   },

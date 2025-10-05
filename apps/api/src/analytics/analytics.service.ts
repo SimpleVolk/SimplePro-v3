@@ -69,7 +69,7 @@ export class AnalyticsService {
     @InjectModel(Job.name)
     private jobModel: Model<JobDocument>,
     @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
+    private _userModel: Model<UserDocument>,
     private cacheService: CacheService,
   ) {}
 
@@ -86,7 +86,9 @@ export class AnalyticsService {
       this.logger.log(`Tracked event: ${event.eventType} for user ${event.userId}`);
       return savedEvent;
     } catch (error) {
-      this.logger.error(`Failed to track event: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to track event: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -150,7 +152,9 @@ export class AnalyticsService {
 
       return result;
     } catch (error) {
-      this.logger.error(`Failed to get dashboard metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to get dashboard metrics: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -507,7 +511,9 @@ export class AnalyticsService {
         cancellations
       };
     } catch (error) {
-      this.logger.error(`Failed to get activity metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to get activity metrics: ${errorMessage}`, errorStack);
       // Return fallback values on error
       return {
         leads: 0,
@@ -575,7 +581,9 @@ export class AnalyticsService {
         inventorySubmissions
       };
     } catch (error) {
-      this.logger.error(`Failed to get open items: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to get open items: ${errorMessage}`, errorStack);
       // Return fallback values on error
       return {
         unassignedLeads: 0,
@@ -761,7 +769,9 @@ export class AnalyticsService {
         referralSources
       };
     } catch (error) {
-      this.logger.error(`Failed to get sales performance: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to get sales performance: ${errorMessage}`, errorStack);
       // Return fallback values on error
       return {
         topPerformers: [],
