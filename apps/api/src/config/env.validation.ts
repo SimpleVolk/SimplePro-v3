@@ -98,20 +98,20 @@ const baseEnvSchema = z.object({
 
   // Database - MongoDB
   MONGODB_URI: z.string().min(1, 'MongoDB URI is required'),
-  MONGODB_POOL_SIZE: z.string().default('50').transform(val => parseInt(val, 10)),
-  MONGODB_MAX_IDLE_TIME_MS: z.string().default('60000').transform(val => parseInt(val, 10)),
-  MONGODB_SERVER_SELECTION_TIMEOUT_MS: z.string().default('5000').transform(val => parseInt(val, 10)),
+  MONGODB_POOL_SIZE: z.string().default('50').transform((val: string) => parseInt(val, 10)),
+  MONGODB_MAX_IDLE_TIME_MS: z.string().default('60000').transform((val: string) => parseInt(val, 10)),
+  MONGODB_SERVER_SELECTION_TIMEOUT_MS: z.string().default('5000').transform((val: string) => parseInt(val, 10)),
 
   // Redis Cache
   REDIS_HOST: z.string().min(1, 'Redis host is required'),
-  REDIS_PORT: z.string().default('6379').transform(val => parseInt(val, 10)),
+  REDIS_PORT: z.string().default('6379').transform((val: string) => parseInt(val, 10)),
   REDIS_PASSWORD: z.string().min(1, 'Redis password is required')
-    .superRefine((val, ctx) => isSecurePassword(val, ctx, 'Redis password')),
-  REDIS_DB: z.string().default('0').transform(val => parseInt(val, 10)),
-  REDIS_CONNECT_TIMEOUT: z.string().default('10000').transform(val => parseInt(val, 10)),
-  REDIS_TTL: z.string().default('300').transform(val => parseInt(val, 10)),
-  REDIS_SHORT_TTL: z.string().default('60').transform(val => parseInt(val, 10)),
-  REDIS_MEDIUM_TTL: z.string().default('300').transform(val => parseInt(val, 10)),
+    .superRefine((val: string, ctx: any) => isSecurePassword(val, ctx, 'Redis password')),
+  REDIS_DB: z.string().default('0').transform((val: string) => parseInt(val, 10)),
+  REDIS_CONNECT_TIMEOUT: z.string().default('10000').transform((val: string) => parseInt(val, 10)),
+  REDIS_TTL: z.string().default('300').transform((val: string) => parseInt(val, 10)),
+  REDIS_SHORT_TTL: z.string().default('60').transform((val: string) => parseInt(val, 10)),
+  REDIS_MEDIUM_TTL: z.string().default('300').transform((val: string) => parseInt(val, 10)),
   REDIS_LONG_TTL: z.string().default('3600').transform(val => parseInt(val, 10)),
   REDIS_EXTRA_LONG_TTL: z.string().default('86400').transform(val => parseInt(val, 10)),
   REDIS_MAX_ITEMS: z.string().default('100000').transform(val => parseInt(val, 10)),

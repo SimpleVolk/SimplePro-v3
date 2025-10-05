@@ -46,7 +46,7 @@ export interface CacheEvictOptions {
 export function CacheEvict(options: CacheEvictOptions = {}) {
   return function (
     _target: any,
-    _propertyKey: string,
+    propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;

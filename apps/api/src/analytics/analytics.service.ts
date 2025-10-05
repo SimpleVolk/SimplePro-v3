@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { AnalyticsEvent, AnalyticsEventDocument } from './schemas/analytics-event.schema';
 import { Customer, CustomerDocument } from '../customers/schemas/customer.schema';
 import { Job, JobDocument } from '../jobs/schemas/job.schema';
-import { User, UserDocument } from '../auth/schemas/user.schema';
+// import { User, UserDocument } from '../auth/schemas/user.schema';
 import { CacheService } from '../cache/cache.service';
 
 export interface AnalyticsEventInput {
