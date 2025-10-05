@@ -530,7 +530,7 @@ describe('AuthService', () => {
         { id: 'perm1', resource: 'users', action: 'read' },
         { id: 'perm2', resource: 'jobs', action: 'create' }
       ]
-    } as User;
+    } as unknown as User;
 
     it('should check single permission correctly', () => {
       const hasPermission = service.hasPermission(userWithPermissions, 'users', 'read');

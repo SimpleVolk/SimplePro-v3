@@ -83,7 +83,7 @@ export class CustomerQueryFiltersDto extends QueryFiltersDto {
   @Transform(({ value }) => {
     return typeof value === 'string' ? value.toLowerCase() : value;
   })
-  status?: 'lead' | 'prospect' | 'active' | 'inactive';
+  declare status?: 'lead' | 'prospect' | 'active' | 'inactive';
 
   @ApiPropertyOptional({ description: 'Lead source filter' })
   @IsOptional()
@@ -150,7 +150,7 @@ export class JobQueryFiltersDto extends QueryFiltersDto {
   @Transform(({ value }) => {
     return typeof value === 'string' ? value.toLowerCase() : value;
   })
-  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+  declare status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
 
   @ApiPropertyOptional({ description: 'Job type filter' })
   @IsOptional()

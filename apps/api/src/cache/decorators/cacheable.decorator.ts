@@ -27,7 +27,7 @@ export function Cacheable(options: CacheableOptions = {}) {
   ) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (this: any, ...args: any[]) {
       // Get CacheService instance from the class
       const cacheService = this.cacheService;
 

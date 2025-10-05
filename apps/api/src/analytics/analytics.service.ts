@@ -68,8 +68,8 @@ export class AnalyticsService {
     private customerModel: Model<CustomerDocument>,
     @InjectModel(Job.name)
     private jobModel: Model<JobDocument>,
-    @InjectModel(User.name)
-    private _userModel: Model<UserDocument>,
+    // @InjectModel(User.name)
+    // private userModel: Model<UserDocument>,
     private cacheService: CacheService,
   ) {}
 

@@ -26,7 +26,6 @@ describe('CacheService', () => {
     }).compile();
 
     service = module.get<CacheService>(CacheService);
-    configService = module.get<ConfigService>(ConfigService);
 
     // Initialize service
     await service.onModuleInit();

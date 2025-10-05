@@ -30,7 +30,6 @@ export class CacheListInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
-    const httpContext = context.switchToHttp();
 
     // Only cache GET requests
     if (request.method !== 'GET') {

@@ -45,13 +45,13 @@ export interface CacheEvictOptions {
  */
 export function CacheEvict(options: CacheEvictOptions = {}) {
   return function (
-    target: any,
-    propertyKey: string,
+    _target: any,
+    _propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (this: any, ...args: any[]) {
       const cacheService = this.cacheService;
 
       if (!cacheService) {
