@@ -51,11 +51,11 @@ export class DocumentFiltersDto {
   @Max(100)
   @Type(() => Number)
   @IsOptional()
-  limit: number = 50;
+  limit = 50;
 
   @IsInt()
   @Min(0)
   @Type(() => Number)
   @IsOptional()
-  offset: number = 0;
+  offset = 0;
 }

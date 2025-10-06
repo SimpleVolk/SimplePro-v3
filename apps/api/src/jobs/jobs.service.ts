@@ -134,8 +134,8 @@ export class JobsService implements OnModuleInit {
 
   async findAll(
     filters?: JobFilters,
-    skip: number = 0,
-    limit: number = 20,
+    skip = 0,
+    limit = 20,
   ): Promise<PaginatedResponse<Job>> {
     // Build MongoDB query object
     const query: any = {};

@@ -112,7 +112,7 @@ export function createSizeMonitoringMiddleware(
  */
 export function createArraySizeMonitoringMiddleware(
   arrayFields: string[],
-  maxArraySize: number = 1000
+  maxArraySize = 1000
 ) {
   return async function (this: any, next: Function) {
     try {

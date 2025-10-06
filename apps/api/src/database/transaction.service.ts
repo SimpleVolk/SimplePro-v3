@@ -52,7 +52,7 @@ export class TransactionService {
   async withTransaction<T>(
     operation: (session: ClientSession) => Promise<T>,
     options?: TransactionOptions,
-    maxRetries: number = 3,
+    maxRetries = 3,
   ): Promise<T> {
     let lastError: Error | undefined;
     let attempt = 0;

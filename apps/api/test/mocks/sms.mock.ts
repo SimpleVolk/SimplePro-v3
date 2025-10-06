@@ -11,7 +11,7 @@ export interface SMSMessage {
 
 export class SMSServiceMock {
   private sentMessages: SMSMessage[] = [];
-  private fromNumber: string = '+15551234567'; // Mock Twilio number
+  private fromNumber = '+15551234567'; // Mock Twilio number
 
   async sendSMS(to: string, body: string): Promise<SMSMessage> {
     const sid = `SM${Date.now()}${Math.random().toString(36).substring(2, 15)}`;

@@ -147,7 +147,7 @@ export default function EstimateLists() {
 
       {filteredPages.length === 0 && (
         <div className={styles.emptyState}>
-          <p>No lists found matching "{searchTerm}"</p>
+          <p>No lists found matching &quot;{searchTerm}&quot;</p>
           <button onClick={() => setSearchTerm('')} className={styles.clearButton}>
             Clear Search
           </button>

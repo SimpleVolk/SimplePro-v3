@@ -10,7 +10,7 @@ export class DatabaseHealthIndicator extends HealthIndicator {
     super();
   }
 
-  async isHealthy(key: string, timeout: number = 5000): Promise<HealthIndicatorResult> {
+  async isHealthy(key: string, timeout = 5000): Promise<HealthIndicatorResult> {
     const startTime = Date.now();
     
     try {

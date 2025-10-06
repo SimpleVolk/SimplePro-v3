@@ -3,7 +3,7 @@
 import { useState, useEffect, memo, useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../lib/config';
 import styles from './ActivitySection.module.css';
 
 interface ActivityMetrics {

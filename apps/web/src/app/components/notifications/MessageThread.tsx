@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useWebSocket } from '@/app/contexts/WebSocketContext';
-import { useAuth } from '@/app/contexts/AuthContext';
-import { getApiUrl } from '@/lib/config';
+import { useWebSocket } from '../../contexts/WebSocketContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { getApiUrl } from '../../../lib/config';
 import styles from './MessageThread.module.css';
 
 interface Message {

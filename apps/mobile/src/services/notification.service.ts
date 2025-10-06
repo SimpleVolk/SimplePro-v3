@@ -70,6 +70,7 @@ class NotificationService {
     if (Platform.OS === 'android') {
       // Android 13+ requires runtime permission
       if (Platform.Version >= 33) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { PermissionsAndroid } = require('react-native');
         try {
           await PermissionsAndroid.request(

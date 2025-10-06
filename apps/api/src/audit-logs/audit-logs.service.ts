@@ -212,7 +212,7 @@ export class AuditLogsService {
    * @param limit - Maximum number of logs to return
    * @returns Array of audit logs
    */
-  async findByUserId(userId: string, limit: number = 100): Promise<AuditLog[]> {
+  async findByUserId(userId: string, limit = 100): Promise<AuditLog[]> {
     return this.auditLogModel
       .find({ userId })
       .sort({ timestamp: -1 })
@@ -232,7 +232,7 @@ export class AuditLogsService {
   async findByResource(
     resource: string,
     resourceId: string,
-    limit: number = 100
+    limit = 100
   ): Promise<AuditLog[]> {
     return this.auditLogModel
       .find({ resource, resourceId })
@@ -382,7 +382,7 @@ export class AuditLogsService {
    * @param daysOld - Delete logs older than this many days
    * @returns Number of deleted logs
    */
-  async cleanup(daysOld: number = 90): Promise<number> {
+  async cleanup(daysOld = 90): Promise<number> {
     this.logger.warn(`Manually cleaning up audit logs older than ${daysOld} days`);
 
     const cutoffDate = new Date();

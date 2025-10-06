@@ -155,7 +155,7 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Generates random string
  */
-export function randomString(length: number = 10): string {
+export function randomString(length = 10): string {
   return Math.random().toString(36).substring(2, 2 + length);
 }
 

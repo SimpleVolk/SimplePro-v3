@@ -4,7 +4,15 @@ import { CircuitBreakerService } from './circuit-breaker.service';
 import { DatabasePerformanceService } from './database-performance.service';
 import { IndexOptimizationService } from './index-optimization.service';
 import { TransactionService } from './transaction.service';
-import { loadSecrets } from '../config/secrets.config';
+
+// Dynamically load secrets.config if available
+let loadSecrets: (() => any) | undefined;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  loadSecrets = require('../config/secrets.config').loadSecrets;
+} catch {
+  loadSecrets = undefined;
+}
 
 @Global()
 @Module({
@@ -13,8 +21,11 @@ import { loadSecrets } from '../config/secrets.config';
       (() => {
         try {
           // Try to load from secure secrets configuration
-          const secrets = loadSecrets();
-          return secrets.mongodb.uri;
+          if (loadSecrets) {
+            const secrets = loadSecrets();
+            return secrets.mongodb.uri;
+          }
+          throw new Error('Secrets not available, falling back to env');
         } catch (error) {
           // Fallback to environment variable for development
           const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URL;

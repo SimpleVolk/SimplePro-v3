@@ -13,7 +13,7 @@ export class ExternalServiceHealthIndicator extends HealthIndicator {
   async isHealthy(
     key: string, 
     url: string, 
-    timeoutMs: number = 5000
+    timeoutMs = 5000
   ): Promise<HealthIndicatorResult> {
     const startTime = Date.now();
     

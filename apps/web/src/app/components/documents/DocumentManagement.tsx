@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../lib/config';
 import { Document, DocumentFilters } from './types';
 import { DocumentUpload } from './DocumentUpload';
 import { DocumentViewer } from './DocumentViewer';

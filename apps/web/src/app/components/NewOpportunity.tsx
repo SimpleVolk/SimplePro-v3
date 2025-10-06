@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../lib/config';
 import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
 import type { EstimateInput, EstimateResult } from '@simplepro/pricing-engine';
 import styles from './NewOpportunity.module.css';

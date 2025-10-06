@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../../lib/config';
 import styles from './AuditLogs.module.css';
 
 interface AuditLog {

@@ -181,7 +181,7 @@ export class MinioService implements OnModuleInit {
    */
   async generatePresignedUrl(
     storageKey: string,
-    expiresIn: number = 3600,
+    expiresIn = 3600,
   ): Promise<string> {
     try {
       const url = await this.minioClient.presignedGetObject(

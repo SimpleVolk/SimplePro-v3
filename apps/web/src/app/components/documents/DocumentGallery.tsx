@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../lib/config';
 import { Document } from './types';
 import { DocumentViewer } from './DocumentViewer';
 import { DocumentUpload } from './DocumentUpload';

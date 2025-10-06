@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../lib/config';
 import { UploadProgress } from './types';
 import styles from './DocumentUpload.module.css';
 

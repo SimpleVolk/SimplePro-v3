@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../lib/config';
 import { ActivityForm } from './ActivityForm';
 import { UpcomingFollowUps } from './UpcomingFollowUps';
 import styles from './LeadActivities.module.css';
@@ -268,12 +268,14 @@ export function LeadActivities() {
       switch (dateRangeFilter) {
         case 'today':
           return activityDate.toDateString() === now.toDateString();
-        case 'week':
+        case 'week': {
           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           return activityDate >= weekAgo;
-        case 'month':
+        }
+        case 'month': {
           const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
           return activityDate >= monthAgo;
+        }
       }
     }
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useWebSocket } from '@/app/contexts/WebSocketContext';
-import { getApiUrl } from '@/lib/config';
+import { useWebSocket } from '../../contexts/WebSocketContext';
+import { getApiUrl } from '../../../lib/config';
 import styles from './NotificationBell.module.css';
 
 interface Notification {

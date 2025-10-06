@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { DeterministicEstimator } from '../../../../packages/pricing-engine/src/estimator';
-import { EstimateInput } from '../../../../packages/pricing-engine/src/schemas/rules.schema';
-import defaultRulesData from '../../../../packages/pricing-engine/src/data/default-rules.json';
+import { DeterministicEstimator } from '@simplepro/pricing-engine';
+import type { EstimateInput } from '@simplepro/pricing-engine';
+import defaultRulesData from '@simplepro/pricing-engine/data/default-rules.json';
 import { CreateEstimateDto } from './dto/create-estimate.dto';
 
 @Injectable()

@@ -3,13 +3,8 @@
  * Handles all document-related API calls including secure shared document access
  */
 
-import { getApiUrl } from '@/lib/config';
-import {
-  AccessSharedDocumentRequest,
-  AccessSharedDocumentResponse,
-  RateLimitError,
-  DocumentAccessError,
-} from '@/app/components/documents/types';
+import { getApiUrl } from '../lib/config';
+import { AccessSharedDocumentRequest, AccessSharedDocumentResponse, RateLimitError, DocumentAccessError } from '../app/components/documents/types';
 
 /**
  * Access a shared document using a secure token and password

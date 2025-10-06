@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git log:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Read(//d//**)"
     ],
     "deny": [],
     "ask": []

@@ -308,7 +308,7 @@ export class IndexOptimizationService implements OnModuleInit {
     return unused;
   }
 
-  async dropUnusedIndexes(dryRun: boolean = true): Promise<any> {
+  async dropUnusedIndexes(dryRun = true): Promise<any> {
     const unused = await this.getUnusedIndexes();
     const results: any = {};
 

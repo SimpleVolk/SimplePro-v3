@@ -245,7 +245,7 @@ export class PartnersService {
   /**
    * Get top performing partners
    */
-  async getTopPartners(limit: number = 10, sortBy: 'leads' | 'revenue' | 'conversion' = 'leads'): Promise<PartnerDocument[]> {
+  async getTopPartners(limit = 10, sortBy: 'leads' | 'revenue' | 'conversion' = 'leads'): Promise<PartnerDocument[]> {
     const sortField = sortBy === 'leads' ? 'statistics.totalLeadsReferred' :
                       sortBy === 'revenue' ? 'statistics.totalRevenue' :
                       'statistics.conversionRate';
@@ -260,7 +260,7 @@ export class PartnersService {
   /**
    * Search partners by text
    */
-  async searchPartners(searchTerm: string, limit: number = 20): Promise<PartnerDocument[]> {
+  async searchPartners(searchTerm: string, limit = 20): Promise<PartnerDocument[]> {
     return this.partnerModel
       .find(
         { $text: { $search: searchTerm } },

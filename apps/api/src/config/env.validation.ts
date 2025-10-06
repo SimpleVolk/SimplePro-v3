@@ -19,7 +19,7 @@ import { Logger } from '@nestjs/common';
 const logger = new Logger('EnvironmentValidation');
 
 // Custom validators
-const isStrongSecret = (value: string, context: z.RefinementCtx, minLength: number = 32): void => {
+const isStrongSecret = (value: string, context: z.RefinementCtx, minLength = 32): void => {
   if (value.length < minLength) {
     context.addIssue({
       code: z.ZodIssueCode.custom,

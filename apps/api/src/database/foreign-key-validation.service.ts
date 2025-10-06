@@ -58,7 +58,7 @@ export class ForeignKeyValidationService {
   createSingleReferenceValidator(
     refField: string,
     refModel: string,
-    required: boolean = false
+    required = false
   ) {
     return async function (this: any, next: Function) {
       try {

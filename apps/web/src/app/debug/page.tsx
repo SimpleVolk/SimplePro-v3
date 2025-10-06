@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../lib/config';
 
 // Force dynamic rendering for debug page
 export const dynamic = 'force-dynamic';

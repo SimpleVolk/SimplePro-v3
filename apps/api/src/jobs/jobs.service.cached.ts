@@ -20,8 +20,8 @@ import { CacheService } from '../cache/cache.service';
 export async function findAllCached(
   this: any,
   filters?: JobFilters,
-  skip: number = 0,
-  limit: number = 20,
+  skip = 0,
+  limit = 20,
 ): Promise<PaginatedResponse<Job>> {
   const cacheService: CacheService = this.cacheService;
 

@@ -35,7 +35,7 @@ export class RedisHealthIndicator extends HealthIndicator {
     }
   }
 
-  async isHealthy(key: string, timeout: number = 5000): Promise<HealthIndicatorResult> {
+  async isHealthy(key: string, timeout = 5000): Promise<HealthIndicatorResult> {
     const startTime = Date.now();
     
     try {

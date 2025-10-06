@@ -20,7 +20,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../lib/config';
 import styles from './AnalyticsOverview.module.css';
 
 interface DashboardMetrics {

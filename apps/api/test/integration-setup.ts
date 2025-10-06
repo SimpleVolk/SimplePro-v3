@@ -209,8 +209,8 @@ export async function createTestUser(userData: Partial<any> = {}): Promise<User>
  * Login test user and get authentication tokens
  */
 export async function loginTestUser(
-  email: string = 'test@example.com',
-  password: string = 'Test123!@#'
+  email = 'test@example.com',
+  password = 'Test123!@#'
 ): Promise<TestAuthData> {
   const response = await request(app.getHttpServer())
     .post('/auth/login')
@@ -301,8 +301,8 @@ export async function cleanupDatabase(): Promise<void> {
  */
 export async function waitForCondition(
   condition: () => Promise<boolean> | boolean,
-  timeout: number = 5000,
-  interval: number = 100
+  timeout = 5000,
+  interval = 100
 ): Promise<void> {
   const startTime = Date.now();
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useWebSocket } from '@/app/contexts/WebSocketContext';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 import styles from './NotificationToast.module.css';
 
 interface Notification {

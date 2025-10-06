@@ -39,7 +39,7 @@ export async function seedPartners(PartnerModel: any, users: any[]): Promise<any
 
     // Generate commission structure
     const commissionType = faker.helpers.arrayElement(['percentage', 'flat_rate', 'tiered']);
-    let commissionStructure: any = {
+    const commissionStructure: any = {
       type: commissionType,
       paymentTerms: faker.helpers.arrayElement(['net30', 'net60', 'net15']),
     };

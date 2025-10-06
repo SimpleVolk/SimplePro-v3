@@ -56,8 +56,8 @@ export class CustomersService {
 
   async findAll(
     filters?: CustomerFilters,
-    skip: number = 0,
-    limit: number = 20,
+    skip = 0,
+    limit = 20,
   ): Promise<PaginatedResponse<Customer>> {
     // Build MongoDB query object
     const query: any = {};

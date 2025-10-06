@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DeterministicEstimator } from '@simplepro/pricing-engine';
 import type { EstimateInput, EstimateResult, PricingRule, LocationHandicap, InventoryRoom } from '@simplepro/pricing-engine';
 import { useAuth } from '../../contexts/AuthContext';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../lib/config';
 import styles from './NewOpportunityForm.module.css';
 
 interface Customer {

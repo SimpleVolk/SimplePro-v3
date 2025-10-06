@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
-import { getWebSocketUrl } from '@/lib/config';
+import { getWebSocketUrl } from '../../lib/config';
 
 interface WebSocketContextType {
   socket: Socket | null;

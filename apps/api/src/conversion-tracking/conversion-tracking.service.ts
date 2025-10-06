@@ -623,7 +623,7 @@ export class ConversionTrackingService {
   async getTopPerformers(
     startDate: Date,
     endDate: Date,
-    limit: number = 10,
+    limit = 10,
   ): Promise<any[]> {
     // Group events by performedBy
     const events = await this.conversionEventModel

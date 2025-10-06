@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../lib/config';
 import styles from './ReferralTracking.module.css';
 import type { Partner, Referral, CreateReferralDto, ReferralStatus } from './types';
 

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { getWebSocketUrl } from '@/lib/config';
+import { getWebSocketUrl } from '../../lib/config';
 import styles from './RealTimeDashboard.module.css';
 
 interface ConnectedUser {

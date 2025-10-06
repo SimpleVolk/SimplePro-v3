@@ -238,8 +238,8 @@ export class AnalyticsOptimizedService {
   // Paginated event retrieval with field selection
   async getEventsPaginated(
     filters: AnalyticsFilters,
-    page: number = 1,
-    limit: number = 50,
+    page = 1,
+    limit = 50,
     fields?: string[]
   ) {
     const cacheKey = `events:${JSON.stringify(filters)}:${page}:${limit}`;

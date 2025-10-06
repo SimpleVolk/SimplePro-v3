@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getApiUrl } from '@/lib/config';
+import { getApiUrl } from '../../../../lib/config';
 import styles from './SmsCampaigns.module.css';
 
 interface SmsCampaign {
@@ -452,7 +452,7 @@ export default function SmsCampaigns() {
                 Use these variables in your SMS templates. They will be automatically replaced with actual values.
               </p>
               <div className={styles.variablesList}>
-                <code>{'{customer_name}'}</code> - Customer's full name
+                <code>{'{customer_name}'}</code> - Customer&apos;s full name
                 <code>{'{move_date}'}</code> - Move date
                 <code>{'{move_time}'}</code> - Move time
                 <code>{'{crew_lead}'}</code> - Crew lead name

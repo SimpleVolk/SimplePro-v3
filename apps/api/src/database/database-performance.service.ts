@@ -81,7 +81,7 @@ export class DatabasePerformanceService {
     this.queryMetrics = [];
   }
 
-  getSlowQueries(threshold: number = 100): QueryMetrics[] {
+  getSlowQueries(threshold = 100): QueryMetrics[] {
     return this.queryMetrics.filter(metric => metric.duration > threshold);
   }
 

@@ -21,7 +21,7 @@ export class NotificationPreferenceService {
    * Get user notification preferences
    */
   async getPreferences(userId: string): Promise<NotificationPreferenceDocument> {
-    let preferences = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
+    const preferences = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
 
     if (!preferences) {
       return await this.createDefaultPreferences(userId);
