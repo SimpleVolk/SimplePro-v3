@@ -121,13 +121,14 @@ export class LoggingMiddleware implements NestMiddleware {
     const chunks: Buffer[] = [];
 
     // Override response methods to capture response data
-    res.write = function(chunk: any) {
+    res.write = function(chunk: any, ...args: any[]) {
       if (chunk) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
       }
-      return originalWrite.apply(res, arguments as any);
+      return originalWrite.apply(res, [chunk, ...args] as any);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     res.end = function(chunk?: any): Response {
       if (chunk) {
