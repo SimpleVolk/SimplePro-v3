@@ -116,6 +116,7 @@ export function deepClone<T>(obj: T): T {
  * Strips Mongoose-specific properties from object
  */
 export function stripMongooseProps(obj: any): any {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, __v, createdAt, updatedAt, ...rest } = obj;
   return rest;
 }

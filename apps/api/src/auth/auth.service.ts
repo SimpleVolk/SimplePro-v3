@@ -11,6 +11,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   User,
   UserRole,
@@ -209,8 +212,6 @@ export class AuthService implements OnModuleInit {
     let password: string;
 
     if (isProduction) {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const crypto = require('crypto');
       password = crypto.randomBytes(16).toString('hex');
     } else {
       // Development password for easier testing
@@ -254,10 +255,6 @@ export class AuthService implements OnModuleInit {
 
     // SECURITY FIX: Never log credentials to console
     // Store the initial admin credentials securely in .secrets directory
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const path = require('path');
     const secretsPath = path.join(process.cwd(), '.secrets');
 
     try {
@@ -788,7 +785,8 @@ Environment: ${process.env.NODE_ENV || 'development'}
   }
 
   private sanitizeUser(user: User): Omit<User, 'passwordHash'> {
-    const { passwordHash: _passwordHash, ...sanitizedUser } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...sanitizedUser } = user;
     return sanitizedUser;
   }
 
@@ -869,8 +867,6 @@ Environment: ${process.env.NODE_ENV || 'development'}
     userId: string,
     timestamp: number,
   ): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const crypto = require('crypto');
     const data = `${userId}_${timestamp}_${process.env.JWT_SECRET}`;
     return crypto
       .createHash('sha256')

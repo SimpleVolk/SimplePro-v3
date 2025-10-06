@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as mongoose from 'mongoose';
 import { TariffSettings } from '../../tariff-settings/schemas/tariff-settings.schema';
 import {
   seedDefaultTariffSettings,
@@ -185,19 +186,17 @@ export class TariffSettingsSeeder {
  * @returns Promise<boolean> - True if seeding was successful
  */
 export async function runTariffSeeder(mongoUri: string): Promise<boolean> {
-  const mongoose = require('mongoose');
-
   try {
     console.log('🔌 Connecting to MongoDB...');
     await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB');
     console.log('');
 
-    // Get model
-    const TariffModel = mongoose.model('TariffSettings');
+    // Get model with proper typing
+    const TariffModel = mongoose.model<TariffSettings>('TariffSettings');
 
     // Run seed
-    await seedDefaultTariffSettings(TariffModel);
+    await seedDefaultTariffSettings(TariffModel as Model<TariffSettings>);
 
     console.log('');
     console.log('✅ Seeding completed successfully');

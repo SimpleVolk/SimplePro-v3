@@ -361,6 +361,7 @@ export class PartnersService {
         }
 
         // Find applicable tier
+        // eslint-disable-next-line no-case-declarations
         const tier = commissionStructure.tiers.find(
           (t) => jobValue >= t.minValue && jobValue <= t.maxValue,
         );

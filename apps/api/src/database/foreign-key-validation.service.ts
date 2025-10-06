@@ -64,6 +64,7 @@ export class ForeignKeyValidationService {
     refModel: string,
     required = false,
   ) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return async function (this: any, next: Function) {
       try {
         const refValue = this[refField];
@@ -99,6 +100,7 @@ export class ForeignKeyValidationService {
   createMultiReferenceValidator(
     references: Array<{ field: string; model: string; required?: boolean }>,
   ) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return async function (this: any, next: Function) {
       try {
         for (const ref of references) {
@@ -140,6 +142,7 @@ export class ForeignKeyValidationService {
     refField: string,
     refModel: string,
   ) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return async function (this: any, next: Function) {
       try {
         const arrayValue = this[arrayField];

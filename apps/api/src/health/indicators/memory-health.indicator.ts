@@ -4,6 +4,7 @@ import {
   HealthIndicatorResult,
   HealthCheckError,
 } from '@nestjs/terminus';
+import * as os from 'os';
 import { SystemResourcesInfo } from '../interfaces/health-check.interface';
 
 @Injectable()
@@ -97,7 +98,6 @@ export class MemoryHealthIndicator extends HealthIndicator {
 
   private getTotalSystemMemory(): number {
     try {
-      const os = require('os');
       return os.totalmem();
     } catch {
       // Fallback if os module is not available

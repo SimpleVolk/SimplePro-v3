@@ -64,6 +64,7 @@ export function createSizeMonitoringMiddleware(
   const maxSizeBytes = config.maxSizeMB * 1024 * 1024;
   const warnSizeBytes = maxSizeBytes * (config.warnThresholdPercent / 100);
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return async function (this: any, next: Function) {
     try {
       const docSizeBytes = calculateDocumentSize(this);
@@ -117,6 +118,7 @@ export function createArraySizeMonitoringMiddleware(
   arrayFields: string[],
   maxArraySize = 1000,
 ) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return async function (this: any, next: Function) {
     try {
       for (const fieldName of arrayFields) {

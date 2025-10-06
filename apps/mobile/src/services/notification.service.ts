@@ -5,7 +5,7 @@
  */
 
 import PushNotification from 'react-native-push-notification';
-import { Platform } from 'react-native';
+import { Platform, PermissionsAndroid } from 'react-native';
 
 class NotificationService {
   /**
@@ -72,7 +72,6 @@ class NotificationService {
     if (Platform.OS === 'android') {
       // Android 13+ requires runtime permission
       if (Platform.Version >= 33) {
-        const { PermissionsAndroid } = require('react-native');
         try {
           await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,

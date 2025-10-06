@@ -20,9 +20,9 @@ export class OpportunitiesResolver {
   constructor(
     private readonly opportunitiesService: OpportunitiesService,
     // Reserved for future direct customer queries
-    // @ts-expect-error - Service injected for future use
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private readonly customersService: CustomersService,
+    // @ts-ignore - Reserved for future use
+    private readonly _customersService: CustomersService,
     private readonly customerDataLoader: CustomerDataLoader,
   ) {}
 

@@ -1,10 +1,19 @@
 // Test setup for API module
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
-// Set test environment variables
+// Load .env.test file before anything else
+const envPath = path.resolve(__dirname, '../.env.test');
+dotenv.config({ path: envPath });
+
+// Set test environment variables (these override .env.test if needed)
 process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-jwt-secret-key';
-process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-key';
-process.env.MONGODB_URI = 'mongodb://localhost:27017/simplepro-test';
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-key-32-characters-long-for-testing-purposes';
+process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh-secret-key-32-characters-long-for-testing';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/simplepro-test';
+process.env.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+process.env.REDIS_PORT = process.env.REDIS_PORT || '6379';
+process.env.REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'test-redis-password';
 
 // Mock crypto for UUID generation
 if (!global.crypto) {

@@ -317,6 +317,7 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       for (let i = 0; i < 101; i++) {
         gateway['typingTimers'].set(
           `socket-${i}:thread-1`,
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           setTimeout(() => {}, 5000),
         );
       }

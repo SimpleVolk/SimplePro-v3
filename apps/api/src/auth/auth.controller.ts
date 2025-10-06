@@ -136,6 +136,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@CurrentUser() user: User) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userProfile } = user;
     return {
       success: true,
@@ -154,6 +155,7 @@ export class AuthController {
       updateUserDto,
       user.id,
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userProfile } = updatedUser;
 
     return {
@@ -227,6 +229,7 @@ export class AuthController {
     @Req() req: any,
   ) {
     const newUser = await this.authService.create(createUserDto, user.id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userProfile } = newUser;
 
     // Log user creation
@@ -265,6 +268,7 @@ export class AuthController {
   @Get('users')
   async findAllUsers() {
     const users = await this.authService.findAll();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const sanitizedUsers = users.map(({ passwordHash, ...user }) => user);
 
     return {
@@ -279,6 +283,7 @@ export class AuthController {
   @Get('users/:id')
   async findOneUser(@Param('id') id: string) {
     const user = await this.authService.findOne(id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userProfile } = user;
 
     return {
@@ -301,6 +306,7 @@ export class AuthController {
       updateUserDto,
       user.id,
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userProfile } = updatedUser;
 
     // Log user update

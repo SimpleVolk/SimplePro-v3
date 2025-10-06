@@ -6,6 +6,7 @@ import {
 } from '@nestjs/terminus';
 import * as fs from 'fs';
 import * as path from 'path';
+import { execSync } from 'child_process';
 
 @Injectable()
 export class DiskHealthIndicator extends HealthIndicator {
@@ -94,7 +95,6 @@ export class DiskHealthIndicator extends HealthIndicator {
   ): Promise<{ used: number; available: number; percentage: number } | null> {
     try {
       // Use the 'df' command to get disk usage information
-      const { execSync } = require('child_process');
       const output = execSync(`df -k "${checkPath}"`, { encoding: 'utf8' });
       const lines = output.trim().split('\n');
 
@@ -133,11 +133,10 @@ export class DiskHealthIndicator extends HealthIndicator {
     try {
       // For Windows, we'll use a simple estimation based on available space
       // This is less accurate but provides basic functionality
-      const { execSync } = require('child_process');
       const drive = path.parse(checkPath).root;
 
       // Use PowerShell to get disk information
-      const command = `powershell "Get-WmiObject -Class Win32_LogicalDisk -Filter \"DriveType=3 AND DeviceID='${drive.replace('\\', '')}'\"; | Select-Object Size,FreeSpace"`;
+      const command = `powershell "Get-WmiObject -Class Win32_LogicalDisk -Filter \\"DriveType=3 AND DeviceID='${drive.replace('\\', '')}'\\"" | Select-Object Size,FreeSpace"`;
       const output = execSync(command, { encoding: 'utf8' });
 
       // Parse PowerShell output

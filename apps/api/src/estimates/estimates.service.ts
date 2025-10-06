@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DeterministicEstimator } from '@simplepro/pricing-engine';
+import {
+  DeterministicEstimator,
+  defaultRules,
+  PricingRule,
+  LocationHandicap,
+} from '@simplepro/pricing-engine';
 import type { EstimateInput } from '@simplepro/pricing-engine';
-import defaultRulesData from '@simplepro/pricing-engine/data/default-rules.json';
 import { CreateEstimateDto } from './dto/create-estimate.dto';
 
 @Injectable()
@@ -9,10 +13,11 @@ export class EstimatesService {
   private readonly estimator: DeterministicEstimator;
 
   constructor() {
-    // Use type assertion to bypass TypeScript strict checks for JSON import
+    // Initialize with default rules from pricing engine
+    // Type assertion needed because JSON imports don't preserve exact types
     this.estimator = new DeterministicEstimator(
-      defaultRulesData.pricingRules as any,
-      defaultRulesData.locationHandicaps as any,
+      defaultRules.pricingRules as PricingRule[],
+      defaultRules.locationHandicaps as LocationHandicap[],
     );
   }
 

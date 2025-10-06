@@ -45,7 +45,7 @@ export class UpdateCompanySettingsDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, {
+  @Matches(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, {
     message: 'Website must be a valid URL',
   })
   website?: string;

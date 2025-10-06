@@ -200,7 +200,7 @@ function setupSwagger(app: any, port: number) {
 // Graceful shutdown handler
 function setupGracefulShutdown(app: any) {
   const signals = ['SIGTERM', 'SIGINT', 'SIGQUIT'] as const;
-  const logger = new (require('@nestjs/common').Logger)('Bootstrap');
+  const logger = new Logger('Bootstrap');
 
   signals.forEach((signal) => {
     process.on(signal, async () => {

@@ -8,9 +8,13 @@ import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
+import { EventEmitter } from 'events';
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
+
+// Type for Redis client with event emitter capabilities
+type RedisClientWithEvents = RedisClientType & EventEmitter;
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
@@ -69,6 +73,14 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 
   private async connectRedis(): Promise<void> {
     try {
+      // Skip Redis connection in test environment - use memory cache only
+      if (process.env.NODE_ENV === 'test') {
+        this.logger.log('Test environment detected - using in-memory cache only');
+        this.isRedisConnected = false;
+        this.redisClient = null;
+        return;
+      }
+
       const redisHost = this.configService.get<string>(
         'REDIS_HOST',
         'localhost',
@@ -82,6 +94,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         socket: {
           host: redisHost,
           port: redisPort,
+          connectTimeout: 5000, // 5 second connection timeout
           reconnectStrategy: (retries) => {
             if (retries > 10) {
               this.logger.error(
@@ -99,22 +112,25 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         password: redisPassword,
       });
 
-      this.redisClient.on('error', (err) => {
+      // Cast to RedisClientWithEvents to access event emitter methods
+      const clientWithEvents = this.redisClient as RedisClientWithEvents;
+
+      clientWithEvents.on('error', (err) => {
         this.logger.error('Redis Client Error:', err);
         this.isRedisConnected = false;
         this.stats.errors++;
       });
 
-      this.redisClient.on('connect', () => {
+      clientWithEvents.on('connect', () => {
         this.logger.log('Redis client connecting...');
       });
 
-      this.redisClient.on('ready', () => {
+      clientWithEvents.on('ready', () => {
         this.logger.log('Redis client ready');
         this.isRedisConnected = true;
       });
 
-      this.redisClient.on('reconnecting', () => {
+      clientWithEvents.on('reconnecting', () => {
         this.logger.warn('Redis client reconnecting...');
         this.isRedisConnected = false;
       });

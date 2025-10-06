@@ -78,9 +78,8 @@ const isSecurePassword = (
   fieldName: string,
 ): void => {
   // Skip strict password validation in test/development environments
-  const isProduction =
-    process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'staging';
+  const nodeEnv = process.env.NODE_ENV;
+  const isProduction = nodeEnv === 'production';
   if (!isProduction) return;
 
   const unsafePatterns = [

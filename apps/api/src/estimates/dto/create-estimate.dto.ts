@@ -151,7 +151,7 @@ export class CreateEstimateDto {
   @IsOptional()
   @IsString()
   @Length(10, 20)
-  @Matches(/^[\+]?[1-9][\d]{0,15}$/, {
+  @Matches(/^[+]?[1-9][\d]{0,15}$/, {
     message: 'Customer phone must be a valid phone number',
   })
   customerPhone?: string;

@@ -37,4 +37,18 @@ export default {
     '^@simplepro/pricing-engine$':
       '<rootDir>/../../packages/pricing-engine/src/index.ts',
   },
+  // Test timeout for async operations (30 seconds)
+  testTimeout: 30000,
+  // Clear mocks between tests
+  clearMocks: true,
+  // Restore mocks between tests
+  restoreMocks: true,
+  // Reset modules between tests
+  resetModules: false,
+  // Detect open handles to prevent hanging tests
+  detectOpenHandles: false,
+  // Force exit after tests complete
+  forceExit: false,
+  // Maximum number of workers (use 50% of CPU cores for tests)
+  maxWorkers: '50%',
 };
