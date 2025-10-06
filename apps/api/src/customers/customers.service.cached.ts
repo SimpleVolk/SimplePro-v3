@@ -206,15 +206,15 @@ export async function getCustomerStatsCached(this: any) {
     recentlyCreated: recentCount,
   };
 
-  statusCounts.forEach(({ _id, count }) => {
+  statusCounts.forEach(({ _id, count }: { _id: string; count: number }) => {
     stats.byStatus[_id] = count;
   });
 
-  typeCounts.forEach(({ _id, count }) => {
+  typeCounts.forEach(({ _id, count }: { _id: string; count: number }) => {
     stats.byType[_id] = count;
   });
 
-  sourceCounts.forEach(({ _id, count }) => {
+  sourceCounts.forEach(({ _id, count }: { _id: string; count: number }) => {
     stats.bySource[_id] = count;
   });
 
