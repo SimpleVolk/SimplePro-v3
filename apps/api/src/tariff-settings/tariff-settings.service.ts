@@ -768,9 +768,10 @@ export class TariffSettingsService {
         await this.addMaterial(id, materialDto, userId);
         result.added++;
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         result.failed++;
         result.errors.push(
-          `Failed to add material "${materialDto.name}": ${error.message}`,
+          `Failed to add material "${materialDto.name}": ${errorMessage}`,
         );
       }
     }

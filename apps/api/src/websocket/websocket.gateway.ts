@@ -351,7 +351,8 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       });
 
     } catch (error) {
-      this.logger.error(`Authentication failed for client ${client.id}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Authentication failed for client ${client.id}:`, errorMessage);
       client.disconnect();
     }
   }
@@ -909,7 +910,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       const errorMessage = error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to send message: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to send message', error: error.message });
+      client.emit('error', { message: 'Failed to send message', error: errorMessage });
     }
   }
 
@@ -1057,7 +1058,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       const errorMessage = error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to edit message: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to edit message', error: error.message });
+      client.emit('error', { message: 'Failed to edit message', error: errorMessage });
     }
   }
 
@@ -1087,7 +1088,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       const errorMessage = error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to delete message: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to delete message', error: error.message });
+      client.emit('error', { message: 'Failed to delete message', error: errorMessage });
     }
   }
 
@@ -1124,7 +1125,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       const errorMessage = error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to subscribe to thread: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to subscribe to thread', error: error.message });
+      client.emit('error', { message: 'Failed to subscribe to thread', error: errorMessage });
     }
   }
 

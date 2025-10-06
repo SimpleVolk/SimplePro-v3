@@ -78,8 +78,9 @@ export class PricingRulesController {
     try {
       return await this.pricingRulesService.createRule(createRuleDto);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to create pricing rule',
+        errorMessage || 'Failed to create pricing rule',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -104,8 +105,9 @@ export class PricingRulesController {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to update pricing rule',
+        errorMessage || 'Failed to update pricing rule',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -143,8 +145,9 @@ export class PricingRulesController {
     try {
       return await this.pricingRulesService.testRule(testRuleDto);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to test pricing rule',
+        errorMessage || 'Failed to test pricing rule',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -202,8 +205,9 @@ export class PricingRulesController {
     try {
       return await this.pricingRulesService.importRules(rulesData);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to import pricing rules',
+        errorMessage || 'Failed to import pricing rules',
         HttpStatus.BAD_REQUEST
       );
     }

@@ -335,10 +335,11 @@ export class IndexOptimizationService implements OnModuleInit {
             });
             this.logger.log(`Dropped unused index ${index.name} from ${collectionName}`);
           } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
             results[collectionName].push({
               action: 'failed_to_drop',
               index: index.name,
-              error: error.message
+              error: errorMessage
             });
           }
         }

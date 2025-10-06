@@ -123,7 +123,8 @@ export class NotificationConfigService implements OnModuleInit {
         await this.emailTransporter.verify();
         this.logger.log('Email transporter initialized and verified successfully');
       } catch (error) {
-        this.logger.error('Failed to initialize email transporter:', error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.error('Failed to initialize email transporter:', errorMessage);
         this.config.email.enabled = false;
         this.emailTransporter = null;
       }
@@ -135,7 +136,8 @@ export class NotificationConfigService implements OnModuleInit {
         this.twilioClient = twilio(this.config.sms.accountSid!, this.config.sms.authToken!);
         this.logger.log('Twilio client initialized successfully');
       } catch (error) {
-        this.logger.error('Failed to initialize Twilio client:', error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.error('Failed to initialize Twilio client:', errorMessage);
         this.config.sms.enabled = false;
         this.twilioClient = null;
       }
@@ -160,7 +162,8 @@ export class NotificationConfigService implements OnModuleInit {
           this.logger.log('Firebase Admin SDK already initialized');
         }
       } catch (error) {
-        this.logger.error('Failed to initialize Firebase Admin SDK:', error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.error('Failed to initialize Firebase Admin SDK:', errorMessage);
         this.config.push.enabled = false;
         this.firebaseInitialized = false;
       }

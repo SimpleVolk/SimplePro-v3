@@ -25,7 +25,8 @@ async function bootstrap() {
     await companyService.getSettings(); // Will create defaults if not exists
     logger.log('✓ Company settings initialized');
   } catch (error) {
-    logger.warn('Company settings initialization skipped:', error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.warn('Company settings initialization skipped:', errorMessage);
   }
 
   // Initialize tariff settings on startup (if SEED_DATA=true)
@@ -43,7 +44,8 @@ async function bootstrap() {
         logger.log('✓ Default tariff settings already exist (skipping seed)');
       }
     } catch (error) {
-      logger.warn('Tariff settings seed skipped:', error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.warn('Tariff settings seed skipped:', errorMessage);
     }
   }
 

@@ -291,7 +291,8 @@ export async function cleanupDatabase(): Promise<void> {
       console.log('✅ Database collections cleaned up');
     }
   } catch (error) {
-    console.warn('Database cleanup warning:', error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.warn('Database cleanup warning:', errorMessage);
   }
 }
 

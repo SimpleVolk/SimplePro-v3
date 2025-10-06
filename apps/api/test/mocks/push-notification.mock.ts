@@ -98,9 +98,10 @@ export class PushNotificationServiceMock {
         );
         successful.push(notification);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         failed.push({
           token: recipient.token,
-          error: error.message || 'Unknown error',
+          error: errorMessage || 'Unknown error',
         });
       }
     }

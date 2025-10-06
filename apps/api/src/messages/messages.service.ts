@@ -148,7 +148,8 @@ export class MessagesService {
       if (filters?.unreadOnly) {
         const threadsWithUnread = await Promise.all(
           threads.map(async (thread) => {
-            const unreadCount = await this.getUnreadCountForThread(thread._id.toString(), userId);
+            const threadId = thread._id?.toString() || '';
+            const unreadCount = await this.getUnreadCountForThread(threadId, userId);
             return unreadCount > 0 ? thread : null;
           })
         );

@@ -50,9 +50,10 @@ export class SMSServiceMock {
         const message = await this.sendSMS(recipient, body);
         successful.push(message);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         failed.push({
           to: recipient,
-          error: error.message || 'Unknown error',
+          error: errorMessage || 'Unknown error',
         });
       }
     }

@@ -134,8 +134,9 @@ export class PricingRulesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to create pricing rule',
+        errorMessage || 'Failed to create pricing rule',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -179,8 +180,9 @@ export class PricingRulesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to update pricing rule',
+        errorMessage || 'Failed to update pricing rule',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -254,12 +256,13 @@ export class PricingRulesService {
         errors: []
       };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         ruleId: testRuleDto.rule.id,
         ruleName: testRuleDto.rule.name,
         matched: false,
         conditionsEvaluated: [],
-        errors: [error.message]
+        errors: [errorMessage]
       };
     }
   }
@@ -372,8 +375,9 @@ export class PricingRulesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
-        error.message || 'Failed to import rules',
+        errorMessage || 'Failed to import rules',
         HttpStatus.BAD_REQUEST
       );
     }

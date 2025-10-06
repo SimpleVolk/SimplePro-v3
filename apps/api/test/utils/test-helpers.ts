@@ -68,11 +68,12 @@ export async function expectToThrowAsync(
     throw new Error('Expected function to throw, but it did not');
   } catch (error) {
     if (!(error instanceof errorClass)) {
+      const errorName = error instanceof Error ? error.constructor.name : String(error);
       throw new Error(
-        `Expected ${errorClass.name} but got ${error.constructor.name}`
+        `Expected ${errorClass.name} but got ${errorName}`
       );
     }
-    if (message && !error.message.includes(message)) {
+    if (message && error instanceof Error && !error.message.includes(message)) {
       throw new Error(
         `Expected error message to include "${message}" but got "${error.message}"`
       );
