@@ -106,6 +106,7 @@ export class AuthService implements OnModuleInit {
     let password: string;
 
     if (isProduction) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const crypto = require('crypto');
       password = crypto.randomBytes(16).toString('hex');
     } else {
@@ -150,7 +151,9 @@ export class AuthService implements OnModuleInit {
 
     // SECURITY FIX: Never log credentials to console
     // Store the initial admin credentials securely in .secrets directory
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const secretsPath = path.join(process.cwd(), '.secrets');
 
@@ -638,7 +641,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
   }
 
   private sanitizeUser(user: User): Omit<User, 'passwordHash'> {
-    const { passwordHash, ...sanitizedUser } = user;
+    const { passwordHash: _, ...sanitizedUser } = user;
     return sanitizedUser;
   }
 
@@ -706,6 +709,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
 
   // SECURITY ENHANCEMENT: Session fingerprinting for additional security
   private generateSessionFingerprint(userId: string, timestamp: number): string {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const crypto = require('crypto');
     const data = `${userId}_${timestamp}_${process.env.JWT_SECRET}`;
     return crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);

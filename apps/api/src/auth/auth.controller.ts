@@ -133,7 +133,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@CurrentUser() user: User) {
-    const { passwordHash, ...userProfile } = user;
+    const { passwordHash: _, ...userProfile } = user;
     return {
       success: true,
       data: userProfile,
@@ -147,7 +147,7 @@ export class AuthController {
     @Body() updateUserDto: Omit<UpdateUserDto, 'roleId' | 'isActive'>,
   ) {
     const updatedUser = await this.authService.update(user.id, updateUserDto, user.id);
-    const { passwordHash, ...userProfile } = updatedUser;
+    const { passwordHash: _, ...userProfile } = updatedUser;
 
     return {
       success: true,
@@ -218,7 +218,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User, @Req() req: any) {
     const newUser = await this.authService.create(createUserDto, user.id);
-    const { passwordHash, ...userProfile } = newUser;
+    const { passwordHash: _, ...userProfile } = newUser;
 
     // Log user creation
     await this.auditLogsService.log(
@@ -252,7 +252,7 @@ export class AuthController {
   @Get('users')
   async findAllUsers() {
     const users = await this.authService.findAll();
-    const sanitizedUsers = users.map(({ passwordHash, ...user }) => user);
+    const sanitizedUsers = users.map(({ passwordHash: _, ...user }) => user);
 
     return {
       success: true,
@@ -266,7 +266,7 @@ export class AuthController {
   @Get('users/:id')
   async findOneUser(@Param('id') id: string) {
     const user = await this.authService.findOne(id);
-    const { passwordHash, ...userProfile } = user;
+    const { passwordHash: _, ...userProfile } = user;
 
     return {
       success: true,
@@ -284,7 +284,7 @@ export class AuthController {
     @Req() req: any,
   ) {
     const updatedUser = await this.authService.update(id, updateUserDto, user.id);
-    const { passwordHash, ...userProfile } = updatedUser;
+    const { passwordHash: _, ...userProfile } = updatedUser;
 
     // Log user update
     await this.auditLogsService.log(

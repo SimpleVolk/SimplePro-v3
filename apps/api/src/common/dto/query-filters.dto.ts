@@ -20,7 +20,7 @@ export class QueryFiltersDto {
     if (typeof value !== 'string') return value;
     // Remove MongoDB operators and special characters that could be used for injection
     return value
-      .replace(/[\$\{\}\[\]]/g, '') // Remove $, {}, []
+      .replace(/[${}[\]]/g, '') // Remove $, {}, []
       .replace(/[^\w\s.-]/g, '') // Only allow word chars, spaces, dots, hyphens
       .trim();
   })
@@ -215,7 +215,7 @@ export function sanitizeMongoQuery(query: any): any {
       sanitized[key] = sanitizeMongoQuery(value);
     } else if (typeof value === 'string') {
       // Sanitize string values
-      sanitized[key] = value.replace(/[\$\{\}\[\]]/g, '');
+      sanitized[key] = value.replace(/[${}[\]]/g, '');
     } else {
       sanitized[key] = value;
     }
