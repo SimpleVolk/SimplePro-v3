@@ -531,7 +531,7 @@ export default function SmsCampaigns() {
                 automatically replaced with actual values.
               </p>
               <div className={styles.variablesList}>
-                <code>{'{customer_name}'}</code> - Customer's full name
+                <code>{'{customer_name}'}</code> - Customer&apos;s full name
                 <code>{'{move_date}'}</code> - Move date
                 <code>{'{move_time}'}</code> - Move time
                 <code>{'{crew_lead}'}</code> - Crew lead name

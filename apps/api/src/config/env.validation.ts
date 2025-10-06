@@ -22,7 +22,7 @@ const logger = new Logger('EnvironmentValidation');
 const isStrongSecret = (
   value: string,
   context: z.RefinementCtx,
-  minLength: number = 32,
+  minLength = 32,
 ): void => {
   if (value.length < minLength) {
     context.addIssue({

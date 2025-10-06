@@ -183,8 +183,8 @@ export class AnalyticsService {
   async getEventsByType(
     eventType: string,
     period: PeriodFilter,
-    limit: number = 100,
-    skip: number = 0,
+    limit = 100,
+    skip = 0,
   ): Promise<{ events: AnalyticsEvent[]; total: number }> {
     const query = {
       eventType,
@@ -211,8 +211,8 @@ export class AnalyticsService {
   async getEventsByCategory(
     category: string,
     period: PeriodFilter,
-    limit: number = 100,
-    skip: number = 0,
+    limit = 100,
+    skip = 0,
   ): Promise<{ events: AnalyticsEvent[]; total: number }> {
     const query = {
       category,

@@ -1,4 +1,5 @@
 // Service Worker for SimplePro Moving Company Management System
+/* global clients */
 const CACHE_NAME = 'simplepro-v1.0.0';
 const STATIC_CACHE_NAME = 'simplepro-static-v1.0.0';
 const DYNAMIC_CACHE_NAME = 'simplepro-dynamic-v1.0.0';

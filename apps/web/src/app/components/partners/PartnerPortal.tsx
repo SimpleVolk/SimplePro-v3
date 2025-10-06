@@ -271,13 +271,13 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
           <div className={styles.submitSection}>
             <h2 className={styles.sectionTitle}>Submit New Referral</h2>
             <p className={styles.sectionDescription}>
-              Fill out the form below to submit a new customer referral. We'll
+              Fill out the form below to submit a new customer referral. We&apos;ll
               contact them within 24 hours.
             </p>
 
             {showSuccessMessage && (
               <div className={styles.successMessage}>
-                ✅ Referral submitted successfully! We'll be in touch soon.
+                ✅ Referral submitted successfully! We&apos;ll be in touch soon.
               </div>
             )}
 
@@ -388,7 +388,7 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
 
             {referrals.length === 0 ? (
               <div className={styles.emptyState}>
-                <p>You haven't submitted any referrals yet.</p>
+                <p>You haven&apos;t submitted any referrals yet.</p>
                 <button
                   className={styles.emptyStateButton}
                   onClick={() => setActiveTab('submit')}
