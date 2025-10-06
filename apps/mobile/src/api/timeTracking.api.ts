@@ -21,7 +21,7 @@ export const timeTrackingApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },
@@ -39,7 +39,7 @@ export const timeTrackingApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },
@@ -57,7 +57,7 @@ export const timeTrackingApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },

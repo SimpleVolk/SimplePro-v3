@@ -23,7 +23,9 @@ export function DocumentGallery({
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+    null,
+  );
   const [showViewer, setShowViewer] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
 
@@ -43,7 +45,7 @@ export function DocumentGallery({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) throw new Error('Failed to fetch documents');
@@ -64,11 +66,14 @@ export function DocumentGallery({
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('Not authenticated');
 
-      const response = await fetch(getApiUrl(`documents/${document.id}/download`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`documents/${document.id}/download`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) throw new Error('Download failed');
 
@@ -139,7 +144,8 @@ export function DocumentGallery({
         <div className={styles.headerLeft}>
           <h3>{title}</h3>
           <span className={styles.documentCount}>
-            {documents.length} {documents.length === 1 ? 'document' : 'documents'}
+            {documents.length}{' '}
+            {documents.length === 1 ? 'document' : 'documents'}
           </span>
         </div>
         {allowUpload && (
@@ -197,7 +203,9 @@ export function DocumentGallery({
                 {doc.mimeType.startsWith('image/') ? (
                   <img src={doc.url} alt={doc.originalName} />
                 ) : (
-                  <div className={styles.fileIcon}>{getFileIcon(doc.mimeType)}</div>
+                  <div className={styles.fileIcon}>
+                    {getFileIcon(doc.mimeType)}
+                  </div>
                 )}
               </div>
               <div className={styles.itemInfo}>

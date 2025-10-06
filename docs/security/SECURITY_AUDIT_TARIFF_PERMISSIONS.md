@@ -22,6 +22,7 @@ This security audit evaluates the proposed fix for missing `tariff_settings` per
 ## 1. Permission Scope Analysis
 
 ### Proposed Permissions
+
 The fix adds five permissions to `super_admin` role:
 
 ```typescript
@@ -37,29 +38,31 @@ The fix adds five permissions to `super_admin` role:
 **Finding:** Permission scope is **appropriately defined** for `super_admin` role.
 
 **Rationale:**
+
 - `super_admin` already has full CRUD permissions for all other resources (users, customers, jobs, estimates, crews, pricing_rules, reports, system_settings)
 - The `tariff_settings` resource is a **configuration resource** similar to `pricing_rules` and `system_settings` - both of which already grant full access to `super_admin`
 - Restricting tariff_settings permissions for `super_admin` would create an **inconsistency** in the permission model
 - The permission granularity (read/create/update/delete/activate) follows the **principle of least privilege** for lower-tier roles
 
 **No Over-Permissioning Detected:**
+
 - Each permission serves a legitimate business function
 - Permission separation allows role-based delegation to lower-tier admins if needed
 - The `activate` permission is appropriately separated from `update` for audit purposes
 
 ### Consistency with Existing Permissions
 
-| Resource | Read | Create | Update | Delete | Special Actions |
-|----------|------|--------|--------|--------|-----------------|
-| users | ✅ | ✅ | ✅ | ✅ | - |
-| customers | ✅ | ✅ | ✅ | ✅ | - |
-| estimates | ✅ | ✅ | ✅ | ✅ | approve |
-| jobs | ✅ | ✅ | ✅ | ✅ | assign |
-| crews | ✅ | ✅ | ✅ | ✅ | assign |
-| pricing_rules | ✅ | ❌ | ✅ | ❌ | - |
-| system_settings | ✅ | ❌ | ✅ | ❌ | - |
-| reports | ✅ | ❌ | ❌ | ❌ | export |
-| **tariff_settings** | **❌** | **❌** | **❌** | **❌** | **❌** |
+| Resource            | Read   | Create | Update | Delete | Special Actions |
+| ------------------- | ------ | ------ | ------ | ------ | --------------- |
+| users               | ✅     | ✅     | ✅     | ✅     | -               |
+| customers           | ✅     | ✅     | ✅     | ✅     | -               |
+| estimates           | ✅     | ✅     | ✅     | ✅     | approve         |
+| jobs                | ✅     | ✅     | ✅     | ✅     | assign          |
+| crews               | ✅     | ✅     | ✅     | ✅     | assign          |
+| pricing_rules       | ✅     | ❌     | ✅     | ❌     | -               |
+| system_settings     | ✅     | ❌     | ✅     | ❌     | -               |
+| reports             | ✅     | ❌     | ❌     | ❌     | export          |
+| **tariff_settings** | **❌** | **❌** | **❌** | **❌** | **❌**          |
 
 **Verdict:** The omission of `tariff_settings` permissions is clearly a **configuration oversight**, not an intentional security restriction.
 
@@ -72,6 +75,7 @@ The fix adds five permissions to `super_admin` role:
 **File Analyzed:** `D:\Claude\SimplePro-v3\apps\api\src\auth\auth.service.ts`
 
 **Security Strengths:**
+
 1. **Bcrypt Password Hashing** (Line 101, 450, 575)
    - Uses bcrypt with 12 rounds (industry best practice)
    - Passwords are never stored in plaintext
@@ -93,6 +97,7 @@ The fix adds five permissions to `super_admin` role:
    - Revokes all sessions if token replay detected (lines 324-333)
 
 **Security Finding:** Authentication mechanism is **enterprise-grade** with proper protections against:
+
 - Credential stuffing (bcrypt with 12 rounds)
 - Token theft (short-lived access tokens)
 - Token replay attacks (refresh token rotation)
@@ -103,6 +108,7 @@ The fix adds five permissions to `super_admin` role:
 **File Analyzed:** `D:\Claude\SimplePro-v3\apps\api\src\auth\guards\roles.guard.ts`
 
 **Security Strengths:**
+
 1. **Dual Authorization Model** (Lines 11-24)
    - Supports both role-based and permission-based access control
    - Guard returns `true` only if BOTH role AND permissions match (lines 32-50)
@@ -124,6 +130,7 @@ The fix adds five permissions to `super_admin` role:
 **File Analyzed:** `D:\Claude\SimplePro-v3\apps\api\src\tariff-settings\tariff-settings.controller.ts`
 
 **Sample Endpoint Analysis:**
+
 ```typescript
 @Get(':id/packing-rates')
 @RequirePermissions({ resource: 'tariff_settings', action: 'read' })
@@ -132,6 +139,7 @@ async getPackingRates(@Param('id') id: string) { ... }
 ```
 
 **Security Strengths:**
+
 1. **Consistent Permission Enforcement** - All 53 endpoints use `@RequirePermissions` decorator
 2. **Appropriate Permission Mapping:**
    - GET endpoints → `tariff_settings:read`
@@ -154,6 +162,7 @@ async getPackingRates(@Param('id') id: string) { ... }
 **Assessment:** ✅ NO - Attack surface remains unchanged
 
 **Rationale:**
+
 - The tariff-settings API endpoints **already exist** and are protected by `@RequirePermissions` decorators
 - Current state: ALL users (including super_admin) receive **403 Forbidden**
 - Proposed state: **Only super_admin** can access endpoints
@@ -162,12 +171,12 @@ async getPackingRates(@Param('id') id: string) { ... }
 
 **Attack Surface Comparison:**
 
-| Scenario | Current State | After Fix |
-|----------|---------------|-----------|
-| Unauthenticated user | 401 Unauthorized | 401 Unauthorized |
-| Authenticated non-admin | 403 Forbidden | 403 Forbidden |
-| Authenticated super_admin | 403 Forbidden | 200 OK (INTENDED) |
-| Compromised JWT token | 403 Forbidden | Depends on stolen role |
+| Scenario                  | Current State    | After Fix              |
+| ------------------------- | ---------------- | ---------------------- |
+| Unauthenticated user      | 401 Unauthorized | 401 Unauthorized       |
+| Authenticated non-admin   | 403 Forbidden    | 403 Forbidden          |
+| Authenticated super_admin | 403 Forbidden    | 200 OK (INTENDED)      |
+| Compromised JWT token     | 403 Forbidden    | Depends on stolen role |
 
 **Verdict:** The fix **restores intended functionality** without expanding the attack surface.
 
@@ -202,6 +211,7 @@ async getPackingRates(@Param('id') id: string) { ... }
 **Risk Assessment:** 🟡 MODERATE RISK (Pre-existing, not introduced by this fix)
 
 **Analysis:**
+
 - `super_admin` already has permissions to:
   - Create/modify customers (could create fake customers)
   - Create/approve estimates (could create fraudulent quotes)
@@ -209,12 +219,14 @@ async getPackingRates(@Param('id') id: string) { ... }
   - Modify system_settings and pricing_rules (similar financial impact)
 
 **Current Controls:**
+
 1. **Audit Logging** - All tariff changes tracked in `AuditLogEntry` schema (lines 17-35, tariff-settings.schema.ts)
 2. **Timestamps** - Every change includes timestamp and userId
 3. **Version Control** - Tariff settings include version tracking (line 63)
 4. **Activation Workflow** - Separate `activate` permission allows review before deployment (line 150, controller)
 
 **Recommended Additional Controls:**
+
 1. **Multi-person approval** for tariff activation (implement workflow)
 2. **Automated anomaly detection** for unusual pricing changes (>X% variance)
 3. **Immutable audit logs** (write to separate audit database or WORM storage)
@@ -252,19 +264,20 @@ async getPackingRates(@Param('id') id: string) { ... }
 
 **Financial Fraud Scenarios:**
 
-| Attack Scenario | Current Protection | Risk Level |
-|-----------------|-------------------|------------|
-| Set hourly rate to $0 | Schema validation, audit logs | LOW |
-| Set negative pricing | Type validation (number fields) | LOW |
-| Apply 1000% surcharge | Business logic validation, audit trail | MEDIUM |
-| Backdated effective dates | Temporal validation, version control | MEDIUM |
-| Delete all tariff settings | Soft delete, audit logs, activation required | LOW |
+| Attack Scenario            | Current Protection                           | Risk Level |
+| -------------------------- | -------------------------------------------- | ---------- |
+| Set hourly rate to $0      | Schema validation, audit logs                | LOW        |
+| Set negative pricing       | Type validation (number fields)              | LOW        |
+| Apply 1000% surcharge      | Business logic validation, audit trail       | MEDIUM     |
+| Backdated effective dates  | Temporal validation, version control         | MEDIUM     |
+| Delete all tariff settings | Soft delete, audit logs, activation required | LOW        |
 
 ### Are Audit Trails Properly Implemented?
 
 **Assessment:** ✅ YES - Comprehensive audit logging
 
 **Audit Trail Features:**
+
 1. **AuditLogEntry Schema** (lines 20-35, tariff-settings.schema.ts)
    - Timestamp (required)
    - User ID (required, tracks WHO made changes)
@@ -282,12 +295,14 @@ async getPackingRates(@Param('id') id: string) { ... }
    - Status transitions logged (DRAFT → ACTIVE → ARCHIVED)
 
 **Audit Trail Gaps:**
+
 - ❌ No separate audit database (changes stored in same document)
 - ❌ No WORM (Write-Once-Read-Many) storage for immutability
 - ❌ No real-time alerting for critical changes
 - ❌ No audit log retention policy defined
 
 **Recommended Enhancements:**
+
 1. Create separate `tariff_audit_logs` collection with append-only writes
 2. Implement event streaming to immutable audit service
 3. Add automated alerts for pricing changes >20%
@@ -304,12 +319,14 @@ async getPackingRates(@Param('id') id: string) { ... }
 **Security Assessment:** 🟡 MODERATE RISK
 
 **Risks:**
+
 1. **Data Loss:** If admin user has created content, foreign key references may break
 2. **Service Disruption:** Active sessions will be invalidated immediately
 3. **Audit Trail Gap:** User deletion may orphan audit logs (createdBy: "admin" becomes stale)
 4. **Password Reset Required:** Users must re-authenticate after service restart
 
 **Benefits:**
+
 1. Clean state - guaranteed to have correct permissions
 2. Simple implementation - no manual database manipulation
 3. Automatic via service restart (onModuleInit lifecycle hook)
@@ -321,37 +338,61 @@ async getPackingRates(@Param('id') id: string) { ... }
 **Security Assessment:** ✅ RECOMMENDED
 
 **MongoDB Update Script:**
+
 ```javascript
 db.users.updateOne(
-  { username: "admin" },
+  { username: 'admin' },
   {
     $push: {
       permissions: {
         $each: [
-          { id: 'perm_all_tariff_settings', resource: 'tariff_settings', action: 'read' },
-          { id: 'perm_all_tariff_settings_create', resource: 'tariff_settings', action: 'create' },
-          { id: 'perm_all_tariff_settings_update', resource: 'tariff_settings', action: 'update' },
-          { id: 'perm_all_tariff_settings_delete', resource: 'tariff_settings', action: 'delete' },
-          { id: 'perm_all_tariff_settings_activate', resource: 'tariff_settings', action: 'activate' }
-        ]
-      }
-    }
-  }
-)
+          {
+            id: 'perm_all_tariff_settings',
+            resource: 'tariff_settings',
+            action: 'read',
+          },
+          {
+            id: 'perm_all_tariff_settings_create',
+            resource: 'tariff_settings',
+            action: 'create',
+          },
+          {
+            id: 'perm_all_tariff_settings_update',
+            resource: 'tariff_settings',
+            action: 'update',
+          },
+          {
+            id: 'perm_all_tariff_settings_delete',
+            resource: 'tariff_settings',
+            action: 'delete',
+          },
+          {
+            id: 'perm_all_tariff_settings_activate',
+            resource: 'tariff_settings',
+            action: 'activate',
+          },
+        ],
+      },
+    },
+  },
+);
 ```
 
 **Security Strengths:**
+
 1. **Surgical Update:** Only modifies permissions array, preserves all other user data
 2. **Audit Preservation:** createdBy/lastModifiedBy fields remain intact
 3. **Zero Downtime:** No service restart required (permissions loaded from DB on each request)
 4. **Idempotent:** Can be re-run safely (MongoDB $push with $each)
 
 **Security Concerns:**
+
 1. **Manual Database Access:** Requires direct MongoDB connection (privilege escalation vector)
 2. **No Application-Level Validation:** Bypasses NestJS validators
 3. **Audit Trail Gap:** Permission change not logged in application audit logs
 
 **Mitigations:**
+
 1. Execute script via secure jump host with MFA
 2. Create manual audit log entry in `system_audit_logs` collection
 3. Verify permissions via `/api/auth/profile` endpoint after update
@@ -364,12 +405,14 @@ db.users.updateOne(
 **Assessment:** ❌ NOT REQUIRED
 
 **Rationale:**
+
 - Permission update does not affect authentication credentials
 - Bcrypt password hash remains unchanged
 - JWT refresh token rotation already provides session security
 - No evidence of credential compromise
 
 **Alternative Security Measure:**
+
 - Monitor admin user activity for 24 hours post-deployment
 - Alert on unusual tariff modifications
 - Review audit logs weekly for suspicious patterns
@@ -379,11 +422,13 @@ db.users.updateOne(
 **Assessment:** ❌ NOT REQUIRED
 
 **Rationale:**
+
 - Permissions are loaded fresh from database on each API request
 - JWT payload includes permissions, but authorization uses DB as source of truth (lines 422-428, auth.service.ts)
 - Guard validates current user permissions, not cached JWT permissions (lines 40-45, roles.guard.ts)
 
 **How Permissions Are Validated:**
+
 1. Request arrives with JWT access token
 2. JwtAuthGuard validates token signature and expiry
 3. JwtStrategy extracts user ID from token payload
@@ -403,6 +448,7 @@ Before deploying to production, execute the following security tests:
 **Objective:** Verify only super_admin can access tariff-settings endpoints
 
 **Steps:**
+
 1. Create test users with roles: super_admin, admin, manager, dispatcher, sales
 2. Attempt to access `GET /api/tariff-settings/active` with each role
 3. Verify:
@@ -417,6 +463,7 @@ Before deploying to production, execute the following security tests:
 **Objective:** Ensure permissions are loaded from database, not cached in JWT
 
 **Steps:**
+
 1. Login as super_admin, capture JWT access token
 2. Modify permissions in database (remove tariff_settings:read)
 3. Make API request with same JWT token
@@ -429,6 +476,7 @@ Before deploying to production, execute the following security tests:
 **Objective:** Confirm all tariff changes are logged
 
 **Steps:**
+
 1. Create new tariff setting
 2. Update packing rates
 3. Activate tariff setting
@@ -442,6 +490,7 @@ Before deploying to production, execute the following security tests:
 **Objective:** Verify throttle limits prevent brute-force attacks
 
 **Steps:**
+
 1. Script 100 rapid requests to `GET /api/tariff-settings/active`
 2. Verify rate limit enforcement (30 requests per 60 seconds, line 58)
 
@@ -452,6 +501,7 @@ Before deploying to production, execute the following security tests:
 **Objective:** Test for injection vulnerabilities in tariff CRUD operations
 
 **Steps:**
+
 1. Attempt SQL injection: `POST /api/tariff-settings/:id/packing-rates` with payload `{"name": "'; DROP TABLE users; --"}`
 2. Attempt NoSQL injection: `{"name": {"$gt": ""}}`
 3. Attempt XSS: `{"description": "<script>alert('xss')</script>"}`
@@ -464,6 +514,7 @@ Before deploying to production, execute the following security tests:
 **Objective:** Verify refresh token rotation prevents session hijacking
 
 **Steps:**
+
 1. Login, capture refresh token
 2. Use refresh token to get new access token
 3. Attempt to reuse original refresh token
@@ -487,27 +538,30 @@ Before deploying to production, execute the following security tests:
 
 ### Security Risks Identified
 
-| Risk | Severity | Mitigation | Status |
-|------|----------|------------|--------|
-| Compromised super_admin can manipulate pricing | MEDIUM | Audit logs + version control | ACCEPTED |
-| No multi-person approval for tariff activation | LOW | Implement workflow in future | DEFERRED |
-| Audit logs stored in same document (not immutable) | LOW | Separate audit collection | DEFERRED |
-| No real-time alerting for pricing changes | LOW | Implement monitoring | DEFERRED |
-| Direct database access for permission update | MEDIUM | MFA + secure jump host | MITIGATED |
+| Risk                                               | Severity | Mitigation                   | Status    |
+| -------------------------------------------------- | -------- | ---------------------------- | --------- |
+| Compromised super_admin can manipulate pricing     | MEDIUM   | Audit logs + version control | ACCEPTED  |
+| No multi-person approval for tariff activation     | LOW      | Implement workflow in future | DEFERRED  |
+| Audit logs stored in same document (not immutable) | LOW      | Separate audit collection    | DEFERRED  |
+| No real-time alerting for pricing changes          | LOW      | Implement monitoring         | DEFERRED  |
+| Direct database access for permission update       | MEDIUM   | MFA + secure jump host       | MITIGATED |
 
 ### Recommended Additional Security Controls
 
 **Priority 1 (Implement within 30 days):**
+
 1. Create separate `tariff_audit_logs` collection with append-only writes
 2. Implement automated alerting for pricing changes >20%
 3. Add database migration script to automate permission updates (avoid manual Mongo commands)
 
 **Priority 2 (Implement within 90 days):**
+
 1. Multi-person approval workflow for tariff activation
 2. Immutable audit log storage (WORM or event sourcing)
 3. Anomaly detection for unusual pricing patterns
 
 **Priority 3 (Future enhancements):**
+
 1. Real-time dashboard for tariff change monitoring
 2. Automated rollback capabilities for erroneous changes
 3. Integration with fraud detection systems
@@ -552,20 +606,22 @@ Before deploying to production, execute the following security tests:
 If issues are detected:
 
 1. **Immediate Rollback:**
+
    ```javascript
    db.users.updateOne(
-     { username: "admin" },
+     { username: 'admin' },
      {
        $pull: {
          permissions: {
-           resource: "tariff_settings"
-         }
-       }
-     }
-   )
+           resource: 'tariff_settings',
+         },
+       },
+     },
+   );
    ```
 
 2. **Restore from Backup:**
+
    ```bash
    mongorestore --db simplepro --collection users /backup/path/users.bson
    ```
@@ -580,16 +636,19 @@ If issues are detected:
 ### Data Protection Regulations
 
 **GDPR Compliance:** ✅ COMPLIANT
+
 - Tariff settings do not contain PII
 - Audit logs track user actions (legitimate interest basis)
 - Data retention policy should be documented
 
 **SOC 2 Type II:** 🟡 PARTIAL COMPLIANCE
+
 - Audit trails exist (CC6.1 - Logical Access Controls)
 - Lacks immutable audit storage (CC7.1 - System Operations)
 - Recommended: Implement WORM storage for full compliance
 
 **PCI-DSS (if processing payments):** ⚠️ REVIEW REQUIRED
+
 - Tariff settings affect pricing calculations
 - Ensure audit logs meet 10.2.5 requirements (changes to audit logs)
 - Implement 10.3 requirements (secure audit trail)
@@ -597,6 +656,7 @@ If issues are detected:
 ### Industry-Specific Standards
 
 **Moving Industry Regulations:**
+
 - FMCSA tariff filing requirements (if interstate moving)
 - State-specific tariff approval requirements
 - Consumer protection regulations (transparent pricing)
@@ -620,6 +680,7 @@ The proposed tariff_settings permission fix is **SECURE** and **APPROVED FOR DEP
 ### Key Security Findings
 
 **Strengths:**
+
 - Enterprise-grade authentication with bcrypt (12 rounds) and JWT tokens
 - Refresh token rotation with race condition detection
 - Comprehensive permission-based authorization system
@@ -628,6 +689,7 @@ The proposed tariff_settings permission fix is **SECURE** and **APPROVED FOR DEP
 - Consistent use of guards and decorators
 
 **Areas for Improvement:**
+
 - Implement immutable audit log storage
 - Add multi-person approval for financial changes
 - Create automated alerting for anomalous pricing
@@ -643,6 +705,7 @@ The proposed tariff_settings permission fix is **SECURE** and **APPROVED FOR DEP
 ## Appendix A: Reference Files
 
 **Files Reviewed:**
+
 1. `D:\Claude\SimplePro-v3\E2E_TEST_REPORT_2025-10-01.md` - Problem identification
 2. `D:\Claude\SimplePro-v3\QUICK_FIX_INSTRUCTIONS.md` - Proposed solution
 3. `D:\Claude\SimplePro-v3\apps\api\src\auth\auth.service.ts` - Authentication logic
@@ -764,6 +827,7 @@ print("4. Review backup in users_backup collection if rollback needed");
 ```
 
 **Script Safety Features:**
+
 - ✅ Creates backup before modification
 - ✅ Verifies update success
 - ✅ Creates audit log entry
@@ -772,6 +836,7 @@ print("4. Review backup in users_backup collection if rollback needed");
 - ✅ Idempotent (safe to re-run if needed)
 
 **Rollback Command (if needed):**
+
 ```javascript
 use simplepro;
 db.users.replaceOne(

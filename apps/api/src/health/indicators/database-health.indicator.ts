@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
+import {
+  HealthIndicator,
+  HealthIndicatorResult,
+  HealthCheckError,
+} from '@nestjs/terminus';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { DatabaseHealthInfo } from '../interfaces/health-check.interface';
@@ -12,19 +16,21 @@ export class DatabaseHealthIndicator extends HealthIndicator {
 
   async isHealthy(key: string, timeout = 5000): Promise<HealthIndicatorResult> {
     const startTime = Date.now();
-    
+
     try {
       // Check database connection state
       if (this.connection.readyState !== 1) {
-        throw new Error(`Database connection state: ${this.getConnectionStateText(this.connection.readyState)}`);
+        throw new Error(
+          `Database connection state: ${this.getConnectionStateText(this.connection.readyState)}`,
+        );
       }
 
       // Perform a simple ping operation with timeout
       await Promise.race([
         this.connection.db?.admin().ping(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Database ping timeout')), timeout)
-        )
+          setTimeout(() => reject(new Error('Database ping timeout')), timeout),
+        ),
       ]);
 
       const responseTime = Date.now() - startTime;
@@ -33,36 +39,48 @@ export class DatabaseHealthIndicator extends HealthIndicator {
       return this.getStatus(key, true, healthInfo);
     } catch (error) {
       const responseTime = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : 'Unknown database error';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown database error';
+
       throw new HealthCheckError(
         `Database health check failed: ${errorMessage}`,
         this.getStatus(key, false, {
           status: 'down' as const,
           responseTime,
           error: errorMessage,
-          connectionState: this.getConnectionStateText(this.connection.readyState)
-        })
+          connectionState: this.getConnectionStateText(
+            this.connection.readyState,
+          ),
+        }),
       );
     }
   }
 
-  private async getDatabaseInfo(responseTime: number): Promise<DatabaseHealthInfo> {
+  private async getDatabaseInfo(
+    responseTime: number,
+  ): Promise<DatabaseHealthInfo> {
     try {
       // Get server status for connection information
       const serverStatus = await this.connection.db?.admin().serverStatus();
       const connectionInfo = serverStatus?.connections || {};
-      
+
       // Get replica set information if available
       let replicaSetInfo;
       try {
-        const replSetStatus = await this.connection.db?.admin().replSetGetStatus();
-        const primary = replSetStatus?.members?.find((member: any) => member.stateStr === 'PRIMARY');
-        const secondaries = replSetStatus?.members?.filter((member: any) => member.stateStr === 'SECONDARY').length || 0;
-        
+        const replSetStatus = await this.connection.db
+          ?.admin()
+          .replSetGetStatus();
+        const primary = replSetStatus?.members?.find(
+          (member: any) => member.stateStr === 'PRIMARY',
+        );
+        const secondaries =
+          replSetStatus?.members?.filter(
+            (member: any) => member.stateStr === 'SECONDARY',
+          ).length || 0;
+
         replicaSetInfo = {
           primary: !!primary,
-          secondaries
+          secondaries,
         };
       } catch {
         // Not a replica set or no permissions
@@ -77,7 +95,7 @@ export class DatabaseHealthIndicator extends HealthIndicator {
           available: connectionInfo.available || 0,
           total: connectionInfo.totalCreated || 0,
         },
-        replicaSet: replicaSetInfo
+        replicaSet: replicaSetInfo,
       };
     } catch (error) {
       // Fallback to basic info if detailed info fails
@@ -88,7 +106,7 @@ export class DatabaseHealthIndicator extends HealthIndicator {
           active: 0,
           available: 0,
           total: 0,
-        }
+        },
       };
     }
   }
@@ -99,7 +117,7 @@ export class DatabaseHealthIndicator extends HealthIndicator {
       1: 'connected',
       2: 'connecting',
       3: 'disconnecting',
-      99: 'uninitialized'
+      99: 'uninitialized',
     };
     return states[state as keyof typeof states] || `unknown(${state})`;
   }

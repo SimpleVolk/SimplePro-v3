@@ -8,6 +8,7 @@
 ## Week 1-2: Quick Wins (High Impact, Low Effort)
 
 ### Week 1: Backend Optimizations
+
 **Total Effort:** 19 hours (~2.5 days)
 **Impact:** 60% faster dashboard, 87% faster lists
 
@@ -29,6 +30,7 @@ Wednesday
 ```
 
 **Deliverables:**
+
 - ✅ Analytics dashboard loads in <400ms (down from 800ms)
 - ✅ Customer/job lists load in <50ms (down from 150ms)
 - ✅ Payloads 70% smaller with compression
@@ -36,6 +38,7 @@ Wednesday
 - ✅ Cache statistics endpoint for monitoring
 
 **Success Metrics:**
+
 - Cache hit rate: 70-85%
 - API response times: p95 < 500ms
 - Frontend bundle size: <500KB initial load
@@ -45,6 +48,7 @@ Wednesday
 ## Week 3-4: Medium-Term Improvements
 
 ### Week 3: Advanced Caching & Payload Optimization
+
 **Total Effort:** 24 hours (~3 days)
 **Impact:** 85% faster dashboard, 80% smaller payloads
 
@@ -64,12 +68,14 @@ Tuesday-Wednesday
 ```
 
 **Deliverables:**
+
 - ✅ Dashboard metrics cached (5-minute TTL)
 - ✅ Smart cache invalidation on data changes
 - ✅ API supports field projection (?fields=id,name,status)
 - ✅ Mobile load times reduced by 75%
 
 **Success Metrics:**
+
 - Dashboard cache hit rate: >90%
 - List payload sizes: <100KB for 20 items
 - Mobile 3G load time: <1 second
@@ -77,6 +83,7 @@ Tuesday-Wednesday
 ---
 
 ### Week 4: WebSocket & Real-time Optimization
+
 **Total Effort:** 40 hours (~5 days)
 **Impact:** Stable memory, horizontal scaling ready
 
@@ -97,12 +104,14 @@ Wednesday-Friday
 ```
 
 **Deliverables:**
+
 - ✅ WebSocket memory usage: <50MB for 10,000 connections
 - ✅ Periodic garbage collection (every 10 minutes)
 - ✅ Redis adapter for horizontal scaling
 - ✅ Connection limit enforcement (10,000 max)
 
 **Success Metrics:**
+
 - Memory growth: Zero leaks over 24 hours
 - Max connections: 10,000+ without degradation
 - Message latency: <50ms p95
@@ -112,6 +121,7 @@ Wednesday-Friday
 ## Week 5-6: Frontend Optimization
 
 ### Week 5: Component Splitting & Bundle Size
+
 **Total Effort:** 24 hours (~3 days)
 **Impact:** 30% smaller initial bundle, 40% faster TTI
 
@@ -132,12 +142,14 @@ Wednesday
 ```
 
 **Deliverables:**
+
 - ✅ All settings pages lazy loaded
 - ✅ Bundle analysis report
 - ✅ Tree shaking verified
 - ✅ Initial bundle: <500KB (down from ~700KB)
 
 **Success Metrics:**
+
 - First Contentful Paint (FCP): <1.5s
 - Time to Interactive (TTI): <2.5s
 - Largest Contentful Paint (LCP): <2.0s
@@ -145,6 +157,7 @@ Wednesday
 ---
 
 ### Week 6: Client-Side Caching & Performance
+
 **Total Effort:** 24 hours (~3 days)
 **Impact:** Instant navigation, better UX
 
@@ -165,12 +178,14 @@ Wednesday
 ```
 
 **Deliverables:**
+
 - ✅ React Query hooks for all major entities
 - ✅ Optimistic updates for mutations
 - ✅ Web Vitals tracking dashboard
 - ✅ Sentry performance monitoring
 
 **Success Metrics:**
+
 - Navigation between cached pages: <100ms
 - Cache hit rate: >80%
 - Web Vitals: All metrics in "Good" range
@@ -180,6 +195,7 @@ Wednesday
 ## Week 7-8: Advanced Optimizations
 
 ### Week 7: Database & Query Optimization
+
 **Total Effort:** 32 hours (~4 days)
 **Impact:** 95% faster deep pagination, prevent 16MB limit
 
@@ -200,12 +216,14 @@ Wednesday-Thursday
 ```
 
 **Deliverables:**
+
 - ✅ Cursor-based pagination API endpoints
 - ✅ Infinite scroll in frontend
 - ✅ Large arrays in separate collections
 - ✅ Data migration scripts
 
 **Success Metrics:**
+
 - Page 100+ loads in: <200ms (vs 5+ seconds)
 - Max document size: <1MB
 - Query performance: Consistent regardless of page depth
@@ -213,6 +231,7 @@ Wednesday-Thursday
 ---
 
 ### Week 8: Caching & Final Polish
+
 **Total Effort:** 32 hours (~4 days)
 **Impact:** 95% faster estimates, complete optimization
 
@@ -240,12 +259,14 @@ Friday
 ```
 
 **Deliverables:**
+
 - ✅ Pricing estimates cached by input hash
 - ✅ GraphQL DataLoader for all entities
 - ✅ Load test results documentation
 - ✅ Final performance report
 
 **Success Metrics:**
+
 - Estimate calculation: 5ms (cached) vs 50ms (uncached)
 - GraphQL N+1 queries: Zero
 - All optimization targets met or exceeded
@@ -256,26 +277,28 @@ Friday
 
 ### Before Optimization (Baseline)
 
-| Metric | Current | Target | Improvement |
-|--------|---------|--------|-------------|
-| Dashboard Load | 800ms | 180ms | 77% faster |
-| Customer List | 150ms | 20ms | 87% faster |
-| Job List | 180ms | 25ms | 86% faster |
-| Analytics Query | 500ms | 120ms | 76% faster |
-| Estimate Calc | 50ms | 5ms | 90% faster |
-| Initial Page Load (FCP) | 2.8s | 1.6s | 43% faster |
-| Time to Interactive (TTI) | 4.2s | 2.5s | 40% faster |
-| Bundle Size | 700KB | 500KB | 29% smaller |
+| Metric                    | Current | Target | Improvement |
+| ------------------------- | ------- | ------ | ----------- |
+| Dashboard Load            | 800ms   | 180ms  | 77% faster  |
+| Customer List             | 150ms   | 20ms   | 87% faster  |
+| Job List                  | 180ms   | 25ms   | 86% faster  |
+| Analytics Query           | 500ms   | 120ms  | 76% faster  |
+| Estimate Calc             | 50ms    | 5ms    | 90% faster  |
+| Initial Page Load (FCP)   | 2.8s    | 1.6s   | 43% faster  |
+| Time to Interactive (TTI) | 4.2s    | 2.5s   | 40% faster  |
+| Bundle Size               | 700KB   | 500KB  | 29% smaller |
 
 ### After Optimization (Target)
 
 **Backend:**
+
 - API response time (p95): <500ms
 - Database queries: 75% reduction
 - Cache hit rate: 70-85%
 - WebSocket memory: <50MB for 10k connections
 
 **Frontend:**
+
 - First Contentful Paint: <1.5s
 - Time to Interactive: <2.5s
 - Largest Contentful Paint: <2.0s
@@ -283,6 +306,7 @@ Friday
 - Initial bundle: <500KB
 
 **Infrastructure:**
+
 - Support: 5,000+ concurrent users
 - Horizontal scaling: Ready
 - Database sharding: Prepared (not yet implemented)
@@ -337,18 +361,21 @@ Each optimization is **independent** and can be rolled back without affecting ot
 ## Success Criteria
 
 ### Technical Metrics
+
 - ✅ All performance targets met or exceeded
 - ✅ Cache hit rate >70%
 - ✅ Zero memory leaks
 - ✅ Test coverage maintained at 58%+
 
 ### Business Metrics
+
 - ✅ User-reported page load times improved
 - ✅ Infrastructure costs reduced by 50%+
 - ✅ System supports 5,000+ concurrent users
 - ✅ Mobile user experience significantly improved
 
 ### Team Metrics
+
 - ✅ All developers trained on new patterns
 - ✅ Documentation complete and up-to-date
 - ✅ Monitoring dashboards operational

@@ -35,21 +35,21 @@ describe('EstimatesController', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john.doe@test.com',
-        phone: '(555) 123-4567'
+        phone: '(555) 123-4567',
       },
       pickupLocation: {
         address: '123 Test Street, Springfield, IL 62701',
         accessDifficulty: 'easy',
         floorNumber: 1,
         elevatorAccess: true,
-        parkingDistance: 50
+        parkingDistance: 50,
       },
       deliveryLocation: {
         address: '456 New Street, Springfield, IL 62703',
         accessDifficulty: 'medium',
         floorNumber: 2,
         elevatorAccess: false,
-        parkingDistance: 100
+        parkingDistance: 100,
       },
       moveDetails: {
         serviceType: 'local',
@@ -58,13 +58,25 @@ describe('EstimatesController', () => {
         estimatedVolume: 500,
         crewSize: 3,
         truckSize: 'medium',
-        isWeekend: false
+        isWeekend: false,
       },
       inventory: [
-        { name: 'Sofa', category: 'Furniture', weight: 150, volume: 80, specialHandling: false },
-        { name: 'Refrigerator', category: 'Appliances', weight: 300, volume: 60, specialHandling: true }
+        {
+          name: 'Sofa',
+          category: 'Furniture',
+          weight: 150,
+          volume: 80,
+          specialHandling: false,
+        },
+        {
+          name: 'Refrigerator',
+          category: 'Appliances',
+          weight: 300,
+          volume: 60,
+          specialHandling: true,
+        },
       ],
-      additionalServices: ['packing']
+      additionalServices: ['packing'],
     };
 
     const mockResult = {
@@ -73,13 +85,13 @@ describe('EstimatesController', () => {
         estimateId: 'test-estimate-id',
         calculations: {
           finalPrice: 750,
-          appliedRules: []
+          appliedRules: [],
         },
         metadata: {
           deterministic: true,
-          hash: 'test-hash'
-        }
-      }
+          hash: 'test-hash',
+        },
+      },
     };
 
     mockEstimatesService.calculateEstimate.mockResolvedValue(mockResult);
@@ -101,7 +113,9 @@ describe('EstimatesController', () => {
     const mockError = new Error('Invalid estimate data');
     mockEstimatesService.calculateEstimate.mockRejectedValue(mockError);
 
-    await expect(controller.calculateEstimate(testEstimate as any)).rejects.toThrow('Invalid estimate data');
+    await expect(
+      controller.calculateEstimate(testEstimate as any),
+    ).rejects.toThrow('Invalid estimate data');
     expect(service.calculateEstimate).toHaveBeenCalledWith(testEstimate);
   });
 
@@ -111,21 +125,21 @@ describe('EstimatesController', () => {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane.smith@test.com',
-        phone: '(555) 987-6543'
+        phone: '(555) 987-6543',
       },
       pickupLocation: {
         address: '789 Old Road, Peoria, IL 61601',
         accessDifficulty: 'difficult',
         floorNumber: 3,
         elevatorAccess: false,
-        parkingDistance: 200
+        parkingDistance: 200,
       },
       deliveryLocation: {
         address: '321 New Ave, Springfield, IL 62705',
         accessDifficulty: 'easy',
         floorNumber: 1,
         elevatorAccess: true,
-        parkingDistance: 25
+        parkingDistance: 25,
       },
       moveDetails: {
         serviceType: 'local',
@@ -134,13 +148,25 @@ describe('EstimatesController', () => {
         estimatedVolume: 1200,
         crewSize: 4,
         truckSize: 'large',
-        isWeekend: true
+        isWeekend: true,
       },
       inventory: [
-        { name: 'Piano', category: 'SpecialItems', weight: 800, volume: 120, specialHandling: true },
-        { name: 'Antique Desk', category: 'Furniture', weight: 200, volume: 80, specialHandling: true }
+        {
+          name: 'Piano',
+          category: 'SpecialItems',
+          weight: 800,
+          volume: 120,
+          specialHandling: true,
+        },
+        {
+          name: 'Antique Desk',
+          category: 'Furniture',
+          weight: 200,
+          volume: 80,
+          specialHandling: true,
+        },
       ],
-      additionalServices: ['packing', 'assembly', 'storage']
+      additionalServices: ['packing', 'assembly', 'storage'],
     };
 
     const mockResult = {
@@ -153,14 +179,14 @@ describe('EstimatesController', () => {
             { ruleId: 'base_local_rate', priceImpact: 200 },
             { ruleId: 'weekend_surcharge', priceImpact: 150 },
             { ruleId: 'heavy_item_fee', priceImpact: 100 },
-            { ruleId: 'piano_handling', priceImpact: 300 }
-          ]
+            { ruleId: 'piano_handling', priceImpact: 300 },
+          ],
         },
         metadata: {
           deterministic: true,
-          hash: 'deterministic-hash-456'
-        }
-      }
+          hash: 'deterministic-hash-456',
+        },
+      },
     };
 
     mockEstimatesService.calculateEstimate.mockResolvedValue(mockResult);

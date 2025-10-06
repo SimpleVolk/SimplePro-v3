@@ -1,4 +1,5 @@
 # Performance Optimization Analysis - SimplePro-v3
+
 **Date:** October 2, 2025
 **Analyst:** Senior Backend Architect
 **Platform Version:** v1.0.0 (Production-Ready)
@@ -12,6 +13,7 @@
 SimplePro-v3 demonstrates **strong architectural foundations** with excellent caching infrastructure, comprehensive indexing, and modern optimization patterns. However, there are **significant untapped optimization opportunities** that could improve performance by 40-60% across critical user journeys.
 
 **Key Strengths:**
+
 - ✅ Comprehensive MongoDB indexing strategy (38 indexes across schemas)
 - ✅ Redis caching layer with fallback to in-memory cache
 - ✅ Next.js bundle optimization with code splitting for Recharts
@@ -20,6 +22,7 @@ SimplePro-v3 demonstrates **strong architectural foundations** with excellent ca
 - ✅ Query parallelization with `Promise.all()` patterns
 
 **Critical Bottlenecks Identified:**
+
 - 🔴 **N+1 Query Problem** in analytics aggregations (lines 610-646 in analytics.service.ts)
 - 🔴 **Cache Underutilization** - only 3 domains cached out of 28 modules
 - 🔴 **Missing DataLoader** for GraphQL (50% complete resolvers)
@@ -28,6 +31,7 @@ SimplePro-v3 demonstrates **strong architectural foundations** with excellent ca
 - 🟡 **Frontend Bundle Size** - 36KB+ of components without tree shaking verification
 
 **Expected Impact of Optimizations:**
+
 - **40-60% faster** dashboard load times (currently loading 10+ aggregation queries)
 - **75% reduction** in database roundtrips (N+1 elimination)
 - **50% faster** customer/job list queries (cache-first strategy)
@@ -40,75 +44,86 @@ SimplePro-v3 demonstrates **strong architectural foundations** with excellent ca
 ### 1.1 Database Query Optimization
 
 #### 🔴 CRITICAL: N+1 Query Problem in Analytics Service
+
 **Location:** `apps/api/src/analytics/analytics.service.ts:610-646`
 
 **Issue:**
+
 ```typescript
 // PROBLEM: Sequential database lookups for each top performer
 const topPerformers = await Promise.all(
   topPerformersData.map(async (performer) => {
     const user = await this.userModel.findById(performer._id).exec(); // N+1!
     // ...
-  })
+  }),
 );
 ```
 
 **Impact:**
+
 - For 5 top performers = **6 database queries** (1 aggregation + 5 individual lookups)
 - Response time: ~200ms → ~500ms with network latency
 - Database load: **5x higher** than necessary
 
 **Recommended Solution:**
+
 ```typescript
 // OPTIMIZED: Use $lookup aggregation stage (1 query instead of N+1)
-const topPerformersData = await this.jobModel.aggregate([
-  {
-    $match: {
-      status: { $in: ['scheduled', 'in_progress', 'completed'] },
-      createdAt: { $gte: startDate },
-      createdBy: { $exists: true, $ne: null }
-    }
-  },
-  {
-    $group: {
-      _id: '$createdBy',
-      sales: { $sum: 1 },
-      revenue: { $sum: '$estimatedCost' }
-    }
-  },
-  {
-    $lookup: {
-      from: 'users',
-      localField: '_id',
-      foreignField: '_id',
-      as: 'userDetails'
-    }
-  },
-  { $unwind: '$userDetails' },
-  {
-    $project: {
-      id: { $toString: '$_id' },
-      name: { $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName'] },
-      role: '$userDetails.role.name',
-      sales: 1,
-      revenue: { $round: '$revenue' },
-      conversion: 0 // TODO: Calculate from estimates
-    }
-  },
-  { $sort: { revenue: -1 } },
-  { $limit: 5 }
-]).exec();
+const topPerformersData = await this.jobModel
+  .aggregate([
+    {
+      $match: {
+        status: { $in: ['scheduled', 'in_progress', 'completed'] },
+        createdAt: { $gte: startDate },
+        createdBy: { $exists: true, $ne: null },
+      },
+    },
+    {
+      $group: {
+        _id: '$createdBy',
+        sales: { $sum: 1 },
+        revenue: { $sum: '$estimatedCost' },
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'userDetails',
+      },
+    },
+    { $unwind: '$userDetails' },
+    {
+      $project: {
+        id: { $toString: '$_id' },
+        name: {
+          $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName'],
+        },
+        role: '$userDetails.role.name',
+        sales: 1,
+        revenue: { $round: '$revenue' },
+        conversion: 0, // TODO: Calculate from estimates
+      },
+    },
+    { $sort: { revenue: -1 } },
+    { $limit: 5 },
+  ])
+  .exec();
 ```
 
 **Expected Improvement:**
+
 - Response time: **60% faster** (500ms → 200ms)
 - Database load: **83% reduction** (6 queries → 1 query)
 - CPU usage: **40% reduction** (no loop processing)
 
 #### 🔴 CRITICAL: Referral Source N+1 Query
+
 **Location:** `apps/api/src/analytics/analytics.service.ts:671-686`
 
 **Issue:**
+
 ```typescript
 // PROBLEM: For each referral source, query customers again
 const referralSources = await Promise.all(
@@ -119,63 +134,73 @@ const referralSources = await Promise.all(
 ```
 
 **Impact:**
+
 - For 10 referral sources = **11 database queries**
 - Response time: ~300ms → ~800ms
 - Exponential scaling with data growth
 
 **Recommended Solution:**
+
 ```typescript
 // OPTIMIZED: Single aggregation with $facet for multiple groupings
-const referralAnalytics = await this.customerModel.aggregate([
-  {
-    $match: {
-      source: { $exists: true, $ne: null },
-      createdAt: { $gte: startDate }
-    }
-  },
-  {
-    $facet: {
-      sourceLeads: [
-        { $group: { _id: '$source', leads: { $sum: 1 } } },
-        { $sort: { leads: -1 } },
-        { $limit: 10 }
-      ],
-      sourceConversions: [
-        { $match: { jobs: { $exists: true, $not: { $size: 0 } } } },
-        { $group: { _id: '$source', conversions: { $sum: 1 } } }
-      ]
-    }
-  }
-]).exec();
+const referralAnalytics = await this.customerModel
+  .aggregate([
+    {
+      $match: {
+        source: { $exists: true, $ne: null },
+        createdAt: { $gte: startDate },
+      },
+    },
+    {
+      $facet: {
+        sourceLeads: [
+          { $group: { _id: '$source', leads: { $sum: 1 } } },
+          { $sort: { leads: -1 } },
+          { $limit: 10 },
+        ],
+        sourceConversions: [
+          { $match: { jobs: { $exists: true, $not: { $size: 0 } } } },
+          { $group: { _id: '$source', conversions: { $sum: 1 } } },
+        ],
+      },
+    },
+  ])
+  .exec();
 
 // Merge results in memory (negligible cost)
-const referralSources = referralAnalytics[0].sourceLeads.map(source => {
-  const conversions = referralAnalytics[0].sourceConversions.find(c => c._id === source._id)?.conversions || 0;
+const referralSources = referralAnalytics[0].sourceLeads.map((source) => {
+  const conversions =
+    referralAnalytics[0].sourceConversions.find((c) => c._id === source._id)
+      ?.conversions || 0;
   return {
     id: source._id,
     name: this.formatSourceName(source._id),
     leads: source.leads,
     conversions,
     conversionRate: Math.round((conversions / source.leads) * 100),
-    revenue: 0 // Requires job revenue join
+    revenue: 0, // Requires job revenue join
   };
 });
 ```
 
 **Expected Improvement:**
+
 - Response time: **73% faster** (800ms → 220ms)
 - Database load: **91% reduction** (11 queries → 1 query)
 
 ### 1.2 Index Optimization
 
 #### ✅ EXCELLENT: Comprehensive Index Coverage
+
 **Strengths:**
+
 - Customer schema: 16 indexes including compound indexes
 - Job schema: 11 indexes with text search
 - Proper sparse indexes for optional fields
 - Text search with weighted fields
 
 **Verification Needed:**
+
 ```typescript
 // Add index usage monitoring to DatabasePerformanceService
 async analyzeIndexUsage(collectionName: string) {
@@ -193,6 +218,7 @@ async analyzeIndexUsage(collectionName: string) {
 ```
 
 **Recommendation:**
+
 - ✅ Keep existing indexes (well-designed)
 - 🔧 Add monitoring to `DatabasePerformanceService` to track unused indexes
 - 🔧 Consider partial indexes for frequently filtered subsets:
@@ -200,14 +226,16 @@ async analyzeIndexUsage(collectionName: string) {
   // Add to customer.schema.ts
   CustomerSchema.index(
     { status: 1, lastContactDate: -1 },
-    { partialFilterExpression: { status: 'lead' } }
+    { partialFilterExpression: { status: 'lead' } },
   );
   ```
 
 #### 🟡 MEDIUM: Missing Covering Indexes
+
 **Location:** `apps/api/src/customers/customers.service.ts:108-117`
 
 **Issue:**
+
 ```typescript
 // Query fetches full documents, but only needs specific fields
 this.customerModel
@@ -216,57 +244,68 @@ this.customerModel
   .skip(skip)
   .limit(limit)
   .lean()
-  .exec()
+  .exec();
 ```
 
 **Recommended Solution:**
+
 ```typescript
 // Add projection to reduce I/O
 this.customerModel
   .find(query)
-  .select('firstName lastName email phone status type source createdAt updatedAt')
+  .select(
+    'firstName lastName email phone status type source createdAt updatedAt',
+  )
   .sort({ createdAt: -1 })
   .skip(skip)
   .limit(limit)
   .lean()
-  .exec()
+  .exec();
 
 // Add covering index for list queries
 CustomerSchema.index(
   { status: 1, createdAt: -1 },
   {
-    partialFilterExpression: { status: { $in: ['lead', 'prospect', 'active'] } },
-    sparse: true
-  }
+    partialFilterExpression: {
+      status: { $in: ['lead', 'prospect', 'active'] },
+    },
+    sparse: true,
+  },
 );
 ```
 
 **Expected Improvement:**
+
 - I/O reduction: **60%** (average customer doc ~2KB → ~500 bytes)
 - Query speed: **30% faster** for list operations
 
 ### 1.3 Pagination Implementation
 
 #### ✅ GOOD: Offset-based Pagination
+
 **Location:** `apps/api/src/customers/customers.service.ts:57-132`
 
 **Current Implementation:**
+
 ```typescript
 const [total, customers] = await Promise.all([
   this.customerModel.countDocuments(query).exec(),
-  this.customerModel.find(query).skip(skip).limit(limit).lean().exec()
+  this.customerModel.find(query).skip(skip).limit(limit).lean().exec(),
 ]);
 ```
 
 **Strengths:**
+
 - ✅ Parallel count and query execution
 - ✅ Lean queries for performance
 - ✅ Consistent pagination metadata
 
 **Limitation:**
+
 - 🟡 Deep pagination (page 100+) becomes slow: `skip(2000)` requires scanning 2000 docs
 
 **Recommended Enhancement for Large Datasets:**
+
 ```typescript
 // Add cursor-based pagination for infinite scroll
 async findAllCursor(
@@ -307,15 +346,18 @@ async findAllCursor(
 ```
 
 **Expected Improvement:**
+
 - Deep pagination: **95% faster** (consistent O(1) performance vs O(n))
 - Better user experience for infinite scroll patterns
 
 ### 1.4 Connection Pooling
 
 #### ✅ EXCELLENT: Properly Configured
+
 **Location:** `apps/api/src/database/database.module.ts:42-45`
 
 **Current Configuration:**
+
 ```typescript
 maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '20', 10),
 minPoolSize: parseInt(process.env.MONGODB_MIN_POOL_SIZE || '5', 10),
@@ -323,11 +365,13 @@ maxIdleTimeMS: parseInt(process.env.MONGODB_MAX_IDLE_TIME || '300000', 10),
 ```
 
 **Analysis:**
+
 - ✅ Pool size appropriate for medium-scale production (20 max)
 - ✅ Minimum pool prevents cold start latency
 - ✅ Idle timeout prevents resource waste
 
 **Recommendations:**
+
 - Current settings: **Optimal for <1000 concurrent users**
 - For high-scale (>5000 users): Increase to `maxPoolSize: 50, minPoolSize: 10`
 - Add connection pool monitoring:
@@ -351,9 +395,11 @@ maxIdleTimeMS: parseInt(process.env.MONGODB_MAX_IDLE_TIME || '300000', 10),
 ### 2.1 Cache Infrastructure
 
 #### ✅ EXCELLENT: Dual-Layer Cache Architecture
+
 **Location:** `apps/api/src/cache/cache.service.ts`
 
 **Strengths:**
+
 - ✅ Redis primary with in-memory fallback
 - ✅ Compression for large objects (>1KB)
 - ✅ Tag-based invalidation
@@ -367,6 +413,7 @@ maxIdleTimeMS: parseInt(process.env.MONGODB_MAX_IDLE_TIME || '300000', 10),
 #### 🔴 CRITICAL: Cache Underutilization
 
 **Coverage Analysis:**
+
 - ✅ **Analytics cache** - `analytics:*` with MEDIUM_TTL (5 min)
 - ✅ **Customer cache** - `customer:{id}` with LONG_TTL (1 hour)
 - ✅ **Job cache** - `job:{id}` with MEDIUM_TTL (5 min)
@@ -376,6 +423,7 @@ maxIdleTimeMS: parseInt(process.env.MONGODB_MAX_IDLE_TIME || '300000', 10),
 - ❌ **Missing:** GraphQL DataLoader integration
 
 **Impact:**
+
 - Dashboard loads trigger **10+ database queries** on every page view
 - Customer list queries hit database even when data unchanged
 - Pricing calculations don't cache intermediate results
@@ -385,6 +433,7 @@ maxIdleTimeMS: parseInt(process.env.MONGODB_MAX_IDLE_TIME || '300000', 10),
 **Location:** `apps/api/src/customers/customers.service.ts:57-132`
 
 **Current Implementation (No Cache):**
+
 ```typescript
 async findAll(filters, skip, limit): Promise<PaginatedResponse<Customer>> {
   // Direct database query every time
@@ -397,6 +446,7 @@ async findAll(filters, skip, limit): Promise<PaginatedResponse<Customer>> {
 ```
 
 **Optimized Implementation:**
+
 ```typescript
 async findAll(filters, skip, limit): Promise<PaginatedResponse<Customer>> {
   // Generate cache key from filters
@@ -437,6 +487,7 @@ async create(dto, userId): Promise<Customer> {
 ```
 
 **Expected Improvement:**
+
 - List query response: **90% faster** (database → cache: 150ms → 15ms)
 - Database load: **80% reduction** for repeated queries
 - Cache hit rate: **70-85%** (assuming typical browse patterns)
@@ -446,6 +497,7 @@ async create(dto, userId): Promise<Customer> {
 **Location:** `apps/api/src/analytics/analytics.service.ts:94-142`
 
 **Issue:**
+
 ```typescript
 async getDashboardMetrics(period?: PeriodFilter): Promise<DashboardMetrics> {
   // 6 parallel aggregation queries EVERY TIME
@@ -458,6 +510,7 @@ async getDashboardMetrics(period?: PeriodFilter): Promise<DashboardMetrics> {
 ```
 
 **Recommended Solution:**
+
 ```typescript
 async getDashboardMetrics(period?: PeriodFilter): Promise<DashboardMetrics> {
   const cacheKey = `analytics:dashboard:${period?.startDate.toISOString()}:${period?.endDate.toISOString()}`;
@@ -481,6 +534,7 @@ async handleJobCompleted() {
 ```
 
 **Expected Improvement:**
+
 - Dashboard load: **85% faster** (800ms → 120ms on cache hit)
 - Database load: **95% reduction** for dashboard queries
 - Better user experience during high-traffic periods
@@ -488,12 +542,15 @@ async handleJobCompleted() {
 ### 2.3 Cache Invalidation Strategy
 
 #### ✅ GOOD: Tag-Based Invalidation
+
 **Current Implementation:**
+
 ```typescript
 await this.cacheService.invalidateByTags(['analytics', 'dashboard', 'reports']);
 ```
 
 **Recommendation:** Add event-driven invalidation
+
 ```typescript
 // In jobs.service.ts
 async updateStatus(id, status, updatedBy): Promise<Job> {
@@ -532,6 +589,7 @@ async handleJobStatusChange(event: JobStatusChangedEvent) {
 **Current:** Compression enabled in Next.js but not verified in NestJS API
 
 **Recommended:**
+
 ```typescript
 // In main.ts
 import * as compression from 'compression';
@@ -540,21 +598,24 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Add compression middleware
-  app.use(compression({
-    threshold: 1024, // Only compress responses > 1KB
-    level: 6, // Balance speed vs size (1-9)
-    filter: (req, res) => {
-      // Don't compress streaming responses
-      if (req.headers['x-no-compression']) return false;
-      return compression.filter(req, res);
-    }
-  }));
+  app.use(
+    compression({
+      threshold: 1024, // Only compress responses > 1KB
+      level: 6, // Balance speed vs size (1-9)
+      filter: (req, res) => {
+        // Don't compress streaming responses
+        if (req.headers['x-no-compression']) return false;
+        return compression.filter(req, res);
+      },
+    }),
+  );
 
   // ...
 }
 ```
 
 **Expected Improvement:**
+
 - Payload size: **70-80% reduction** for JSON responses
 - Network transfer: **3-5x faster** over typical connections
 - Bandwidth costs: **75% reduction**
@@ -566,6 +627,7 @@ async function bootstrap() {
 **Location:** `apps/api/src/jobs/jobs.service.ts:643-688`
 
 **Issue:**
+
 ```typescript
 // convertJobDocument returns ALL fields (50+ properties)
 private convertJobDocument(doc: JobDocument | any): Job {
@@ -583,11 +645,13 @@ private convertJobDocument(doc: JobDocument | any): Job {
 ```
 
 **Impact:**
+
 - Average job response: **~15-20KB** per job
 - List of 20 jobs: **~300-400KB** uncompressed
 - Mobile clients on 3G: **2-3 seconds** to download
 
 **Recommended Solution:**
+
 ```typescript
 // Add field projection based on use case
 async findAll(
@@ -627,6 +691,7 @@ async findAll(
 ```
 
 **Expected Improvement:**
+
 - List responses: **80% smaller** (400KB → 80KB for summary view)
 - Mobile load time: **75% faster** (3s → 750ms on 3G)
 
@@ -635,11 +700,12 @@ async findAll(
 #### ✅ EXCELLENT: Proper Parallelization
 
 **Strengths:**
+
 ```typescript
 // Good use of Promise.all() throughout codebase
 const [total, customers] = await Promise.all([
   this.customerModel.countDocuments(query).exec(),
-  this.customerModel.find(query).skip(skip).limit(limit).lean().exec()
+  this.customerModel.find(query).skip(skip).limit(limit).lean().exec(),
 ]);
 ```
 
@@ -648,26 +714,32 @@ const [total, customers] = await Promise.all([
 ### 3.4 Rate Limiting Impact
 
 #### ✅ GOOD: Multi-Tier Throttling
+
 **Location:** `apps/api/src/app.module.ts:50-71`
 
 **Configuration:**
+
 ```typescript
 ThrottlerModule.forRoot([
-  { name: 'short', ttl: 1000, limit: 10 },   // 10/sec
+  { name: 'short', ttl: 1000, limit: 10 }, // 10/sec
   { name: 'medium', ttl: 10000, limit: 50 }, // 50/10sec
-  { name: 'long', ttl: 60000, limit: 200 },  // 200/min
-  { name: 'auth', ttl: 60000, limit: 5 }     // 5/min for login
-])
+  { name: 'long', ttl: 60000, limit: 200 }, // 200/min
+  { name: 'auth', ttl: 60000, limit: 5 }, // 5/min for login
+]);
 ```
 
 **Analysis:**
+
 - ✅ Appropriate limits for internal business app
 - ✅ Strict authentication limits prevent brute force
 - 🔧 Consider adding rate limit headers for debugging:
   ```typescript
   // In throttle.guard.ts
   context.switchToHttp().getResponse().setHeader('X-RateLimit-Limit', limit);
-  context.switchToHttp().getResponse().setHeader('X-RateLimit-Remaining', remaining);
+  context
+    .switchToHttp()
+    .getResponse()
+    .setHeader('X-RateLimit-Remaining', remaining);
   ```
 
 ---
@@ -677,9 +749,11 @@ ThrottlerModule.forRoot([
 ### 4.1 Bundle Size Analysis
 
 #### ✅ GOOD: Code Splitting for Recharts
+
 **Location:** `apps/web/next.config.js:69-76`
 
 **Current Implementation:**
+
 ```javascript
 charts: {
   name: 'charts',
@@ -691,11 +765,13 @@ charts: {
 ```
 
 **Strengths:**
+
 - ✅ Recharts isolated in separate chunk (~80KB)
 - ✅ Framework chunk for React core
 - ✅ Common libraries chunk
 
 **Verification Needed:**
+
 ```bash
 # Run bundle analyzer to verify actual sizes
 npm install --save-dev @next/bundle-analyzer
@@ -707,17 +783,28 @@ ANALYZE=true npm run build
 **Location:** `apps/web/src/app/components/AnalyticsDashboard.tsx:7-9`
 
 **Current Implementation:**
+
 ```typescript
-const AnalyticsOverview = lazy(() => import('./AnalyticsOverview').then(mod => ({ default: mod.AnalyticsOverview })));
-const ReportsManagement = lazy(() => import('./ReportsManagement').then(mod => ({ default: mod.ReportsManagement })));
+const AnalyticsOverview = lazy(() =>
+  import('./AnalyticsOverview').then((mod) => ({
+    default: mod.AnalyticsOverview,
+  })),
+);
+const ReportsManagement = lazy(() =>
+  import('./ReportsManagement').then((mod) => ({
+    default: mod.ReportsManagement,
+  })),
+);
 ```
 
 **Analysis:**
+
 - ✅ Dashboard components lazy loaded
 - ✅ Suspense boundaries with loading states
 - 🔧 Extend pattern to other heavy components
 
 **Recommendation:**
+
 ```typescript
 // Apply to all settings pages (33 pages!)
 // In apps/web/src/app/settings/layout.tsx
@@ -734,12 +821,14 @@ const settingsComponents = {
 ```
 
 **Expected Improvement:**
+
 - Initial bundle: **30% smaller** (split 33 settings pages)
 - Time to interactive: **40% faster** on first load
 
 ### 4.2 Render Performance
 
 #### ✅ EXCELLENT: Memoization Strategy
+
 **Location:** `apps/web/src/app/components/AnalyticsDashboard.tsx:11`
 
 ```typescript
@@ -747,11 +836,13 @@ export const AnalyticsDashboard = memo(function AnalyticsDashboard() {
 ```
 
 **Strengths:**
+
 - ✅ React.memo() for expensive components
 - ✅ Lazy loading with Suspense
 - ✅ State management localized
 
 **Recommendation:** Add React DevTools Profiler checks
+
 ```typescript
 // In development, check for unnecessary re-renders
 import { Profiler } from 'react';
@@ -770,6 +861,7 @@ function onRenderCallback(id, phase, actualDuration) {
 ### 4.3 Image Optimization
 
 #### ✅ EXCELLENT: Next.js Image Configuration
+
 **Location:** `apps/web/next.config.js:33-39`
 
 ```javascript
@@ -782,6 +874,7 @@ images: {
 ```
 
 **Analysis:**
+
 - ✅ Modern formats (WebP, AVIF)
 - ✅ Responsive sizes
 - ✅ Long cache TTL
@@ -794,16 +887,18 @@ images: {
 **Issue:** No React Query or SWR for server state management
 
 **Current Pattern:**
+
 ```typescript
 // Manual fetch on every component mount
 useEffect(() => {
   fetch('/api/customers')
-    .then(res => res.json())
+    .then((res) => res.json())
     .then(setCustomers);
 }, []);
 ```
 
 **Recommended Solution:**
+
 ```typescript
 // Install: npm install @tanstack/react-query
 
@@ -844,6 +939,7 @@ function CustomerList() {
 ```
 
 **Expected Improvement:**
+
 - **Eliminates duplicate requests** across components
 - **Instant navigation** when returning to cached pages
 - **Automatic background refresh** keeps data fresh
@@ -856,11 +952,14 @@ function CustomerList() {
 ### 5.1 Schema Design Efficiency
 
 #### ✅ EXCELLENT: Normalized with Embedded Documents
+
 **Locations:**
+
 - `apps/api/src/customers/schemas/customer.schema.ts`
 - `apps/api/src/jobs/schemas/job.schema.ts`
 
 **Strengths:**
+
 - ✅ Proper balance of normalization and embedding
 - ✅ Address embedded (read-heavy, rarely updated)
 - ✅ References for relationships (customers ↔ jobs)
@@ -875,6 +974,7 @@ function CustomerList() {
 **Location:** `apps/api/src/jobs/schemas/job.schema.ts:119-165`
 
 **Potential Issue:**
+
 ```typescript
 @Prop({ type: [Object], default: [] })
 inventory!: InventoryItem[]; // Can grow to 500+ items
@@ -887,11 +987,13 @@ internalNotes!: InternalNote[]; // Unbounded growth
 ```
 
 **Risk:**
+
 - MongoDB 16MB document size limit
 - Large jobs (500 inventory items × 2KB = 1MB just for inventory)
 - Performance degradation when arrays exceed 100 elements
 
 **Recommended Solution:**
+
 ```typescript
 // For large collections, use separate collection with references
 // Create InventoryItem schema
@@ -915,6 +1017,7 @@ const inventory = await this.inventoryModel.find({ jobId }).exec();
 ```
 
 **Expected Improvement:**
+
 - Document size: **90% reduction** for large jobs
 - Query performance: **Unchanged for small jobs, 50% faster for large jobs**
 - Scalability: **No 16MB limit concerns**
@@ -926,9 +1029,11 @@ const inventory = await this.inventoryModel.find({ jobId }).exec();
 ### 6.1 Memory Management
 
 #### 🔴 CRITICAL: Potential Memory Leaks
+
 **Location:** `apps/api/src/websocket/websocket.gateway.ts:34-44`
 
 **Issue:**
+
 ```typescript
 private connectedClients = new Map<string, AuthenticatedSocket>();
 private userSockets = new Map<string, Set<string>>();
@@ -939,12 +1044,14 @@ private typingTimers = new Map<string, NodeJS.Timeout>();
 ```
 
 **Risk:**
+
 - 6 Maps storing connection state
 - Cleanup on disconnect (lines 73-91) but no periodic garbage collection
 - Stale entries if disconnection handler fails
 - No max size limits
 
 **Recommended Solution:**
+
 ```typescript
 // Add periodic cleanup and size limits
 private readonly MAX_CONNECTIONS = 10000;
@@ -992,6 +1099,7 @@ async onModuleDestroy() {
 ```
 
 **Expected Improvement:**
+
 - Memory usage: **Stable under all conditions** (no leaks)
 - Max memory: **~50MB** for 10,000 connections (vs unbounded growth)
 
@@ -1002,6 +1110,7 @@ async onModuleDestroy() {
 **Current:** Single WebSocket instance (no Redis adapter configured)
 
 **Recommended for Production:**
+
 ```typescript
 // In websocket.gateway.ts
 import { RedisIoAdapter } from '@socket.io/redis-adapter';
@@ -1020,6 +1129,7 @@ async afterInit(server: Server) {
 ```
 
 **Benefits:**
+
 - **Horizontal scaling** across multiple API instances
 - **Load balancing** for WebSocket connections
 - **Session persistence** across server restarts
@@ -1033,12 +1143,14 @@ async afterInit(server: Server) {
 #### ✅ EXCELLENT: Stateless API Design
 
 **Strengths:**
+
 - ✅ JWT authentication (no server-side sessions)
 - ✅ MongoDB for state persistence
 - ✅ Redis for distributed caching
 - ✅ Environment-based configuration
 
 **Recommendation:** Add health checks for load balancer
+
 ```typescript
 // In health.controller.ts
 @Get('health/ready')
@@ -1067,6 +1179,7 @@ async readiness() {
 **Issue:** Deterministic pricing calculations on every estimate request
 
 **Recommended Solution:**
+
 ```typescript
 // Cache pricing calculations by input hash
 async calculateEstimate(input: EstimateInput, userId: string): Promise<EstimateResult> {
@@ -1091,6 +1204,7 @@ async calculateEstimate(input: EstimateInput, userId: string): Promise<EstimateR
 ```
 
 **Expected Improvement:**
+
 - Estimate endpoint: **95% faster** for duplicate requests
 - CPU usage: **80% reduction** during quote sessions
 
@@ -1101,13 +1215,15 @@ async calculateEstimate(input: EstimateInput, userId: string): Promise<EstimateR
 **Current:** Single MongoDB instance (sufficient for current scale)
 
 **Recommendation for >100k jobs:**
+
 ```javascript
 // Shard by customerId for data locality
-sh.shardCollection("simplepro.jobs", { customerId: 1, scheduledDate: 1 });
-sh.shardCollection("simplepro.customers", { _id: "hashed" });
+sh.shardCollection('simplepro.jobs', { customerId: 1, scheduledDate: 1 });
+sh.shardCollection('simplepro.customers', { _id: 'hashed' });
 ```
 
 **Benefits:**
+
 - Distribute load across multiple database servers
 - Scale beyond single-server limits
 - Better query parallelization
@@ -1119,12 +1235,14 @@ sh.shardCollection("simplepro.customers", { _id: "hashed" });
 ### 8.1 Quick Wins (1-2 Days, High Impact)
 
 #### #1: Fix N+1 Queries in Analytics Service
+
 **File:** `apps/api/src/analytics/analytics.service.ts`
 **Lines:** 586-646 (top performers), 671-686 (referral sources)
 **Effort:** 4 hours
 **Impact:** **60% faster dashboard** (800ms → 320ms)
 
 **Implementation:**
+
 1. Replace `Promise.all(map(async))` with `$lookup` aggregation
 2. Add `.explain()` to verify single query execution
 3. Test with production-like data volume
@@ -1132,11 +1250,13 @@ sh.shardCollection("simplepro.customers", { _id: "hashed" });
 ---
 
 #### #2: Implement Cache-First Strategy for Lists
+
 **File:** `apps/api/src/customers/customers.service.ts:57-132`
 **Effort:** 6 hours
 **Impact:** **80% reduction in database load**, **90% faster response**
 
 **Implementation:**
+
 1. Add cache check before database query
 2. Implement tag-based invalidation on mutations
 3. Add cache statistics endpoint for monitoring
@@ -1144,14 +1264,17 @@ sh.shardCollection("simplepro.customers", { _id: "hashed" });
 ---
 
 #### #3: Add Response Compression
+
 **File:** `apps/api/src/main.ts`
 **Effort:** 1 hour
 **Impact:** **70% smaller payloads**, **3-5x faster network transfer**
 
 **Implementation:**
+
 ```bash
 npm install compression @types/compression
 ```
+
 ```typescript
 app.use(compression({ threshold: 1024, level: 6 }));
 ```
@@ -1159,11 +1282,13 @@ app.use(compression({ threshold: 1024, level: 6 }));
 ---
 
 #### #4: Implement React Query for Client State
+
 **File:** `apps/web/src/app/layout.tsx` (or `_app.tsx`)
 **Effort:** 8 hours
 **Impact:** **Eliminate duplicate API calls**, **instant navigation**
 
 **Implementation:**
+
 1. Install `@tanstack/react-query`
 2. Wrap app in `QueryClientProvider`
 3. Convert `useEffect` fetch patterns to `useQuery`
@@ -1174,6 +1299,7 @@ app.use(compression({ threshold: 1024, level: 6 }));
 ### 8.2 Medium-Term Improvements (1-2 Weeks, Medium-High Impact)
 
 #### #5: Dashboard KPI Caching
+
 **File:** `apps/api/src/analytics/analytics.service.ts:94-142`
 **Effort:** 3 days
 **Impact:** **85% faster dashboard**, event-driven invalidation
@@ -1181,6 +1307,7 @@ app.use(compression({ threshold: 1024, level: 6 }));
 ---
 
 #### #6: Implement Field Projection for Large Documents
+
 **Files:** `jobs.service.ts`, `customers.service.ts`
 **Effort:** 4 days
 **Impact:** **80% smaller payloads** for list views, **75% faster mobile load**
@@ -1188,6 +1315,7 @@ app.use(compression({ threshold: 1024, level: 6 }));
 ---
 
 #### #7: WebSocket Memory Management & Redis Adapter
+
 **File:** `apps/api/src/websocket/websocket.gateway.ts`
 **Effort:** 5 days
 **Impact:** **Prevent memory leaks**, **enable horizontal scaling**
@@ -1195,6 +1323,7 @@ app.use(compression({ threshold: 1024, level: 6 }));
 ---
 
 #### #8: Aggressive Component Code Splitting
+
 **Files:** 33 settings pages in `apps/web/src/app/settings/`
 **Effort:** 3 days
 **Impact:** **30% smaller initial bundle**, **40% faster time to interactive**
@@ -1204,24 +1333,28 @@ app.use(compression({ threshold: 1024, level: 6 }));
 ### 8.3 Long-Term Optimizations (1+ Months, Strategic)
 
 #### #9: Cursor-Based Pagination for Infinite Scroll
+
 **Effort:** 2 weeks
 **Impact:** **95% faster deep pagination**, better UX
 
 ---
 
 #### #10: Pricing Calculation Caching
+
 **Effort:** 1 week
 **Impact:** **95% faster estimates**, **80% CPU reduction**
 
 ---
 
 #### #11: Separate Large Arrays to Collections
+
 **Effort:** 3 weeks
 **Impact:** **Prevent 16MB limit**, **50% faster large job queries**
 
 ---
 
 #### #12: GraphQL DataLoader Implementation
+
 **Effort:** 4 weeks
 **Impact:** **Eliminate N+1 in GraphQL**, prepare for complex queries
 
@@ -1231,28 +1364,30 @@ app.use(compression({ threshold: 1024, level: 6 }));
 
 ### 9.1 Current State (Estimated)
 
-| Operation | Current | Expected with Optimizations | Improvement |
-|-----------|---------|----------------------------|-------------|
-| Dashboard Load | 800ms | 180ms | **77% faster** |
-| Customer List (20 items) | 150ms | 20ms (cached) | **87% faster** |
-| Job List (20 items) | 180ms | 25ms (cached) | **86% faster** |
-| Analytics Query | 500ms | 120ms | **76% faster** |
-| Estimate Calculation | 50ms | 5ms (cached) | **90% faster** |
-| WebSocket Message | 15ms | 10ms | **33% faster** |
-| Initial Page Load (FCP) | 2.8s | 1.6s | **43% faster** |
-| Time to Interactive (TTI) | 4.2s | 2.5s | **40% faster** |
+| Operation                 | Current | Expected with Optimizations | Improvement    |
+| ------------------------- | ------- | --------------------------- | -------------- |
+| Dashboard Load            | 800ms   | 180ms                       | **77% faster** |
+| Customer List (20 items)  | 150ms   | 20ms (cached)               | **87% faster** |
+| Job List (20 items)       | 180ms   | 25ms (cached)               | **86% faster** |
+| Analytics Query           | 500ms   | 120ms                       | **76% faster** |
+| Estimate Calculation      | 50ms    | 5ms (cached)                | **90% faster** |
+| WebSocket Message         | 15ms    | 10ms                        | **33% faster** |
+| Initial Page Load (FCP)   | 2.8s    | 1.6s                        | **43% faster** |
+| Time to Interactive (TTI) | 4.2s    | 2.5s                        | **40% faster** |
 
 ### 9.2 Load Testing Recommendations
 
 **Tools:** k6, Artillery, or Apache JMeter
 
 **Scenarios to Test:**
+
 1. **Dashboard concurrent users:** 100 users loading dashboard simultaneously
 2. **Customer list pagination:** 50 users browsing through customer lists
 3. **Real-time updates:** 200 WebSocket connections with active messaging
 4. **Estimate calculations:** 500 pricing calculations per minute
 
 **Sample k6 Test:**
+
 ```javascript
 // test/load/dashboard-load.js
 import http from 'k6/http';
@@ -1262,11 +1397,11 @@ export const options = {
   stages: [
     { duration: '2m', target: 100 }, // Ramp up to 100 users
     { duration: '5m', target: 100 }, // Stay at 100 users
-    { duration: '2m', target: 0 },   // Ramp down
+    { duration: '2m', target: 0 }, // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests under 500ms
-    http_req_failed: ['rate<0.01'],   // Less than 1% failures
+    http_req_failed: ['rate<0.01'], // Less than 1% failures
   },
 };
 
@@ -1292,6 +1427,7 @@ export default function () {
 ### 10.1 Key Metrics to Track
 
 **Backend Metrics:**
+
 - Request latency (p50, p95, p99)
 - Database query time
 - Cache hit rate
@@ -1300,6 +1436,7 @@ export default function () {
 - Memory usage & garbage collection
 
 **Frontend Metrics:**
+
 - First Contentful Paint (FCP)
 - Largest Contentful Paint (LCP)
 - Time to Interactive (TTI)
@@ -1309,16 +1446,19 @@ export default function () {
 ### 10.2 Recommended Tools
 
 **APM (Application Performance Monitoring):**
+
 - New Relic (comprehensive, paid)
 - Datadog (excellent for microservices)
 - Sentry (error tracking + performance)
 
 **Self-Hosted (Free):**
+
 - Prometheus + Grafana (metrics)
 - Elastic APM (distributed tracing)
 - Jaeger (OpenTelemetry tracing)
 
 **Implementation:**
+
 ```typescript
 // In database-performance.service.ts
 async getQueryPerformanceMetrics() {
@@ -1347,18 +1487,21 @@ async getQueryPerformanceMetrics() {
 ## 11. Scalability Roadmap
 
 ### Phase 1: Foundation (Current → 1,000 concurrent users)
+
 - ✅ Connection pooling configured
 - ✅ Indexes in place
 - 🔧 Implement caching (Quick Wins #1-4)
 - 🔧 Fix N+1 queries
 
 ### Phase 2: Growth (1,000 → 5,000 concurrent users)
+
 - 🔧 Horizontal scaling (multiple API instances)
 - 🔧 WebSocket Redis adapter
 - 🔧 Database read replicas
 - 🔧 CDN for static assets
 
 ### Phase 3: Scale (5,000 → 20,000 concurrent users)
+
 - 🔧 Database sharding
 - 🔧 Message queue for async operations (Bull/RabbitMQ)
 - 🔧 Dedicated analytics database (ClickHouse/TimescaleDB)
@@ -1376,6 +1519,7 @@ SimplePro-v3 is a **well-architected platform** with solid fundamentals. The inf
 4. **Prevent future bottlenecks** as data grows
 
 **Recommended Action Plan:**
+
 1. **Week 1:** Implement Quick Wins #1-4 (N+1 fixes, caching, compression, React Query)
 2. **Week 2-3:** Dashboard caching, field projection, WebSocket optimization
 3. **Month 2:** Component splitting, cursor pagination, pricing cache

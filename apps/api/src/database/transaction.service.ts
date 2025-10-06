@@ -64,7 +64,9 @@ export class TransactionService {
       const session = await this.connection.startSession();
 
       try {
-        this.logger.debug(`Starting transaction attempt ${attempt}/${maxRetries}`);
+        this.logger.debug(
+          `Starting transaction attempt ${attempt}/${maxRetries}`,
+        );
 
         // Start transaction
         session.startTransaction(txOptions);

@@ -1,4 +1,5 @@
 # Comprehensive Dependency Audit Analysis
+
 ## SimplePro-v3 Project
 
 **Date:** October 2, 2025
@@ -15,6 +16,7 @@
 **Overall Assessment:** The SimplePro-v3 project has a moderately healthy dependency ecosystem with several areas requiring attention. Recent security fixes (Next.js downgrade from 15.6.0-canary to 14.2.33) have addressed critical vulnerabilities. However, there are 5 low-severity vulnerabilities, significant outdated dependencies, and version conflicts that need resolution.
 
 **Key Highlights:**
+
 - ✅ **CRITICAL SECURITY FIXED:** Next.js vulnerability resolved by downgrading to stable version
 - ⚠️ **5 Low-Severity Vulnerabilities:** Related to `tmp` package in commitizen chain
 - ⚠️ **88 Outdated Packages:** 26 major version updates available, 34 minor updates, 28 patches
@@ -32,6 +34,7 @@
 #### 🟡 LOW: tmp Package Vulnerability Chain
 
 **Vulnerability:** `tmp` allows arbitrary temporary file/directory write via symbolic link
+
 - **CVE:** GHSA-52f5-9888-hmc6
 - **Advisory:** https://github.com/advisories/GHSA-52f5-9888-hmc6
 - **Affected Package:** `tmp@<=0.2.3`
@@ -40,6 +43,7 @@
 - **CVSS Score:** ~4.3 (Medium-Low)
 
 **Dependency Chain:**
+
 ```
 commitizen@>=3.0.1
   └── cz-conventional-changelog@>=3.0.2
@@ -49,6 +53,7 @@ commitizen@>=3.0.1
 ```
 
 **Impact Assessment:**
+
 - **Development-only dependency** - Not included in production builds
 - Used for commit message formatting (Git hooks)
 - Requires local filesystem access to exploit
@@ -57,12 +62,14 @@ commitizen@>=3.0.1
 **Remediation Options:**
 
 **Option 1 (RECOMMENDED - Safe):** Accept the risk
+
 ```bash
 # Rationale: Dev-only dependency, minimal impact
 # No action required - document in security policy
 ```
 
 **Option 2 (Breaking Changes):** Force update commitizen
+
 ```bash
 npm audit fix --force
 # WARNING: Downgrades commitizen from 4.3.1 to 3.0.0 (BREAKING)
@@ -70,6 +77,7 @@ npm audit fix --force
 ```
 
 **Option 3 (Future):** Monitor for upstream fix
+
 ```bash
 # Track updates to commitizen/inquirer that resolve tmp dependency
 npm outdated commitizen inquirer
@@ -85,11 +93,13 @@ npm outdated commitizen inquirer
 #### ✅ CRITICAL: Next.js Server-Side Request Forgery (FIXED)
 
 **Previous Vulnerability:** Next.js 15.6.0-canary.39 (unstable pre-release)
+
 - **Status:** RESOLVED by downgrading to 14.2.33 (stable)
 - **Current Version:** next@14.2.33 (secure)
 - **Action Taken:** Package locked with exact version to prevent regressions
 
 **Additional Security Hardening Implemented:**
+
 - ✅ Password logging removed from console output
 - ✅ Secure storage in `.secrets/` directory with 0o600 permissions
 - ✅ Rate limiting implemented (5 attempts/min login, multi-tier throttling)
@@ -101,6 +111,7 @@ npm outdated commitizen inquirer
 ### 1.3 Security Recommendations
 
 **IMMEDIATE ACTIONS (Priority 1 - Next 7 Days):**
+
 1. ✅ **COMPLETED:** Next.js security vulnerability fixed
 2. ✅ **COMPLETED:** Password security hardened
 3. ✅ **COMPLETED:** Rate limiting implemented
@@ -108,6 +119,7 @@ npm outdated commitizen inquirer
 5. ⚠️ **PENDING:** Document tmp vulnerability acceptance in security policy
 
 **SHORT-TERM ACTIONS (Priority 2 - Next 30 Days):**
+
 1. Enable npm audit in CI/CD pipeline with failure on HIGH/CRITICAL
 2. Setup Dependabot or Renovate Bot for automated security updates
 3. Implement security scanning with Snyk or Socket.dev
@@ -115,6 +127,7 @@ npm outdated commitizen inquirer
 5. Enable Subresource Integrity (SRI) for external scripts
 
 **LONG-TERM ACTIONS (Priority 3 - Next 90 Days):**
+
 1. Conduct penetration testing of authentication system
 2. Implement automated SBOM (Software Bill of Materials) generation
 3. Setup vulnerability disclosure policy
@@ -131,20 +144,21 @@ npm outdated commitizen inquirer
 
 **HIGH PRIORITY - Breaking Changes Likely:**
 
-| Package | Current | Latest | Impact | Breaking Changes | Priority |
-|---------|---------|--------|--------|------------------|----------|
-| `@apollo/server` | 4.12.2 | **5.0.0** | GraphQL API | Apollo Server 5 architecture changes | HIGH |
-| `@nestjs/apollo` | 12.2.2 | **13.2.1** | Backend API | Requires NestJS core upgrade | HIGH |
-| `@nestjs/graphql` | 12.2.2 | **13.2.0** | GraphQL | Breaking API changes | HIGH |
-| `next` | 14.2.33 | **15.5.4** | Frontend | App Router breaking changes | **CRITICAL** |
-| `react` | 18.3.1 | **19.2.0** | Frontend | Server Components API changes | **CRITICAL** |
-| `react-dom` | 18.3.1 | **19.2.0** | Frontend | Concurrent rendering changes | **CRITICAL** |
-| `eslint` | 8.57.1 | **9.36.0** | Linting | Flat config required, plugin API changes | MEDIUM |
-| `jest` | 29.7.0 | **30.2.0** | Testing | Test runner API changes | MEDIUM |
-| `@types/node` | 20.19.9 | **24.6.2** | TypeScript | Node.js 24 LTS types | LOW |
-| `@typescript-eslint/*` | 7.18.0 | **8.45.0** | Linting | ESLint 9 compatibility | MEDIUM |
+| Package                | Current | Latest     | Impact      | Breaking Changes                         | Priority     |
+| ---------------------- | ------- | ---------- | ----------- | ---------------------------------------- | ------------ |
+| `@apollo/server`       | 4.12.2  | **5.0.0**  | GraphQL API | Apollo Server 5 architecture changes     | HIGH         |
+| `@nestjs/apollo`       | 12.2.2  | **13.2.1** | Backend API | Requires NestJS core upgrade             | HIGH         |
+| `@nestjs/graphql`      | 12.2.2  | **13.2.0** | GraphQL     | Breaking API changes                     | HIGH         |
+| `next`                 | 14.2.33 | **15.5.4** | Frontend    | App Router breaking changes              | **CRITICAL** |
+| `react`                | 18.3.1  | **19.2.0** | Frontend    | Server Components API changes            | **CRITICAL** |
+| `react-dom`            | 18.3.1  | **19.2.0** | Frontend    | Concurrent rendering changes             | **CRITICAL** |
+| `eslint`               | 8.57.1  | **9.36.0** | Linting     | Flat config required, plugin API changes | MEDIUM       |
+| `jest`                 | 29.7.0  | **30.2.0** | Testing     | Test runner API changes                  | MEDIUM       |
+| `@types/node`          | 20.19.9 | **24.6.2** | TypeScript  | Node.js 24 LTS types                     | LOW          |
+| `@typescript-eslint/*` | 7.18.0  | **8.45.0** | Linting     | ESLint 9 compatibility                   | MEDIUM       |
 
 **React 19 Migration Considerations:**
+
 - **Server Components:** Breaking changes to async component patterns
 - **Concurrent Features:** New `use()` hook, automatic batching changes
 - **Hydration:** Updated hydration error handling
@@ -153,6 +167,7 @@ npm outdated commitizen inquirer
 - **Third-Party Compatibility:** Recharts, React Navigation may need updates
 
 **Next.js 15 Migration Considerations:**
+
 - **Turbopack:** Replaces Webpack (breaking for custom Webpack configs)
 - **Server Actions:** New caching behaviors
 - **Image Optimization:** Updated `next/image` API
@@ -161,6 +176,7 @@ npm outdated commitizen inquirer
 - **Build Output:** Changed directory structure
 
 **Recommendation for React/Next.js:**
+
 ```bash
 # DO NOT UPGRADE YET - Wait for ecosystem stability
 # Reasons:
@@ -178,20 +194,22 @@ npm outdated commitizen inquirer
 #### NestJS Ecosystem (Mixed Versions - Requires Coordination)
 
 **Current State:**
+
 ```json
 {
-  "@nestjs/core": "11.1.6",           // ✅ Latest stable
-  "@nestjs/common": "11.1.6",         // ✅ Latest stable
-  "@nestjs/apollo": "12.2.2",         // ⚠️ Behind (13.2.1 available)
-  "@nestjs/graphql": "12.2.2",        // ⚠️ Behind (13.2.0 available)
-  "@nestjs/schedule": "6.0.1",        // ✅ Latest
-  "@nestjs/jwt": "11.0.0",            // ✅ Latest
-  "@nestjs/mongoose": "11.0.3",       // ✅ Latest
-  "@nestjs/throttler": "6.4.0"        // ✅ Latest
+  "@nestjs/core": "11.1.6", // ✅ Latest stable
+  "@nestjs/common": "11.1.6", // ✅ Latest stable
+  "@nestjs/apollo": "12.2.2", // ⚠️ Behind (13.2.1 available)
+  "@nestjs/graphql": "12.2.2", // ⚠️ Behind (13.2.0 available)
+  "@nestjs/schedule": "6.0.1", // ✅ Latest
+  "@nestjs/jwt": "11.0.0", // ✅ Latest
+  "@nestjs/mongoose": "11.0.3", // ✅ Latest
+  "@nestjs/throttler": "6.4.0" // ✅ Latest
 }
 ```
 
 **Peer Dependency Conflict:**
+
 ```
 @nestjs/apollo@12.2.2 requires @nestjs/core@^9.3.8 || ^10.0.0
 @nestjs/graphql@12.2.2 requires @nestjs/core@^9.3.8 || ^10.0.0
@@ -201,6 +219,7 @@ Current: @nestjs/core@11.1.6 (PEER DEPENDENCY MISMATCH)
 **Impact:** Non-blocking warnings during installation, but may cause runtime issues with GraphQL resolvers.
 
 **Remediation:**
+
 ```bash
 # Upgrade Apollo and GraphQL modules to match NestJS 11
 npm install @nestjs/apollo@^13.2.1 @nestjs/graphql@^13.2.0
@@ -213,12 +232,14 @@ npm run test:api
 ```
 
 **Breaking Changes in @nestjs/graphql@13:**
+
 - Updated GraphQL schema generation
 - Changed resolver decorator behavior
 - Modified context handling in subscriptions
 - Updated error formatting
 
 **Migration Checklist:**
+
 - [ ] Update all GraphQL resolvers (50% currently implemented)
 - [ ] Test GraphQL subscriptions (WebSocket gateway)
 - [ ] Update Apollo Server configuration
@@ -234,12 +255,13 @@ npm run test:api
 
 ```json
 {
-  "mongoose": "8.18.2",               // Latest: 8.19.0 (patch update)
-  "@nestjs/mongoose": "11.0.3"        // ✅ Latest stable
+  "mongoose": "8.18.2", // Latest: 8.19.0 (patch update)
+  "@nestjs/mongoose": "11.0.3" // ✅ Latest stable
 }
 ```
 
 **Recommendation:** Safe to update mongoose to 8.19.0 (patch release)
+
 ```bash
 npm install mongoose@8.19.0
 ```
@@ -248,15 +270,16 @@ npm install mongoose@8.19.0
 
 ```json
 {
-  "redis": "5.8.2",                   // Latest: 5.8.3 (patch update)
-  "ioredis": "5.8.0",                 // ✅ Current stable
-  "cache-manager": "6.4.3",           // Latest: 7.2.3 (major update)
+  "redis": "5.8.2", // Latest: 5.8.3 (patch update)
+  "ioredis": "5.8.0", // ✅ Current stable
+  "cache-manager": "6.4.3", // Latest: 7.2.3 (major update)
   "cache-manager-redis-store": "3.0.1" // ⚠️ Deprecated package
 }
 ```
 
 **IMPORTANT:** `cache-manager-redis-store` is deprecated
 **Recommended Replacement:**
+
 ```bash
 # Remove deprecated package
 npm uninstall cache-manager-redis-store
@@ -267,13 +290,14 @@ npm install cache-manager-redis-yet@^5.0.0  # Official Redis adapter
 ```
 
 **Migration Guide:**
+
 ```typescript
 // OLD (cache-manager@6 + cache-manager-redis-store)
 import * as redisStore from 'cache-manager-redis-store';
 const cacheManager = caching({
   store: redisStore,
   host: 'localhost',
-  port: 6379
+  port: 6379,
 });
 
 // NEW (cache-manager@7 + cache-manager-redis-yet)
@@ -282,9 +306,9 @@ const cacheManager = caching({
   store: await redisStore({
     socket: {
       host: 'localhost',
-      port: 6379
-    }
-  })
+      port: 6379,
+    },
+  }),
 });
 ```
 
@@ -296,11 +320,12 @@ const cacheManager = caching({
 
 ```json
 {
-  "bcryptjs": "2.4.3",                // Latest: 3.0.2 (MAJOR UPDATE)
+  "bcryptjs": "2.4.3" // Latest: 3.0.2 (MAJOR UPDATE)
 }
 ```
 
 **bcryptjs@3.0.2 Breaking Changes:**
+
 - Dropped Node.js < 18 support
 - Changed TypeScript types
 - Updated hash generation (backward compatible with verification)
@@ -308,6 +333,7 @@ const cacheManager = caching({
 **Migration Impact:** LOW - Existing hashed passwords will still verify correctly
 
 **Recommendation:** SAFE TO UPGRADE
+
 ```bash
 npm install bcryptjs@^3.0.2
 npm install --save-dev @types/bcryptjs@latest
@@ -320,11 +346,11 @@ npm run test:api -- auth.service.spec.ts
 
 ```json
 {
-  "@nestjs/jwt": "11.0.0",            // ✅ Latest
-  "@nestjs/passport": "11.0.5",       // ✅ Latest
-  "passport": "0.7.0",                // ✅ Latest
-  "passport-jwt": "4.0.1",            // ✅ Latest
-  "passport-local": "1.0.0"           // ✅ Latest
+  "@nestjs/jwt": "11.0.0", // ✅ Latest
+  "@nestjs/passport": "11.0.5", // ✅ Latest
+  "passport": "0.7.0", // ✅ Latest
+  "passport-jwt": "4.0.1", // ✅ Latest
+  "passport-local": "1.0.0" // ✅ Latest
 }
 ```
 
@@ -338,15 +364,16 @@ npm run test:api -- auth.service.spec.ts
 
 ```json
 {
-  "jest": "29.7.0",                   // Latest: 30.2.0 (MAJOR)
-  "ts-jest": "29.4.4",                // Latest: 30.x (requires Jest 30)
-  "@types/jest": "29.5.14",           // Latest: 30.0.0
+  "jest": "29.7.0", // Latest: 30.2.0 (MAJOR)
+  "ts-jest": "29.4.4", // Latest: 30.x (requires Jest 30)
+  "@types/jest": "29.5.14", // Latest: 30.0.0
   "jest-environment-jsdom": "29.7.0", // Latest: 30.2.0
-  "babel-jest": "29.7.0"              // Latest: 30.2.0
+  "babel-jest": "29.7.0" // Latest: 30.2.0
 }
 ```
 
 **Jest 30 Breaking Changes:**
+
 - Removed `--coverage` legacy options
 - Changed snapshot format (requires regeneration)
 - Updated mock function types
@@ -354,11 +381,13 @@ npm run test:api -- auth.service.spec.ts
 - Dropped Node.js < 18 support
 
 **Impact on SimplePro-v3:**
+
 - **Pricing Engine:** 38/38 tests passing (will need snapshot updates)
 - **API Tests:** 93/159 tests passing (58% coverage)
 - **Web Tests:** Minimal test coverage (requires expansion)
 
 **Migration Strategy:**
+
 ```bash
 # Step 1: Update Jest and related packages
 npm install --save-dev \
@@ -380,6 +409,7 @@ npm run test:coverage
 ```
 
 **Recommendation:** DEFER UPGRADE until test coverage improves
+
 - Current test coverage: 58% API, <10% frontend
 - Focus on adding tests first, then upgrade testing framework
 - Timeline: Q1 2026 after reaching 80% coverage
@@ -392,18 +422,20 @@ npm run test:coverage
 
 ```json
 {
-  "nx": "21.5.3",                     // Latest: 21.6.3 (minor)
-  "@nx/*": "21.5.3"                   // Latest: 21.6.3 (all packages)
+  "nx": "21.5.3", // Latest: 21.6.3 (minor)
+  "@nx/*": "21.5.3" // Latest: 21.6.3 (all packages)
 }
 ```
 
 **NX 21.6.3 Changes:**
+
 - Bug fixes for module federation
 - Improved cache performance
 - Updated Vite integration
 - Better TypeScript 5.9 support
 
 **Recommendation:** SAFE TO UPGRADE (Low risk)
+
 ```bash
 # Update all NX packages to 21.6.3
 npx nx migrate latest
@@ -421,16 +453,18 @@ npm install
 
 ```json
 {
-  "typescript": "5.9.2",              // Latest: 5.9.3 (patch)
+  "typescript": "5.9.2" // Latest: 5.9.3 (patch)
 }
 ```
 
 **TypeScript 5.9.3 Changes:**
+
 - Bug fixes for type inference
 - Improved error messages
 - Performance improvements
 
 **Recommendation:** SAFE TO UPGRADE
+
 ```bash
 npm install typescript@5.9.3
 npm run build  # Verify compilation
@@ -442,19 +476,21 @@ npm run build  # Verify compilation
 
 ```json
 {
-  "@swc/core": "1.5.29",              // Latest: 1.13.5 (major version jump)
-  "@swc-node/register": "1.9.2",      // Latest: 1.11.1 (minor)
-  "@swc/helpers": "0.5.17"            // Latest: 0.5.17 (current)
+  "@swc/core": "1.5.29", // Latest: 1.13.5 (major version jump)
+  "@swc-node/register": "1.9.2", // Latest: 1.11.1 (minor)
+  "@swc/helpers": "0.5.17" // Latest: 0.5.17 (current)
 }
 ```
 
 **SWC 1.13.5 Changes:**
+
 - Significant performance improvements (up to 30% faster)
 - Better TypeScript 5.9 support
 - Improved source map generation
 - Bug fixes for decorators
 
 **Recommendation:** SAFE TO UPGRADE (High performance benefit)
+
 ```bash
 npm install @swc/core@^1.13.5 @swc-node/register@^1.11.1
 npm run build  # Test compilation
@@ -473,15 +509,16 @@ npm run test   # Verify tests still pass
 
 ```json
 {
-  "react": "18.3.1",                  // Latest: 19.2.0 (MAJOR - DO NOT UPGRADE YET)
-  "react-dom": "18.3.1",              // Latest: 19.2.0 (MAJOR - DO NOT UPGRADE YET)
-  "react-native": "0.79.6",           // Latest: 0.81.4 (minor-major)
-  "@types/react": "18.3.12",          // Latest: 19.2.0
-  "@types/react-dom": "18.3.1"        // Latest: 19.2.0
+  "react": "18.3.1", // Latest: 19.2.0 (MAJOR - DO NOT UPGRADE YET)
+  "react-dom": "18.3.1", // Latest: 19.2.0 (MAJOR - DO NOT UPGRADE YET)
+  "react-native": "0.79.6", // Latest: 0.81.4 (minor-major)
+  "@types/react": "18.3.12", // Latest: 19.2.0
+  "@types/react-dom": "18.3.1" // Latest: 19.2.0
 }
 ```
 
 **React 19 Adoption Timeline:**
+
 - **Now (Oct 2025):** React 19 just released, ecosystem unstable
 - **Q1 2026:** Early adopters testing, library updates in progress
 - **Q2 2026:** Most major libraries compatible, safe to begin migration
@@ -489,15 +526,16 @@ npm run test   # Verify tests still pass
 
 **Third-Party Library Compatibility Status:**
 
-| Library | React 18 Support | React 19 Support | Status |
-|---------|------------------|------------------|--------|
-| Recharts | ✅ 3.2.1 | ⚠️ Testing | Wait |
-| React Navigation | ✅ 7.1.17 | ❌ Not yet | BLOCKER |
-| React Native | ✅ 0.79.6 | ⚠️ 0.81+ testing | Wait |
-| Socket.io-client | ✅ 4.8.1 | ✅ Compatible | OK |
-| @testing-library/react | ✅ 16.3.0 | ⚠️ Beta support | Wait |
+| Library                | React 18 Support | React 19 Support | Status  |
+| ---------------------- | ---------------- | ---------------- | ------- |
+| Recharts               | ✅ 3.2.1         | ⚠️ Testing       | Wait    |
+| React Navigation       | ✅ 7.1.17        | ❌ Not yet       | BLOCKER |
+| React Native           | ✅ 0.79.6        | ⚠️ 0.81+ testing | Wait    |
+| Socket.io-client       | ✅ 4.8.1         | ✅ Compatible    | OK      |
+| @testing-library/react | ✅ 16.3.0        | ⚠️ Beta support  | Wait    |
 
 **Recommendation:** **STAY ON REACT 18** for 6-12 months
+
 - React 18.3.1 is stable, secure, and fully supported
 - All current libraries are compatible
 - No urgent need for React 19 features (Server Components already available via Next.js 14)
@@ -509,7 +547,7 @@ npm run test   # Verify tests still pass
 
 ```json
 {
-  "recharts": "3.2.1"                 // ✅ Latest stable
+  "recharts": "3.2.1" // ✅ Latest stable
 }
 ```
 
@@ -522,21 +560,23 @@ npm run test   # Verify tests still pass
 
 ```json
 {
-  "react-native": "0.79.6",           // Latest: 0.81.4 (2 minor versions behind)
-  "react-native-screens": "4.16.0",   // ✅ Latest
+  "react-native": "0.79.6", // Latest: 0.81.4 (2 minor versions behind)
+  "react-native-screens": "4.16.0", // ✅ Latest
   "react-native-safe-area-context": "5.6.1", // ✅ Latest
   "@react-navigation/native": "7.1.17", // ✅ Latest
-  "@react-navigation/stack": "7.4.8"   // ✅ Latest
+  "@react-navigation/stack": "7.4.8" // ✅ Latest
 }
 ```
 
 **React Native 0.81.4 Changes:**
+
 - New Architecture (Fabric) improvements
 - Bridgeless mode enhancements
 - Performance optimizations
 - Updated Hermes engine
 
 **Recommendation:** UPGRADE (Low risk for mobile app)
+
 ```bash
 # React Native is not heavily used yet (mobile app in early stages)
 npm install react-native@0.81.4
@@ -555,17 +595,19 @@ cd apps/mobile && npx react-native upgrade
 
 ```json
 {
-  "stripe": "14.25.0"                 // Latest: 19.0.0 (MAJOR UPDATE)
+  "stripe": "14.25.0" // Latest: 19.0.0 (MAJOR UPDATE)
 }
 ```
 
 **Stripe SDK 19.0.0 Breaking Changes:**
+
 - Removed deprecated payment methods API
 - Changed webhook signature verification
 - Updated TypeScript types
 - Minimum Node.js 18 required
 
 **Recommendation:** UPGRADE (Important security improvements)
+
 ```bash
 npm install stripe@^19.0.0
 
@@ -574,6 +616,7 @@ npm install stripe@^19.0.0
 ```
 
 **Migration Checklist:**
+
 - [ ] Update webhook signature verification code
 - [ ] Test payment intent creation
 - [ ] Verify subscription handling
@@ -588,17 +631,19 @@ npm install stripe@^19.0.0
 
 ```json
 {
-  "twilio": "4.23.0"                  // Latest: 5.10.2 (MAJOR UPDATE)
+  "twilio": "4.23.0" // Latest: 5.10.2 (MAJOR UPDATE)
 }
 ```
 
 **Twilio SDK 5.x Breaking Changes:**
+
 - Removed callback-based API (Promise-only)
 - Changed error response format
 - Updated TypeScript types
 - New authentication pattern
 
 **Recommendation:** UPGRADE (Improved async/await support)
+
 ```bash
 npm install twilio@^5.10.2
 
@@ -607,6 +652,7 @@ npm install twilio@^5.10.2
 ```
 
 **Migration Example:**
+
 ```typescript
 // OLD (Twilio 4.x)
 client.messages.create({ ... }, (err, message) => {
@@ -631,17 +677,19 @@ try {
 
 ```json
 {
-  "nodemailer": "6.10.1"              // Latest: 7.0.6 (MAJOR UPDATE)
+  "nodemailer": "6.10.1" // Latest: 7.0.6 (MAJOR UPDATE)
 }
 ```
 
 **Nodemailer 7.x Breaking Changes:**
+
 - Minimum Node.js 18 required
 - Changed attachment handling
 - Updated OAuth2 authentication
 - Removed some deprecated transports
 
 **Recommendation:** DEFER UPGRADE (Current version works well)
+
 - Nodemailer 6.10.1 is stable and secure
 - Version 7.x is recent (2025 release)
 - No critical features needed from v7
@@ -653,7 +701,7 @@ try {
 
 ```json
 {
-  "firebase-admin": "13.5.0"          // ✅ Latest stable
+  "firebase-admin": "13.5.0" // ✅ Latest stable
 }
 ```
 
@@ -666,13 +714,14 @@ try {
 
 ```json
 {
-  "aws-sdk": "2.1692.0"               // ⚠️ AWS SDK v2 (deprecated, use v3)
+  "aws-sdk": "2.1692.0" // ⚠️ AWS SDK v2 (deprecated, use v3)
 }
 ```
 
 **IMPORTANT:** AWS SDK v2 is deprecated and will lose support in 2025
 
 **Recommendation:** MIGRATE TO AWS SDK v3
+
 ```bash
 # Install modular AWS SDK v3 packages
 npm uninstall aws-sdk
@@ -686,6 +735,7 @@ npm install @aws-sdk/client-s3 @aws-sdk/client-ses
 ```
 
 **Migration Complexity:** MEDIUM (2-3 days)
+
 - Update S3 operations (if used)
 - Update SES email operations (if used)
 - Test all AWS integrations thoroughly
@@ -700,9 +750,9 @@ npm install @aws-sdk/client-s3 @aws-sdk/client-ses
 
 ```json
 {
-  "eslint": "8.57.1",                 // Latest: 9.36.0 (MAJOR)
-  "eslint-config-next": "14.2.18",    // Latest: 15.5.4
-  "eslint-plugin-react": "7.35.0",    // Latest: 7.37.5 (minor)
+  "eslint": "8.57.1", // Latest: 9.36.0 (MAJOR)
+  "eslint-config-next": "14.2.18", // Latest: 15.5.4
+  "eslint-plugin-react": "7.35.0", // Latest: 7.37.5 (minor)
   "eslint-plugin-react-hooks": "4.6.2", // Latest: 6.1.0 (MAJOR)
   "@typescript-eslint/parser": "7.18.0", // Latest: 8.45.0 (MAJOR)
   "@typescript-eslint/eslint-plugin": "7.18.0" // Latest: 8.45.0 (MAJOR)
@@ -710,6 +760,7 @@ npm install @aws-sdk/client-s3 @aws-sdk/client-ses
 ```
 
 **ESLint 9 Breaking Changes:**
+
 - **Flat Config Required:** No more `.eslintrc.json`, use `eslint.config.js`
 - **Plugin API Changes:** Requires plugin updates
 - **Removed Rules:** Some deprecated rules removed
@@ -718,6 +769,7 @@ npm install @aws-sdk/client-s3 @aws-sdk/client-ses
 **Migration Complexity:** HIGH (1-2 days)
 
 **Recommendation:** DEFER UPGRADE until Q1 2026
+
 - ESLint 8 is LTS until October 2025 (still supported)
 - ESLint 9 requires significant configuration changes
 - Many plugins still updating for ESLint 9 compatibility
@@ -731,11 +783,12 @@ npm install @aws-sdk/client-s3 @aws-sdk/client-ses
 
 ```json
 {
-  "prettier": "3.3.0"                 // Latest: 3.6.2 (minor)
+  "prettier": "3.3.0" // Latest: 3.6.2 (minor)
 }
 ```
 
 **Recommendation:** SAFE TO UPGRADE
+
 ```bash
 npm install prettier@^3.6.2
 npm run format  # Reformat codebase
@@ -750,19 +803,21 @@ npm run format  # Reformat codebase
 
 ```json
 {
-  "commitizen": "4.3.1",              // ✅ Latest
+  "commitizen": "4.3.1", // ✅ Latest
   "cz-conventional-changelog": "3.3.0", // ✅ Latest
-  "husky": "9.1.7",                   // ✅ Latest
-  "lint-staged": "15.5.2"             // Latest: 16.2.3 (MAJOR)
+  "husky": "9.1.7", // ✅ Latest
+  "lint-staged": "15.5.2" // Latest: 16.2.3 (MAJOR)
 }
 ```
 
 **lint-staged 16.x Changes:**
+
 - Requires Node.js 20+
 - Changed configuration format
 - Improved performance
 
 **Recommendation:** SAFE TO UPGRADE (Already on Node 20)
+
 ```bash
 npm install lint-staged@^16.2.3
 # Update .lintstagedrc.json if needed
@@ -774,13 +829,13 @@ npm install lint-staged@^16.2.3
 
 ### 3.1 Core Framework Health Assessment
 
-| Framework | Version | Last Update | Health | Maintenance |
-|-----------|---------|-------------|--------|-------------|
-| **NestJS** | 11.1.6 | 2 weeks ago | ✅ Excellent | Active daily commits |
-| **Next.js** | 14.2.33 | 1 month ago | ✅ Excellent | LTS branch, security updates |
-| **React** | 18.3.1 | 3 months ago | ✅ Excellent | Stable LTS, React 19 now available |
-| **Mongoose** | 8.18.2 | 2 weeks ago | ✅ Excellent | Active development |
-| **TypeScript** | 5.9.3 | 1 month ago | ✅ Excellent | Quarterly releases |
+| Framework      | Version | Last Update  | Health       | Maintenance                        |
+| -------------- | ------- | ------------ | ------------ | ---------------------------------- |
+| **NestJS**     | 11.1.6  | 2 weeks ago  | ✅ Excellent | Active daily commits               |
+| **Next.js**    | 14.2.33 | 1 month ago  | ✅ Excellent | LTS branch, security updates       |
+| **React**      | 18.3.1  | 3 months ago | ✅ Excellent | Stable LTS, React 19 now available |
+| **Mongoose**   | 8.18.2  | 2 weeks ago  | ✅ Excellent | Active development                 |
+| **TypeScript** | 5.9.3   | 1 month ago  | ✅ Excellent | Quarterly releases                 |
 
 **Analysis:** All core frameworks are actively maintained with regular security updates and bug fixes.
 
@@ -825,13 +880,13 @@ npm install lint-staged@^16.2.3
 
 **Packages with No Updates in 12+ Months:**
 
-| Package | Last Update | Stars | Status | Recommendation |
-|---------|-------------|-------|--------|----------------|
-| `passport-local` | 8+ years | 2.5k | ✅ Stable | Keep (mature, stable API) |
-| `passport-jwt` | 3 years | 2k | ✅ Stable | Keep (widely used, stable) |
-| `bcryptjs` | 2 years | 2.5k | ⚠️ Stale | Upgrade to 3.0.2 |
-| `cache-manager-redis-store` | 2 years | 600 | ❌ Abandoned | **MIGRATE** |
-| `multer` | 2 years | 11k | ⚠️ Stale | LTS version, consider alternative |
+| Package                     | Last Update | Stars | Status       | Recommendation                    |
+| --------------------------- | ----------- | ----- | ------------ | --------------------------------- |
+| `passport-local`            | 8+ years    | 2.5k  | ✅ Stable    | Keep (mature, stable API)         |
+| `passport-jwt`              | 3 years     | 2k    | ✅ Stable    | Keep (widely used, stable)        |
+| `bcryptjs`                  | 2 years     | 2.5k  | ⚠️ Stale     | Upgrade to 3.0.2                  |
+| `cache-manager-redis-store` | 2 years     | 600   | ❌ Abandoned | **MIGRATE**                       |
+| `multer`                    | 2 years     | 11k   | ⚠️ Stale     | LTS version, consider alternative |
 
 **Analysis:** Most "old" packages are mature and stable (e.g., Passport strategies). The exceptions are cache-manager-redis-store (abandoned) and AWS SDK v2 (deprecated).
 
@@ -848,6 +903,7 @@ npm install lint-staged@^16.2.3
 **Mitigation Strategies:**
 
 **Immediate Actions:**
+
 ```bash
 # 1. Enable npm audit in CI
 echo "npm audit --audit-level=high --production" >> .github/workflows/ci.yml
@@ -860,6 +916,7 @@ npm install --package-lock-only
 ```
 
 **Long-term Actions:**
+
 1. **Consider pnpm:** Better dependency isolation, prevents phantom dependencies
 2. **Implement SBOM:** Generate Software Bill of Materials for compliance
 3. **Use Socket.dev:** Detect supply chain attacks and malicious packages
@@ -874,20 +931,20 @@ npm install --package-lock-only
 
 **Total Packages:** 2,437 (including all transitive dependencies)
 
-| License Type | Count | % | Commercial Use | Attribution Required |
-|--------------|-------|---|----------------|---------------------|
-| **MIT** | 2,008 | 82.4% | ✅ Yes | ✅ Yes (minimal) |
-| **Apache-2.0** | 176 | 7.2% | ✅ Yes | ✅ Yes (with NOTICE) |
-| **ISC** | 118 | 4.8% | ✅ Yes | ✅ Yes (minimal) |
-| **BSD-3-Clause** | 58 | 2.4% | ✅ Yes | ✅ Yes |
-| **BSD-2-Clause** | 38 | 1.6% | ✅ Yes | ✅ Yes |
-| **BlueOak-1.0.0** | 6 | 0.2% | ✅ Yes | ❌ No |
-| **CC0-1.0** | 5 | 0.2% | ✅ Yes | ❌ No (public domain) |
-| **0BSD** | 2 | 0.1% | ✅ Yes | ❌ No |
-| **Unlicense** | 2 | 0.1% | ✅ Yes | ❌ No (public domain) |
-| **MPL-2.0** | 1 | <0.1% | ✅ Yes | ⚠️ Yes (weak copyleft) |
-| **UNLICENSED** | 3 | 0.1% | ⚠️ Check | ❌ Unknown |
-| **UNKNOWN** | 1 | <0.1% | ❌ Review | ❌ Unknown |
+| License Type      | Count | %     | Commercial Use | Attribution Required   |
+| ----------------- | ----- | ----- | -------------- | ---------------------- |
+| **MIT**           | 2,008 | 82.4% | ✅ Yes         | ✅ Yes (minimal)       |
+| **Apache-2.0**    | 176   | 7.2%  | ✅ Yes         | ✅ Yes (with NOTICE)   |
+| **ISC**           | 118   | 4.8%  | ✅ Yes         | ✅ Yes (minimal)       |
+| **BSD-3-Clause**  | 58    | 2.4%  | ✅ Yes         | ✅ Yes                 |
+| **BSD-2-Clause**  | 38    | 1.6%  | ✅ Yes         | ✅ Yes                 |
+| **BlueOak-1.0.0** | 6     | 0.2%  | ✅ Yes         | ❌ No                  |
+| **CC0-1.0**       | 5     | 0.2%  | ✅ Yes         | ❌ No (public domain)  |
+| **0BSD**          | 2     | 0.1%  | ✅ Yes         | ❌ No                  |
+| **Unlicense**     | 2     | 0.1%  | ✅ Yes         | ❌ No (public domain)  |
+| **MPL-2.0**       | 1     | <0.1% | ✅ Yes         | ⚠️ Yes (weak copyleft) |
+| **UNLICENSED**    | 3     | 0.1%  | ⚠️ Check       | ❌ Unknown             |
+| **UNKNOWN**       | 1     | <0.1% | ❌ Review      | ❌ Unknown             |
 
 ---
 
@@ -910,11 +967,13 @@ npm install --package-lock-only
 #### 🟢 LOW RISK: MIT, Apache-2.0, ISC, BSD (97.2%)
 
 **Requirements:**
+
 - Include copyright notices in distributed software
 - Provide LICENSE file with attribution
 - Apache-2.0: Include NOTICE file if it exists
 
 **Compliance Actions:**
+
 ```bash
 # Generate license attribution file
 npx license-checker --json --out licenses.json
@@ -931,12 +990,14 @@ npx license-checker --summary > docs/LICENSES.md
 **Package:** Needs identification (likely in transitive dependencies)
 
 **MPL-2.0 Requirements:**
+
 - File-level copyleft (not project-level)
 - Modified MPL files must remain MPL
 - Can combine with proprietary code
 - Must disclose source of MPL-licensed files
 
 **Action Required:** Identify MPL-2.0 package
+
 ```bash
 npx license-checker --onlyAllow 'MIT;Apache-2.0;ISC;BSD' --summary
 # Will flag MPL-2.0 package for review
@@ -949,6 +1010,7 @@ npx license-checker --onlyAllow 'MIT;Apache-2.0;ISC;BSD' --summary
 **Impact:** Cannot legally use without explicit permission
 
 **Action Required:** Identify and resolve
+
 ```bash
 # Find unlicensed packages
 npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .licenses == "UNKNOWN")'
@@ -967,24 +1029,28 @@ npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .lice
 ### 4.4 License Compliance Recommendations
 
 **IMMEDIATE ACTIONS (Next 7 Days):**
+
 1. Identify UNLICENSED/UNKNOWN packages and resolve
 2. Generate license attribution file for distribution
 3. Create NOTICE file with Apache-2.0 attributions
 4. Document license compliance in legal documentation
 
 **SHORT-TERM ACTIONS (Next 30 Days):**
+
 1. Implement license checking in CI/CD pipeline
 2. Automate license attribution file generation
 3. Create license policy document
 4. Train developers on license compliance
 
 **LONG-TERM ACTIONS (Next 90 Days):**
+
 1. Regular license audits (quarterly)
 2. Monitor for license changes in dependencies
 3. Implement SBOM (Software Bill of Materials)
 4. Consider legal review for international distribution
 
 **Recommended CI Check:**
+
 ```bash
 # Add to .github/workflows/ci.yml
 - name: License Compliance Check
@@ -1005,6 +1071,7 @@ npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .lice
 **Estimated Total Size:** ~2.5 GB (including all workspaces and nested dependencies)
 
 **Breakdown by Workspace:**
+
 - **Root node_modules:** ~1.8 GB (shared dependencies)
 - **apps/api/node_modules:** ~400 MB (NestJS ecosystem)
 - **apps/web/node_modules:** Hoisted to root
@@ -1015,24 +1082,24 @@ npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .lice
 
 ### 5.2 Largest Dependencies (Top 20)
 
-| Package | Size | Purpose | Optimization Opportunity |
-|---------|------|---------|--------------------------|
-| `next` | ~150 MB | Frontend framework | ❌ Required |
-| `aws-sdk` | ~120 MB | AWS integrations | ✅ **MIGRATE TO v3** (-80% size) |
-| `firebase-admin` | ~45 MB | Push notifications | ❌ Required |
-| `@nestjs/*` | ~80 MB | Backend framework | ❌ Required |
-| `mongoose` | ~35 MB | MongoDB ODM | ❌ Required |
-| `sharp` | ~30 MB | Image processing | ❌ Required |
-| `@swc/core` | ~25 MB | TypeScript compiler | ❌ Required |
-| `playwright` | ~200 MB | E2E testing | ✅ Move to devDependencies |
-| `@nx/workspace` | ~40 MB | Monorepo tooling | ❌ Required (dev) |
-| `stripe` | ~15 MB | Payment processing | ❌ Required |
-| `twilio` | ~12 MB | SMS service | ❌ Required |
-| `ioredis` | ~8 MB | Redis client | ❌ Required |
-| `bull` | ~5 MB | Job queues | ❌ Required |
-| `socket.io` | ~10 MB | WebSocket | ❌ Required |
-| `recharts` | ~8 MB | Data visualization | ❌ Required |
-| `react-native` | ~50 MB | Mobile framework | ❌ Required |
+| Package          | Size    | Purpose             | Optimization Opportunity         |
+| ---------------- | ------- | ------------------- | -------------------------------- |
+| `next`           | ~150 MB | Frontend framework  | ❌ Required                      |
+| `aws-sdk`        | ~120 MB | AWS integrations    | ✅ **MIGRATE TO v3** (-80% size) |
+| `firebase-admin` | ~45 MB  | Push notifications  | ❌ Required                      |
+| `@nestjs/*`      | ~80 MB  | Backend framework   | ❌ Required                      |
+| `mongoose`       | ~35 MB  | MongoDB ODM         | ❌ Required                      |
+| `sharp`          | ~30 MB  | Image processing    | ❌ Required                      |
+| `@swc/core`      | ~25 MB  | TypeScript compiler | ❌ Required                      |
+| `playwright`     | ~200 MB | E2E testing         | ✅ Move to devDependencies       |
+| `@nx/workspace`  | ~40 MB  | Monorepo tooling    | ❌ Required (dev)                |
+| `stripe`         | ~15 MB  | Payment processing  | ❌ Required                      |
+| `twilio`         | ~12 MB  | SMS service         | ❌ Required                      |
+| `ioredis`        | ~8 MB   | Redis client        | ❌ Required                      |
+| `bull`           | ~5 MB   | Job queues          | ❌ Required                      |
+| `socket.io`      | ~10 MB  | WebSocket           | ❌ Required                      |
+| `recharts`       | ~8 MB   | Data visualization  | ❌ Required                      |
+| `react-native`   | ~50 MB  | Mobile framework    | ❌ Required                      |
 
 **Total Optimizable Size:** ~120-150 MB (primarily AWS SDK v2 → v3 migration)
 
@@ -1047,14 +1114,19 @@ npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .lice
 **Savings:** ~100 MB (~83% reduction)
 
 **Implementation:**
+
 ```typescript
 // Before (AWS SDK v2)
 import AWS from 'aws-sdk';
-const s3 = new AWS.S3({ /* config */ });
+const s3 = new AWS.S3({
+  /* config */
+});
 
 // After (AWS SDK v3)
 import { S3Client } from '@aws-sdk/client-s3';
-const s3 = new S3Client({ /* config */ });
+const s3 = new S3Client({
+  /* config */
+});
 ```
 
 **Benefit:** Modular imports, tree-shaking, smaller production bundles
@@ -1064,11 +1136,13 @@ const s3 = new S3Client({ /* config */ });
 #### 🟡 MEDIUM IMPACT: Remove Unused Dependencies
 
 **Potentially Unused Packages:**
+
 1. **Playwright** (~200 MB) - Should be in devDependencies only
 2. **@next/bundle-analyzer** - Development tool, should be devDependency
 3. **react-native-web** - Not used in current web implementation
 
 **Action Required:**
+
 ```bash
 # Audit for unused dependencies
 npx depcheck
@@ -1085,11 +1159,13 @@ npm install --save-dev @next/bundle-analyzer
 **Issue:** Some development tools are in `dependencies` instead of `devDependencies`
 
 **Misplaced Dependencies:**
+
 - `@nestjs/cli` - Should be devDependency
 - `@nestjs/schematics` - Should be devDependency
 - `dotenv` - Only needed in development (use env vars in production)
 
 **Fix:**
+
 ```bash
 # Move to devDependencies
 npm install --save-dev @nestjs/cli @nestjs/schematics
@@ -1102,11 +1178,13 @@ npm uninstall @nestjs/cli @nestjs/schematics
 #### 🟡 MEDIUM IMPACT: Duplicate Dependencies
 
 **Potential Duplicates:**
+
 - Multiple versions of `@types/node` (20.19.9 root, 20.19.17 in apps)
 - Multiple TypeScript versions across workspaces
 - React Navigation packages with different versions
 
 **Action Required:**
+
 ```bash
 # Find duplicates
 npx npm-dedupe
@@ -1124,6 +1202,7 @@ npx pnpm install
 ### 5.4 Production Build Optimization
 
 **Current Production Build Size (Estimated):**
+
 - **API Docker Image:** ~800 MB (Node 20 + dependencies)
 - **Web Production Bundle:** ~2.5 MB (gzipped)
 - **Mobile APK:** ~40 MB (Android)
@@ -1131,6 +1210,7 @@ npx pnpm install
 **Optimization Recommendations:**
 
 **1. Multi-Stage Docker Builds**
+
 ```dockerfile
 # Current: Single-stage build (~800 MB)
 FROM node:20-alpine
@@ -1156,14 +1236,15 @@ CMD ["node", "dist/main.js"]
 ---
 
 **2. Next.js Bundle Optimization**
+
 ```javascript
 // next.config.js
 module.exports = {
   compiler: {
-    removeConsole: true,  // Remove console.* in production
+    removeConsole: true, // Remove console.* in production
   },
   experimental: {
-    optimizePackageImports: ['recharts', 'lodash'],  // Tree-shake large libraries
+    optimizePackageImports: ['recharts', 'lodash'], // Tree-shake large libraries
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -1187,6 +1268,7 @@ module.exports = {
 ---
 
 **3. Lazy Loading & Code Splitting**
+
 ```typescript
 // Current: Eager loading
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
@@ -1205,6 +1287,7 @@ const AnalyticsDashboard = dynamic(
 ### 5.5 Bundle Analysis Tools
 
 **Recommended Tools:**
+
 ```bash
 # 1. Next.js Bundle Analyzer (already installed)
 npm install --save-dev @next/bundle-analyzer
@@ -1232,11 +1315,13 @@ npm install --save-dev bundlesize
 ### 6.1 Direct vs Transitive Dependencies
 
 **Root package.json:**
+
 - **Direct Dependencies:** 30 packages
 - **Direct DevDependencies:** 59 packages
 - **Total Direct:** 89 packages
 
 **Transitive Dependencies:**
+
 - **Total Installed Packages:** 2,437 packages
 - **Transitive Ratio:** 27:1 (27 transitive deps per direct dep)
 - **Deepest Dependency Chain:** 15 levels
@@ -1250,6 +1335,7 @@ npm install --save-dev bundlesize
 #### 🔴 CRITICAL: React Version Mismatch
 
 **Conflict:**
+
 ```
 react-native@0.79.6 requires react@^19.0.0
 Current: react@18.3.1
@@ -1260,6 +1346,7 @@ Current: react@18.3.1
 **Resolution Options:**
 
 **Option 1 (RECOMMENDED):** Update react-native to support React 18
+
 ```bash
 # React Native 0.79.x is incorrectly specifying React 19
 # This is likely a peer dependency specification error
@@ -1268,14 +1355,17 @@ npm install --legacy-peer-deps
 ```
 
 **Option 2:** Upgrade to React 19 (NOT RECOMMENDED)
+
 - Requires extensive testing
 - Many libraries not compatible yet
 - Risk of breaking changes
 
 **Option 3:** Downgrade react-native (NOT RECOMMENDED)
+
 - Lose recent features and bug fixes
 
 **Recommended Action:** Add to `.npmrc`:
+
 ```
 legacy-peer-deps=true
 ```
@@ -1287,6 +1377,7 @@ And file issue with react-native: https://github.com/facebook/react-native/issue
 #### 🟡 WARNING: NestJS Core Version Mismatch
 
 **Conflict:**
+
 ```
 @nestjs/apollo@12.2.2 requires @nestjs/core@^9.3.8 || ^10.0.0
 @nestjs/graphql@12.2.2 requires @nestjs/core@^9.3.8 || ^10.0.0
@@ -1296,6 +1387,7 @@ Current: @nestjs/core@11.1.6
 **Impact:** Installation warnings, potential GraphQL resolver issues
 
 **Resolution:**
+
 ```bash
 # Upgrade to compatible versions
 npm install @nestjs/apollo@^13.2.1 @nestjs/graphql@^13.2.0
@@ -1309,6 +1401,7 @@ npm install @nestjs/apollo@^13.2.1 @nestjs/graphql@^13.2.0
 ### 6.3 Circular Dependencies
 
 **Detection:**
+
 ```bash
 npx madge --circular --extensions ts,tsx,js,jsx apps/api/src
 npx madge --circular --extensions ts,tsx,js,jsx apps/web/src
@@ -1324,13 +1417,14 @@ npx madge --circular --extensions ts,tsx,js,jsx apps/web/src
 
 **Current Versioning Patterns:**
 
-| Pattern | Example | Risk Level | Usage |
-|---------|---------|------------|-------|
-| **Caret (^)** | `^18.3.1` | MEDIUM | Most dependencies (97%) |
-| **Tilde (~)** | `~1.9.1` | LOW | SWC packages (3%) |
-| **Exact** | `21.5.3` | VERY LOW | NX packages (<1%) |
+| Pattern       | Example   | Risk Level | Usage                   |
+| ------------- | --------- | ---------- | ----------------------- |
+| **Caret (^)** | `^18.3.1` | MEDIUM     | Most dependencies (97%) |
+| **Tilde (~)** | `~1.9.1`  | LOW        | SWC packages (3%)       |
+| **Exact**     | `21.5.3`  | VERY LOW   | NX packages (<1%)       |
 
 **Risk Analysis:**
+
 - **Caret (^):** Allows minor and patch updates (e.g., 18.3.1 → 18.9.9)
   - Pro: Automatic bug fixes and security patches
   - Con: May introduce breaking changes in minor versions
@@ -1346,6 +1440,7 @@ npx madge --circular --extensions ts,tsx,js,jsx apps/web/src
 **Recommended Versioning Strategy:**
 
 **Production Dependencies:**
+
 ```json
 {
   "dependencies": {
@@ -1365,6 +1460,7 @@ npx madge --circular --extensions ts,tsx,js,jsx apps/web/src
 ```
 
 **Development Dependencies:**
+
 ```json
 {
   "devDependencies": {
@@ -1388,15 +1484,16 @@ npx madge --circular --extensions ts,tsx,js,jsx apps/web/src
 
 **Priority 1: Security & Deprecation Fixes**
 
-| Task | Complexity | Time | Risk | Benefit |
-|------|------------|------|------|---------|
-| ✅ Document tmp vulnerability acceptance | LOW | 30 min | NONE | Compliance |
-| 🔴 Migrate AWS SDK v2 → v3 | MEDIUM | 2-3 days | MEDIUM | Security + Bundle size |
-| 🔴 Identify UNLICENSED packages | LOW | 1 hour | LOW | Legal compliance |
-| 🟡 Upgrade bcryptjs to 3.0.2 | LOW | 2 hours | LOW | Security |
-| 🟡 Update mongoose to 8.19.0 | LOW | 1 hour | VERY LOW | Bug fixes |
+| Task                                     | Complexity | Time     | Risk     | Benefit                |
+| ---------------------------------------- | ---------- | -------- | -------- | ---------------------- |
+| ✅ Document tmp vulnerability acceptance | LOW        | 30 min   | NONE     | Compliance             |
+| 🔴 Migrate AWS SDK v2 → v3               | MEDIUM     | 2-3 days | MEDIUM   | Security + Bundle size |
+| 🔴 Identify UNLICENSED packages          | LOW        | 1 hour   | LOW      | Legal compliance       |
+| 🟡 Upgrade bcryptjs to 3.0.2             | LOW        | 2 hours  | LOW      | Security               |
+| 🟡 Update mongoose to 8.19.0             | LOW        | 1 hour   | VERY LOW | Bug fixes              |
 
 **Commands:**
+
 ```bash
 # Day 1: Security audit
 npm audit --json > audit-report.json
@@ -1419,6 +1516,7 @@ npm run test:e2e
 ```
 
 **Success Criteria:**
+
 - [ ] AWS SDK v3 migration complete with passing tests
 - [ ] All UNLICENSED packages identified and resolved
 - [ ] bcryptjs and mongoose updated without breaking changes
@@ -1430,16 +1528,17 @@ npm run test:e2e
 
 **Priority 2: Backend Framework Updates**
 
-| Task | Complexity | Time | Risk | Benefit |
-|------|------------|------|------|---------|
-| 🟡 Upgrade NestJS GraphQL modules | MEDIUM | 1-2 days | MEDIUM | Fix peer deps |
-| 🟡 Migrate cache-manager to v7 | MEDIUM | 1 day | MEDIUM | Remove deprecated pkg |
-| 🟡 Upgrade Stripe SDK to v19 | MEDIUM | 1-2 days | MEDIUM | Security + Features |
-| 🟡 Upgrade Twilio SDK to v5 | LOW | 4-6 hours | LOW | Better async/await |
-| 🟢 Update NX to 21.6.3 | LOW | 1 hour | VERY LOW | Bug fixes |
-| 🟢 Update SWC to 1.13.5 | LOW | 2 hours | LOW | Performance +30% |
+| Task                              | Complexity | Time      | Risk     | Benefit               |
+| --------------------------------- | ---------- | --------- | -------- | --------------------- |
+| 🟡 Upgrade NestJS GraphQL modules | MEDIUM     | 1-2 days  | MEDIUM   | Fix peer deps         |
+| 🟡 Migrate cache-manager to v7    | MEDIUM     | 1 day     | MEDIUM   | Remove deprecated pkg |
+| 🟡 Upgrade Stripe SDK to v19      | MEDIUM     | 1-2 days  | MEDIUM   | Security + Features   |
+| 🟡 Upgrade Twilio SDK to v5       | LOW        | 4-6 hours | LOW      | Better async/await    |
+| 🟢 Update NX to 21.6.3            | LOW        | 1 hour    | VERY LOW | Bug fixes             |
+| 🟢 Update SWC to 1.13.5           | LOW        | 2 hours   | LOW      | Performance +30%      |
 
 **Week 1:**
+
 ```bash
 # NestJS GraphQL upgrade
 npm install @nestjs/apollo@^13.2.1 @nestjs/graphql@^13.2.0 @apollo/server@^5.0.0
@@ -1448,6 +1547,7 @@ npm run test:api
 ```
 
 **Week 2:**
+
 ```bash
 # cache-manager upgrade
 npm uninstall cache-manager-redis-store
@@ -1457,6 +1557,7 @@ npm run test:api
 ```
 
 **Week 3:**
+
 ```bash
 # External SDK upgrades
 npm install stripe@^19.0.0 twilio@^5.10.2
@@ -1465,6 +1566,7 @@ npm run test:api
 ```
 
 **Week 4:**
+
 ```bash
 # Build tool upgrades
 npx nx migrate latest
@@ -1474,6 +1576,7 @@ npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] All peer dependency warnings resolved
 - [ ] GraphQL functionality tested and working
 - [ ] Cache service using supported Redis adapter
@@ -1487,15 +1590,16 @@ npm run build
 
 **Priority 3: Infrastructure & Tooling**
 
-| Task | Complexity | Time | Risk | Benefit |
-|------|------------|------|------|---------|
-| 🟡 Setup Dependabot/Renovate | LOW | 4 hours | VERY LOW | Automated updates |
-| 🟡 Implement license checking in CI | LOW | 2 hours | VERY LOW | Compliance |
-| 🟡 Upgrade lint-staged to v16 | LOW | 1 hour | VERY LOW | Bug fixes |
-| 🟡 Update TypeScript to 5.9.3 | LOW | 2 hours | VERY LOW | Bug fixes |
-| 🟢 Update minor dependencies | LOW | 4 hours | LOW | Bug fixes |
+| Task                                | Complexity | Time    | Risk     | Benefit           |
+| ----------------------------------- | ---------- | ------- | -------- | ----------------- |
+| 🟡 Setup Dependabot/Renovate        | LOW        | 4 hours | VERY LOW | Automated updates |
+| 🟡 Implement license checking in CI | LOW        | 2 hours | VERY LOW | Compliance        |
+| 🟡 Upgrade lint-staged to v16       | LOW        | 1 hour  | VERY LOW | Bug fixes         |
+| 🟡 Update TypeScript to 5.9.3       | LOW        | 2 hours | VERY LOW | Bug fixes         |
+| 🟢 Update minor dependencies        | LOW        | 4 hours | LOW      | Bug fixes         |
 
 **Month 1:**
+
 ```bash
 # Setup automation
 # Create .github/dependabot.yml
@@ -1507,6 +1611,7 @@ npm run build
 ```
 
 **Month 2:**
+
 ```bash
 # TypeScript and tooling updates
 npm install typescript@5.9.3
@@ -1516,6 +1621,7 @@ npm run build
 ```
 
 **Month 3:**
+
 ```bash
 # Minor dependency updates
 npm install @types/node@20.19.19
@@ -1526,6 +1632,7 @@ npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] Automated dependency updates enabled
 - [ ] License compliance in CI/CD
 - [ ] All minor versions up-to-date
@@ -1538,33 +1645,37 @@ npm run test
 
 **Priority 4: Major Framework Updates**
 
-| Task | Complexity | Time | Risk | Benefit |
-|------|------------|------|------|---------|
-| 🔴 Evaluate React 19 migration | HIGH | 2-3 weeks | HIGH | Server Components |
-| 🔴 Evaluate Next.js 15 migration | HIGH | 2-3 weeks | HIGH | Turbopack |
-| 🔴 Upgrade Jest to v30 | MEDIUM | 1 week | MEDIUM | Latest features |
-| 🔴 Upgrade ESLint to v9 | MEDIUM | 1-2 weeks | MEDIUM | Flat config |
-| 🟡 Nodemailer v7 migration | MEDIUM | 3-4 days | MEDIUM | Latest features |
+| Task                             | Complexity | Time      | Risk   | Benefit           |
+| -------------------------------- | ---------- | --------- | ------ | ----------------- |
+| 🔴 Evaluate React 19 migration   | HIGH       | 2-3 weeks | HIGH   | Server Components |
+| 🔴 Evaluate Next.js 15 migration | HIGH       | 2-3 weeks | HIGH   | Turbopack         |
+| 🔴 Upgrade Jest to v30           | MEDIUM     | 1 week    | MEDIUM | Latest features   |
+| 🔴 Upgrade ESLint to v9          | MEDIUM     | 1-2 weeks | MEDIUM | Flat config       |
+| 🟡 Nodemailer v7 migration       | MEDIUM     | 3-4 days  | MEDIUM | Latest features   |
 
 **Q1 2026 (Jan-Mar):**
+
 - Monitor React 19 ecosystem maturity
 - Track third-party library compatibility
 - Test React 19 in isolated branch
 - Evaluate Next.js 15 App Router changes
 
 **Q2 2026 (Apr-Jun):**
+
 - Begin React 19 migration if ecosystem stable
 - Update Next.js to 15.x
 - Migrate ESLint to flat config
 - Upgrade Jest and testing frameworks
 
 **Q3 2026 (Jul-Sep):**
+
 - Complete React 19 migration
 - Optimize bundle sizes post-migration
 - Update all testing frameworks
 - Full regression testing
 
 **Success Criteria:**
+
 - [ ] React 19 migration complete without breaking changes
 - [ ] Next.js 15 features utilized (Turbopack, improved caching)
 - [ ] Test coverage maintained at 80%+
@@ -1577,23 +1688,24 @@ npm run test
 
 **Risk Assessment for Major Updates:**
 
-| Update | Breaking Changes | Test Impact | Production Risk | Recommendation |
-|--------|------------------|-------------|-----------------|----------------|
-| **AWS SDK v3** | HIGH | MEDIUM | LOW | ✅ DO NOW |
-| **bcryptjs v3** | LOW | LOW | VERY LOW | ✅ DO NOW |
-| **NestJS GraphQL v13** | MEDIUM | MEDIUM | MEDIUM | ✅ Do in 30 days |
-| **cache-manager v7** | MEDIUM | LOW | MEDIUM | ✅ Do in 30 days |
-| **Stripe v19** | MEDIUM | MEDIUM | MEDIUM | ✅ Do in 30 days |
-| **React 19** | HIGH | HIGH | HIGH | ⏸️ WAIT 6-12 months |
-| **Next.js 15** | HIGH | MEDIUM | HIGH | ⏸️ WAIT 6-12 months |
-| **Jest v30** | MEDIUM | HIGH | LOW | ⏸️ WAIT until 80% coverage |
-| **ESLint v9** | HIGH | LOW | LOW | ⏸️ WAIT until Q1 2026 |
+| Update                 | Breaking Changes | Test Impact | Production Risk | Recommendation             |
+| ---------------------- | ---------------- | ----------- | --------------- | -------------------------- |
+| **AWS SDK v3**         | HIGH             | MEDIUM      | LOW             | ✅ DO NOW                  |
+| **bcryptjs v3**        | LOW              | LOW         | VERY LOW        | ✅ DO NOW                  |
+| **NestJS GraphQL v13** | MEDIUM           | MEDIUM      | MEDIUM          | ✅ Do in 30 days           |
+| **cache-manager v7**   | MEDIUM           | LOW         | MEDIUM          | ✅ Do in 30 days           |
+| **Stripe v19**         | MEDIUM           | MEDIUM      | MEDIUM          | ✅ Do in 30 days           |
+| **React 19**           | HIGH             | HIGH        | HIGH            | ⏸️ WAIT 6-12 months        |
+| **Next.js 15**         | HIGH             | MEDIUM      | HIGH            | ⏸️ WAIT 6-12 months        |
+| **Jest v30**           | MEDIUM           | HIGH        | LOW             | ⏸️ WAIT until 80% coverage |
+| **ESLint v9**          | HIGH             | LOW         | LOW             | ⏸️ WAIT until Q1 2026      |
 
 ---
 
 ### 7.6 Testing Strategy for Updates
 
 **Pre-Update Checklist:**
+
 ```bash
 # 1. Create feature branch
 git checkout -b deps/update-package-name
@@ -1624,6 +1736,7 @@ git commit -m "chore: update <package-name> to <version>"
 ```
 
 **Post-Update Monitoring:**
+
 ```bash
 # Monitor for 7 days after deployment
 # - Check error rates in production logs
@@ -1649,48 +1762,54 @@ npm run build
 **Recommended Strategy:**
 
 **Option 1: Conservative (RECOMMENDED for SimplePro-v3)**
+
 ```json
 {
   "dependencies": {
     // Pin major versions, allow patch updates
-    "react": "~18.3.1",           // 18.3.x only
-    "next": "~14.2.33",            // 14.2.x only
-    "@nestjs/core": "~11.1.6",     // 11.1.x only
+    "react": "~18.3.1", // 18.3.x only
+    "next": "~14.2.33", // 14.2.x only
+    "@nestjs/core": "~11.1.6", // 11.1.x only
 
     // Allow minor updates for stable packages
-    "mongoose": "^8.18.2",         // 8.x.x
-    "stripe": "^19.0.0"            // 19.x.x
+    "mongoose": "^8.18.2", // 8.x.x
+    "stripe": "^19.0.0" // 19.x.x
   }
 }
 ```
 
 **Benefits:**
+
 - Reduced risk of breaking changes
 - More predictable deployments
 - Easier to debug issues (consistent versions)
 
 **Drawbacks:**
+
 - May miss security patches in minor versions
 - Requires more frequent manual updates
 
 ---
 
 **Option 2: Aggressive (For greenfield projects)**
+
 ```json
 {
   "dependencies": {
     // Allow all minor and patch updates
-    "react": "^18.3.1",            // 18.x.x
-    "mongoose": "^8.18.2"          // 8.x.x
+    "react": "^18.3.1", // 18.x.x
+    "mongoose": "^8.18.2" // 8.x.x
   }
 }
 ```
 
 **Benefits:**
+
 - Automatic bug fixes and security patches
 - Less manual maintenance
 
 **Drawbacks:**
+
 - Higher risk of breaking changes
 - Harder to debug version-related issues
 
@@ -1703,47 +1822,50 @@ npm run build
 #### Option 1: Dependabot (GitHub Native)
 
 **Setup:**
+
 ```yaml
 # .github/dependabot.yml
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     open-pull-requests-limit: 10
     reviewers:
-      - "team/backend-team"
+      - 'team/backend-team'
     assignees:
-      - "team/devops-team"
+      - 'team/devops-team'
     labels:
-      - "dependencies"
-      - "automated"
+      - 'dependencies'
+      - 'automated'
     commit-message:
-      prefix: "chore"
-      include: "scope"
+      prefix: 'chore'
+      include: 'scope'
     groups:
       nestjs:
         patterns:
-          - "@nestjs/*"
+          - '@nestjs/*'
       nx:
         patterns:
-          - "@nx/*"
-          - "nx"
+          - '@nx/*'
+          - 'nx'
     ignore:
       # Don't update React to v19 yet
-      - dependency-name: "react"
-        versions: [">=19.0.0"]
-      - dependency-name: "next"
-        versions: [">=15.0.0"]
+      - dependency-name: 'react'
+        versions: ['>=19.0.0']
+      - dependency-name: 'next'
+        versions: ['>=15.0.0']
 ```
 
 **Pros:**
+
 - Free for GitHub repositories
 - Good GitHub integration
 - Automated security updates
 
 **Cons:**
+
 - Limited configuration options
 - No automatic merging without third-party actions
 
@@ -1752,6 +1874,7 @@ updates:
 #### Option 2: Renovate Bot (More Powerful)
 
 **Setup:**
+
 ```json
 // renovate.json
 {
@@ -1789,12 +1912,14 @@ updates:
 ```
 
 **Pros:**
+
 - Highly configurable
 - Auto-merge for low-risk updates
 - Better grouping and scheduling
 - Supports multiple platforms (GitHub, GitLab, Bitbucket)
 
 **Cons:**
+
 - More complex setup
 - Requires configuration maintenance
 
@@ -1817,7 +1942,7 @@ on:
     branches: [main, develop]
   pull_request:
   schedule:
-    - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM
+    - cron: '0 6 * * 1' # Weekly on Monday at 6 AM
 
 jobs:
   security-audit:
@@ -1921,6 +2046,7 @@ jobs:
    - Policy enforcement
 
 **Setup Example (Snyk):**
+
 ```bash
 # Install Snyk CLI
 npm install -g snyk
@@ -1950,21 +2076,25 @@ snyk fix
 ## Version Update Guidelines
 
 ### Critical Updates (Apply within 7 days)
+
 - Security vulnerabilities (CRITICAL, HIGH)
 - Deprecated packages reaching EOL
 - Breaking bugs in production
 
 ### High Priority Updates (Apply within 30 days)
+
 - Security vulnerabilities (MEDIUM)
 - Major version updates with significant features
 - Performance improvements >20%
 
 ### Medium Priority Updates (Apply within 90 days)
+
 - Minor version updates
 - Non-critical bug fixes
 - Peer dependency updates
 
 ### Low Priority Updates (Apply opportunistically)
+
 - Patch version updates
 - Documentation updates
 - Development tool updates
@@ -1972,16 +2102,19 @@ snyk fix
 ## Approval Process
 
 ### Automated (No approval required)
+
 - Patch updates (x.y.Z)
 - Security fixes
 - Development dependencies
 
 ### Manual Review Required
+
 - Major version updates (X.y.z)
 - Framework updates (React, Next.js, NestJS)
 - Breaking changes
 
 ### Architecture Review Required
+
 - Framework migrations (e.g., Webpack → Turbopack)
 - Major architectural changes
 - License compliance issues
@@ -1989,14 +2122,17 @@ snyk fix
 ## Testing Requirements
 
 ### Patch Updates
+
 - Automated test suite must pass
 - No manual testing required
 
 ### Minor Updates
+
 - Automated test suite must pass
 - Manual smoke testing of affected features
 
 ### Major Updates
+
 - Full test suite (unit + integration + e2e)
 - Manual regression testing
 - Performance testing
@@ -2005,6 +2141,7 @@ snyk fix
 ## Rollback Plan
 
 All dependency updates must have documented rollback plan:
+
 1. Git revert to previous commit
 2. Restore package-lock.json
 3. Rebuild and redeploy
@@ -2023,6 +2160,7 @@ All dependency updates must have documented rollback plan:
 **Target:** `@aws-sdk/client-s3@3.x`, `@aws-sdk/client-ses@3.x` (~20 MB)
 
 **Migration Steps:**
+
 ```bash
 # Step 1: Uninstall AWS SDK v2
 npm uninstall aws-sdk
@@ -2056,6 +2194,7 @@ npm run test:integration
 ```
 
 **Files to Update:**
+
 - `apps/api/src/storage/storage.service.ts` (if using S3)
 - Any email services using SES
 - Configuration files with AWS credentials
@@ -2072,12 +2211,14 @@ npm run test:integration
 **Target:** `bcryptjs@3.0.2`
 
 **Migration Steps:**
+
 ```bash
 npm install bcryptjs@^3.0.2
 npm run test:api -- auth.service.spec.ts
 ```
 
 **Verification:**
+
 ```typescript
 // Test that existing passwords still verify correctly
 const existingHash = '$2a$12$...'; // from database
@@ -2095,11 +2236,13 @@ expect(isValid).toBe(true); // Should still work
 #### 3. Identify and Resolve UNLICENSED Packages
 
 **Detection:**
+
 ```bash
 npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .licenses == "UNKNOWN")' > unlicensed-packages.json
 ```
 
 **Resolution Steps:**
+
 1. Contact package maintainers for license clarification
 2. Find alternative packages with clear licenses
 3. Get explicit written permission to use
@@ -2119,6 +2262,7 @@ npx license-checker --json | jq '.[] | select(.licenses == "UNLICENSED" or .lice
 **Target:** `@nestjs/apollo@13.2.1`, `@nestjs/graphql@13.2.0`
 
 **Migration Steps:**
+
 ```bash
 npm install @nestjs/apollo@^13.2.1 @nestjs/graphql@^13.2.0 @apollo/server@^5.0.0
 
@@ -2130,6 +2274,7 @@ npm run test:api -- --testPathPattern=resolver
 ```
 
 **Breaking Changes:**
+
 - Apollo Server 5 uses different plugin system
 - Context creation has changed
 - Error formatting updated
@@ -2146,6 +2291,7 @@ npm run test:api -- --testPathPattern=resolver
 **Target:** `cache-manager@7.2.3`, `cache-manager-redis-yet@5.0.0`
 
 **Migration Steps:**
+
 ```bash
 npm uninstall cache-manager-redis-store
 npm install cache-manager@^7.2.3 cache-manager-redis-yet@^5.0.0
@@ -2155,6 +2301,7 @@ npm install cache-manager@^7.2.3 cache-manager-redis-yet@^5.0.0
 ```
 
 **Code Changes:**
+
 ```typescript
 // Before (cache-manager@6)
 import * as redisStore from 'cache-manager-redis-store';
@@ -2162,7 +2309,7 @@ import * as redisStore from 'cache-manager-redis-store';
 CacheModule.register({
   store: redisStore,
   host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT
+  port: process.env.REDIS_PORT,
 });
 
 // After (cache-manager@7)
@@ -2173,10 +2320,10 @@ CacheModule.registerAsync({
     store: await redisStore({
       socket: {
         host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT)
-      }
-    })
-  })
+        port: Number(process.env.REDIS_PORT),
+      },
+    }),
+  }),
 });
 ```
 
@@ -2192,6 +2339,7 @@ CacheModule.registerAsync({
 **Target:** `stripe@19.0.0`
 
 **Migration Steps:**
+
 ```bash
 npm install stripe@^19.0.0
 
@@ -2203,6 +2351,7 @@ npm run test:api -- --testPathPattern=payment
 ```
 
 **Breaking Changes:**
+
 - Webhook signature verification API changed
 - Some deprecated payment methods removed
 - Error response format updated
@@ -2221,6 +2370,7 @@ npm run test:api -- --testPathPattern=payment
 **Target:** `twilio@5.10.2`
 
 **Migration Steps:**
+
 ```bash
 npm install twilio@^5.10.2
 
@@ -2229,6 +2379,7 @@ npm install twilio@^5.10.2
 ```
 
 **Code Changes:**
+
 ```typescript
 // Before (Twilio 4.x - callback-based)
 client.messages.create({ to, from, body }, (err, message) => {
@@ -2257,6 +2408,7 @@ try {
 **Target:** `nx@21.6.3`, `@nx/*@21.6.3`
 
 **Migration Steps:**
+
 ```bash
 npx nx migrate latest
 npx nx migrate --run-migrations
@@ -2278,6 +2430,7 @@ npm run test
 **Target:** `@swc/core@1.13.5`
 
 **Migration Steps:**
+
 ```bash
 npm install @swc/core@^1.13.5 @swc-node/register@^1.11.1
 
@@ -2301,6 +2454,7 @@ npm run test   # Ensure tests pass
 **Status:** ⏸️ **DO NOT UPGRADE YET**
 
 **Reasons to Wait:**
+
 1. React 19 is very recent (2025 release)
 2. Third-party library ecosystem not yet stable
 3. React Navigation does not support React 19 yet (BLOCKER)
@@ -2310,6 +2464,7 @@ npm run test   # Ensure tests pass
 **Timeline:** Re-evaluate in Q2 2026 (6-12 months)
 
 **Pre-Migration Checklist (when ready):**
+
 - [ ] React Navigation supports React 19
 - [ ] Recharts supports React 19
 - [ ] @testing-library/react has stable React 19 support
@@ -2329,6 +2484,7 @@ npm run test   # Ensure tests pass
 **Status:** ⏸️ **DO NOT UPGRADE YET**
 
 **Reasons to Wait:**
+
 1. Next.js 15 uses Turbopack (may break custom Webpack configs)
 2. App Router has breaking changes
 3. Image optimization API changes
@@ -2347,6 +2503,7 @@ npm run test   # Ensure tests pass
 **Status:** ⏸️ **DEFER until test coverage improves**
 
 **Reasons to Wait:**
+
 1. Current test coverage is only 58% (API), <10% (frontend)
 2. Jest 30 requires snapshot regeneration
 3. Focus on writing more tests first, then upgrade testing framework
@@ -2364,6 +2521,7 @@ npm run test   # Ensure tests pass
 **Status:** ⏸️ **DEFER to Q1 2026**
 
 **Reasons to Wait:**
+
 1. ESLint 9 requires flat config (major configuration rewrite)
 2. Plugin ecosystem still updating
 3. ESLint 8 is LTS until October 2025 (still supported)
@@ -2385,6 +2543,7 @@ npm run test   # Ensure tests pass
 **Alternative:** `multer-s3@3.0.1` (direct upload to S3)
 
 **Benefits:**
+
 - Reduced server memory usage
 - Faster upload times
 - Reduced server bandwidth costs
@@ -2399,6 +2558,7 @@ npm run test   # Ensure tests pass
 **Alternative:** `es-toolkit` (tree-shakeable, TypeScript-first)
 
 **Benefits:**
+
 - 97% smaller bundle size
 - Better TypeScript support
 - Modern ES2015+ features
@@ -2415,12 +2575,14 @@ npm run test   # Ensure tests pass
 
 **Purpose:** Replace `class-validator` for schema validation
 **Benefits:**
+
 - Better TypeScript inference
 - Composable schemas
 - Smaller bundle size
 - Works in both Node.js and browser
 
 **Example:**
+
 ```typescript
 // Current (class-validator)
 import { IsString, IsEmail } from 'class-validator';
@@ -2433,7 +2595,7 @@ class CreateUserDto {
 // Alternative (zod)
 import { z } from 'zod';
 const CreateUserSchema = z.object({
-  email: z.string().email()
+  email: z.string().email(),
 });
 type CreateUserDto = z.infer<typeof CreateUserSchema>;
 ```
@@ -2446,6 +2608,7 @@ type CreateUserDto = z.infer<typeof CreateUserSchema>;
 
 **Purpose:** Replace `bull@4.16.5` with BullMQ
 **Benefits:**
+
 - Better TypeScript support
 - Improved performance
 - Modern async/await API
@@ -2461,6 +2624,7 @@ type CreateUserDto = z.infer<typeof CreateUserSchema>;
 
 **Purpose:** Alternative to Mongoose for SQL databases (if needed)
 **Benefits:**
+
 - Type-safe queries
 - Better performance than Mongoose
 - Supports PostgreSQL, MySQL, SQLite
@@ -2476,12 +2640,14 @@ type CreateUserDto = z.infer<typeof CreateUserSchema>;
 SimplePro-v3 has a **moderately healthy dependency ecosystem** (7.5/10) with several areas requiring attention:
 
 **Strengths:**
+
 - ✅ Core frameworks (NestJS 11, Next.js 14, React 18) are stable and secure
 - ✅ Recent security fixes applied (Next.js downgrade, rate limiting, NoSQL protection)
 - ✅ License compliance is good (97% commercial-friendly licenses)
 - ✅ Active maintenance of critical dependencies
 
 **Weaknesses:**
+
 - ⚠️ 88 outdated packages (26 major versions available)
 - ⚠️ 2 deprecated packages (AWS SDK v2, cache-manager-redis-store)
 - ⚠️ Peer dependency conflicts (React, NestJS)
@@ -2516,6 +2682,7 @@ SimplePro-v3 has a **moderately healthy dependency ecosystem** (7.5/10) with sev
    - Test database operations
 
 **Commands:**
+
 ```bash
 # Day 1: Audit and planning
 npm audit --json > audit-report.json
@@ -2541,21 +2708,25 @@ npm run build
 ### 11.3 High-Priority Action Items (Next 30 Days)
 
 **Week 1: Backend Framework Updates**
+
 - Upgrade NestJS GraphQL modules to v13
 - Upgrade Apollo Server to v5
 - Fix peer dependency warnings
 
 **Week 2: Infrastructure Updates**
+
 - Migrate cache-manager to v7
 - Remove deprecated redis-store package
 - Test Redis caching thoroughly
 
 **Week 3: External SDK Updates**
+
 - Upgrade Stripe to v19
 - Upgrade Twilio to v5
 - Test payment and SMS integrations
 
 **Week 4: Build Tools**
+
 - Update NX to 21.6.3
 - Update SWC to 1.13.5
 - Measure build time improvements
@@ -2565,16 +2736,19 @@ npm run build
 ### 11.4 Medium-Priority Action Items (Next 90 Days)
 
 **Month 1: Automation Setup**
+
 - Configure Dependabot or Renovate Bot
 - Add license checking to CI/CD
 - Setup Snyk or Socket.dev monitoring
 
 **Month 2: Tooling Updates**
+
 - Update TypeScript to 5.9.3
 - Update lint-staged to v16
 - Update Prettier to 3.6.2
 
 **Month 3: Minor Updates**
+
 - Update all patch versions
 - Update type definition packages
 - Cleanup and deduplicate dependencies
@@ -2584,11 +2758,13 @@ npm run build
 ### 11.5 Long-Term Strategy (Q1-Q2 2026)
 
 **Q1 2026:**
+
 - Monitor React 19 ecosystem maturity
 - Plan Jest 30 migration after improving test coverage
 - Plan ESLint 9 migration (flat config)
 
 **Q2 2026:**
+
 - Evaluate React 19 migration (if ecosystem stable)
 - Evaluate Next.js 15 migration (after React)
 - Complete testing framework updates
@@ -2599,17 +2775,17 @@ npm run build
 
 **Track these metrics after each update cycle:**
 
-| Metric | Current | Target (30 days) | Target (90 days) |
-|--------|---------|------------------|------------------|
-| **Security Vulnerabilities** | 5 low | 0 | 0 |
-| **Outdated Packages** | 88 | 40 | 10 |
-| **Deprecated Packages** | 2 | 0 | 0 |
-| **Peer Dependency Warnings** | 3 | 0 | 0 |
-| **Bundle Size (node_modules)** | ~2.5 GB | ~2.3 GB | ~2.2 GB |
-| **Production Bundle (API)** | ~800 MB | ~200 MB | ~150 MB |
-| **Build Time** | ~3 min | ~2 min | ~1.5 min |
-| **Test Coverage (API)** | 58% | 65% | 80% |
-| **License Compliance** | 99% | 100% | 100% |
+| Metric                         | Current | Target (30 days) | Target (90 days) |
+| ------------------------------ | ------- | ---------------- | ---------------- |
+| **Security Vulnerabilities**   | 5 low   | 0                | 0                |
+| **Outdated Packages**          | 88      | 40               | 10               |
+| **Deprecated Packages**        | 2       | 0                | 0                |
+| **Peer Dependency Warnings**   | 3       | 0                | 0                |
+| **Bundle Size (node_modules)** | ~2.5 GB | ~2.3 GB          | ~2.2 GB          |
+| **Production Bundle (API)**    | ~800 MB | ~200 MB          | ~150 MB          |
+| **Build Time**                 | ~3 min  | ~2 min           | ~1.5 min         |
+| **Test Coverage (API)**        | 58%     | 65%              | 80%              |
+| **License Compliance**         | 99%     | 100%             | 100%             |
 
 ---
 
@@ -2618,17 +2794,20 @@ npm run build
 **For Each Update:**
 
 1. **Create feature branch**
+
    ```bash
    git checkout -b deps/update-package-name
    ```
 
 2. **Document current state**
+
    ```bash
    npm list package-name > before-update.txt
    npm run test > test-results-before.txt
    ```
 
 3. **Perform update with testing**
+
    ```bash
    npm install package-name@version
    npm run test:unit
@@ -2646,6 +2825,7 @@ npm run build
    - [ ] Real-time messaging
 
 5. **Prepare rollback plan**
+
    ```bash
    # If issues detected:
    git revert HEAD
@@ -2664,22 +2844,26 @@ npm run build
 ### 11.8 Ongoing Maintenance
 
 **Weekly:**
+
 - Review Dependabot/Renovate PRs
 - Check npm audit results
 - Monitor security advisories
 
 **Monthly:**
+
 - Update patch versions
 - Review outdated packages
 - Test in staging environment
 
 **Quarterly:**
+
 - Full dependency audit (like this document)
 - License compliance review
 - Performance benchmarking
 - Bundle size analysis
 
 **Annually:**
+
 - Major framework evaluations (React, Next.js, NestJS)
 - Architecture review
 - Third-party service evaluation
@@ -2690,23 +2874,27 @@ npm run build
 ### 11.9 Final Recommendations
 
 **DO NOW (High ROI, Low Risk):**
+
 1. ✅ Migrate AWS SDK v2 → v3 (security + 100 MB savings)
 2. ✅ Upgrade bcryptjs to v3 (security)
 3. ✅ Setup automated dependency updates (Dependabot)
 4. ✅ Add license checking to CI/CD
 
 **DO SOON (High Impact):**
+
 1. Upgrade NestJS GraphQL to v13 (fix warnings)
 2. Migrate cache-manager to v7 (remove deprecated)
 3. Upgrade Stripe and Twilio SDKs (security)
 4. Update NX and SWC (performance)
 
 **DO LATER (Lower Priority):**
+
 1. Plan Jest 30 migration (after test coverage improves)
 2. Plan ESLint 9 migration (after ecosystem stabilizes)
 3. Evaluate Nodemailer v7 upgrade
 
 **DON'T DO YET (Too Risky):**
+
 1. ❌ React 19 upgrade (wait 6-12 months)
 2. ❌ Next.js 15 upgrade (wait for ecosystem)
 3. ❌ Major testing framework changes (improve coverage first)
@@ -2718,6 +2906,7 @@ npm run build
 ### 12.1 Useful Commands
 
 **Security & Auditing:**
+
 ```bash
 # Security audit
 npm audit
@@ -2736,6 +2925,7 @@ npx license-checker --onlyAllow 'MIT;Apache-2.0;ISC'
 ```
 
 **Dependency Analysis:**
+
 ```bash
 # Dependency tree
 npm list
@@ -2756,6 +2946,7 @@ ANALYZE=true npm run build
 ```
 
 **Update Management:**
+
 ```bash
 # Interactive updates
 npx npm-check-updates --interactive
@@ -2774,6 +2965,7 @@ npm install
 ```
 
 **Monorepo Management:**
+
 ```bash
 # NX workspace
 nx graph  # Visualize dependencies
@@ -2790,17 +2982,20 @@ npm run test --workspace=@simplepro/api
 ### 12.2 Additional Resources
 
 **Documentation:**
+
 - [npm Audit Documentation](https://docs.npmjs.com/cli/v10/commands/npm-audit)
 - [Semantic Versioning](https://semver.org/)
 - [SPDX License List](https://spdx.org/licenses/)
 - [NX Monorepo Guide](https://nx.dev/concepts/more-concepts/dependency-management)
 
 **Security:**
+
 - [GitHub Advisory Database](https://github.com/advisories)
 - [Snyk Vulnerability Database](https://security.snyk.io/)
 - [npm Security Best Practices](https://docs.npmjs.com/security-best-practices)
 
 **Tools:**
+
 - [Socket.dev](https://socket.dev/) - Supply chain security
 - [Dependabot](https://github.com/dependabot) - Automated updates
 - [Renovate](https://renovate.whitesourcesoftware.com/) - Dependency management
@@ -2811,6 +3006,7 @@ npm run test --workspace=@simplepro/api
 ### 12.3 Change Log
 
 **Version 1.0 (October 2, 2025)**
+
 - Initial comprehensive dependency audit
 - Analyzed 318 packages (169 production, 149 development)
 - Identified 5 low-severity vulnerabilities
@@ -2829,4 +3025,4 @@ npm run test --workspace=@simplepro/api
 
 ---
 
-*End of Dependency Audit Analysis Report*
+_End of Dependency Audit Analysis Report_

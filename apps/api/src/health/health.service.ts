@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, HealthCheckResult } from '@nestjs/terminus';
+import {
+  HealthCheck,
+  HealthCheckService,
+  HealthCheckResult,
+} from '@nestjs/terminus';
 import { DatabaseHealthIndicator } from './indicators/database-health.indicator';
 import { RedisHealthIndicator } from './indicators/redis-health.indicator';
 import { MemoryHealthIndicator } from './indicators/memory-health.indicator';
@@ -30,14 +34,18 @@ export class HealthService {
   @HealthCheck()
   async basicHealthCheck(): Promise<HealthCheckResponseDto> {
     const startTime = Date.now();
-    
+
     try {
       const result = await this.health.check([
         // Only check critical dependencies for basic check
         () => this.databaseHealthIndicator.isHealthy('database', 2000),
       ]);
 
-      return this.formatHealthCheckResponse(result, startTime, HealthCheckLevel.BASIC);
+      return this.formatHealthCheckResponse(
+        result,
+        startTime,
+        HealthCheckLevel.BASIC,
+      );
     } catch (error) {
       this.logger.error('Basic health check failed:', error);
       return this.formatErrorResponse(error, startTime, HealthCheckLevel.BASIC);
@@ -50,22 +58,30 @@ export class HealthService {
   @HealthCheck()
   async detailedHealthCheck(): Promise<HealthCheckResponseDto> {
     const startTime = Date.now();
-    
+
     try {
       const result = await this.health.check([
         // Core infrastructure
         () => this.databaseHealthIndicator.isHealthy('database', 5000),
         () => this.redisHealthIndicator.isHealthy('redis', 3000),
-        
+
         // System resources
         () => this.memoryHealthIndicator.isHealthy('memory'),
         () => this.diskHealthIndicator.isHealthy('disk'),
       ]);
 
-      return this.formatHealthCheckResponse(result, startTime, HealthCheckLevel.DETAILED);
+      return this.formatHealthCheckResponse(
+        result,
+        startTime,
+        HealthCheckLevel.DETAILED,
+      );
     } catch (error) {
       this.logger.error('Detailed health check failed:', error);
-      return this.formatErrorResponse(error, startTime, HealthCheckLevel.DETAILED);
+      return this.formatErrorResponse(
+        error,
+        startTime,
+        HealthCheckLevel.DETAILED,
+      );
     }
   }
 
@@ -75,35 +91,41 @@ export class HealthService {
   @HealthCheck()
   async fullHealthCheck(): Promise<HealthCheckResponseDto> {
     const startTime = Date.now();
-    
+
     try {
       const checks = [
         // Core infrastructure
         () => this.databaseHealthIndicator.isHealthy('database', 5000),
         () => this.redisHealthIndicator.isHealthy('redis', 3000),
-        
+
         // System resources
         () => this.memoryHealthIndicator.isHealthy('memory'),
         () => this.diskHealthIndicator.isHealthy('disk'),
       ];
 
       // Add external service checks if configured
-      const externalServices = this.externalServiceHealthIndicator.getConfiguredServices();
+      const externalServices =
+        this.externalServiceHealthIndicator.getConfiguredServices();
       if (externalServices.length > 0) {
         checks.push(
-          ...externalServices.map(service => 
-            () => this.externalServiceHealthIndicator.isHealthy(
-              service.key, 
-              service.url, 
-              service.timeout
-            )
-          )
+          ...externalServices.map(
+            (service) => () =>
+              this.externalServiceHealthIndicator.isHealthy(
+                service.key,
+                service.url,
+                service.timeout,
+              ),
+          ),
         );
       }
 
       const result = await this.health.check(checks);
 
-      return this.formatHealthCheckResponse(result, startTime, HealthCheckLevel.FULL);
+      return this.formatHealthCheckResponse(
+        result,
+        startTime,
+        HealthCheckLevel.FULL,
+      );
     } catch (error) {
       this.logger.error('Full health check failed:', error);
       return this.formatErrorResponse(error, startTime, HealthCheckLevel.FULL);
@@ -124,9 +146,9 @@ export class HealthService {
         liveness: {
           status: 'up',
           uptime: process.uptime(),
-          pid: process.pid
-        }
-      }
+          pid: process.pid,
+        },
+      },
     };
   }
 
@@ -135,38 +157,46 @@ export class HealthService {
    */
   async readinessCheck(): Promise<HealthCheckResponseDto> {
     const startTime = Date.now();
-    
+
     try {
       // For readiness, we need at least database connectivity
       const result = await this.health.check([
         () => this.databaseHealthIndicator.isHealthy('database', 3000),
       ]);
 
-      const response = this.formatHealthCheckResponse(result, startTime, HealthCheckLevel.BASIC);
-      
+      const response = this.formatHealthCheckResponse(
+        result,
+        startTime,
+        HealthCheckLevel.BASIC,
+      );
+
       // Add readiness-specific information
       response.details = {
         ...response.details,
         readiness: {
           ready: true,
           checkedAt: new Date().toISOString(),
-          responseTime: Date.now() - startTime
-        }
+          responseTime: Date.now() - startTime,
+        },
       };
 
       return response;
     } catch (error) {
       this.logger.error('Readiness check failed:', error);
-      const errorResponse = this.formatErrorResponse(error, startTime, HealthCheckLevel.BASIC);
-      
+      const errorResponse = this.formatErrorResponse(
+        error,
+        startTime,
+        HealthCheckLevel.BASIC,
+      );
+
       errorResponse.details = {
         ...errorResponse.details,
         readiness: {
           ready: false,
           checkedAt: new Date().toISOString(),
           responseTime: Date.now() - startTime,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        }
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
       };
 
       return errorResponse;
@@ -178,7 +208,7 @@ export class HealthService {
    */
   async getSystemInfo(): Promise<any> {
     const memUsage = process.memoryUsage();
-    
+
     return {
       service: this.serviceName,
       version: this.version,
@@ -188,26 +218,26 @@ export class HealthService {
         uptime: process.uptime(),
         pid: process.pid,
         platform: process.platform,
-        arch: process.arch
+        arch: process.arch,
       },
       memory: {
         rss: this.formatBytes(memUsage.rss),
         heapTotal: this.formatBytes(memUsage.heapTotal),
         heapUsed: this.formatBytes(memUsage.heapUsed),
         external: this.formatBytes(memUsage.external),
-        arrayBuffers: this.formatBytes(memUsage.arrayBuffers || 0)
+        arrayBuffers: this.formatBytes(memUsage.arrayBuffers || 0),
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
   private formatHealthCheckResponse(
-    result: HealthCheckResult, 
-    startTime: number, 
-    level: HealthCheckLevel
+    result: HealthCheckResult,
+    startTime: number,
+    level: HealthCheckLevel,
   ): HealthCheckResponseDto {
     const responseTime = Date.now() - startTime;
-    
+
     return {
       status: result.status,
       timestamp: new Date().toISOString(),
@@ -219,18 +249,18 @@ export class HealthService {
         level,
         responseTime,
         checks: Object.keys(result.info || {}).length,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
   }
 
   private formatErrorResponse(
-    error: any, 
-    startTime: number, 
-    level: HealthCheckLevel
+    error: any,
+    startTime: number,
+    level: HealthCheckLevel,
   ): HealthCheckResponseDto {
     const responseTime = Date.now() - startTime;
-    
+
     return {
       status: 'error',
       timestamp: new Date().toISOString(),
@@ -242,8 +272,8 @@ export class HealthService {
         level,
         responseTime,
         timestamp: new Date().toISOString(),
-        errorType: error?.constructor?.name || 'Error'
-      }
+        errorType: error?.constructor?.name || 'Error',
+      },
     };
   }
 
@@ -251,6 +281,6 @@ export class HealthService {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
   }
 }

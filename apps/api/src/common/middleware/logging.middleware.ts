@@ -71,8 +71,10 @@ export class LoggingMiddleware implements NestMiddleware {
     const timestamp = new Date().toISOString();
 
     // Generate correlation ID if not present
-    const correlationId = req.get('X-Correlation-ID') || this.generateCorrelationId();
-    const requestId = (req as any).securityContext?.requestId || this.generateRequestId();
+    const correlationId =
+      req.get('X-Correlation-ID') || this.generateCorrelationId();
+    const requestId =
+      (req as any).securityContext?.requestId || this.generateRequestId();
 
     // Set correlation ID in response headers
     res.setHeader('X-Correlation-ID', correlationId);
@@ -121,16 +123,15 @@ export class LoggingMiddleware implements NestMiddleware {
     const chunks: Buffer[] = [];
 
     // Override response methods to capture response data
-    res.write = function(chunk: any, ...args: any[]) {
+    res.write = function (chunk: any) {
       if (chunk) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
       }
-      return originalWrite.apply(res, [chunk, ...args] as any);
+      return originalWrite.apply(res, arguments as any);
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    res.end = function(chunk?: any): Response {
+    res.end = function (chunk?: any): Response {
       if (chunk) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
       }
@@ -140,7 +141,8 @@ export class LoggingMiddleware implements NestMiddleware {
       perfMetrics.duration = perfMetrics.endTime - perfMetrics.startTime;
 
       // Get response body for audit logging (with masking)
-      const responseBody = chunks.length > 0 ? Buffer.concat(chunks).toString('utf8') : '';
+      const responseBody =
+        chunks.length > 0 ? Buffer.concat(chunks).toString('utf8') : '';
 
       // Log outgoing response
       self.logOutgoingResponse(req, res, logContext, perfMetrics, responseBody);
@@ -168,7 +170,11 @@ export class LoggingMiddleware implements NestMiddleware {
     next();
   }
 
-  private logIncomingRequest(req: Request, logContext: LogContext, securityContext: SecurityContext): void {
+  private logIncomingRequest(
+    req: Request,
+    logContext: LogContext,
+    securityContext: SecurityContext,
+  ): void {
     const sanitizedBody = this.sanitizeData(req.body);
     const sanitizedQuery = this.sanitizeData(req.query);
     const sanitizedHeaders = this.sanitizeHeaders(req.headers);
@@ -200,9 +206,11 @@ export class LoggingMiddleware implements NestMiddleware {
     res: Response,
     logContext: LogContext,
     perfMetrics: PerformanceMetrics,
-    responseBody: string
+    responseBody: string,
   ): void {
-    const sanitizedResponse = this.sanitizeData(this.parseResponseBody(responseBody));
+    const sanitizedResponse = this.sanitizeData(
+      this.parseResponseBody(responseBody),
+    );
 
     const logData = {
       type: 'outgoing_response',
@@ -211,15 +219,25 @@ export class LoggingMiddleware implements NestMiddleware {
       statusMessage: res.statusMessage,
       duration: perfMetrics.duration,
       responseSize: responseBody.length,
-      response: this.shouldLogResponseBody(req, res) ? sanitizedResponse : '[BODY_NOT_LOGGED]',
+      response: this.shouldLogResponseBody(req, res)
+        ? sanitizedResponse
+        : '[BODY_NOT_LOGGED]',
       headers: this.sanitizeHeaders(res.getHeaders()),
     };
 
     const logLevel = this.getLogLevel(res.statusCode);
-    this.logger[logLevel](`← ${res.statusCode} ${req.method} ${req.url} [${perfMetrics.duration}ms]`, logData);
+    this.logger[logLevel](
+      `← ${res.statusCode} ${req.method} ${req.url} [${perfMetrics.duration}ms]`,
+      logData,
+    );
   }
 
-  logAuditEvent(req: Request, res: Response, logContext: LogContext, responseBody: string): void {
+  logAuditEvent(
+    req: Request,
+    res: Response,
+    logContext: LogContext,
+    responseBody: string,
+  ): void {
     const auditData = {
       type: 'audit_event',
       ...logContext,
@@ -232,7 +250,9 @@ export class LoggingMiddleware implements NestMiddleware {
       responseData: this.sanitizeData(this.parseResponseBody(responseBody)),
       compliance: {
         dataAccess: (req as any).securityContext?.dataAccess || [],
-        sensitiveDataAccessed: this.containsSensitiveData(req.body) || this.containsSensitiveData(responseBody),
+        sensitiveDataAccessed:
+          this.containsSensitiveData(req.body) ||
+          this.containsSensitiveData(responseBody),
         auditRequired: true,
       },
     };
@@ -244,13 +264,16 @@ export class LoggingMiddleware implements NestMiddleware {
     req: Request,
     res: Response,
     logContext: LogContext,
-    perfMetrics: PerformanceMetrics
+    perfMetrics: PerformanceMetrics,
   ): void {
     const currentMemory = process.memoryUsage();
     const memoryDelta = {
-      heapUsed: currentMemory.heapUsed - (perfMetrics.memoryUsage?.heapUsed || 0),
-      heapTotal: currentMemory.heapTotal - (perfMetrics.memoryUsage?.heapTotal || 0),
-      external: currentMemory.external - (perfMetrics.memoryUsage?.external || 0),
+      heapUsed:
+        currentMemory.heapUsed - (perfMetrics.memoryUsage?.heapUsed || 0),
+      heapTotal:
+        currentMemory.heapTotal - (perfMetrics.memoryUsage?.heapTotal || 0),
+      external:
+        currentMemory.external - (perfMetrics.memoryUsage?.external || 0),
       rss: currentMemory.rss - (perfMetrics.memoryUsage?.rss || 0),
     };
 
@@ -270,9 +293,15 @@ export class LoggingMiddleware implements NestMiddleware {
 
     // Log performance warnings for slow requests
     if (perfMetrics.duration! > 5000) {
-      this.performanceLogger.warn(`Slow request detected: ${perfMetrics.duration}ms`, performanceData);
+      this.performanceLogger.warn(
+        `Slow request detected: ${perfMetrics.duration}ms`,
+        performanceData,
+      );
     } else if (perfMetrics.duration! > 1000) {
-      this.performanceLogger.log(`Performance: ${perfMetrics.duration}ms`, performanceData);
+      this.performanceLogger.log(
+        `Performance: ${perfMetrics.duration}ms`,
+        performanceData,
+      );
     }
 
     // Log memory warnings
@@ -289,7 +318,7 @@ export class LoggingMiddleware implements NestMiddleware {
     req: Request,
     res: Response,
     logContext: LogContext,
-    securityContext: SecurityContext
+    securityContext: SecurityContext,
   ): void {
     // Log failed authentication attempts
     if (securityContext.authAttempt && res.statusCode === 401) {
@@ -351,7 +380,9 @@ export class LoggingMiddleware implements NestMiddleware {
     }
 
     if (Array.isArray(obj)) {
-      return obj.map((item, index) => this.maskSensitiveFields(item, `${prefix}[${index}]`));
+      return obj.map((item, index) =>
+        this.maskSensitiveFields(item, `${prefix}[${index}]`),
+      );
     }
 
     const masked = {};
@@ -359,7 +390,7 @@ export class LoggingMiddleware implements NestMiddleware {
       const fullKey = prefix ? `${prefix}.${key}` : key;
       const lowerKey = key.toLowerCase();
 
-      if (this.sensitiveFields.some(field => lowerKey.includes(field))) {
+      if (this.sensitiveFields.some((field) => lowerKey.includes(field))) {
         (masked as any)[key] = '[MASKED]';
       } else if (typeof value === 'object') {
         (masked as any)[key] = this.maskSensitiveFields(value, fullKey);
@@ -373,7 +404,12 @@ export class LoggingMiddleware implements NestMiddleware {
 
   private sanitizeHeaders(headers: any): any {
     const sanitized = { ...headers };
-    const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key', 'x-auth-token'];
+    const sensitiveHeaders = [
+      'authorization',
+      'cookie',
+      'x-api-key',
+      'x-auth-token',
+    ];
 
     for (const header of sensitiveHeaders) {
       if (sanitized[header]) {
@@ -408,12 +444,19 @@ export class LoggingMiddleware implements NestMiddleware {
   }
 
   requiresAuditLog(req: Request): boolean {
-    return this.auditEndpoints.some(endpoint => req.path.startsWith(endpoint));
+    return this.auditEndpoints.some((endpoint) =>
+      req.path.startsWith(endpoint),
+    );
   }
 
   private isAdminOperation(req: Request): boolean {
-    const adminPaths = ['/api/auth/users', '/api/auth/roles', '/api/pricing-rules', '/api/system'];
-    return adminPaths.some(path => req.path.startsWith(path));
+    const adminPaths = [
+      '/api/auth/users',
+      '/api/auth/roles',
+      '/api/pricing-rules',
+      '/api/system',
+    ];
+    return adminPaths.some((path) => req.path.startsWith(path));
   }
 
   private getDataAccessTypes(req: Request): string[] {
@@ -440,11 +483,13 @@ export class LoggingMiddleware implements NestMiddleware {
   }
 
   private getClientIp(req: Request): string {
-    return (req as any).securityContext?.clientIp ||
-           req.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
-           req.get('X-Real-IP') ||
-           req.ip ||
-           'unknown';
+    return (
+      (req as any).securityContext?.clientIp ||
+      req.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
+      req.get('X-Real-IP') ||
+      req.ip ||
+      'unknown'
+    );
   }
 
   private getLogLevel(statusCode: number): 'log' | 'warn' | 'error' {
@@ -464,19 +509,26 @@ export class LoggingMiddleware implements NestMiddleware {
 
   private getAction(method: string, path: string): string {
     switch (method) {
-      case 'GET': return path.includes('/:') ? 'read' : 'list';
-      case 'POST': return 'create';
+      case 'GET':
+        return path.includes('/:') ? 'read' : 'list';
+      case 'POST':
+        return 'create';
       case 'PUT':
-      case 'PATCH': return 'update';
-      case 'DELETE': return 'delete';
-      default: return 'unknown';
+      case 'PATCH':
+        return 'update';
+      case 'DELETE':
+        return 'delete';
+      default:
+        return 'unknown';
     }
   }
 
   private containsSensitiveData(data: any): boolean {
     if (!data) return false;
     const str = typeof data === 'string' ? data : JSON.stringify(data);
-    return this.sensitiveFields.some(field => str.toLowerCase().includes(field));
+    return this.sensitiveFields.some((field) =>
+      str.toLowerCase().includes(field),
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -488,17 +540,27 @@ export class LoggingMiddleware implements NestMiddleware {
 
   private getErrorType(statusCode: number): string {
     switch (statusCode) {
-      case 400: return 'Bad Request';
-      case 401: return 'Unauthorized';
-      case 403: return 'Forbidden';
-      case 404: return 'Not Found';
-      case 429: return 'Rate Limited';
-      case 500: return 'Internal Server Error';
-      default: return 'Unknown Error';
+      case 400:
+        return 'Bad Request';
+      case 401:
+        return 'Unauthorized';
+      case 403:
+        return 'Forbidden';
+      case 404:
+        return 'Not Found';
+      case 429:
+        return 'Rate Limited';
+      case 500:
+        return 'Internal Server Error';
+      default:
+        return 'Unknown Error';
     }
   }
 
-  private assessThreatLevel(req: Request, res: Response): 'low' | 'medium' | 'high' {
+  private assessThreatLevel(
+    req: Request,
+    res: Response,
+  ): 'low' | 'medium' | 'high' {
     if (res.statusCode === 401 && req.path.includes('/auth/')) return 'medium';
     if (res.statusCode === 403) return 'medium';
     if (res.statusCode === 429) return 'high';

@@ -1,4 +1,5 @@
 # CRITICAL BUG - Executive Summary
+
 **Date:** October 1, 2025
 **Reporter:** e2e-project-tester agent
 **Status:** 🔴 CRITICAL - BLOCKING PRODUCTION
@@ -22,24 +23,29 @@
 ## The Problem (2 Minutes)
 
 ### What's Broken
+
 - ❌ Settings → Tariffs → Packing Rates (completely inaccessible)
 - ❌ Settings → Tariffs → Location Handicaps (completely inaccessible)
 - ❌ Settings → Tariffs → Distance Rates (likely broken)
 - ❌ Settings → Tariffs → Move Sizes (likely broken)
 
 ### What Users See
+
 ```
 Error: Failed to fetch tariff settings
 ```
 
 ### What's Actually Happening
+
 ```
 HTTP 403 Forbidden
 "Access denied. Required permissions: tariff_settings:read"
 ```
 
 ### Why It Happens
+
 The backend code that creates the super admin user gives them permissions for:
+
 - ✅ Users
 - ✅ Customers
 - ✅ Jobs
@@ -52,12 +58,14 @@ The backend code that creates the super admin user gives them permissions for:
 ## The Impact (1 Minute)
 
 ### Business Impact
+
 - **SEVERITY:** 🔴 CRITICAL
 - **BLOCKING:** Production deployment
 - **USER IMPACT:** Cannot configure pricing
 - **WORKAROUND:** None available
 
 ### Technical Impact
+
 - **Affected Endpoints:** 53+ API endpoints return 403 Forbidden
 - **Affected Components:** 4+ frontend components non-functional
 - **Data Loss Risk:** None (no data affected)
@@ -68,10 +76,12 @@ The backend code that creates the super admin user gives them permissions for:
 ## The Fix (1 Minute)
 
 ### What Needs to Change
+
 **File:** `apps/api/src/auth/auth.service.ts`
 **Lines:** After line 77
 
 **Add these 5 lines:**
+
 ```typescript
 { id: 'perm_all_tariff_settings', resource: 'tariff_settings', action: 'read' },
 { id: 'perm_all_tariff_settings_create', resource: 'tariff_settings', action: 'create' },
@@ -81,6 +91,7 @@ The backend code that creates the super admin user gives them permissions for:
 ```
 
 ### How Long
+
 - **Code change:** 2 minutes
 - **Restart services:** 2 minutes
 - **Update database:** 3 minutes
@@ -88,7 +99,9 @@ The backend code that creates the super admin user gives them permissions for:
 - **TOTAL:** 10 minutes
 
 ### Risk Level
+
 🟢 **LOW RISK**
+
 - Simple configuration change
 - Well-defined permission system
 - Easy to rollback if needed
@@ -98,6 +111,7 @@ The backend code that creates the super admin user gives them permissions for:
 ## The Verification (30 Seconds)
 
 ### After Fix, Verify These Work:
+
 1. Login returns JWT with `tariff_settings` permissions
 2. GET /api/tariff-settings/active → 200 OK (not 403)
 3. Settings → Tariffs → Packing Rates loads without error
@@ -108,6 +122,7 @@ The backend code that creates the super admin user gives them permissions for:
 ## Timeline
 
 ### Current Status
+
 ```
 Services Running:     ✅ API, Web, MongoDB, Redis all healthy
 Authentication:       ✅ Login working, JWT tokens valid
@@ -117,6 +132,7 @@ Backend Code:         ❌ Missing permissions configuration
 ```
 
 ### Next Steps
+
 ```
 1. [10 min] Backend dev: Apply fix
 2. [5 min]  Backend dev: Verify fix works
@@ -129,6 +145,7 @@ Backend Code:         ❌ Missing permissions configuration
 ## For Executives/Non-Technical
 
 **In Plain English:**
+
 - We built a new pricing configuration feature
 - We forgot to give managers the keys to access it
 - Users can't configure pricing because the system says they don't have permission
@@ -156,6 +173,7 @@ You built a new office in your building but forgot to give the manager keys to u
 **Recommended Action:** APPROVE IMMEDIATELY
 
 **Justification:**
+
 1. Critical blocker for production
 2. Simple fix (5 lines of code)
 3. Low risk (configuration only)
@@ -164,6 +182,7 @@ You built a new office in your building but forgot to give the manager keys to u
 6. Easy to rollback if needed
 
 **Alternative (NOT RECOMMENDED):** Wait for formal change review
+
 - Delays production deployment
 - Keeps tariff settings broken
 - No benefit (risk is already low)
@@ -204,8 +223,8 @@ A: No. The permission system is working correctly. We just forgot to configure i
 
 ---
 
-*Report Generated: October 1, 2025*
-*Severity: CRITICAL 🔴*
-*Action Required: IMMEDIATE*
-*Estimated Fix Time: 10 minutes*
-*Risk Level: LOW 🟢*
+_Report Generated: October 1, 2025_
+_Severity: CRITICAL 🔴_
+_Action Required: IMMEDIATE_
+_Estimated Fix Time: 10 minutes_
+_Risk Level: LOW 🟢_

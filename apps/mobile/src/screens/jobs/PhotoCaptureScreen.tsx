@@ -98,8 +98,8 @@ export const PhotoCaptureScreen = ({ route, navigation }: any) => {
             photoType,
             photoUri: photo.uri,
             fileName: photo.fileName || `photo_${Date.now()}.jpg`,
-          })
-        )
+          }),
+        ),
       );
 
       await Promise.all(uploadPromises);
@@ -112,7 +112,7 @@ export const PhotoCaptureScreen = ({ route, navigation }: any) => {
         Alert.alert(
           'Queued for Upload',
           `${photos.length} photo(s) queued. They will be uploaded when you're back online.`,
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
+          [{ text: 'OK', onPress: () => navigation.goBack() }],
         );
       }
     } catch (error: any) {
@@ -120,7 +120,7 @@ export const PhotoCaptureScreen = ({ route, navigation }: any) => {
         Alert.alert(
           'Queued for Upload',
           'Photos queued for upload when online',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
+          [{ text: 'OK', onPress: () => navigation.goBack() }],
         );
       } else {
         Alert.alert('Error', 'Failed to upload some photos');
@@ -170,7 +170,10 @@ export const PhotoCaptureScreen = ({ route, navigation }: any) => {
             <View style={styles.photosGrid}>
               {photos.map((photo, index) => (
                 <View key={index} style={styles.photoCard}>
-                  <Image source={{ uri: photo.uri }} style={styles.photoImage} />
+                  <Image
+                    source={{ uri: photo.uri }}
+                    style={styles.photoImage}
+                  />
                   <TouchableOpacity
                     style={styles.removeButton}
                     onPress={() => removePhoto(index)}

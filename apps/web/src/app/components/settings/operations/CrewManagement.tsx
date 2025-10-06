@@ -47,10 +47,20 @@ export default function CrewManagement() {
 
   const [formData, setFormData] = useState<CrewSettings>({
     roles: [
-      { id: '1', name: 'Lead Mover', hourlyRate: 25, requiresCertification: true },
+      {
+        id: '1',
+        name: 'Lead Mover',
+        hourlyRate: 25,
+        requiresCertification: true,
+      },
       { id: '2', name: 'Mover', hourlyRate: 18, requiresCertification: false },
       { id: '3', name: 'Driver', hourlyRate: 22, requiresCertification: true },
-      { id: '4', name: 'Specialist', hourlyRate: 30, requiresCertification: true },
+      {
+        id: '4',
+        name: 'Specialist',
+        hourlyRate: 30,
+        requiresCertification: true,
+      },
     ],
     defaultCrewSizeByJobType: {
       local: 3,
@@ -92,9 +102,9 @@ export default function CrewManagement() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/crew-management'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -127,7 +137,7 @@ export default function CrewManagement() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -144,14 +154,16 @@ export default function CrewManagement() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving crew settings:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const updateFormData = (path: string[], value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = JSON.parse(JSON.stringify(prev));
       let current = updated;
 
@@ -174,21 +186,34 @@ export default function CrewManagement() {
       {error && (
         <div className={styles.errorMessage}>
           <span>{error}</span>
-          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+          <button onClick={() => setError(null)} className={styles.closeError}>
+            ×
+          </button>
         </div>
       )}
 
       {success && (
         <div className={styles.successMessage}>
           <span>{success}</span>
-          <button onClick={() => setSuccess(null)} className={styles.closeSuccess}>×</button>
+          <button
+            onClick={() => setSuccess(null)}
+            className={styles.closeSuccess}
+          >
+            ×
+          </button>
         </div>
       )}
 
       {loading ? (
         <div className={styles.loadingMessage}>Loading crew settings...</div>
       ) : (
-        <form className={styles.formSection} onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+        <form
+          className={styles.formSection}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
           <h4>Default Crew Sizes</h4>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
@@ -199,7 +224,12 @@ export default function CrewManagement() {
                 min="1"
                 max="10"
                 value={formData.defaultCrewSizeByJobType.local}
-                onChange={(e) => updateFormData(['defaultCrewSizeByJobType', 'local'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(
+                    ['defaultCrewSizeByJobType', 'local'],
+                    parseInt(e.target.value),
+                  )
+                }
                 className={styles.input}
               />
             </div>
@@ -212,7 +242,12 @@ export default function CrewManagement() {
                 min="1"
                 max="10"
                 value={formData.defaultCrewSizeByJobType.longDistance}
-                onChange={(e) => updateFormData(['defaultCrewSizeByJobType', 'longDistance'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(
+                    ['defaultCrewSizeByJobType', 'longDistance'],
+                    parseInt(e.target.value),
+                  )
+                }
                 className={styles.input}
               />
             </div>
@@ -225,7 +260,12 @@ export default function CrewManagement() {
                 min="1"
                 max="10"
                 value={formData.defaultCrewSizeByJobType.packingOnly}
-                onChange={(e) => updateFormData(['defaultCrewSizeByJobType', 'packingOnly'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(
+                    ['defaultCrewSizeByJobType', 'packingOnly'],
+                    parseInt(e.target.value),
+                  )
+                }
                 className={styles.input}
               />
             </div>
@@ -234,13 +274,20 @@ export default function CrewManagement() {
           <h4>Scheduling Rules</h4>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
-              <label htmlFor="minHoursBetweenJobs">Min Hours Between Jobs</label>
+              <label htmlFor="minHoursBetweenJobs">
+                Min Hours Between Jobs
+              </label>
               <input
                 id="minHoursBetweenJobs"
                 type="number"
                 min="0"
                 value={formData.schedulingRules.minHoursBetweenJobs}
-                onChange={(e) => updateFormData(['schedulingRules', 'minHoursBetweenJobs'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(
+                    ['schedulingRules', 'minHoursBetweenJobs'],
+                    parseInt(e.target.value),
+                  )
+                }
                 className={styles.input}
               />
             </div>
@@ -253,7 +300,12 @@ export default function CrewManagement() {
                 min="1"
                 max="24"
                 value={formData.schedulingRules.maxHoursPerDay}
-                onChange={(e) => updateFormData(['schedulingRules', 'maxHoursPerDay'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(
+                    ['schedulingRules', 'maxHoursPerDay'],
+                    parseInt(e.target.value),
+                  )
+                }
                 className={styles.input}
               />
             </div>
@@ -263,7 +315,12 @@ export default function CrewManagement() {
                 <input
                   type="checkbox"
                   checked={formData.schedulingRules.requireRestDays}
-                  onChange={(e) => updateFormData(['schedulingRules', 'requireRestDays'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['schedulingRules', 'requireRestDays'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Require Rest Days
               </label>
@@ -278,7 +335,12 @@ export default function CrewManagement() {
                   min="1"
                   max="7"
                   value={formData.schedulingRules.restDaysPerWeek}
-                  onChange={(e) => updateFormData(['schedulingRules', 'restDaysPerWeek'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['schedulingRules', 'restDaysPerWeek'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                 />
               </div>
@@ -292,7 +354,12 @@ export default function CrewManagement() {
                 <input
                   type="checkbox"
                   checked={formData.breakRequirements.enabled}
-                  onChange={(e) => updateFormData(['breakRequirements', 'enabled'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['breakRequirements', 'enabled'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Enable Break Requirements
               </label>
@@ -307,19 +374,31 @@ export default function CrewManagement() {
                     type="number"
                     min="1"
                     value={formData.breakRequirements.breakAfterHours}
-                    onChange={(e) => updateFormData(['breakRequirements', 'breakAfterHours'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['breakRequirements', 'breakAfterHours'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="breakDurationMinutes">Break Duration (minutes)</label>
+                  <label htmlFor="breakDurationMinutes">
+                    Break Duration (minutes)
+                  </label>
                   <input
                     id="breakDurationMinutes"
                     type="number"
                     min="15"
                     value={formData.breakRequirements.breakDurationMinutes}
-                    onChange={(e) => updateFormData(['breakRequirements', 'breakDurationMinutes'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['breakRequirements', 'breakDurationMinutes'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -334,7 +413,9 @@ export default function CrewManagement() {
                 <input
                   type="checkbox"
                   checked={formData.overtime.enabled}
-                  onChange={(e) => updateFormData(['overtime', 'enabled'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['overtime', 'enabled'], e.target.checked)
+                  }
                 />
                 Enable Overtime Calculation
               </label>
@@ -343,13 +424,20 @@ export default function CrewManagement() {
             {formData.overtime.enabled && (
               <>
                 <div className={styles.formGroup}>
-                  <label htmlFor="thresholdHours">Overtime Threshold (hours)</label>
+                  <label htmlFor="thresholdHours">
+                    Overtime Threshold (hours)
+                  </label>
                   <input
                     id="thresholdHours"
                     type="number"
                     min="1"
                     value={formData.overtime.thresholdHours}
-                    onChange={(e) => updateFormData(['overtime', 'thresholdHours'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['overtime', 'thresholdHours'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -362,7 +450,12 @@ export default function CrewManagement() {
                     step="0.1"
                     min="1"
                     value={formData.overtime.multiplier}
-                    onChange={(e) => updateFormData(['overtime', 'multiplier'], parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['overtime', 'multiplier'],
+                        parseFloat(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -377,7 +470,12 @@ export default function CrewManagement() {
                 <input
                   type="checkbox"
                   checked={formData.performanceTracking.trackJobCompletionTime}
-                  onChange={(e) => updateFormData(['performanceTracking', 'trackJobCompletionTime'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['performanceTracking', 'trackJobCompletionTime'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Track Job Completion Time
               </label>
@@ -388,7 +486,12 @@ export default function CrewManagement() {
                 <input
                   type="checkbox"
                   checked={formData.performanceTracking.trackCustomerRatings}
-                  onChange={(e) => updateFormData(['performanceTracking', 'trackCustomerRatings'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['performanceTracking', 'trackCustomerRatings'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Track Customer Ratings
               </label>
@@ -399,7 +502,12 @@ export default function CrewManagement() {
                 <input
                   type="checkbox"
                   checked={formData.performanceTracking.trackDamageReports}
-                  onChange={(e) => updateFormData(['performanceTracking', 'trackDamageReports'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['performanceTracking', 'trackDamageReports'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Track Damage Reports
               </label>

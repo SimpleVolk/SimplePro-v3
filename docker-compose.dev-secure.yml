@@ -7,8 +7,8 @@ services:
     container_name: simplepro-nginx-dev
     restart: unless-stopped
     ports:
-      - "80:80"      # Only HTTP exposed for development
-      - "443:443"    # HTTPS for testing SSL
+      - '80:80' # Only HTTP exposed for development
+      - '443:443' # HTTPS for testing SSL
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./docker/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
@@ -21,7 +21,7 @@ services:
       - api-dev
       - web-dev
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -31,7 +31,7 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-      target: development  # Use development stage
+      target: development # Use development stage
     container_name: simplepro-api-dev
     restart: unless-stopped
     # No direct port exposure - only accessible via nginx
@@ -45,7 +45,7 @@ services:
       CORS_ORIGIN: http://localhost:80,https://localhost:443
       LOG_LEVEL: debug
     volumes:
-      - ./apps/api/src:/app/src:ro  # Development hot reload
+      - ./apps/api/src:/app/src:ro # Development hot reload
       - ./logs:/app/logs
     networks:
       - backend-network
@@ -56,7 +56,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:4000/api/health']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -67,7 +67,7 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-      target: development  # Use development stage
+      target: development # Use development stage
     container_name: simplepro-web-dev
     restart: unless-stopped
     # No direct port exposure - only accessible via nginx
@@ -76,14 +76,14 @@ services:
       NEXT_PUBLIC_API_URL: http://localhost/api
       NEXT_TELEMETRY_DISABLED: 1
     volumes:
-      - ./apps/web/src:/app/src:ro  # Development hot reload
+      - ./apps/web/src:/app/src:ro # Development hot reload
     networks:
       - frontend-network
       - backend-network
     depends_on:
       - api-dev
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -105,7 +105,7 @@ services:
     networks:
       - storage-network
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -122,7 +122,7 @@ services:
     networks:
       - storage-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -134,7 +134,7 @@ services:
     restart: unless-stopped
     # Only expose console for development debugging - API internal only
     ports:
-      - "127.0.0.1:9001:9001"  # Console only accessible from localhost
+      - '127.0.0.1:9001:9001' # Console only accessible from localhost
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-simplepro_minio_2024}
@@ -144,7 +144,7 @@ services:
     networks:
       - storage-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 30s
       timeout: 20s
       retries: 3
@@ -155,7 +155,7 @@ services:
     container_name: simplepro-mongo-express
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8081:8081"  # Only accessible from localhost
+      - '127.0.0.1:8081:8081' # Only accessible from localhost
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD:-simplepro_dev_2024}

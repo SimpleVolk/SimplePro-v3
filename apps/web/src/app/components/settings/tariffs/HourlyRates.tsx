@@ -31,7 +31,15 @@ interface HourlyRatesData {
 }
 
 export default function HourlyRates() {
-  const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const daysOfWeek = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
   const crewSizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // All crew sizes from backend
 
   const [tariffId, setTariffId] = useState<string | null>(null);
@@ -40,7 +48,10 @@ export default function HourlyRates() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [editingCell, setEditingCell] = useState<{ day: string; crewSize: number } | null>(null);
+  const [editingCell, setEditingCell] = useState<{
+    day: string;
+    crewSize: number;
+  } | null>(null);
   const [tempValue, setTempValue] = useState('');
 
   // Fetch tariff settings on mount
@@ -56,9 +67,9 @@ export default function HourlyRates() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('tariff-settings/active'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -82,8 +93,8 @@ export default function HourlyRates() {
 
   const getRateForCrewAndDay = (crewSize: number, day: string): number => {
     if (!hourlyRates) return 0;
-    const rateEntry = hourlyRates.rates.find(r => r.crewSize === crewSize);
-    return rateEntry ? rateEntry[day as keyof HourlyRateEntry] as number : 0;
+    const rateEntry = hourlyRates.rates.find((r) => r.crewSize === crewSize);
+    return rateEntry ? (rateEntry[day as keyof HourlyRateEntry] as number) : 0;
   };
 
   const getMinHoursForDay = (day: string): number => {
@@ -91,7 +102,11 @@ export default function HourlyRates() {
     return hourlyRates.minHours[day as keyof typeof hourlyRates.minHours];
   };
 
-  const handleCellEdit = (day: string, crewSize: number, currentValue: number) => {
+  const handleCellEdit = (
+    day: string,
+    crewSize: number,
+    currentValue: number,
+  ) => {
     setEditingCell({ day, crewSize });
     setTempValue(currentValue.toString());
   };
@@ -113,26 +128,29 @@ export default function HourlyRates() {
       const token = localStorage.getItem('access_token');
 
       // Update the rates array with the new value
-      const updatedRates = hourlyRates.rates.map(rateEntry => {
+      const updatedRates = hourlyRates.rates.map((rateEntry) => {
         if (rateEntry.crewSize === editingCell.crewSize) {
           return {
             ...rateEntry,
-            [editingCell.day]: newRate
+            [editingCell.day]: newRate,
           };
         }
         return rateEntry;
       });
 
-      const response = await fetch(getApiUrl(`tariff-settings/${tariffId}/hourly-rates`), {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        getApiUrl(`tariff-settings/${tariffId}/hourly-rates`),
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            rates: updatedRates,
+          }),
         },
-        body: JSON.stringify({
-          rates: updatedRates
-        })
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to update hourly rates');
@@ -167,13 +185,13 @@ export default function HourlyRates() {
   const applyToAllDays = (day: string, crewSize: number) => {
     const rate = getRateForCrewAndDay(crewSize, day);
     const confirm = window.confirm(
-      `Apply $${rate}/hour to ${formatDay(day)} rate for all crew sizes?`
+      `Apply $${rate}/hour to ${formatDay(day)} rate for all crew sizes?`,
     );
 
     if (confirm && hourlyRates && tariffId) {
-      const updatedRates = hourlyRates.rates.map(rateEntry => ({
+      const updatedRates = hourlyRates.rates.map((rateEntry) => ({
         ...rateEntry,
-        [day]: rate
+        [day]: rate,
       }));
 
       updateAllRates(updatedRates);
@@ -189,16 +207,19 @@ export default function HourlyRates() {
 
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(getApiUrl(`tariff-settings/${tariffId}/hourly-rates`), {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        getApiUrl(`tariff-settings/${tariffId}/hourly-rates`),
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            rates: updatedRates,
+          }),
         },
-        body: JSON.stringify({
-          rates: updatedRates
-        })
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to update hourly rates');
@@ -220,11 +241,13 @@ export default function HourlyRates() {
     if (!hourlyRates) return;
 
     const csvContent = [
-      ['Crew Size', ...daysOfWeek.map(d => formatDay(d))].join(','),
-      ...hourlyRates.rates.map(rateEntry => [
-        rateEntry.crewSize,
-        ...daysOfWeek.map(day => rateEntry[day as keyof HourlyRateEntry])
-      ].join(','))
+      ['Crew Size', ...daysOfWeek.map((d) => formatDay(d))].join(','),
+      ...hourlyRates.rates.map((rateEntry) =>
+        [
+          rateEntry.crewSize,
+          ...daysOfWeek.map((day) => rateEntry[day as keyof HourlyRateEntry]),
+        ].join(','),
+      ),
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -306,7 +329,7 @@ export default function HourlyRates() {
             <thead>
               <tr>
                 <th className={styles.dayHeader}>Day</th>
-                {crewSizes.map(size => (
+                {crewSizes.map((size) => (
                   <th key={size} className={styles.crewHeader}>
                     <div className={styles.crewSize}>
                       <span>{size}-Person</span>
@@ -319,20 +342,24 @@ export default function HourlyRates() {
               </tr>
             </thead>
             <tbody>
-              {daysOfWeek.map(day => (
+              {daysOfWeek.map((day) => (
                 <tr key={day} className={styles.dayRow}>
                   <td className={styles.dayCell}>
                     <div className={styles.dayInfo}>
                       <span className={styles.dayName}>{formatDay(day)}</span>
-                      <span className={styles.dayAbbr}>{day.slice(0, 3).toUpperCase()}</span>
+                      <span className={styles.dayAbbr}>
+                        {day.slice(0, 3).toUpperCase()}
+                      </span>
                       <span className={styles.minHours}>
                         Min: {getMinHoursForDay(day)}h
                       </span>
                     </div>
                   </td>
-                  {crewSizes.map(crewSize => {
+                  {crewSizes.map((crewSize) => {
                     const rate = getRateForCrewAndDay(crewSize, day);
-                    const isEditing = editingCell?.day === day && editingCell?.crewSize === crewSize;
+                    const isEditing =
+                      editingCell?.day === day &&
+                      editingCell?.crewSize === crewSize;
 
                     return (
                       <td key={crewSize} className={styles.rateCell}>
@@ -353,8 +380,12 @@ export default function HourlyRates() {
                               ) : (
                                 <button
                                   className={styles.rateButton}
-                                  onClick={() => handleCellEdit(day, crewSize, rate)}
-                                  onDoubleClick={() => applyToAllDays(day, crewSize)}
+                                  onClick={() =>
+                                    handleCellEdit(day, crewSize, rate)
+                                  }
+                                  onDoubleClick={() =>
+                                    applyToAllDays(day, crewSize)
+                                  }
                                   title="Click to edit, double-click to apply to all days"
                                   disabled={saving}
                                 >
@@ -377,11 +408,17 @@ export default function HourlyRates() {
           <h4>Rate Guidelines</h4>
           <div className={styles.legendItems}>
             <div className={styles.legendItem}>
-              <span className={styles.legendColor} style={{ backgroundColor: 'var(--color-primary)' }}></span>
+              <span
+                className={styles.legendColor}
+                style={{ backgroundColor: 'var(--color-primary)' }}
+              ></span>
               <span>Hourly rates are per hour of labor</span>
             </div>
             <div className={styles.legendItem}>
-              <span className={styles.legendColor} style={{ backgroundColor: 'var(--color-success)' }}></span>
+              <span
+                className={styles.legendColor}
+                style={{ backgroundColor: 'var(--color-success)' }}
+              ></span>
               <span>Minimum hours ensure profitability for short jobs</span>
             </div>
           </div>
@@ -390,15 +427,21 @@ export default function HourlyRates() {
             <h5>Tips:</h5>
             <ul>
               <li>Click on a rate to edit it individually</li>
-              <li>Double-click to apply that rate to all days for that crew size</li>
-              <li>Weekend rates are typically 10-20% higher than weekday rates</li>
+              <li>
+                Double-click to apply that rate to all days for that crew size
+              </li>
+              <li>
+                Weekend rates are typically 10-20% higher than weekday rates
+              </li>
               <li>Minimum hours vary by day (shown under each day name)</li>
               <li>Changes are saved immediately to the database</li>
             </ul>
           </div>
 
           <div className={styles.statusIndicator}>
-            {saving && <p className={styles.savingText}>💾 Saving changes...</p>}
+            {saving && (
+              <p className={styles.savingText}>💾 Saving changes...</p>
+            )}
             {!saving && hourlyRates.enabled && (
               <p className={styles.enabledText}>✅ Hourly rates are enabled</p>
             )}

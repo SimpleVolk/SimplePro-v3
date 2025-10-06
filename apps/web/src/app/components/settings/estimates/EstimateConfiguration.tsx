@@ -12,35 +12,44 @@ export default function EstimateConfiguration() {
       description: 'General estimate configuration and defaults',
       icon: '⚙️',
       path: '/settings/estimates/common-settings',
-      color: '#3B82F6'
+      color: '#3B82F6',
     },
     {
       title: 'Custom Fields',
       description: 'Define custom fields for estimates',
       icon: '🔧',
       path: '/settings/estimates/custom-fields',
-      color: '#8B5CF6'
+      color: '#8B5CF6',
     },
     {
       title: 'Price Ranges',
       description: 'Set price range categories and brackets',
       icon: '💰',
       path: '/settings/estimates/price-ranges',
-      color: '#10B981'
+      color: '#10B981',
     },
     {
       title: 'Move Sizes',
       description: 'Configure move size classifications',
       icon: '📏',
       path: '/settings/estimates/move-sizes',
-      color: '#F59E0B'
-    }
+      color: '#F59E0B',
+    },
   ];
 
   const quickActions = [
-    { label: 'View All Estimates', action: () => console.log('View estimates') },
-    { label: 'Create New Estimate', action: () => console.log('Create estimate') },
-    { label: 'Export Configuration', action: () => console.log('Export config') }
+    {
+      label: 'View All Estimates',
+      action: () => console.log('View estimates'),
+    },
+    {
+      label: 'Create New Estimate',
+      action: () => console.log('Create estimate'),
+    },
+    {
+      label: 'Export Configuration',
+      action: () => console.log('Export config'),
+    },
   ];
 
   return (
@@ -84,7 +93,10 @@ export default function EstimateConfiguration() {
             onClick={() => router.push(page.path)}
             style={{ borderTopColor: page.color }}
           >
-            <div className={styles.cardIcon} style={{ backgroundColor: page.color + '20', color: page.color }}>
+            <div
+              className={styles.cardIcon}
+              style={{ backgroundColor: page.color + '20', color: page.color }}
+            >
               {page.icon}
             </div>
             <h4>{page.title}</h4>
@@ -98,7 +110,11 @@ export default function EstimateConfiguration() {
         <h4>Quick Actions</h4>
         <div className={styles.actionsGrid}>
           {quickActions.map((action, index) => (
-            <button key={index} onClick={action.action} className={styles.actionButton}>
+            <button
+              key={index}
+              onClick={action.action}
+              className={styles.actionButton}
+            >
               {action.label}
             </button>
           ))}

@@ -10,10 +10,7 @@ import {
   TimeOffRequest,
   TimeOffRequestDocument,
 } from '../schemas/time-off-request.schema';
-import {
-  TimeOffRequestDto,
-  TimeOffFiltersDto,
-} from '../dto';
+import { TimeOffRequestDto, TimeOffFiltersDto } from '../dto';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 
 @Injectable()

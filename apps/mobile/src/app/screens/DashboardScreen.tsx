@@ -38,14 +38,10 @@ const DashboardScreen = ({ navigation }: any) => {
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: logout },
-      ]
-    );
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Sign Out', style: 'destructive', onPress: logout },
+    ]);
   };
 
   const getStatusColor = (status: string) => {
@@ -85,12 +81,19 @@ const DashboardScreen = ({ navigation }: any) => {
     >
       <View style={styles.jobHeader}>
         <Text style={styles.customerName}>{item.customerName}</Text>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: getStatusColor(item.status) },
+          ]}
+        >
           <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
         </View>
       </View>
 
-      <Text style={styles.serviceType}>{item.serviceType.replace('_', ' ').toUpperCase()}</Text>
+      <Text style={styles.serviceType}>
+        {item.serviceType.replace('_', ' ').toUpperCase()}
+      </Text>
 
       <View style={styles.addressContainer}>
         <Text style={styles.addressLabel}>From:</Text>
@@ -99,7 +102,9 @@ const DashboardScreen = ({ navigation }: any) => {
 
       <View style={styles.addressContainer}>
         <Text style={styles.addressLabel}>To:</Text>
-        <Text style={styles.addressText}>{item.addresses.delivery.address}</Text>
+        <Text style={styles.addressText}>
+          {item.addresses.delivery.address}
+        </Text>
       </View>
 
       <View style={styles.jobFooter}>
@@ -257,9 +262,7 @@ const DashboardScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={styles.welcomeText}>
-            Welcome, {user?.username}
-          </Text>
+          <Text style={styles.welcomeText}>Welcome, {user?.username}</Text>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutText}>Sign Out</Text>
           </TouchableOpacity>
@@ -269,7 +272,7 @@ const DashboardScreen = ({ navigation }: any) => {
           <View
             style={[
               styles.onlineIndicator,
-              { backgroundColor: isOnline ? colors.success : colors.error }
+              { backgroundColor: isOnline ? colors.success : colors.error },
             ]}
           />
           <Text style={styles.statusText}>

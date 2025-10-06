@@ -34,7 +34,7 @@ export class Job {
     required: true,
     type: String,
     enum: ['local', 'long_distance', 'storage', 'packing_only'],
-    index: true
+    index: true,
   })
   type!: 'local' | 'long_distance' | 'storage' | 'packing_only';
 
@@ -43,7 +43,7 @@ export class Job {
     type: String,
     enum: ['scheduled', 'in_progress', 'completed', 'cancelled', 'on_hold'],
     default: 'scheduled',
-    index: true
+    index: true,
   })
   status!: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
 
@@ -52,7 +52,7 @@ export class Job {
     type: String,
     enum: ['low', 'normal', 'high', 'urgent'],
     default: 'normal',
-    index: true
+    index: true,
   })
   priority!: 'low' | 'normal' | 'high' | 'urgent';
 
@@ -180,18 +180,35 @@ export class Job {
 export const JobSchema = SchemaFactory.createForClass(Job);
 
 // Document size monitoring middleware (prevent 16MB limit issues)
-JobSchema.pre('save', createSizeMonitoringMiddleware({
-  maxSizeMB: 10,
-  warnThresholdPercent: 70,
-  logWarnings: true,
-  throwOnExceed: true,
-}));
+JobSchema.pre(
+  'save',
+  createSizeMonitoringMiddleware({
+    maxSizeMB: 10,
+    warnThresholdPercent: 70,
+    logWarnings: true,
+    throwOnExceed: true,
+  }),
+);
 
 // Array size monitoring middleware (warn about unbounded arrays)
-JobSchema.pre('save', createArraySizeMonitoringMiddleware(
-  ['assignedCrew', 'inventory', 'services', 'equipment', 'milestones', 'photos', 'documents', 'customerNotifications', 'internalNotes', 'additionalCharges'],
-  500 // Maximum 500 items per array
-));
+JobSchema.pre(
+  'save',
+  createArraySizeMonitoringMiddleware(
+    [
+      'assignedCrew',
+      'inventory',
+      'services',
+      'equipment',
+      'milestones',
+      'photos',
+      'documents',
+      'customerNotifications',
+      'internalNotes',
+      'additionalCharges',
+    ],
+    500, // Maximum 500 items per array
+  ),
+);
 
 // Foreign key validation middleware
 JobSchema.pre('save', async function (next) {
@@ -228,7 +245,9 @@ JobSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const leadCrewExists = await User.exists({ _id: this.leadCrew });
       if (!leadCrewExists) {
-        throw new Error(`Referenced User (leadCrew) not found: ${this.leadCrew}`);
+        throw new Error(
+          `Referenced User (leadCrew) not found: ${this.leadCrew}`,
+        );
       }
     }
 
@@ -237,9 +256,13 @@ JobSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       for (const assignment of this.assignedCrew) {
         if (assignment.crewMemberId) {
-          const crewExists = await User.exists({ _id: assignment.crewMemberId });
+          const crewExists = await User.exists({
+            _id: assignment.crewMemberId,
+          });
           if (!crewExists) {
-            throw new Error(`Referenced User (crewMemberId) not found: ${assignment.crewMemberId}`);
+            throw new Error(
+              `Referenced User (crewMemberId) not found: ${assignment.crewMemberId}`,
+            );
           }
         }
       }
@@ -250,7 +273,9 @@ JobSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const creatorExists = await User.exists({ _id: this.createdBy });
       if (!creatorExists) {
-        throw new Error(`Referenced User (createdBy) not found: ${this.createdBy}`);
+        throw new Error(
+          `Referenced User (createdBy) not found: ${this.createdBy}`,
+        );
       }
     }
 
@@ -259,7 +284,9 @@ JobSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const modifierExists = await User.exists({ _id: this.lastModifiedBy });
       if (!modifierExists) {
-        throw new Error(`Referenced User (lastModifiedBy) not found: ${this.lastModifiedBy}`);
+        throw new Error(
+          `Referenced User (lastModifiedBy) not found: ${this.lastModifiedBy}`,
+        );
       }
     }
 
@@ -290,17 +317,20 @@ JobSchema.index({ customerId: 1, status: 1 }); // PERFORMANCE: Customer job hist
 JobSchema.index({ createdBy: 1, createdAt: -1 }); // PERFORMANCE: Sales performance analytics
 
 // Text index for search functionality
-JobSchema.index({
-  title: 'text',
-  description: 'text',
-  jobNumber: 'text',
-  'specialInstructions': 'text'
-}, {
-  weights: {
-    jobNumber: 10,
-    title: 5,
-    description: 2,
-    specialInstructions: 1
+JobSchema.index(
+  {
+    title: 'text',
+    description: 'text',
+    jobNumber: 'text',
+    specialInstructions: 'text',
   },
-  name: 'job_text_search'
-});
+  {
+    weights: {
+      jobNumber: 10,
+      title: 5,
+      description: 2,
+      specialInstructions: 1,
+    },
+    name: 'job_text_search',
+  },
+);

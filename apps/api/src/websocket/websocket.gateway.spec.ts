@@ -22,15 +22,18 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
     email: 'test@example.com',
     role: { name: 'crew' },
     isActive: true,
-    crewId: 'crew-456'
+    crewId: 'crew-456',
   };
 
   const mockServer = {
     to: jest.fn().mockReturnThis(),
-    emit: jest.fn()
+    emit: jest.fn(),
   } as unknown as Server;
 
-  const createMockSocket = (socketId: string, userId: string): AuthenticatedSocket => {
+  const createMockSocket = (
+    socketId: string,
+    userId: string,
+  ): AuthenticatedSocket => {
     const socket = {
       id: socketId,
       userId: userId,
@@ -40,12 +43,12 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       handshake: {
         auth: { token: 'valid-token' },
         address: '127.0.0.1',
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
       },
       join: jest.fn().mockResolvedValue(undefined),
       leave: jest.fn().mockResolvedValue(undefined),
       emit: jest.fn(),
-      disconnect: jest.fn()
+      disconnect: jest.fn(),
     } as unknown as AuthenticatedSocket;
     return socket;
   };
@@ -57,27 +60,27 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
         {
           provide: JwtService,
           useValue: {
-            verify: jest.fn().mockReturnValue({ sub: 'user-123' })
-          }
+            verify: jest.fn().mockReturnValue({ sub: 'user-123' }),
+          },
         },
         {
           provide: AuthService,
           useValue: {
-            findOne: jest.fn().mockResolvedValue(mockUser)
-          }
+            findOne: jest.fn().mockResolvedValue(mockUser),
+          },
         },
         {
           provide: MessagesService,
           useValue: {
             getThreadById: jest.fn().mockResolvedValue({
-              participants: ['user-123', 'user-456']
+              participants: ['user-123', 'user-456'],
             }),
             sendMessage: jest.fn(),
             markAsRead: jest.fn(),
             editMessage: jest.fn(),
             deleteMessage: jest.fn(),
-            getMessageById: jest.fn()
-          }
+            getMessageById: jest.fn(),
+          },
         },
         {
           provide: TypingService,
@@ -85,10 +88,10 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
             startTyping: jest.fn().mockResolvedValue(undefined),
             stopTyping: jest.fn().mockResolvedValue(undefined),
             getTypingUsers: jest.fn().mockResolvedValue([]),
-            cleanupExpiredIndicators: jest.fn().mockResolvedValue(undefined)
-          }
-        }
-      ]
+            cleanupExpiredIndicators: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+      ],
     }).compile();
 
     gateway = module.get<WebSocketGateway>(WebSocketGateway);
@@ -171,7 +174,9 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       await gateway.handleConnection(socket);
 
       // Subscribe to analytics
-      await gateway.handleAnalyticsSubscription(socket, { dashboardType: 'overview' });
+      await gateway.handleAnalyticsSubscription(socket, {
+        dashboardType: 'overview',
+      });
 
       // Disconnect
       gateway.handleDisconnect(socket);
@@ -214,17 +219,20 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
     it('should auto-clear typing timer after timeout', (done) => {
       const socket = createMockSocket('socket-1', 'user-123');
 
-      gateway.handleConnection(socket).then(() => {
-        return gateway.handleTypingStart(socket, { threadId: 'thread-123' });
-      }).then(() => {
-        // Wait for auto-clear timeout (5 seconds + buffer)
-        setTimeout(() => {
-          gateway.getMemoryStats();
-          // Timer should be auto-cleared
-          expect(typingService.stopTyping).toHaveBeenCalled();
-          done();
-        }, 5100);
-      });
+      gateway
+        .handleConnection(socket)
+        .then(() => {
+          return gateway.handleTypingStart(socket, { threadId: 'thread-123' });
+        })
+        .then(() => {
+          // Wait for auto-clear timeout (5 seconds + buffer)
+          setTimeout(() => {
+            gateway.getMemoryStats();
+            // Timer should be auto-cleared
+            expect(typingService.stopTyping).toHaveBeenCalled();
+            done();
+          }, 5100);
+        });
     }, 10000);
 
     it('should clear all typing timers for socket on disconnect', async () => {
@@ -307,19 +315,21 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
 
       // Manually set high timer count for testing
       for (let i = 0; i < 101; i++) {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        gateway['typingTimers'].set(`socket-${i}:thread-1`, setTimeout(() => {}, 5000));
+        gateway['typingTimers'].set(
+          `socket-${i}:thread-1`,
+          setTimeout(() => {}, 5000),
+        );
       }
 
       // Trigger stats logging
       gateway['logConnectionStats']();
 
       expect(loggerWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('High typing timer count detected')
+        expect.stringContaining('High typing timer count detected'),
       );
 
       // Cleanup
-      gateway['typingTimers'].forEach(timer => clearTimeout(timer));
+      gateway['typingTimers'].forEach((timer) => clearTimeout(timer));
       gateway['typingTimers'].clear();
     });
   });
@@ -380,7 +390,9 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       const statsAfterUnsub = gateway.getMemoryStats();
 
       // Room count should decrease
-      expect(statsAfterUnsub.totalTrackedRooms).toBeLessThan(statsAfterSub.totalTrackedRooms);
+      expect(statsAfterUnsub.totalTrackedRooms).toBeLessThan(
+        statsAfterSub.totalTrackedRooms,
+      );
     });
 
     it('should remove room from tracking when unsubscribing from thread', async () => {
@@ -396,7 +408,9 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       const statsAfterUnsub = gateway.getMemoryStats();
 
       // Room count should decrease
-      expect(statsAfterUnsub.totalTrackedRooms).toBeLessThan(statsAfterSub.totalTrackedRooms);
+      expect(statsAfterUnsub.totalTrackedRooms).toBeLessThan(
+        statsAfterSub.totalTrackedRooms,
+      );
     });
 
     it('should remove room from tracking when unsubscribing from analytics', async () => {
@@ -405,17 +419,23 @@ describe('WebSocketGateway Memory Leak Fixes', () => {
       await gateway.handleConnection(socket);
 
       // Subscribe to analytics with dashboard type
-      await gateway.handleAnalyticsSubscription(socket, { dashboardType: 'overview' });
+      await gateway.handleAnalyticsSubscription(socket, {
+        dashboardType: 'overview',
+      });
       const statsAfterSub = gateway.getMemoryStats();
       const roomsAfterSub = statsAfterSub.totalTrackedRooms;
 
       // Unsubscribe (this should remove both base and dashboard-specific rooms)
-      await gateway.handleAnalyticsUnsubscription(socket, { dashboardType: 'overview' });
+      await gateway.handleAnalyticsUnsubscription(socket, {
+        dashboardType: 'overview',
+      });
       const statsAfterUnsub = gateway.getMemoryStats();
 
       // Room count should decrease by at least 1 (the dashboard-specific room)
       // Note: The base "analytics:subscribers" room is also removed
-      expect(statsAfterUnsub.totalTrackedRooms).toBeLessThanOrEqual(roomsAfterSub);
+      expect(statsAfterUnsub.totalTrackedRooms).toBeLessThanOrEqual(
+        roomsAfterSub,
+      );
     });
   });
 });

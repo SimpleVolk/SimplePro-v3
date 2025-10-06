@@ -44,7 +44,7 @@ export const login = createAsyncThunk(
     await AsyncStorage.setItem('accessToken', response.accessToken);
     await AsyncStorage.setItem('refreshToken', response.refreshToken);
     return response;
-  }
+  },
 );
 
 export const refreshAccessToken = createAsyncThunk(
@@ -54,7 +54,7 @@ export const refreshAccessToken = createAsyncThunk(
     const response = await authApi.refresh(auth.refreshToken);
     await AsyncStorage.setItem('accessToken', response.accessToken);
     return response;
-  }
+  },
 );
 
 export const fetchProfile = createAsyncThunk(
@@ -62,7 +62,7 @@ export const fetchProfile = createAsyncThunk(
   async (_, { getState }: any) => {
     const { auth } = getState();
     return await authApi.getProfile(auth.accessToken);
-  }
+  },
 );
 
 export const updateProfile = createAsyncThunk(
@@ -70,7 +70,7 @@ export const updateProfile = createAsyncThunk(
   async (data: Partial<User>, { getState }: any) => {
     const { auth } = getState();
     return await authApi.updateProfile(auth.accessToken, data);
-  }
+  },
 );
 
 // Slice
@@ -89,7 +89,10 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
+    setTokens: (
+      state,
+      action: PayloadAction<{ accessToken: string; refreshToken: string }>,
+    ) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;

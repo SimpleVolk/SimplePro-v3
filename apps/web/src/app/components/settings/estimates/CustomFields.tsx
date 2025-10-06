@@ -22,9 +22,34 @@ export default function CustomFields() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [customFields, setCustomFields] = useState<CustomField[]>([
-    { id: '1', name: 'Referral Source', fieldType: 'dropdown', category: 'customer', required: false, showInForms: true, options: ['Google', 'Yelp', 'Friend'], orderIndex: 1 },
-    { id: '2', name: 'Special Instructions', fieldType: 'text', category: 'job', required: false, showInForms: true, orderIndex: 2 },
-    { id: '3', name: 'Building Floor', fieldType: 'number', category: 'estimate', required: false, showInForms: true, orderIndex: 3 },
+    {
+      id: '1',
+      name: 'Referral Source',
+      fieldType: 'dropdown',
+      category: 'customer',
+      required: false,
+      showInForms: true,
+      options: ['Google', 'Yelp', 'Friend'],
+      orderIndex: 1,
+    },
+    {
+      id: '2',
+      name: 'Special Instructions',
+      fieldType: 'text',
+      category: 'job',
+      required: false,
+      showInForms: true,
+      orderIndex: 2,
+    },
+    {
+      id: '3',
+      name: 'Building Floor',
+      fieldType: 'number',
+      category: 'estimate',
+      required: false,
+      showInForms: true,
+      orderIndex: 3,
+    },
   ]);
 
   const [editForm, setEditForm] = useState<Partial<CustomField>>({});
@@ -42,9 +67,9 @@ export default function CustomFields() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/custom-fields'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -77,7 +102,7 @@ export default function CustomFields() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ customFields }),
       });
@@ -94,7 +119,9 @@ export default function CustomFields() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving custom fields:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -126,7 +153,7 @@ export default function CustomFields() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this custom field?')) {
-      setCustomFields(customFields.filter(f => f.id !== id));
+      setCustomFields(customFields.filter((f) => f.id !== id));
       setSuccess('Custom field deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -135,16 +162,22 @@ export default function CustomFields() {
   const moveUp = (index: number) => {
     if (index === 0) return;
     const newFields = [...customFields];
-    [newFields[index], newFields[index - 1]] = [newFields[index - 1], newFields[index]];
-    newFields.forEach((f, i) => f.orderIndex = i + 1);
+    [newFields[index], newFields[index - 1]] = [
+      newFields[index - 1],
+      newFields[index],
+    ];
+    newFields.forEach((f, i) => (f.orderIndex = i + 1));
     setCustomFields(newFields);
   };
 
   const moveDown = (index: number) => {
     if (index === customFields.length - 1) return;
     const newFields = [...customFields];
-    [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
-    newFields.forEach((f, i) => f.orderIndex = i + 1);
+    [newFields[index], newFields[index + 1]] = [
+      newFields[index + 1],
+      newFields[index],
+    ];
+    newFields.forEach((f, i) => (f.orderIndex = i + 1));
     setCustomFields(newFields);
   };
 
@@ -187,7 +220,9 @@ export default function CustomFields() {
                 id="name"
                 type="text"
                 value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., Preferred Contact Time"
               />
@@ -198,7 +233,9 @@ export default function CustomFields() {
               <select
                 id="fieldType"
                 value={editForm.fieldType || ''}
-                onChange={(e) => setEditForm({ ...editForm, fieldType: e.target.value as any })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, fieldType: e.target.value as any })
+                }
                 className={styles.select}
               >
                 <option value="">Select type</option>
@@ -215,7 +252,9 @@ export default function CustomFields() {
               <select
                 id="category"
                 value={editForm.category || ''}
-                onChange={(e) => setEditForm({ ...editForm, category: e.target.value as any })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, category: e.target.value as any })
+                }
                 className={styles.select}
               >
                 <option value="">Select category</option>
@@ -233,7 +272,12 @@ export default function CustomFields() {
                 id="options"
                 type="text"
                 value={(editForm.options || []).join(', ')}
-                onChange={(e) => setEditForm({ ...editForm, options: e.target.value.split(',').map(o => o.trim()) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    options: e.target.value.split(',').map((o) => o.trim()),
+                  })
+                }
                 className={styles.input}
                 placeholder="Option 1, Option 2, Option 3"
               />
@@ -246,7 +290,9 @@ export default function CustomFields() {
                 <input
                   type="checkbox"
                   checked={editForm.required ?? false}
-                  onChange={(e) => setEditForm({ ...editForm, required: e.target.checked })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, required: e.target.checked })
+                  }
                 />
                 Required Field
               </label>
@@ -257,7 +303,9 @@ export default function CustomFields() {
                 <input
                   type="checkbox"
                   checked={editForm.showInForms ?? true}
-                  onChange={(e) => setEditForm({ ...editForm, showInForms: e.target.checked })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, showInForms: e.target.checked })
+                  }
                 />
                 Show in Forms
               </label>
@@ -307,21 +355,43 @@ export default function CustomFields() {
                   </div>
                 </td>
                 <td>{field.name}</td>
-                <td>{field.fieldType.charAt(0).toUpperCase() + field.fieldType.slice(1)}</td>
-                <td>{field.category.charAt(0).toUpperCase() + field.category.slice(1)}</td>
                 <td>
-                  <span className={field.required ? styles.statusActive : styles.statusInactive}>
+                  {field.fieldType.charAt(0).toUpperCase() +
+                    field.fieldType.slice(1)}
+                </td>
+                <td>
+                  {field.category.charAt(0).toUpperCase() +
+                    field.category.slice(1)}
+                </td>
+                <td>
+                  <span
+                    className={
+                      field.required
+                        ? styles.statusActive
+                        : styles.statusInactive
+                    }
+                  >
                     {field.required ? 'Yes' : 'No'}
                   </span>
                 </td>
                 <td>
-                  <span className={field.showInForms ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      field.showInForms
+                        ? styles.statusActive
+                        : styles.statusInactive
+                    }
+                  >
                     {field.showInForms ? 'Yes' : 'No'}
                   </span>
                 </td>
                 <td>
                   <div className={styles.actions}>
-                    <button className={styles.actionButton} onClick={() => handleDelete(field.id)} title="Delete">
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => handleDelete(field.id)}
+                      title="Delete"
+                    >
                       🗑️
                     </button>
                   </div>
@@ -333,7 +403,11 @@ export default function CustomFields() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

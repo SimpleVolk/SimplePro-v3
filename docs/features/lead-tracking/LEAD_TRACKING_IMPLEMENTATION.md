@@ -9,13 +9,16 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 ### Component Files (4 Components, 8 Files Total)
 
 #### 1. LeadActivities Component
+
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\leads\`
 
 **Files:**
+
 - `LeadActivities.tsx` (18,342 bytes) - Main activity tracking dashboard
 - `LeadActivities.module.css` (7,775 bytes) - Dashboard styling
 
 **Features:**
+
 - Activity timeline with comprehensive filtering
 - Statistics dashboard (total, overdue, completed this week, upcoming)
 - Quick action buttons (log call, send email, schedule follow-up)
@@ -27,13 +30,16 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 - Real-time updates with optimistic UI
 
 #### 2. ActivityForm Component
+
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\leads\`
 
 **Files:**
+
 - `ActivityForm.tsx` (15,872 bytes) - Create/edit activity modal form
 - `ActivityForm.module.css` (4,227 bytes) - Form styling
 
 **Features:**
+
 - Modal form for creating and editing activities
 - Quick template selection (5 pre-built templates)
 - Customer search and selection
@@ -46,6 +52,7 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 - Assign to sales rep option
 
 **Pre-built Templates:**
+
 1. Initial Contact Call
 2. Quote Follow-up
 3. Pre-move Confirmation
@@ -53,13 +60,16 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 5. Referral Request
 
 #### 3. UpcomingFollowUps Component
+
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\leads\`
 
 **Files:**
+
 - `UpcomingFollowUps.tsx` (9,296 bytes) - Upcoming activities widget
 - `UpcomingFollowUps.module.css` (4,580 bytes) - Widget styling
 
 **Features:**
+
 - Displays activities due in next 7 days
 - Relative time display ("In 2 hours", "In 3 days", "Overdue")
 - Quick complete button with success outcome
@@ -71,13 +81,16 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 - Optimistic UI updates
 
 #### 4. FollowUpRules Component
+
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\leads\`
 
 **Files:**
+
 - `FollowUpRules.tsx` (22,952 bytes) - Automation rules manager
 - `FollowUpRules.module.css` (9,048 bytes) - Rules styling
 
 **Features:**
+
 - Visual rule flow display (Trigger → Delay → Action)
 - Enable/disable toggle for each rule
 - Rule statistics (total triggered, success rate, last triggered)
@@ -96,12 +109,14 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\leads\`
 
 **Files:**
+
 - `index.ts` (482 bytes) - Component exports
 - `README.md` (9,234 bytes) - Comprehensive documentation
 
 ## Technical Implementation
 
 ### Architecture
+
 - **Framework:** Next.js 15+ with React 18+
 - **Language:** TypeScript with strict typing
 - **Styling:** CSS Modules with dark theme
@@ -112,6 +127,7 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 ### API Endpoints Integrated
 
 **Lead Activities:**
+
 - `GET /api/lead-activities` - Get all activities
 - `GET /api/lead-activities?opportunityId=:id` - Filter by opportunity
 - `POST /api/lead-activities` - Create new activity
@@ -121,6 +137,7 @@ Complete frontend UI system for lead activity tracking and follow-up automation 
 - `GET /api/lead-activities/upcoming` - Get upcoming activities (next 7 days)
 
 **Follow-up Rules:**
+
 - `GET /api/follow-up-rules` - Get all automation rules
 - `POST /api/follow-up-rules` - Create new rule
 - `PATCH /api/follow-up-rules/:id/toggle` - Enable/disable rule
@@ -137,7 +154,13 @@ interface LeadActivity {
   customerName?: string;
   subject: string;
   description?: string;
-  outcome?: 'successful' | 'no_answer' | 'voicemail' | 'scheduled' | 'not_interested' | 'callback_requested';
+  outcome?:
+    | 'successful'
+    | 'no_answer'
+    | 'voicemail'
+    | 'scheduled'
+    | 'not_interested'
+    | 'callback_requested';
   scheduledDate?: string;
   completedDate?: string;
   dueDate?: string;
@@ -157,7 +180,12 @@ interface FollowUpRule {
   id: string;
   name: string;
   description?: string;
-  trigger: 'quote_sent' | 'no_response' | 'initial_contact' | 'meeting_scheduled' | 'callback_requested';
+  trigger:
+    | 'quote_sent'
+    | 'no_response'
+    | 'initial_contact'
+    | 'meeting_scheduled'
+    | 'callback_requested';
   delayHours: number;
   action: 'create_task' | 'send_email' | 'schedule_call' | 'send_sms';
   emailTemplate?: string;
@@ -182,6 +210,7 @@ interface FollowUpRule {
 ### Styling System
 
 **Dark Theme Colors:**
+
 - Background: `#1f2937`, `#374151`, `#4b5563`
 - Text: `#e5e7eb`, `#d1d5db`, `#9ca3af`
 - Primary: `#3b82f6` (blue)
@@ -207,6 +236,7 @@ All components implement mobile-first responsive design:
 Create dedicated pages for lead management:
 
 **File:** `D:\Claude\SimplePro-v3\apps\web\src\app\leads\page.tsx`
+
 ```typescript
 'use client';
 
@@ -218,6 +248,7 @@ export default function LeadsPage() {
 ```
 
 **File:** `D:\Claude\SimplePro-v3\apps\web\src\app\automation\page.tsx`
+
 ```typescript
 'use client';
 
@@ -295,6 +326,7 @@ npm run dev:web
 ### 3. Test Scenarios
 
 **Lead Activities:**
+
 1. Create new activity with quick action buttons
 2. Filter activities by type, status, outcome
 3. Complete an activity and verify status update
@@ -303,6 +335,7 @@ npm run dev:web
 6. Search activities by customer name or subject
 
 **Activity Form:**
+
 1. Select template and verify pre-filled data
 2. Search and select customer
 3. Set scheduled date and due date
@@ -311,6 +344,7 @@ npm run dev:web
 6. Validate required fields
 
 **Upcoming Follow-ups:**
+
 1. View activities due in next 7 days
 2. Complete activity with quick button
 3. Snooze activity (1h, 4h, 1d, 3d)
@@ -318,6 +352,7 @@ npm run dev:web
 5. Collapse/expand widget
 
 **Follow-up Rules:**
+
 1. Create automation rule with trigger, delay, action
 2. Toggle rule active/inactive
 3. View execution statistics
@@ -328,6 +363,7 @@ npm run dev:web
 ## Dependencies
 
 **No additional packages required!** All components use:
+
 - React 18+ (already installed)
 - Next.js 15+ (already installed)
 - TypeScript 5+ (already installed)
@@ -341,6 +377,7 @@ npm run dev:web
 **Lines of Code:** ~2,500 lines
 
 **Component Breakdown:**
+
 - LeadActivities: ~550 lines
 - ActivityForm: ~475 lines
 - UpcomingFollowUps: ~280 lines
@@ -351,6 +388,7 @@ npm run dev:web
 ## Features Summary
 
 ### Lead Activities Dashboard
+
 ✅ Activity timeline with status indicators
 ✅ Statistics dashboard (4 KPIs)
 ✅ Quick action buttons
@@ -361,6 +399,7 @@ npm run dev:web
 ✅ Mobile responsive
 
 ### Activity Form
+
 ✅ Modal design
 ✅ Template selection
 ✅ Customer search
@@ -371,6 +410,7 @@ npm run dev:web
 ✅ Mobile responsive
 
 ### Upcoming Follow-ups Widget
+
 ✅ 7-day view
 ✅ Relative time display
 ✅ Quick complete
@@ -381,6 +421,7 @@ npm run dev:web
 ✅ Mobile responsive
 
 ### Follow-up Rules Manager
+
 ✅ Visual rule flow
 ✅ Enable/disable toggle
 ✅ Execution statistics
@@ -404,6 +445,7 @@ npm run dev:web
 ## Production Readiness
 
 ### ✅ Completed
+
 - All components implemented
 - Dark theme styling
 - Mobile responsive design
@@ -415,6 +457,7 @@ npm run dev:web
 - Documentation
 
 ### 🔄 Recommended Enhancements
+
 - Unit tests for components
 - E2E tests for workflows
 - Accessibility (WCAG AA) improvements

@@ -27,9 +27,9 @@ export class Partner {
       'storage_facility',
       'corporate_client',
       'referral_network',
-      'other'
+      'other',
     ],
-    index: true
+    index: true,
   })
   partnerType!: string;
 
@@ -38,13 +38,13 @@ export class Partner {
     type: String,
     enum: ['active', 'inactive', 'pending', 'suspended'],
     default: 'pending',
-    index: true
+    index: true,
   })
   status!: string;
 
   @Prop({
     required: true,
-    type: Object
+    type: Object,
   })
   commissionStructure!: {
     type: 'percentage' | 'flat_rate' | 'tiered' | 'custom';
@@ -60,7 +60,7 @@ export class Partner {
 
   @Prop({
     required: true,
-    type: Object
+    type: Object,
   })
   address!: {
     street: string;
@@ -75,7 +75,7 @@ export class Partner {
 
   @Prop({
     type: Object,
-    default: { enabled: false }
+    default: { enabled: false },
   })
   portalAccess!: {
     enabled: boolean;
@@ -91,8 +91,8 @@ export class Partner {
       totalLeadsConverted: 0,
       totalRevenue: 0,
       totalCommissionsPaid: 0,
-      conversionRate: 0
-    }
+      conversionRate: 0,
+    },
   })
   statistics!: {
     totalLeadsReferred: number;
@@ -107,8 +107,8 @@ export class Partner {
     default: {
       autoNotifyOnLeadUpdate: true,
       preferredContactMethod: 'email',
-      customFields: {}
-    }
+      customFields: {},
+    },
   })
   settings!: {
     autoNotifyOnLeadUpdate: boolean;
@@ -145,26 +145,33 @@ PartnerSchema.index({ 'statistics.conversionRate': -1 });
 PartnerSchema.index({ tags: 1 });
 
 // Compound indexes for common query patterns
-PartnerSchema.index({ status: 1, partnerType: 1, 'statistics.totalLeadsReferred': -1 });
+PartnerSchema.index({
+  status: 1,
+  partnerType: 1,
+  'statistics.totalLeadsReferred': -1,
+});
 PartnerSchema.index({ createdBy: 1, status: 1 });
 
 // Text search index for comprehensive search
-PartnerSchema.index({
-  companyName: 'text',
-  contactName: 'text',
-  email: 'text',
-  phone: 'text',
-  notes: 'text'
-}, {
-  weights: {
-    companyName: 10,
-    contactName: 8,
-    email: 5,
-    phone: 3,
-    notes: 1
+PartnerSchema.index(
+  {
+    companyName: 'text',
+    contactName: 'text',
+    email: 'text',
+    phone: 'text',
+    notes: 'text',
   },
-  name: 'partner_text_search'
-});
+  {
+    weights: {
+      companyName: 10,
+      contactName: 8,
+      email: 5,
+      phone: 3,
+      notes: 1,
+    },
+    name: 'partner_text_search',
+  },
+);
 
 // Sparse indexes for optional fields
 PartnerSchema.index({ contractStartDate: 1 }, { sparse: true });
@@ -172,7 +179,9 @@ PartnerSchema.index({ contractEndDate: 1 }, { sparse: true });
 PartnerSchema.index({ 'portalAccess.lastLogin': -1 }, { sparse: true });
 
 // Virtual for active contract
-PartnerSchema.virtual('hasActiveContract').get(function(this: PartnerDocument) {
+PartnerSchema.virtual('hasActiveContract').get(function (
+  this: PartnerDocument,
+) {
   if (!this.contractStartDate || !this.contractEndDate) return false;
   const now = new Date();
   return now >= this.contractStartDate && now <= this.contractEndDate;

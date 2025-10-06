@@ -4,7 +4,10 @@
  * Verifies that settings changes affect estimate calculations correctly
  */
 
-import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
+import {
+  DeterministicEstimator,
+  defaultRules,
+} from '@simplepro/pricing-engine';
 import type { EstimateInput } from '@simplepro/pricing-engine';
 
 describe('Pricing Engine Integration Tests', () => {
@@ -13,7 +16,7 @@ describe('Pricing Engine Integration Tests', () => {
   beforeEach(() => {
     estimator = new DeterministicEstimator(
       defaultRules.pricingRules as any,
-      defaultRules.locationHandicaps as any
+      defaultRules.locationHandicaps as any,
     );
   });
 
@@ -80,34 +83,48 @@ describe('Pricing Engine Integration Tests', () => {
       const weekdayInput = { ...baseInput, isWeekend: false };
       const weekendInput = { ...baseInput, isWeekend: true };
 
-      const weekdayResult = estimator.calculateEstimate(weekdayInput, 'test-user');
-      const weekendResult = estimator.calculateEstimate(weekendInput, 'test-user');
+      const weekdayResult = estimator.calculateEstimate(
+        weekdayInput,
+        'test-user',
+      );
+      const weekendResult = estimator.calculateEstimate(
+        weekendInput,
+        'test-user',
+      );
 
       // Weekend should cost more
       expect(weekendResult.calculations.finalPrice).toBeGreaterThan(
-        weekdayResult.calculations.finalPrice
+        weekdayResult.calculations.finalPrice,
       );
 
       // Check that weekend rule is applied
       const hasWeekendRule = weekendResult.calculations.appliedRules.some(
-        rule => rule.ruleId === 'weekend_surcharge'
+        (rule) => rule.ruleId === 'weekend_surcharge',
       );
       expect(hasWeekendRule).toBe(true);
     });
 
     it('should apply piano special handling charge', () => {
-      const withoutPiano = { ...baseInput, specialItems: { ...baseInput.specialItems, piano: false } };
+      const withoutPiano = {
+        ...baseInput,
+        specialItems: { ...baseInput.specialItems, piano: false },
+      };
       const withPiano = baseInput;
 
-      const noPianoResult = estimator.calculateEstimate(withoutPiano, 'test-user');
+      const noPianoResult = estimator.calculateEstimate(
+        withoutPiano,
+        'test-user',
+      );
       const pianoResult = estimator.calculateEstimate(withPiano, 'test-user');
 
       // Piano move should cost more
-      expect(pianoResult.calculations.finalPrice).toBeGreaterThan(noPianoResult.calculations.finalPrice);
+      expect(pianoResult.calculations.finalPrice).toBeGreaterThan(
+        noPianoResult.calculations.finalPrice,
+      );
 
       // Check that piano rule is applied
       const hasPianoRule = pianoResult.calculations.appliedRules.some(
-        rule => rule.ruleId === 'piano_special_handling'
+        (rule) => rule.ruleId === 'piano_special_handling',
       );
       expect(hasPianoRule).toBe(true);
     });
@@ -123,8 +140,12 @@ describe('Pricing Engine Integration Tests', () => {
       const stairsResult = estimator.calculateEstimate(withStairs, 'test-user');
 
       // Stairs should add cost
-      expect(stairsResult.calculations.finalPrice).toBeGreaterThan(noStairsResult.calculations.finalPrice);
-      expect(stairsResult.calculations.breakdown.locationHandicaps).toBeGreaterThan(0);
+      expect(stairsResult.calculations.finalPrice).toBeGreaterThan(
+        noStairsResult.calculations.finalPrice,
+      );
+      expect(
+        stairsResult.calculations.breakdown.locationHandicaps,
+      ).toBeGreaterThan(0);
     });
 
     it('should apply packing service charge', () => {
@@ -134,12 +155,22 @@ describe('Pricing Engine Integration Tests', () => {
       };
       const withPacking = baseInput;
 
-      const noPackingResult = estimator.calculateEstimate(noPacking, 'test-user');
-      const packingResult = estimator.calculateEstimate(withPacking, 'test-user');
+      const noPackingResult = estimator.calculateEstimate(
+        noPacking,
+        'test-user',
+      );
+      const packingResult = estimator.calculateEstimate(
+        withPacking,
+        'test-user',
+      );
 
       // Packing should add cost
-      expect(packingResult.calculations.finalPrice).toBeGreaterThan(noPackingResult.calculations.finalPrice);
-      expect(packingResult.calculations.breakdown.specialServices).toBeGreaterThan(0);
+      expect(packingResult.calculations.finalPrice).toBeGreaterThan(
+        noPackingResult.calculations.finalPrice,
+      );
+      expect(
+        packingResult.calculations.breakdown.specialServices,
+      ).toBeGreaterThan(0);
     });
 
     it('should apply access difficulty multiplier', () => {
@@ -153,10 +184,15 @@ describe('Pricing Engine Integration Tests', () => {
       };
 
       const easyResult = estimator.calculateEstimate(easyAccess, 'test-user');
-      const difficultResult = estimator.calculateEstimate(difficultAccess, 'test-user');
+      const difficultResult = estimator.calculateEstimate(
+        difficultAccess,
+        'test-user',
+      );
 
       // Difficult access should cost more
-      expect(difficultResult.calculations.finalPrice).toBeGreaterThan(easyResult.calculations.finalPrice);
+      expect(difficultResult.calculations.finalPrice).toBeGreaterThan(
+        easyResult.calculations.finalPrice,
+      );
     });
 
     it('should provide complete price breakdown', () => {
@@ -171,7 +207,9 @@ describe('Pricing Engine Integration Tests', () => {
       expect(result.calculations.breakdown).toHaveProperty('total');
 
       // Verify total matches final price
-      expect(result.calculations.breakdown.total).toBe(result.calculations.finalPrice);
+      expect(result.calculations.breakdown.total).toBe(
+        result.calculations.finalPrice,
+      );
     });
 
     it('should be deterministic - same input produces same output', () => {
@@ -179,8 +217,12 @@ describe('Pricing Engine Integration Tests', () => {
       const result2 = estimator.calculateEstimate(baseInput, 'test-user');
       const result3 = estimator.calculateEstimate(baseInput, 'test-user');
 
-      expect(result1.calculations.finalPrice).toBe(result2.calculations.finalPrice);
-      expect(result2.calculations.finalPrice).toBe(result3.calculations.finalPrice);
+      expect(result1.calculations.finalPrice).toBe(
+        result2.calculations.finalPrice,
+      );
+      expect(result2.calculations.finalPrice).toBe(
+        result3.calculations.finalPrice,
+      );
       expect(result1.metadata.hash).toBe(result2.metadata.hash);
       expect(result2.metadata.hash).toBe(result3.metadata.hash);
     });
@@ -200,7 +242,7 @@ describe('Pricing Engine Integration Tests', () => {
 
       expect(result.calculations.appliedRules.length).toBeGreaterThan(0);
 
-      result.calculations.appliedRules.forEach(rule => {
+      result.calculations.appliedRules.forEach((rule) => {
         expect(rule).toHaveProperty('ruleId');
         expect(rule).toHaveProperty('ruleName');
         expect(rule).toHaveProperty('priceImpact');
@@ -263,7 +305,7 @@ describe('Pricing Engine Integration Tests', () => {
       const result = estimator.calculateEstimate(heavyInput, 'test-user');
 
       const hasHeavyWeightRule = result.calculations.appliedRules.some(
-        rule => rule.ruleId === 'heavy_shipment_surcharge'
+        (rule) => rule.ruleId === 'heavy_shipment_surcharge',
       );
 
       expect(hasHeavyWeightRule).toBe(true);
@@ -273,12 +315,18 @@ describe('Pricing Engine Integration Tests', () => {
       const smallCrew = { ...heavyInput, crewSize: 2 };
       const largeCrew = heavyInput;
 
-      const smallCrewResult = estimator.calculateEstimate(smallCrew, 'test-user');
-      const largeCrewResult = estimator.calculateEstimate(largeCrew, 'test-user');
+      const smallCrewResult = estimator.calculateEstimate(
+        smallCrew,
+        'test-user',
+      );
+      const largeCrewResult = estimator.calculateEstimate(
+        largeCrew,
+        'test-user',
+      );
 
       // Large crew should cost more
       expect(largeCrewResult.calculations.finalPrice).toBeGreaterThan(
-        smallCrewResult.calculations.finalPrice
+        smallCrewResult.calculations.finalPrice,
       );
     });
 
@@ -286,15 +334,18 @@ describe('Pricing Engine Integration Tests', () => {
       const result = estimator.calculateEstimate(heavyInput, 'test-user');
 
       // Should have significant location handicap costs
-      expect(result.calculations.breakdown.locationHandicaps).toBeGreaterThan(100);
+      expect(result.calculations.breakdown.locationHandicaps).toBeGreaterThan(
+        100,
+      );
 
       // Multiple handicaps: long carry, extreme/difficult access, stairs, narrow hallways
       const locationRules = result.calculations.appliedRules.filter(
-        rule => rule.ruleId.includes('stairs') ||
-               rule.ruleId.includes('carry') ||
-               rule.ruleId.includes('access') ||
-               rule.ruleId.includes('parking') ||
-               rule.ruleId.includes('narrow')
+        (rule) =>
+          rule.ruleId.includes('stairs') ||
+          rule.ruleId.includes('carry') ||
+          rule.ruleId.includes('access') ||
+          rule.ruleId.includes('parking') ||
+          rule.ruleId.includes('narrow'),
       );
 
       expect(locationRules.length).toBeGreaterThan(0);
@@ -304,7 +355,7 @@ describe('Pricing Engine Integration Tests', () => {
       const result = estimator.calculateEstimate(heavyInput, 'test-user');
 
       const hasFragileRule = result.calculations.appliedRules.some(
-        rule => rule.ruleId === 'fragile_items_surcharge'
+        (rule) => rule.ruleId === 'fragile_items_surcharge',
       );
 
       // Should apply when fragile items >= 10
@@ -315,7 +366,7 @@ describe('Pricing Engine Integration Tests', () => {
       const result = estimator.calculateEstimate(heavyInput, 'test-user');
 
       const hasAntiqueRule = result.calculations.appliedRules.some(
-        rule => rule.ruleId === 'antique_handling'
+        (rule) => rule.ruleId === 'antique_handling',
       );
 
       expect(hasAntiqueRule).toBe(true);
@@ -329,7 +380,9 @@ describe('Pricing Engine Integration Tests', () => {
 
       // Verify all breakdown components
       expect(result.calculations.breakdown.baseLabor).toBeGreaterThan(0);
-      expect(result.calculations.breakdown.locationHandicaps).toBeGreaterThan(0);
+      expect(result.calculations.breakdown.locationHandicaps).toBeGreaterThan(
+        0,
+      );
       expect(result.calculations.breakdown.specialServices).toBeGreaterThan(0);
 
       // Sum should equal total
@@ -341,7 +394,9 @@ describe('Pricing Engine Integration Tests', () => {
         result.calculations.breakdown.specialServices +
         result.calculations.breakdown.overhead;
 
-      expect(Math.abs(calculatedTotal - result.calculations.breakdown.total)).toBeLessThan(0.01);
+      expect(
+        Math.abs(calculatedTotal - result.calculations.breakdown.total),
+      ).toBeLessThan(0.01);
     });
   });
 
@@ -397,19 +452,29 @@ describe('Pricing Engine Integration Tests', () => {
     };
 
     it('should calculate long distance pricing differently than local', () => {
-      const localInput = { ...longDistanceInput, service: 'local' as const, distance: 20 };
+      const localInput = {
+        ...longDistanceInput,
+        service: 'local' as const,
+        distance: 20,
+      };
 
       const localResult = estimator.calculateEstimate(localInput, 'test-user');
-      const longDistanceResult = estimator.calculateEstimate(longDistanceInput, 'test-user');
+      const longDistanceResult = estimator.calculateEstimate(
+        longDistanceInput,
+        'test-user',
+      );
 
       // Long distance should be significantly more expensive
       expect(longDistanceResult.calculations.finalPrice).toBeGreaterThan(
-        localResult.calculations.finalPrice
+        localResult.calculations.finalPrice,
       );
     });
 
     it('should include transportation costs for long distance', () => {
-      const result = estimator.calculateEstimate(longDistanceInput, 'test-user');
+      const result = estimator.calculateEstimate(
+        longDistanceInput,
+        'test-user',
+      );
 
       expect(result.calculations.breakdown.transportation).toBeGreaterThan(0);
     });
@@ -420,7 +485,9 @@ describe('Pricing Engine Integration Tests', () => {
       const validation = estimator.validateInput(invalidLocal);
 
       expect(validation.valid).toBe(false);
-      expect(validation.errors).toContain('Local moves must be 50 miles or less');
+      expect(validation.errors).toContain(
+        'Local moves must be 50 miles or less',
+      );
     });
   });
 
@@ -480,7 +547,7 @@ describe('Pricing Engine Integration Tests', () => {
 
       // Should apply minimum charge
       const hasMinimumRule = result.calculations.appliedRules.some(
-        rule => rule.ruleId === 'minimum_charge_local'
+        (rule) => rule.ruleId === 'minimum_charge_local',
       );
 
       expect(hasMinimumRule).toBe(true);

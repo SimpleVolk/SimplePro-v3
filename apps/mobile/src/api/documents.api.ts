@@ -17,7 +17,7 @@ export const documentsApi = {
       photoType: string;
       photoUri: string;
       fileName: string;
-    }
+    },
   ) => {
     const formData = new FormData();
     formData.append('jobId', data.jobId);
@@ -47,7 +47,7 @@ export const documentsApi = {
       jobId: string;
       signatureData: string;
       documentType: string;
-    }
+    },
   ) => {
     const formData = new FormData();
     formData.append('jobId', data.jobId);

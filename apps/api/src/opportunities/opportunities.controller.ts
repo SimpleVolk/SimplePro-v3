@@ -53,8 +53,13 @@ export class OpportunitiesController {
   }
 
   @Get('statistics')
-  async getStatistics(@CurrentUser() user: User, @Query('userId') userId?: string) {
-    const stats = await this.opportunitiesService.getStatistics(userId || user.id);
+  async getStatistics(
+    @CurrentUser() user: User,
+    @Query('userId') userId?: string,
+  ) {
+    const stats = await this.opportunitiesService.getStatistics(
+      userId || user.id,
+    );
 
     return {
       success: true,
@@ -78,7 +83,11 @@ export class OpportunitiesController {
     @Body() updateDto: Partial<CreateOpportunityDto>,
     @CurrentUser() user: User,
   ) {
-    const opportunity = await this.opportunitiesService.update(id, updateDto, user.id);
+    const opportunity = await this.opportunitiesService.update(
+      id,
+      updateDto,
+      user.id,
+    );
 
     return {
       success: true,

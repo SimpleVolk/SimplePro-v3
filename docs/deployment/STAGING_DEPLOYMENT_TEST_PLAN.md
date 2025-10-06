@@ -35,21 +35,21 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
 
 ### Port Requirements
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| Nginx | 80 | HTTP (redirects to HTTPS) |
-| Nginx | 443 | HTTPS (SSL/TLS) |
-| API | 3001 | API direct access (internal) |
-| Web | 3009 | Web app direct access (internal) |
-| MongoDB | 27017 | Database |
-| Redis | 6379 | Cache |
-| MinIO | 9000 | S3 API |
-| MinIO Console | 9001 | MinIO web UI |
-| Prometheus | 9090 | Metrics |
-| Grafana | 3000 | Dashboards |
-| MongoDB Exporter | 9216 | MongoDB metrics |
-| Redis Exporter | 9121 | Redis metrics |
-| Node Exporter | 9100 | System metrics |
+| Service          | Port  | Purpose                          |
+| ---------------- | ----- | -------------------------------- |
+| Nginx            | 80    | HTTP (redirects to HTTPS)        |
+| Nginx            | 443   | HTTPS (SSL/TLS)                  |
+| API              | 3001  | API direct access (internal)     |
+| Web              | 3009  | Web app direct access (internal) |
+| MongoDB          | 27017 | Database                         |
+| Redis            | 6379  | Cache                            |
+| MinIO            | 9000  | S3 API                           |
+| MinIO Console    | 9001  | MinIO web UI                     |
+| Prometheus       | 9090  | Metrics                          |
+| Grafana          | 3000  | Dashboards                       |
+| MongoDB Exporter | 9216  | MongoDB metrics                  |
+| Redis Exporter   | 9121  | Redis metrics                    |
+| Node Exporter    | 9100  | System metrics                   |
 
 ## Pre-Deployment Checklist
 
@@ -86,17 +86,21 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
 **Objective:** Initialize staging environment with proper configuration
 
 **Steps:**
+
 1. Run prerequisite checks
+
    ```bash
    ./scripts/setup-staging.sh --check-prereqs
    ```
 
 2. Generate staging secrets
+
    ```bash
    ./scripts/setup-staging.sh --generate-secrets
    ```
 
 3. Validate environment configuration
+
    ```bash
    ./scripts/validate-environment.sh staging
    ```
@@ -107,6 +111,7 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
    ```
 
 **Success Criteria:**
+
 - All prerequisite checks pass
 - Secrets generated and stored securely
 - Environment variables validated
@@ -117,27 +122,33 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
 **Objective:** Deploy all infrastructure services
 
 **Steps:**
+
 1. Create staging network
+
    ```bash
    docker network create simplepro-staging-network
    ```
 
 2. Pull required Docker images
+
    ```bash
    docker-compose -f docker-compose.staging.yml pull
    ```
 
 3. Build application containers
+
    ```bash
    docker-compose -f docker-compose.staging.yml build --no-cache
    ```
 
 4. Start infrastructure services (MongoDB, Redis, MinIO)
+
    ```bash
    docker-compose -f docker-compose.staging.yml up -d mongodb redis minio
    ```
 
 5. Wait for infrastructure health checks
+
    ```bash
    ./scripts/setup-staging.sh --wait-infrastructure
    ```
@@ -148,6 +159,7 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
    ```
 
 **Success Criteria:**
+
 - All images pulled successfully
 - Builds complete without errors
 - MongoDB is healthy and accepting connections
@@ -159,22 +171,27 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
 **Objective:** Deploy API and Web applications
 
 **Steps:**
+
 1. Start API service
+
    ```bash
    docker-compose -f docker-compose.staging.yml up -d api
    ```
 
 2. Wait for API health check
+
    ```bash
    ./scripts/setup-staging.sh --wait-api
    ```
 
 3. Start Web service
+
    ```bash
    docker-compose -f docker-compose.staging.yml up -d web
    ```
 
 4. Wait for Web health check
+
    ```bash
    ./scripts/setup-staging.sh --wait-web
    ```
@@ -185,6 +202,7 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
    ```
 
 **Success Criteria:**
+
 - API container starts and passes health checks
 - Web container starts and passes health checks
 - Nginx starts and routes traffic correctly
@@ -195,17 +213,21 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
 **Objective:** Deploy monitoring and observability stack
 
 **Steps:**
+
 1. Start Prometheus
+
    ```bash
    docker-compose -f docker-compose.staging.yml up -d prometheus
    ```
 
 2. Start Grafana
+
    ```bash
    docker-compose -f docker-compose.staging.yml up -d grafana
    ```
 
 3. Start exporters
+
    ```bash
    docker-compose -f docker-compose.staging.yml up -d mongodb-exporter redis-exporter node-exporter
    ```
@@ -216,6 +238,7 @@ This document outlines the comprehensive test plan for deploying SimplePro-v3 to
    ```
 
 **Success Criteria:**
+
 - Prometheus is collecting metrics
 - Grafana is accessible and connected to Prometheus
 - All exporters are reporting data
@@ -234,6 +257,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Critical
 
 **Tests:**
+
 - MongoDB connection and authentication
 - Redis connection and basic operations (SET/GET)
 - MinIO S3 API connectivity
@@ -241,6 +265,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Network connectivity between services
 
 **Pass Criteria:**
+
 - All services respond within 5 seconds
 - Authentication succeeds
 - Basic CRUD operations work
@@ -254,6 +279,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Critical
 
 **Tests:**
+
 - `/api/health` endpoint responds 200 OK
 - `/api/health/ready` endpoint reports all dependencies healthy
 - `/api/docs` Swagger UI is accessible
@@ -261,6 +287,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Error responses have proper format
 
 **Pass Criteria:**
+
 - All endpoints return expected status codes
 - Response times meet SLA
 - JSON responses are well-formed
@@ -274,6 +301,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Critical
 
 **Tests:**
+
 - User login with valid credentials
 - User login with invalid credentials returns 401
 - JWT token is issued on successful login
@@ -282,6 +310,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Token expiration is enforced
 
 **Pass Criteria:**
+
 - Authentication succeeds with valid credentials
 - Authentication fails with invalid credentials
 - Tokens are properly formatted and valid
@@ -296,6 +325,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Critical
 
 **Tests:**
+
 - Create user record
 - Read user record
 - Update user record
@@ -304,6 +334,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Index usage for queries
 
 **Pass Criteria:**
+
 - All CRUD operations succeed
 - Data persists across service restarts
 - Query performance is acceptable
@@ -317,6 +348,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** High
 
 **Tests:**
+
 - Upload file to MinIO via API
 - Download file from MinIO via API
 - Delete file from MinIO
@@ -325,6 +357,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Large file upload (100MB+)
 
 **Pass Criteria:**
+
 - All file operations succeed
 - Files are accessible after upload
 - Presigned URLs work and expire correctly
@@ -339,6 +372,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** High
 
 **Tests:**
+
 - WebSocket connection establishment
 - Message send and receive
 - Connection limit enforcement
@@ -346,6 +380,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Authentication requirement
 
 **Pass Criteria:**
+
 - WebSocket connects successfully
 - Messages are delivered in real-time
 - Connection limits work
@@ -360,6 +395,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** High
 
 **Tests:**
+
 - Homepage loads successfully
 - Login page is accessible
 - Dashboard loads after login
@@ -368,6 +404,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Navigation works
 
 **Pass Criteria:**
+
 - All pages return 200 OK
 - No console errors
 - Authentication flow works
@@ -382,6 +419,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Medium
 
 **Tests:**
+
 - Prometheus scrapes all targets
 - Grafana displays dashboards
 - Metrics are being collected
@@ -389,6 +427,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Logs are being written
 
 **Pass Criteria:**
+
 - All Prometheus targets are "UP"
 - Grafana shows live data
 - Metrics update in real-time
@@ -403,6 +442,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Critical
 
 **Tests:**
+
 - No hardcoded secrets in containers
 - Environment variables properly injected
 - SSL/TLS certificates valid
@@ -413,6 +453,7 @@ The smoke test suite validates critical functionality across all components. Tes
 - Password hashing (bcrypt)
 
 **Pass Criteria:**
+
 - No secrets visible in container inspect
 - HTTPS enforced on all endpoints
 - CORS only allows specified origins
@@ -428,6 +469,7 @@ The smoke test suite validates critical functionality across all components. Tes
 **Priority:** Medium
 
 **Tests:**
+
 - API response time (p50, p95, p99)
 - Database query performance
 - Concurrent user handling (10, 50, 100 users)
@@ -436,12 +478,14 @@ The smoke test suite validates critical functionality across all components. Tes
 - Container restart time
 
 **Metrics to Capture:**
+
 - Average response time
 - Requests per second
 - Error rate
 - Resource utilization
 
 **Pass Criteria:**
+
 - API p95 response time < 1000ms
 - System handles 100 concurrent users
 - No memory leaks detected
@@ -515,6 +559,7 @@ ab -n 500 -c 10 -H "Authorization: Bearer $TOKEN" http://localhost:3001/api/cust
 ```
 
 **Success Criteria:**
+
 - Health endpoint: p95 < 50ms
 - Login endpoint: p95 < 500ms
 - Authenticated requests: p95 < 1000ms
@@ -531,6 +576,7 @@ docker exec simplepro-redis-staging redis-cli --latency-history
 ```
 
 **Success Criteria:**
+
 - MongoDB average query time < 100ms
 - Redis latency < 1ms
 
@@ -545,6 +591,7 @@ docker-compose -f docker-compose.staging.yml logs --tail=100
 ```
 
 **Success Criteria:**
+
 - API memory usage < 500MB
 - Web memory usage < 256MB
 - MongoDB memory usage < 1GB
@@ -555,6 +602,7 @@ docker-compose -f docker-compose.staging.yml logs --tail=100
 ### 1. Secrets Management
 
 **Test:**
+
 ```bash
 # Verify no secrets in environment variables visible externally
 docker inspect simplepro-api-staging | grep -i "password\|secret\|key"
@@ -564,6 +612,7 @@ docker exec simplepro-api-staging cat /run/secrets/jwt_secret
 ```
 
 **Pass Criteria:**
+
 - No plaintext secrets in container inspect
 - Secrets loaded from /run/secrets
 - Secrets have proper permissions (0600)
@@ -571,6 +620,7 @@ docker exec simplepro-api-staging cat /run/secrets/jwt_secret
 ### 2. Network Security
 
 **Test:**
+
 ```bash
 # Verify services are on isolated network
 docker network inspect simplepro-staging-network
@@ -580,6 +630,7 @@ nmap -p 1-65535 localhost
 ```
 
 **Pass Criteria:**
+
 - Services communicate on private network
 - Only exposed ports are accessible externally
 - No unnecessary ports open
@@ -587,6 +638,7 @@ nmap -p 1-65535 localhost
 ### 3. SSL/TLS Validation
 
 **Test:**
+
 ```bash
 # Test SSL certificate
 openssl s_client -connect localhost:443 -showcerts
@@ -596,6 +648,7 @@ curl -I http://localhost/
 ```
 
 **Pass Criteria:**
+
 - Valid SSL certificate
 - HTTP redirects to HTTPS
 - TLS 1.2+ only
@@ -603,6 +656,7 @@ curl -I http://localhost/
 ### 4. Authentication & Authorization
 
 **Test:**
+
 ```bash
 # Test unauthenticated access is blocked
 curl -I http://localhost:3001/api/customers
@@ -615,6 +669,7 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 ```
 
 **Pass Criteria:**
+
 - Unauthenticated requests return 401
 - Authenticated requests return 200
 - Rate limiting blocks after threshold
@@ -624,17 +679,21 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 ### Scenario 1: Health Check Failures
 
 **Detection:**
+
 - Service fails to start
 - Health checks timeout
 - Container exits unexpectedly
 
 **Rollback Steps:**
+
 1. Stop all staging services
+
    ```bash
    docker-compose -f docker-compose.staging.yml down
    ```
 
 2. Review logs
+
    ```bash
    docker-compose -f docker-compose.staging.yml logs
    ```
@@ -646,22 +705,27 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 ### Scenario 2: Data Corruption
 
 **Detection:**
+
 - Database connection errors
 - Data inconsistencies
 - Failed transactions
 
 **Rollback Steps:**
+
 1. Stop application services (API, Web)
+
    ```bash
    docker-compose -f docker-compose.staging.yml stop api web
    ```
 
 2. Restore from backup
+
    ```bash
    ./scripts/backup-restore.sh restore --latest
    ```
 
 3. Verify data integrity
+
    ```bash
    docker exec simplepro-mongodb-staging mongosh --eval "db.users.count()"
    ```
@@ -674,17 +738,21 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 ### Scenario 3: Security Issues
 
 **Detection:**
+
 - Secrets exposed
 - Authentication bypass
 - Unauthorized access
 
 **Rollback Steps:**
+
 1. Immediately stop all services
+
    ```bash
    docker-compose -f docker-compose.staging.yml down
    ```
 
 2. Rotate all secrets
+
    ```bash
    ./scripts/secrets-management.sh rotate --all
    ```
@@ -696,12 +764,15 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 ### Scenario 4: Performance Degradation
 
 **Detection:**
+
 - Response times exceed SLA
 - High resource usage
 - Container OOM kills
 
 **Rollback Steps:**
+
 1. Scale back to previous version
+
    ```bash
    docker-compose -f docker-compose.staging.yml down
    git checkout <previous-stable-commit>
@@ -726,26 +797,33 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 **Status:** Open / In Progress / Resolved
 
 ### Description
+
 [Detailed description of the issue]
 
 ### Steps to Reproduce
+
 1. Step 1
 2. Step 2
 3. Step 3
 
 ### Expected Behavior
+
 [What should happen]
 
 ### Actual Behavior
+
 [What actually happens]
 
 ### Impact
+
 [Impact on deployment]
 
 ### Resolution
+
 [How it was fixed, or proposed solution]
 
 ### Verification
+
 [How to verify the fix works]
 ```
 
@@ -760,18 +838,18 @@ for i in {1..10}; do curl http://localhost:3001/api/auth/login; done
 
 ### Timeline
 
-| Phase | Duration | Start | End |
-|-------|----------|-------|-----|
-| Pre-deployment Checklist | 15 min | T+0 | T+15 |
-| Environment Setup | 30 min | T+15 | T+45 |
-| Infrastructure Deployment | 45 min | T+45 | T+90 |
-| Application Deployment | 30 min | T+90 | T+120 |
-| Monitoring Deployment | 15 min | T+120 | T+135 |
-| Smoke Tests | 60 min | T+135 | T+195 |
-| Performance Tests | 30 min | T+195 | T+225 |
-| Security Validation | 30 min | T+225 | T+255 |
-| Documentation | 15 min | T+255 | T+270 |
-| **Total** | **4.5 hours** | | |
+| Phase                     | Duration      | Start | End   |
+| ------------------------- | ------------- | ----- | ----- |
+| Pre-deployment Checklist  | 15 min        | T+0   | T+15  |
+| Environment Setup         | 30 min        | T+15  | T+45  |
+| Infrastructure Deployment | 45 min        | T+45  | T+90  |
+| Application Deployment    | 30 min        | T+90  | T+120 |
+| Monitoring Deployment     | 15 min        | T+120 | T+135 |
+| Smoke Tests               | 60 min        | T+135 | T+195 |
+| Performance Tests         | 30 min        | T+195 | T+225 |
+| Security Validation       | 30 min        | T+225 | T+255 |
+| Documentation             | 15 min        | T+255 | T+270 |
+| **Total**                 | **4.5 hours** |       |       |
 
 ### Milestones
 

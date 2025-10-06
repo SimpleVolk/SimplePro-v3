@@ -6,7 +6,14 @@ import styles from './NotificationToast.module.css';
 
 interface Notification {
   id: string;
-  type: 'job_assigned' | 'shift_reminder' | 'customer_inquiry' | 'quote_request' | 'job_completed' | 'payment_received' | 'system_alert';
+  type:
+    | 'job_assigned'
+    | 'shift_reminder'
+    | 'customer_inquiry'
+    | 'quote_request'
+    | 'job_completed'
+    | 'payment_received'
+    | 'system_alert';
   priority: 'low' | 'normal' | 'high' | 'urgent';
   title: string;
   message: string;
@@ -49,7 +56,7 @@ export function NotificationToast({ onNavigate }: NotificationToastProps) {
       dismissed: false,
     };
 
-    setToasts(prev => {
+    setToasts((prev) => {
       // Remove oldest toast if we have too many
       const newToasts = prev.length >= MAX_TOASTS ? prev.slice(1) : prev;
       return [...newToasts, toast];
@@ -70,32 +77,35 @@ export function NotificationToast({ onNavigate }: NotificationToastProps) {
 
   // Dismiss toast
   const dismissToast = useCallback((toastId: string) => {
-    setToasts(prev =>
-      prev.map(toast =>
-        toast.toastId === toastId ? { ...toast, dismissed: true } : toast
-      )
+    setToasts((prev) =>
+      prev.map((toast) =>
+        toast.toastId === toastId ? { ...toast, dismissed: true } : toast,
+      ),
     );
 
     // Remove from DOM after animation
     setTimeout(() => {
-      setToasts(prev => prev.filter(toast => toast.toastId !== toastId));
+      setToasts((prev) => prev.filter((toast) => toast.toastId !== toastId));
     }, 300);
   }, []);
 
   // Handle toast click
-  const handleToastClick = useCallback((toast: ToastNotification) => {
-    if (toast.actionUrl && onNavigate) {
-      onNavigate(toast.actionUrl);
-    }
-    dismissToast(toast.toastId);
-  }, [onNavigate, dismissToast]);
+  const handleToastClick = useCallback(
+    (toast: ToastNotification) => {
+      if (toast.actionUrl && onNavigate) {
+        onNavigate(toast.actionUrl);
+      }
+      dismissToast(toast.toastId);
+    },
+    [onNavigate, dismissToast],
+  );
 
   // Play notification sound
   const playNotificationSound = () => {
     try {
       const audio = new Audio('/notification-sound.mp3');
       audio.volume = 0.5;
-      audio.play().catch(err => console.error('Audio play error:', err));
+      audio.play().catch((err) => console.error('Audio play error:', err));
     } catch (err) {
       console.error('Failed to play sound:', err);
     }
@@ -107,7 +117,10 @@ export function NotificationToast({ onNavigate }: NotificationToastProps) {
 
     const handleNotificationCreated = (notification: Notification) => {
       // Only show toasts for high priority or urgent notifications
-      if (notification.priority === 'high' || notification.priority === 'urgent') {
+      if (
+        notification.priority === 'high' ||
+        notification.priority === 'urgent'
+      ) {
         addToast(notification);
       }
     };
@@ -135,7 +148,7 @@ export function NotificationToast({ onNavigate }: NotificationToastProps) {
 
   return (
     <div className={styles.toastContainer}>
-      {toasts.map(toast => (
+      {toasts.map((toast) => (
         <div
           key={toast.toastId}
           className={`${styles.toast} ${getPriorityClass(toast.priority)} ${toast.dismissed ? styles.dismissed : ''}`}

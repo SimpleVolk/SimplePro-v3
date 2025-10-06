@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Inject,
+  forwardRef,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -9,7 +16,7 @@ import {
   JobStats,
   CrewAssignment,
   JobMilestone,
-  InternalNote
+  InternalNote,
 } from './interfaces/job.interface';
 import { Job as JobSchema, JobDocument } from './schemas/job.schema';
 import { CacheService } from '../cache/cache.service';
@@ -58,34 +65,38 @@ export class JobsService implements OnModuleInit {
     const jobNumber = this.generateJobNumber();
 
     // Set up initial crew assignments
-    const assignedCrew: CrewAssignment[] = createJobDto.assignedCrew?.map(crew => ({
-      ...crew,
-      assignedAt: new Date(),
-      status: 'assigned' as const,
-    })) || [];
+    const assignedCrew: CrewAssignment[] =
+      createJobDto.assignedCrew?.map((crew) => ({
+        ...crew,
+        assignedAt: new Date(),
+        status: 'assigned' as const,
+      })) || [];
 
     // Set up default milestones based on job type
     const milestones = this.createDefaultMilestones(createJobDto.type);
 
     // Prepare inventory items with generated IDs
-    const inventory = createJobDto.inventory?.map(item => ({
-      ...item,
-      id: this.generateId(),
-      condition: item.condition || 'good',
-      location: item.location || 'pickup',
-    })) || [];
+    const inventory =
+      createJobDto.inventory?.map((item) => ({
+        ...item,
+        id: this.generateId(),
+        condition: item.condition || 'good',
+        location: item.location || 'pickup',
+      })) || [];
 
     // Prepare services with default status
-    const services = createJobDto.services?.map(service => ({
-      ...service,
-      status: 'pending' as const,
-    })) || [];
+    const services =
+      createJobDto.services?.map((service) => ({
+        ...service,
+        status: 'pending' as const,
+      })) || [];
 
     // Prepare equipment with default status
-    const equipment = createJobDto.equipment?.map(eq => ({
-      ...eq,
-      status: 'required' as const,
-    })) || [];
+    const equipment =
+      createJobDto.equipment?.map((eq) => ({
+        ...eq,
+        status: 'required' as const,
+      })) || [];
 
     // Create job document
     const job = new this.jobModel({
@@ -108,7 +119,7 @@ export class JobsService implements OnModuleInit {
       deliveryAddress: createJobDto.deliveryAddress,
 
       assignedCrew,
-      leadCrew: assignedCrew.find(c => c.role === 'lead')?.crewMemberId,
+      leadCrew: assignedCrew.find((c) => c.role === 'lead')?.crewMemberId,
 
       inventory,
       services,
@@ -155,8 +166,10 @@ export class JobsService implements OnModuleInit {
       // Date range filters
       if (filters.scheduledAfter || filters.scheduledBefore) {
         query.scheduledDate = {};
-        if (filters.scheduledAfter) query.scheduledDate.$gte = filters.scheduledAfter;
-        if (filters.scheduledBefore) query.scheduledDate.$lte = filters.scheduledBefore;
+        if (filters.scheduledAfter)
+          query.scheduledDate.$gte = filters.scheduledAfter;
+        if (filters.scheduledBefore)
+          query.scheduledDate.$lte = filters.scheduledBefore;
       }
 
       if (filters.createdAfter || filters.createdBefore) {
@@ -176,9 +189,14 @@ export class JobsService implements OnModuleInit {
       this.jobModel.countDocuments(query).exec(),
       this.jobModel
         .find(query)
-        .select('jobNumber title status type priority customerId scheduledDate estimatedDuration estimatedCost assignedCrew leadCrew pickupAddress deliveryAddress createdAt updatedAt') // Only select needed fields
+        .select(
+          'jobNumber title status type priority customerId scheduledDate estimatedDuration estimatedCost assignedCrew leadCrew pickupAddress deliveryAddress createdAt updatedAt',
+        ) // Only select needed fields
         .populate('customerId', 'firstName lastName email phone') // Only populate needed customer fields
-        .populate('assignedCrew.crewMemberId', 'firstName lastName profilePicture') // Only populate needed crew fields
+        .populate(
+          'assignedCrew.crewMemberId',
+          'firstName lastName profilePicture',
+        ) // Only populate needed crew fields
         .sort({ scheduledDate: -1 })
         .skip(skip)
         .limit(limit)
@@ -186,13 +204,17 @@ export class JobsService implements OnModuleInit {
         .exec(),
     ]);
 
-    const data = jobs.map(job => this.convertJobDocument(job as any));
+    const data = jobs.map((job) => this.convertJobDocument(job as any));
     const page = Math.floor(skip / limit) + 1;
     const totalPages = Math.ceil(total / limit);
 
     // PERFORMANCE: Cache list results
     const cacheKey = `jobs:list:${JSON.stringify(query)}:${skip}:${limit}`;
-    await this.cacheService.set(cacheKey, { data, pagination: { page, limit, total, totalPages } }, { ttl: 120, tags: ['jobs'] });
+    await this.cacheService.set(
+      cacheKey,
+      { data, pagination: { page, limit, total, totalPages } },
+      { ttl: 120, tags: ['jobs'] },
+    );
 
     return {
       data,
@@ -218,7 +240,11 @@ export class JobsService implements OnModuleInit {
     return job ? this.convertJobDocument(job) : null;
   }
 
-  async update(id: string, updateJobDto: UpdateJobDto, updatedBy: string): Promise<Job> {
+  async update(
+    id: string,
+    updateJobDto: UpdateJobDto,
+    updatedBy: string,
+  ): Promise<Job> {
     // Check if job exists
     const existingJob = await this.jobModel.findById(id).exec();
     if (!existingJob) {
@@ -248,11 +274,13 @@ export class JobsService implements OnModuleInit {
     updateData.lastModifiedBy = updatedBy;
 
     // Use findByIdAndUpdate for atomic update
-    const updatedJob = await this.jobModel.findByIdAndUpdate(
-      id,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    ).exec();
+    const updatedJob = await this.jobModel
+      .findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true },
+      )
+      .exec();
 
     if (!updatedJob) {
       throw new NotFoundException(`Job with ID ${id} not found`);
@@ -271,11 +299,18 @@ export class JobsService implements OnModuleInit {
    *
    * All operations succeed or fail atomically.
    */
-  async updateStatus(id: string, status: Job['status'], updatedBy: string): Promise<Job> {
+  async updateStatus(
+    id: string,
+    status: Job['status'],
+    updatedBy: string,
+  ): Promise<Job> {
     // Use transaction for multi-document operations
     return this.transactionService.withTransaction(async (session) => {
       // 1. Find and update job
-      const existingJob = await this.jobModel.findById(id).session(session).exec();
+      const existingJob = await this.jobModel
+        .findById(id)
+        .session(session)
+        .exec();
       if (!existingJob) {
         throw new NotFoundException(`Job with ID ${id} not found`);
       }
@@ -295,11 +330,13 @@ export class JobsService implements OnModuleInit {
       }
 
       // Atomic update within transaction
-      const updatedJob = await this.jobModel.findByIdAndUpdate(
-        id,
-        { $set: updates },
-        { new: true, runValidators: true, session }
-      ).exec();
+      const updatedJob = await this.jobModel
+        .findByIdAndUpdate(
+          id,
+          { $set: updates },
+          { new: true, runValidators: true, session },
+        )
+        .exec();
 
       if (!updatedJob) {
         throw new NotFoundException(`Job with ID ${id} not found`);
@@ -338,34 +375,44 @@ export class JobsService implements OnModuleInit {
     await this.jobModel.findByIdAndDelete(id).exec();
   }
 
-  async assignCrew(id: string, crewAssignments: Omit<CrewAssignment, 'assignedAt' | 'status'>[], assignedBy: string): Promise<Job> {
+  async assignCrew(
+    id: string,
+    crewAssignments: Omit<CrewAssignment, 'assignedAt' | 'status'>[],
+    assignedBy: string,
+  ): Promise<Job> {
     const existingJob = await this.jobModel.findById(id).exec();
     if (!existingJob) {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
 
     // Prepare new crew assignments
-    const newAssignments: CrewAssignment[] = crewAssignments.map(assignment => ({
-      ...assignment,
-      assignedAt: new Date(),
-      status: 'assigned' as const,
-    }));
+    const newAssignments: CrewAssignment[] = crewAssignments.map(
+      (assignment) => ({
+        ...assignment,
+        assignedAt: new Date(),
+        status: 'assigned' as const,
+      }),
+    );
 
     // Determine lead crew
-    const leadCrew = existingJob.leadCrew || newAssignments.find(c => c.role === 'lead')?.crewMemberId;
+    const leadCrew =
+      existingJob.leadCrew ||
+      newAssignments.find((c) => c.role === 'lead')?.crewMemberId;
 
     // Atomic update using $push to add new crew members
-    const updatedJob = await this.jobModel.findByIdAndUpdate(
-      id,
-      {
-        $push: { assignedCrew: { $each: newAssignments } },
-        $set: {
-          leadCrew,
-          lastModifiedBy: assignedBy
-        }
-      },
-      { new: true, runValidators: true }
-    ).exec();
+    const updatedJob = await this.jobModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: { assignedCrew: { $each: newAssignments } },
+          $set: {
+            leadCrew,
+            lastModifiedBy: assignedBy,
+          },
+        },
+        { new: true, runValidators: true },
+      )
+      .exec();
 
     if (!updatedJob) {
       throw new NotFoundException(`Job with ID ${id} not found`);
@@ -374,22 +421,31 @@ export class JobsService implements OnModuleInit {
     return this.convertJobDocument(updatedJob);
   }
 
-  async updateCrewStatus(id: string, crewMemberId: string, status: CrewAssignment['status'], updatedBy: string): Promise<Job> {
+  async updateCrewStatus(
+    id: string,
+    crewMemberId: string,
+    status: CrewAssignment['status'],
+    updatedBy: string,
+  ): Promise<Job> {
     const job = await this.jobModel.findById(id).exec();
     if (!job) {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
 
     // Find the crew member index
-    const crewIndex = job.assignedCrew.findIndex(crew => crew.crewMemberId === crewMemberId);
+    const crewIndex = job.assignedCrew.findIndex(
+      (crew) => crew.crewMemberId === crewMemberId,
+    );
     if (crewIndex === -1) {
-      throw new NotFoundException(`Crew member ${crewMemberId} not found in job ${id}`);
+      throw new NotFoundException(
+        `Crew member ${crewMemberId} not found in job ${id}`,
+      );
     }
 
     // Build update object for the specific crew member
     const updates: any = {
       [`assignedCrew.${crewIndex}.status`]: status,
-      lastModifiedBy: updatedBy
+      lastModifiedBy: updatedBy,
     };
 
     if (status === 'checked_in') {
@@ -403,17 +459,21 @@ export class JobsService implements OnModuleInit {
       // Calculate hours worked if check-in time exists
       const crew = job.assignedCrew[crewIndex];
       if (crew.checkInTime) {
-        const hoursWorked = (checkOutTime.getTime() - crew.checkInTime.getTime()) / (1000 * 60 * 60);
+        const hoursWorked =
+          (checkOutTime.getTime() - crew.checkInTime.getTime()) /
+          (1000 * 60 * 60);
         updates[`assignedCrew.${crewIndex}.hoursWorked`] = hoursWorked;
       }
     }
 
     // Atomic update
-    const updatedJob = await this.jobModel.findByIdAndUpdate(
-      id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).exec();
+    const updatedJob = await this.jobModel
+      .findByIdAndUpdate(
+        id,
+        { $set: updates },
+        { new: true, runValidators: true },
+      )
+      .exec();
 
     if (!updatedJob) {
       throw new NotFoundException(`Job with ID ${id} not found`);
@@ -422,7 +482,11 @@ export class JobsService implements OnModuleInit {
     return this.convertJobDocument(updatedJob);
   }
 
-  async addNote(id: string, note: Omit<InternalNote, 'id' | 'createdAt'>, addedBy: string): Promise<Job> {
+  async addNote(
+    id: string,
+    note: Omit<InternalNote, 'id' | 'createdAt'>,
+    addedBy: string,
+  ): Promise<Job> {
     const newNote: InternalNote = {
       ...note,
       id: this.generateId(),
@@ -431,14 +495,16 @@ export class JobsService implements OnModuleInit {
     };
 
     // Atomic update using $push
-    const updatedJob = await this.jobModel.findByIdAndUpdate(
-      id,
-      {
-        $push: { internalNotes: newNote },
-        $set: { lastModifiedBy: addedBy }
-      },
-      { new: true, runValidators: true }
-    ).exec();
+    const updatedJob = await this.jobModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: { internalNotes: newNote },
+          $set: { lastModifiedBy: addedBy },
+        },
+        { new: true, runValidators: true },
+      )
+      .exec();
 
     if (!updatedJob) {
       throw new NotFoundException(`Job with ID ${id} not found`);
@@ -447,22 +513,31 @@ export class JobsService implements OnModuleInit {
     return this.convertJobDocument(updatedJob);
   }
 
-  async updateMilestone(id: string, milestoneId: string, status: JobMilestone['status'], completedBy?: string): Promise<Job> {
+  async updateMilestone(
+    id: string,
+    milestoneId: string,
+    status: JobMilestone['status'],
+    completedBy?: string,
+  ): Promise<Job> {
     const job = await this.jobModel.findById(id).exec();
     if (!job) {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
 
     // Find milestone index
-    const milestoneIndex = job.milestones.findIndex(m => m.id === milestoneId);
+    const milestoneIndex = job.milestones.findIndex(
+      (m) => m.id === milestoneId,
+    );
     if (milestoneIndex === -1) {
-      throw new NotFoundException(`Milestone ${milestoneId} not found in job ${id}`);
+      throw new NotFoundException(
+        `Milestone ${milestoneId} not found in job ${id}`,
+      );
     }
 
     // Build update object
     const updates: any = {
       [`milestones.${milestoneIndex}.status`]: status,
-      lastModifiedBy: completedBy || 'system'
+      lastModifiedBy: completedBy || 'system',
     };
 
     if (status === 'completed') {
@@ -473,11 +548,13 @@ export class JobsService implements OnModuleInit {
     }
 
     // Atomic update
-    const updatedJob = await this.jobModel.findByIdAndUpdate(
-      id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).exec();
+    const updatedJob = await this.jobModel
+      .findByIdAndUpdate(
+        id,
+        { $set: updates },
+        { new: true, runValidators: true },
+      )
+      .exec();
 
     if (!updatedJob) {
       throw new NotFoundException(`Job with ID ${id} not found`);
@@ -504,38 +581,79 @@ export class JobsService implements OnModuleInit {
       inProgressCount,
       overdueCount,
       durationStats,
-      revenueStats
+      revenueStats,
     ] = await Promise.all([
       this.jobModel.countDocuments().exec(),
-      this.jobModel.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]).exec(),
-      this.jobModel.aggregate([{ $group: { _id: '$type', count: { $sum: 1 } } }]).exec(),
-      this.jobModel.aggregate([{ $group: { _id: '$priority', count: { $sum: 1 } } }]).exec(),
-      this.jobModel.countDocuments({ scheduledDate: { $gte: today, $lt: tomorrow } }).exec(),
-      this.jobModel.countDocuments({ scheduledDate: { $gte: weekStart } }).exec(),
+      this.jobModel
+        .aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }])
+        .exec(),
+      this.jobModel
+        .aggregate([{ $group: { _id: '$type', count: { $sum: 1 } } }])
+        .exec(),
+      this.jobModel
+        .aggregate([{ $group: { _id: '$priority', count: { $sum: 1 } } }])
+        .exec(),
+      this.jobModel
+        .countDocuments({ scheduledDate: { $gte: today, $lt: tomorrow } })
+        .exec(),
+      this.jobModel
+        .countDocuments({ scheduledDate: { $gte: weekStart } })
+        .exec(),
       this.jobModel.countDocuments({ status: 'in_progress' }).exec(),
-      this.jobModel.countDocuments({
-        scheduledDate: { $lt: today },
-        status: { $nin: ['completed', 'cancelled'] }
-      }).exec(),
-      this.jobModel.aggregate([
-        { $match: { actualStartTime: { $exists: true }, actualEndTime: { $exists: true } } },
-        {
-          $project: {
-            duration: {
-              $divide: [{ $subtract: ['$actualEndTime', '$actualStartTime'] }, 1000 * 60 * 60]
-            }
-          }
-        },
-        { $group: { _id: null, avgDuration: { $avg: '$duration' }, count: { $sum: 1 } } }
-      ]).exec(),
-      this.jobModel.aggregate([
-        {
-          $project: {
-            revenue: { $ifNull: ['$actualCost', { $cond: [{ $eq: ['$status', 'completed'] }, '$estimatedCost', 0] }] }
-          }
-        },
-        { $group: { _id: null, totalRevenue: { $sum: '$revenue' } } }
-      ]).exec()
+      this.jobModel
+        .countDocuments({
+          scheduledDate: { $lt: today },
+          status: { $nin: ['completed', 'cancelled'] },
+        })
+        .exec(),
+      this.jobModel
+        .aggregate([
+          {
+            $match: {
+              actualStartTime: { $exists: true },
+              actualEndTime: { $exists: true },
+            },
+          },
+          {
+            $project: {
+              duration: {
+                $divide: [
+                  { $subtract: ['$actualEndTime', '$actualStartTime'] },
+                  1000 * 60 * 60,
+                ],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              avgDuration: { $avg: '$duration' },
+              count: { $sum: 1 },
+            },
+          },
+        ])
+        .exec(),
+      this.jobModel
+        .aggregate([
+          {
+            $project: {
+              revenue: {
+                $ifNull: [
+                  '$actualCost',
+                  {
+                    $cond: [
+                      { $eq: ['$status', 'completed'] },
+                      '$estimatedCost',
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+          { $group: { _id: null, totalRevenue: { $sum: '$revenue' } } },
+        ])
+        .exec(),
     ]);
 
     const stats: JobStats = {
@@ -552,30 +670,42 @@ export class JobsService implements OnModuleInit {
     };
 
     // Convert aggregation results
-    statusCounts.forEach(({ _id, count }) => { stats.byStatus[_id] = count; });
-    typeCounts.forEach(({ _id, count }) => { stats.byType[_id] = count; });
-    priorityCounts.forEach(({ _id, count }) => { stats.byPriority[_id] = count; });
+    statusCounts.forEach(({ _id, count }) => {
+      stats.byStatus[_id] = count;
+    });
+    typeCounts.forEach(({ _id, count }) => {
+      stats.byType[_id] = count;
+    });
+    priorityCounts.forEach(({ _id, count }) => {
+      stats.byPriority[_id] = count;
+    });
 
     return stats;
   }
 
   async getJobsByDate(date: Date): Promise<Job[]> {
-    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const startOfDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
     const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
     const jobs = await this.jobModel
       .find({
-        scheduledDate: { $gte: startOfDay, $lt: endOfDay }
+        scheduledDate: { $gte: startOfDay, $lt: endOfDay },
       })
       .sort({ scheduledStartTime: 1 })
       .lean()
       .exec();
 
-    return jobs.map(job => this.convertJobDocument(job as any));
+    return jobs.map((job) => this.convertJobDocument(job as any));
   }
 
   private generateId(): string {
-    return 'job_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    return (
+      'job_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36)
+    );
   }
 
   private generateJobNumber(): string {
@@ -637,10 +767,10 @@ export class JobsService implements OnModuleInit {
         name: 'Job Completed',
         description: 'Job finished and signed off',
         status: 'pending',
-      }
+      },
     );
 
-    return baseMilestones.map(milestone => ({
+    return baseMilestones.map((milestone) => ({
       ...milestone,
       id: this.generateId(),
     }));

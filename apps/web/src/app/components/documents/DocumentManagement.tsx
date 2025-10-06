@@ -17,7 +17,9 @@ export function DocumentManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+    null,
+  );
   const [showUpload, setShowUpload] = useState(false);
   const [showViewer, setShowViewer] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
@@ -48,8 +50,10 @@ export function DocumentManagement() {
 
       const queryParams = new URLSearchParams();
       if (filters.search) queryParams.append('search', filters.search);
-      if (filters.documentType) queryParams.append('documentType', filters.documentType);
-      if (filters.entityType) queryParams.append('entityType', filters.entityType);
+      if (filters.documentType)
+        queryParams.append('documentType', filters.documentType);
+      if (filters.entityType)
+        queryParams.append('entityType', filters.entityType);
 
       const response = await fetch(
         `${getApiUrl('documents')}?${queryParams.toString()}`,
@@ -57,7 +61,7 @@ export function DocumentManagement() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) throw new Error('Failed to fetch documents');
@@ -66,11 +70,14 @@ export function DocumentManagement() {
       setDocuments(data);
 
       // Calculate stats
-      const totalSize = data.reduce((sum: number, doc: Document) => sum + doc.size, 0);
+      const totalSize = data.reduce(
+        (sum: number, doc: Document) => sum + doc.size,
+        0,
+      );
       const now = new Date();
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       const recentUploads = data.filter(
-        (doc: Document) => new Date(doc.uploadedAt) > sevenDaysAgo
+        (doc: Document) => new Date(doc.uploadedAt) > sevenDaysAgo,
       ).length;
 
       setStats({
@@ -93,11 +100,14 @@ export function DocumentManagement() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('Not authenticated');
 
-      const response = await fetch(getApiUrl(`documents/${document.id}/download`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`documents/${document.id}/download`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) throw new Error('Download failed');
 
@@ -215,7 +225,9 @@ export function DocumentManagement() {
         <div className={styles.statCard}>
           <div className={styles.statIcon}>💾</div>
           <div className={styles.statContent}>
-            <p className={styles.statValue}>{formatFileSize(stats.totalSize)}</p>
+            <p className={styles.statValue}>
+              {formatFileSize(stats.totalSize)}
+            </p>
             <p className={styles.statLabel}>Storage Used</p>
           </div>
         </div>
@@ -346,7 +358,9 @@ export function DocumentManagement() {
                   {doc.originalName}
                 </h3>
                 <div className={styles.documentMeta}>
-                  <span className={styles.documentType}>{doc.documentType}</span>
+                  <span className={styles.documentType}>
+                    {doc.documentType}
+                  </span>
                   <span className={styles.documentSize}>
                     {formatFileSize(doc.size)}
                   </span>

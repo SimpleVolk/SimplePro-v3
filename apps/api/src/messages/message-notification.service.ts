@@ -10,7 +10,10 @@ export class MessageNotificationService {
     // For now, this is a placeholder for future integration
   }
 
-  async sendMessageNotification(message: Message, recipients: string[]): Promise<void> {
+  async sendMessageNotification(
+    message: Message,
+    recipients: string[],
+  ): Promise<void> {
     try {
       // TODO: Integrate with NotificationsModule when available
       // This would:
@@ -19,7 +22,7 @@ export class MessageNotificationService {
       // 3. Optionally send email for missed messages after a delay
 
       this.logger.debug(
-        `Would send notification for message ${(message as any)._id} to ${recipients.length} recipients`
+        `Would send notification for message ${(message as any)._id} to ${recipients.length} recipients`,
       );
 
       // Placeholder implementation
@@ -27,30 +30,43 @@ export class MessageNotificationService {
         this.logger.debug(`Notification queued for user ${recipientId}`);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to send message notification: ${errorMessage}`);
       // Don't throw - notifications are non-critical
     }
   }
 
-  async sendReadReceiptNotification(messageId: string, _senderId: string, readBy: string): Promise<void> {
+  async sendReadReceiptNotification(
+    messageId: string,
+    _senderId: string,
+    readBy: string,
+  ): Promise<void> {
     try {
       this.logger.debug(`Read receipt: Message ${messageId} read by ${readBy}`);
       // Placeholder for future implementation
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
-      this.logger.error(`Failed to send read receipt notification: ${errorMessage}`);
+      this.logger.error(
+        `Failed to send read receipt notification: ${errorMessage}`,
+      );
     }
   }
 
-  async sendTypingNotification(threadId: string, userId: string, _recipients: string[]): Promise<void> {
+  async sendTypingNotification(
+    threadId: string,
+    userId: string,
+    _recipients: string[],
+  ): Promise<void> {
     try {
       this.logger.debug(`User ${userId} is typing in thread ${threadId}`);
       // Placeholder for future implementation
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to send typing notification: ${errorMessage}`);
     }

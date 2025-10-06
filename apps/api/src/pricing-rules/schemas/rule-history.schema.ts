@@ -11,8 +11,16 @@ export class RuleHistory {
   @Prop({
     required: true,
     type: String,
-    enum: ['created', 'updated', 'deleted', 'activated', 'deactivated', 'imported', 'exported'],
-    index: true
+    enum: [
+      'created',
+      'updated',
+      'deleted',
+      'activated',
+      'deactivated',
+      'imported',
+      'exported',
+    ],
+    index: true,
   })
   action!: string;
 

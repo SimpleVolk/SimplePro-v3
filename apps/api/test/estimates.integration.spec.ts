@@ -95,9 +95,27 @@ describe('Estimates Integration Tests', () => {
             distance: 500, // 500 miles
           },
           inventory: [
-            { name: 'Grand Piano', category: 'Specialty', weight: 800, volume: 100, specialHandling: true },
-            { name: 'Antique Furniture Set', category: 'Furniture', weight: 1200, volume: 300, specialHandling: true },
-            { name: 'Household Items', category: 'General', weight: 6000, volume: 800, specialHandling: false },
+            {
+              name: 'Grand Piano',
+              category: 'Specialty',
+              weight: 800,
+              volume: 100,
+              specialHandling: true,
+            },
+            {
+              name: 'Antique Furniture Set',
+              category: 'Furniture',
+              weight: 1200,
+              volume: 300,
+              specialHandling: true,
+            },
+            {
+              name: 'Household Items',
+              category: 'General',
+              weight: 6000,
+              volume: 800,
+              specialHandling: false,
+            },
           ],
           additionalServices: ['packing', 'assembly', 'storage'],
         });
@@ -113,9 +131,19 @@ describe('Estimates Integration Tests', () => {
         expect(estimate.calculations.finalPrice).toBeGreaterThan(3000);
 
         // Should have weekend and long distance rules applied
-        const appliedRuleNames = estimate.calculations.appliedRules.map((rule: any) => rule.ruleName);
-        expect(appliedRuleNames.some((name: string) => name.toLowerCase().includes('weekend'))).toBe(true);
-        expect(appliedRuleNames.some((name: string) => name.toLowerCase().includes('distance'))).toBe(true);
+        const appliedRuleNames = estimate.calculations.appliedRules.map(
+          (rule: any) => rule.ruleName,
+        );
+        expect(
+          appliedRuleNames.some((name: string) =>
+            name.toLowerCase().includes('weekend'),
+          ),
+        ).toBe(true);
+        expect(
+          appliedRuleNames.some((name: string) =>
+            name.toLowerCase().includes('distance'),
+          ),
+        ).toBe(true);
       });
 
       it('should calculate estimate for packing-only service', async () => {
@@ -144,7 +172,7 @@ describe('Estimates Integration Tests', () => {
 
         // Should have packing-specific rules
         const serviceTypeRules = estimate.calculations.appliedRules.filter(
-          (rule: any) => rule.ruleName.toLowerCase().includes('packing')
+          (rule: any) => rule.ruleName.toLowerCase().includes('packing'),
         );
         expect(serviceTypeRules.length).toBeGreaterThan(0);
       });
@@ -174,7 +202,7 @@ describe('Estimates Integration Tests', () => {
 
         // Should have storage-related rules applied
         const storageRules = estimate.calculations.appliedRules.filter(
-          (rule: any) => rule.ruleName.toLowerCase().includes('storage')
+          (rule: any) => rule.ruleName.toLowerCase().includes('storage'),
         );
         expect(storageRules.length).toBeGreaterThan(0);
       });
@@ -234,10 +262,12 @@ describe('Estimates Integration Tests', () => {
       expect(stairsPrice).toBeGreaterThan(basePrice);
 
       // Check for stairs-related handicaps in applied rules
-      const stairsRules = stairsResponse.body.estimate.calculations.appliedRules.filter(
-        (rule: any) => rule.ruleName.toLowerCase().includes('stairs') ||
-                      rule.ruleName.toLowerCase().includes('floor')
-      );
+      const stairsRules =
+        stairsResponse.body.estimate.calculations.appliedRules.filter(
+          (rule: any) =>
+            rule.ruleName.toLowerCase().includes('stairs') ||
+            rule.ruleName.toLowerCase().includes('floor'),
+        );
       expect(stairsRules.length).toBeGreaterThan(0);
     });
 
@@ -321,11 +351,12 @@ describe('Estimates Integration Tests', () => {
       const estimate = response.body.estimate;
 
       // Should have multiple handicap rules applied
-      const handicapRules = estimate.calculations.appliedRules.filter((rule: any) =>
-        rule.ruleName.toLowerCase().includes('difficult') ||
-        rule.ruleName.toLowerCase().includes('stairs') ||
-        rule.ruleName.toLowerCase().includes('parking') ||
-        rule.ruleName.toLowerCase().includes('floor')
+      const handicapRules = estimate.calculations.appliedRules.filter(
+        (rule: any) =>
+          rule.ruleName.toLowerCase().includes('difficult') ||
+          rule.ruleName.toLowerCase().includes('stairs') ||
+          rule.ruleName.toLowerCase().includes('parking') ||
+          rule.ruleName.toLowerCase().includes('floor'),
       );
 
       expect(handicapRules.length).toBeGreaterThan(2);
@@ -336,9 +367,27 @@ describe('Estimates Integration Tests', () => {
     it('should handle piano moves with special pricing', async () => {
       const pianoMove = TestDataFactories.createEstimateData({
         inventory: [
-          { name: 'Grand Piano', category: 'Specialty', weight: 800, volume: 120, specialHandling: true },
-          { name: 'Piano Bench', category: 'Furniture', weight: 50, volume: 10, specialHandling: false },
-          { name: 'Household Items', category: 'General', weight: 2000, volume: 300, specialHandling: false },
+          {
+            name: 'Grand Piano',
+            category: 'Specialty',
+            weight: 800,
+            volume: 120,
+            specialHandling: true,
+          },
+          {
+            name: 'Piano Bench',
+            category: 'Furniture',
+            weight: 50,
+            volume: 10,
+            specialHandling: false,
+          },
+          {
+            name: 'Household Items',
+            category: 'General',
+            weight: 2000,
+            volume: 300,
+            specialHandling: false,
+          },
         ],
         moveDetails: {
           serviceType: 'local',
@@ -363,10 +412,11 @@ describe('Estimates Integration Tests', () => {
       expect(estimate.calculations.finalPrice).toBeGreaterThan(1000);
 
       // Should have piano-specific rules
-      const pianoRules = estimate.calculations.appliedRules.filter((rule: any) =>
-        rule.ruleName.toLowerCase().includes('piano') ||
-        rule.ruleName.toLowerCase().includes('specialty') ||
-        rule.ruleName.toLowerCase().includes('heavy')
+      const pianoRules = estimate.calculations.appliedRules.filter(
+        (rule: any) =>
+          rule.ruleName.toLowerCase().includes('piano') ||
+          rule.ruleName.toLowerCase().includes('specialty') ||
+          rule.ruleName.toLowerCase().includes('heavy'),
       );
       expect(pianoRules.length).toBeGreaterThan(0);
     });
@@ -374,10 +424,34 @@ describe('Estimates Integration Tests', () => {
     it('should calculate estimates for antique and artwork moves', async () => {
       const antiqueMove = TestDataFactories.createEstimateData({
         inventory: [
-          { name: 'Antique Armoire', category: 'Antiques', weight: 400, volume: 80, specialHandling: true },
-          { name: 'Oil Paintings', category: 'Artwork', weight: 50, volume: 20, specialHandling: true },
-          { name: 'Ming Vase Collection', category: 'Antiques', weight: 30, volume: 15, specialHandling: true },
-          { name: 'Regular Furniture', category: 'Furniture', weight: 1500, volume: 200, specialHandling: false },
+          {
+            name: 'Antique Armoire',
+            category: 'Antiques',
+            weight: 400,
+            volume: 80,
+            specialHandling: true,
+          },
+          {
+            name: 'Oil Paintings',
+            category: 'Artwork',
+            weight: 50,
+            volume: 20,
+            specialHandling: true,
+          },
+          {
+            name: 'Ming Vase Collection',
+            category: 'Antiques',
+            weight: 30,
+            volume: 15,
+            specialHandling: true,
+          },
+          {
+            name: 'Regular Furniture',
+            category: 'Furniture',
+            weight: 1500,
+            volume: 200,
+            specialHandling: false,
+          },
         ],
         additionalServices: ['packing', 'assembly'],
       });
@@ -392,11 +466,12 @@ describe('Estimates Integration Tests', () => {
       const estimate = response.body.estimate;
 
       // Antique moves should include special handling charges
-      const specialHandlingRules = estimate.calculations.appliedRules.filter((rule: any) =>
-        rule.ruleName.toLowerCase().includes('antique') ||
-        rule.ruleName.toLowerCase().includes('artwork') ||
-        rule.ruleName.toLowerCase().includes('special') ||
-        rule.ruleName.toLowerCase().includes('fragile')
+      const specialHandlingRules = estimate.calculations.appliedRules.filter(
+        (rule: any) =>
+          rule.ruleName.toLowerCase().includes('antique') ||
+          rule.ruleName.toLowerCase().includes('artwork') ||
+          rule.ruleName.toLowerCase().includes('special') ||
+          rule.ruleName.toLowerCase().includes('fragile'),
       );
       expect(specialHandlingRules.length).toBeGreaterThan(0);
     });
@@ -404,10 +479,34 @@ describe('Estimates Integration Tests', () => {
     it('should handle large appliance moves', async () => {
       const applianceMove = TestDataFactories.createEstimateData({
         inventory: [
-          { name: 'Sub-Zero Refrigerator', category: 'Appliances', weight: 400, volume: 60, specialHandling: true },
-          { name: 'Commercial Washer/Dryer', category: 'Appliances', weight: 600, volume: 80, specialHandling: true },
-          { name: 'Wine Cellar Unit', category: 'Appliances', weight: 300, volume: 40, specialHandling: true },
-          { name: 'Household Items', category: 'General', weight: 2000, volume: 300, specialHandling: false },
+          {
+            name: 'Sub-Zero Refrigerator',
+            category: 'Appliances',
+            weight: 400,
+            volume: 60,
+            specialHandling: true,
+          },
+          {
+            name: 'Commercial Washer/Dryer',
+            category: 'Appliances',
+            weight: 600,
+            volume: 80,
+            specialHandling: true,
+          },
+          {
+            name: 'Wine Cellar Unit',
+            category: 'Appliances',
+            weight: 300,
+            volume: 40,
+            specialHandling: true,
+          },
+          {
+            name: 'Household Items',
+            category: 'General',
+            weight: 2000,
+            volume: 300,
+            specialHandling: false,
+          },
         ],
         moveDetails: {
           serviceType: 'local',
@@ -429,10 +528,11 @@ describe('Estimates Integration Tests', () => {
       const estimate = response.body.estimate;
 
       // Should account for heavy appliances
-      const applianceRules = estimate.calculations.appliedRules.filter((rule: any) =>
-        rule.ruleName.toLowerCase().includes('appliance') ||
-        rule.ruleName.toLowerCase().includes('heavy') ||
-        rule.ruleName.toLowerCase().includes('weight')
+      const applianceRules = estimate.calculations.appliedRules.filter(
+        (rule: any) =>
+          rule.ruleName.toLowerCase().includes('appliance') ||
+          rule.ruleName.toLowerCase().includes('heavy') ||
+          rule.ruleName.toLowerCase().includes('weight'),
       );
       expect(applianceRules.length).toBeGreaterThan(0);
     });
@@ -452,12 +552,48 @@ describe('Estimates Integration Tests', () => {
         },
         additionalServices: ['packing', 'assembly', 'storage', 'cleaning'],
         inventory: [
-          { name: 'Living Room Set', category: 'Furniture', weight: 800, volume: 150, specialHandling: false },
-          { name: 'Bedroom Sets (3)', category: 'Furniture', weight: 1200, volume: 250, specialHandling: false },
-          { name: 'Kitchen Items', category: 'General', weight: 1000, volume: 200, specialHandling: false },
-          { name: 'Electronics', category: 'Electronics', weight: 300, volume: 80, specialHandling: true },
-          { name: 'Books and Documents', category: 'General', weight: 500, volume: 100, specialHandling: false },
-          { name: 'Artwork and Decor', category: 'Artwork', weight: 200, volume: 120, specialHandling: true },
+          {
+            name: 'Living Room Set',
+            category: 'Furniture',
+            weight: 800,
+            volume: 150,
+            specialHandling: false,
+          },
+          {
+            name: 'Bedroom Sets (3)',
+            category: 'Furniture',
+            weight: 1200,
+            volume: 250,
+            specialHandling: false,
+          },
+          {
+            name: 'Kitchen Items',
+            category: 'General',
+            weight: 1000,
+            volume: 200,
+            specialHandling: false,
+          },
+          {
+            name: 'Electronics',
+            category: 'Electronics',
+            weight: 300,
+            volume: 80,
+            specialHandling: true,
+          },
+          {
+            name: 'Books and Documents',
+            category: 'General',
+            weight: 500,
+            volume: 100,
+            specialHandling: false,
+          },
+          {
+            name: 'Artwork and Decor',
+            category: 'Artwork',
+            weight: 200,
+            volume: 120,
+            specialHandling: true,
+          },
         ],
       });
 
@@ -474,10 +610,16 @@ describe('Estimates Integration Tests', () => {
       expect(estimate.calculations.finalPrice).toBeGreaterThan(4000);
 
       // Should have rules for all services
-      const serviceTypes = ['packing', 'assembly', 'storage', 'weekend', 'distance'];
-      serviceTypes.forEach(service => {
-        const hasService = estimate.calculations.appliedRules.some((rule: any) =>
-          rule.ruleName.toLowerCase().includes(service)
+      const serviceTypes = [
+        'packing',
+        'assembly',
+        'storage',
+        'weekend',
+        'distance',
+      ];
+      serviceTypes.forEach((service) => {
+        const hasService = estimate.calculations.appliedRules.some(
+          (rule: any) => rule.ruleName.toLowerCase().includes(service),
         );
         expect(hasService).toBe(true);
       });
@@ -664,13 +806,13 @@ describe('Estimates Integration Tests', () => {
 
       // All calculations should have the same final price
       const firstPrice = calculations[0].calculations.finalPrice;
-      calculations.forEach(calc => {
+      calculations.forEach((calc) => {
         expect(calc.calculations.finalPrice).toBe(firstPrice);
       });
 
       // All calculations should have the same hash
       const firstHash = calculations[0].metadata.hash;
-      calculations.forEach(calc => {
+      calculations.forEach((calc) => {
         expect(calc.metadata.hash).toBe(firstHash);
       });
     });
@@ -754,7 +896,7 @@ describe('Estimates Integration Tests', () => {
       expect(breakdown).toHaveProperty('total');
 
       // All breakdown values should be numbers
-      Object.values(breakdown).forEach(value => {
+      Object.values(breakdown).forEach((value) => {
         expect(typeof value).toBe('number');
         expect(value).toBeGreaterThanOrEqual(0);
       });
@@ -778,9 +920,9 @@ describe('Estimates Integration Tests', () => {
 
       // Should have rules for each additional service
       const serviceRules = appliedRules.filter((rule: any) =>
-        ['packing', 'assembly', 'storage'].some(service =>
-          rule.ruleName.toLowerCase().includes(service)
-        )
+        ['packing', 'assembly', 'storage'].some((service) =>
+          rule.ruleName.toLowerCase().includes(service),
+        ),
       );
 
       expect(serviceRules.length).toBeGreaterThan(0);
@@ -795,21 +937,23 @@ describe('Estimates Integration Tests', () => {
       const promises = Array.from({ length: 10 }, () =>
         request(app.getHttpServer())
           .post('/estimates/calculate')
-          .send(estimateData)
+          .send(estimateData),
       );
 
       const responses = await Promise.all(promises);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
         ResponseAssertions.assertSuccessResponse(response);
-        expect(response.body.estimate.calculations.finalPrice).toBeGreaterThan(0);
+        expect(response.body.estimate.calculations.finalPrice).toBeGreaterThan(
+          0,
+        );
       });
 
       // All should produce identical results (deterministic)
       const firstPrice = responses[0].body.estimate.calculations.finalPrice;
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.body.estimate.calculations.finalPrice).toBe(firstPrice);
       });
     }, 15000);
@@ -857,7 +1001,9 @@ describe('Estimates Integration Tests', () => {
       const endTime = Date.now();
 
       ResponseAssertions.assertSuccessResponse(response);
-      expect(response.body.estimate.calculations.finalPrice).toBeGreaterThan(5000);
+      expect(response.body.estimate.calculations.finalPrice).toBeGreaterThan(
+        5000,
+      );
 
       // Should complete in reasonable time (less than 2 seconds)
       expect(endTime - startTime).toBeLessThan(2000);
@@ -866,13 +1012,21 @@ describe('Estimates Integration Tests', () => {
     it('should maintain accuracy under load', async () => {
       const testScenarios = [
         { serviceType: 'local', weight: 2000, expectedRange: [500, 1500] },
-        { serviceType: 'long_distance', weight: 5000, expectedRange: [2000, 8000] },
+        {
+          serviceType: 'long_distance',
+          weight: 5000,
+          expectedRange: [2000, 8000],
+        },
         { serviceType: 'storage', weight: 3000, expectedRange: [800, 2500] },
-        { serviceType: 'packing_only', weight: 1500, expectedRange: [300, 1200] },
+        {
+          serviceType: 'packing_only',
+          weight: 1500,
+          expectedRange: [300, 1200],
+        },
       ];
 
       const results = await Promise.all(
-        testScenarios.map(async scenario => {
+        testScenarios.map(async (scenario) => {
           const estimateData = TestDataFactories.createEstimateData({
             moveDetails: {
               serviceType: scenario.serviceType,
@@ -891,11 +1045,11 @@ describe('Estimates Integration Tests', () => {
             scenario,
             price: response.body.estimate.calculations.finalPrice,
           };
-        })
+        }),
       );
 
       // Verify all prices are within expected ranges
-      results.forEach(result => {
+      results.forEach((result) => {
         const [min, max] = result.scenario.expectedRange;
         expect(result.price).toBeGreaterThanOrEqual(min);
         expect(result.price).toBeLessThanOrEqual(max);
@@ -956,7 +1110,9 @@ describe('Estimates Integration Tests', () => {
 
       // Rules should be ordered by priority
       for (let i = 1; i < appliedRules.length; i++) {
-        expect(appliedRules[i].priority).toBeGreaterThanOrEqual(appliedRules[i - 1].priority);
+        expect(appliedRules[i].priority).toBeGreaterThanOrEqual(
+          appliedRules[i - 1].priority,
+        );
       }
     });
 
@@ -971,7 +1127,10 @@ describe('Estimates Integration Tests', () => {
       const estimate = response.body.estimate;
 
       expect(estimate.metadata).toHaveProperty('methodology');
-      expect(estimate.metadata.methodology).toHaveProperty('engine', 'DeterministicEstimator');
+      expect(estimate.metadata.methodology).toHaveProperty(
+        'engine',
+        'DeterministicEstimator',
+      );
       expect(estimate.metadata.methodology).toHaveProperty('version');
       expect(estimate.metadata.methodology).toHaveProperty('rulesVersion');
     });

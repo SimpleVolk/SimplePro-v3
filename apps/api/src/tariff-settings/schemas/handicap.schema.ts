@@ -20,14 +20,14 @@ export class Handicap {
     required: true,
     type: String,
     enum: Object.values(HandicapCategory),
-    index: true
+    index: true,
   })
   category!: HandicapCategory;
 
   @Prop({
     required: true,
     type: String,
-    enum: ['fixed_fee', 'percentage', 'per_unit']
+    enum: ['fixed_fee', 'percentage', 'per_unit'],
   })
   type!: 'fixed_fee' | 'percentage' | 'per_unit';
 
@@ -44,7 +44,7 @@ export class Handicap {
     type: [String],
     required: true,
     enum: ['pickup', 'delivery', 'both'],
-    default: ['both']
+    default: ['both'],
   })
   appliesTo!: ('pickup' | 'delivery' | 'both')[];
 

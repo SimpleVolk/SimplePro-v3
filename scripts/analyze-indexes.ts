@@ -31,7 +31,9 @@ interface CollectionIndexReport {
 }
 
 async function connectToDatabase() {
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://admin:password123@localhost:27017/simplepro?authSource=admin';
+  const mongoUri =
+    process.env.MONGODB_URI ||
+    'mongodb://admin:password123@localhost:27017/simplepro?authSource=admin';
 
   try {
     await mongoose.connect(mongoUri);
@@ -42,7 +44,9 @@ async function connectToDatabase() {
   }
 }
 
-async function analyzeCollectionIndexes(collectionName: string): Promise<CollectionIndexReport> {
+async function analyzeCollectionIndexes(
+  collectionName: string,
+): Promise<CollectionIndexReport> {
   const db = mongoose.connection.db;
   if (!db) {
     throw new Error('Database connection not established');
@@ -63,7 +67,10 @@ async function analyzeCollectionIndexes(collectionName: string): Promise<Collect
       since: stat.accesses?.since || new Date(),
     }));
   } catch (error) {
-    console.warn(`Could not get index stats for ${collectionName}:`, (error as Error).message);
+    console.warn(
+      `Could not get index stats for ${collectionName}:`,
+      (error as Error).message,
+    );
     indexStats = indexes.map((idx: any) => ({
       name: idx.name,
       keys: idx.key,
@@ -79,47 +86,60 @@ async function analyzeCollectionIndexes(collectionName: string): Promise<Collect
 
   // Analyze indexes
   const unusedIndexes = indexStats
-    .filter(idx => idx.accesses === 0 && idx.name !== '_id_')
-    .map(idx => idx.name);
+    .filter((idx) => idx.accesses === 0 && idx.name !== '_id_')
+    .map((idx) => idx.name);
 
   // Generate recommendations
   const recommendations: string[] = [];
 
   // Check for unused indexes
   if (unusedIndexes.length > 0) {
-    recommendations.push(`${unusedIndexes.length} unused indexes found. Consider removing: ${unusedIndexes.join(', ')}`);
+    recommendations.push(
+      `${unusedIndexes.length} unused indexes found. Consider removing: ${unusedIndexes.join(', ')}`,
+    );
   }
 
   // Check for too many indexes
   if (indexes.length > 15) {
-    recommendations.push(`High index count (${indexes.length}). Each index slows down writes by ~${(indexes.length * 1.5).toFixed(1)}%`);
+    recommendations.push(
+      `High index count (${indexes.length}). Each index slows down writes by ~${(indexes.length * 1.5).toFixed(1)}%`,
+    );
   }
 
   // Check for duplicate or overlapping compound indexes
-  const compoundIndexes = indexes.filter((idx: any) => Object.keys(idx.key).length > 1);
-  const singleFieldIndexes = indexes.filter((idx: any) => Object.keys(idx.key).length === 1);
+  const compoundIndexes = indexes.filter(
+    (idx: any) => Object.keys(idx.key).length > 1,
+  );
+  const singleFieldIndexes = indexes.filter(
+    (idx: any) => Object.keys(idx.key).length === 1,
+  );
 
   for (const compound of compoundIndexes) {
     const firstField = Object.keys(compound.key)[0];
-    const hasSingleFieldIndex = singleFieldIndexes.some((single: any) =>
-      Object.keys(single.key)[0] === firstField
+    const hasSingleFieldIndex = singleFieldIndexes.some(
+      (single: any) => Object.keys(single.key)[0] === firstField,
     );
 
     if (hasSingleFieldIndex && compound.name !== '_id_') {
-      recommendations.push(`Compound index ${compound.name} may make single-field index on '${firstField}' redundant`);
+      recommendations.push(
+        `Compound index ${compound.name} may make single-field index on '${firstField}' redundant`,
+      );
     }
   }
 
   // Check for low access indexes relative to document count
   const lowAccessThreshold = Math.max(10, documentCount * 0.001); // 0.1% of documents
-  const lowAccessIndexes = indexStats.filter(idx =>
-    idx.accesses > 0 &&
-    idx.accesses < lowAccessThreshold &&
-    idx.name !== '_id_'
+  const lowAccessIndexes = indexStats.filter(
+    (idx) =>
+      idx.accesses > 0 &&
+      idx.accesses < lowAccessThreshold &&
+      idx.name !== '_id_',
   );
 
   if (lowAccessIndexes.length > 0) {
-    recommendations.push(`${lowAccessIndexes.length} indexes with very low usage (<${lowAccessThreshold.toFixed(0)} accesses). Review: ${lowAccessIndexes.map(i => i.name).join(', ')}`);
+    recommendations.push(
+      `${lowAccessIndexes.length} indexes with very low usage (<${lowAccessThreshold.toFixed(0)} accesses). Review: ${lowAccessIndexes.map((i) => i.name).join(', ')}`,
+    );
   }
 
   return {
@@ -164,23 +184,33 @@ async function analyzeAllIndexes() {
       // Print report
       console.log(`\n--- ${report.collection} ---`);
       console.log(`Documents: ${report.documentCount.toLocaleString()}`);
-      console.log(`Indexes: ${report.totalIndexes} (${report.unusedIndexes.length} unused)`);
+      console.log(
+        `Indexes: ${report.totalIndexes} (${report.unusedIndexes.length} unused)`,
+      );
 
       // Sort indexes by usage (most used first)
-      const sortedIndexes = [...report.indexes].sort((a, b) => b.accesses - a.accesses);
+      const sortedIndexes = [...report.indexes].sort(
+        (a, b) => b.accesses - a.accesses,
+      );
 
       console.log('\nIndex Usage:');
       for (const idx of sortedIndexes) {
         const keyStr = JSON.stringify(idx.keys);
-        const usage = idx.accesses === 0 ? 'UNUSED' : `${idx.accesses.toLocaleString()} ops`;
-        const status = idx.accesses === 0 ? '❌' : idx.accesses > 1000 ? '✅' : '⚠️';
-        console.log(`  ${status} ${idx.name.padEnd(40)} ${usage.padEnd(15)} ${keyStr}`);
+        const usage =
+          idx.accesses === 0
+            ? 'UNUSED'
+            : `${idx.accesses.toLocaleString()} ops`;
+        const status =
+          idx.accesses === 0 ? '❌' : idx.accesses > 1000 ? '✅' : '⚠️';
+        console.log(
+          `  ${status} ${idx.name.padEnd(40)} ${usage.padEnd(15)} ${keyStr}`,
+        );
       }
 
       // Print recommendations
       if (report.recommendations.length > 0) {
         console.log('\nRecommendations:');
-        report.recommendations.forEach(rec => console.log(`  • ${rec}`));
+        report.recommendations.forEach((rec) => console.log(`  • ${rec}`));
       }
     } catch (error) {
       console.error(`Error analyzing ${collectionName}:`, error);
@@ -196,22 +226,28 @@ async function analyzeAllIndexes() {
   console.log(`Estimated write performance impact: ${writeImpact}% slower`);
 
   if (totalUnusedIndexes > 0) {
-    console.log(`\nPotential improvement by removing unused indexes: ${(totalUnusedIndexes * 1.5).toFixed(1)}% faster writes`);
+    console.log(
+      `\nPotential improvement by removing unused indexes: ${(totalUnusedIndexes * 1.5).toFixed(1)}% faster writes`,
+    );
   }
 
   // Collections with most indexes
-  const sortedByIndexCount = [...reports].sort((a, b) => b.totalIndexes - a.totalIndexes);
+  const sortedByIndexCount = [...reports].sort(
+    (a, b) => b.totalIndexes - a.totalIndexes,
+  );
   console.log('\n\nCollections with most indexes:');
-  sortedByIndexCount.slice(0, 5).forEach(r => {
+  sortedByIndexCount.slice(0, 5).forEach((r) => {
     console.log(`  ${r.collection.padEnd(30)} ${r.totalIndexes} indexes`);
   });
 
   // Collections with most unused indexes
-  const withUnused = reports.filter(r => r.unusedIndexes.length > 0);
+  const withUnused = reports.filter((r) => r.unusedIndexes.length > 0);
   if (withUnused.length > 0) {
     console.log('\n\nCollections with unused indexes:');
-    withUnused.forEach(r => {
-      console.log(`  ${r.collection.padEnd(30)} ${r.unusedIndexes.length} unused: ${r.unusedIndexes.join(', ')}`);
+    withUnused.forEach((r) => {
+      console.log(
+        `  ${r.collection.padEnd(30)} ${r.unusedIndexes.length} unused: ${r.unusedIndexes.join(', ')}`,
+      );
     });
   }
 
@@ -220,17 +256,21 @@ async function analyzeAllIndexes() {
   const fs = await import('fs/promises');
   await fs.writeFile(
     reportFile,
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      database: db.databaseName,
-      summary: {
-        totalCollections: reports.length,
-        totalIndexes,
-        totalUnusedIndexes,
-        writeImpactPercent: parseFloat(writeImpact),
+    JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        database: db.databaseName,
+        summary: {
+          totalCollections: reports.length,
+          totalIndexes,
+          totalUnusedIndexes,
+          writeImpactPercent: parseFloat(writeImpact),
+        },
+        collections: reports,
       },
-      collections: reports
-    }, null, 2)
+      null,
+      2,
+    ),
   );
   console.log(`\n\nFull report saved to: ${reportFile}`);
 }

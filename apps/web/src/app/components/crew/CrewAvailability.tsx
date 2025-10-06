@@ -44,17 +44,31 @@ export function CrewAvailability() {
   const { user: _user } = useAuth();
   const [selectedCrew, setSelectedCrew] = useState<string>('');
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [availability, setAvailability] = useState<CrewAvailability | null>(null);
+  const [availability, setAvailability] = useState<CrewAvailability | null>(
+    null,
+  );
   const [timeOffRequests, setTimeOffRequests] = useState<TimeOffRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showTimeOffModal, setShowTimeOffModal] = useState(false);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
-  const [_selectedSlot, setSelectedSlot] = useState<{ date: string; time: string } | null>(null);
+  const [_selectedSlot, setSelectedSlot] = useState<{
+    date: string;
+    time: string;
+  } | null>(null);
 
   const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00',
-    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
+    '08:00',
+    '09:00',
+    '10:00',
+    '11:00',
+    '12:00',
+    '13:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
   ];
 
   useEffect(() => {
@@ -69,11 +83,14 @@ export function CrewAvailability() {
       setLoading(true);
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(getApiUrl(`crew-schedule/availability/${selectedCrew}`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`crew-schedule/availability/${selectedCrew}`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -118,14 +135,22 @@ export function CrewAvailability() {
     }
   };
 
-  const handleSlotClick = (date: string, time: string, currentStatus: string) => {
+  const handleSlotClick = (
+    date: string,
+    time: string,
+    currentStatus: string,
+  ) => {
     setSelectedSlot({ date, time });
 
     const newStatus = currentStatus === 'available' ? 'busy' : 'available';
     updateAvailability(date, time, newStatus);
   };
 
-  const updateAvailability = async (date: string, time: string, status: string) => {
+  const updateAvailability = async (
+    date: string,
+    time: string,
+    status: string,
+  ) => {
     try {
       const token = localStorage.getItem('access_token');
 
@@ -191,7 +216,9 @@ export function CrewAvailability() {
     }
   };
 
-  const submitRecurringPattern = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitRecurringPattern = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -213,7 +240,7 @@ export function CrewAvailability() {
           await updateAvailability(
             formatDate(date),
             pattern.startTime,
-            pattern.status
+            pattern.status,
           );
         }
       }
@@ -265,10 +292,12 @@ export function CrewAvailability() {
   const getSlotStatus = (date: string, time: string): string => {
     if (!availability) return 'available';
 
-    const dayAvailability = availability.availability.find(a => a.date === date);
+    const dayAvailability = availability.availability.find(
+      (a) => a.date === date,
+    );
     if (!dayAvailability) return 'available';
 
-    const slot = dayAvailability.slots.find(s => s.startTime === time);
+    const slot = dayAvailability.slots.find((s) => s.startTime === time);
     return slot ? slot.status : 'available';
   };
 
@@ -295,14 +324,22 @@ export function CrewAvailability() {
       <div className={styles.header}>
         <div>
           <h2>Crew Availability</h2>
-          <p className={styles.subtitle}>Manage crew member availability and time-off requests</p>
+          <p className={styles.subtitle}>
+            Manage crew member availability and time-off requests
+          </p>
         </div>
 
         <div className={styles.headerActions}>
-          <button onClick={() => setShowRecurringModal(true)} className={styles.actionButton}>
+          <button
+            onClick={() => setShowRecurringModal(true)}
+            className={styles.actionButton}
+          >
             Set Recurring Pattern
           </button>
-          <button onClick={() => setShowTimeOffModal(true)} className={styles.primaryButton}>
+          <button
+            onClick={() => setShowTimeOffModal(true)}
+            className={styles.primaryButton}
+          >
             Request Time Off
           </button>
         </div>
@@ -334,28 +371,43 @@ export function CrewAvailability() {
       {selectedCrew && (
         <>
           <div className={styles.navigation}>
-            <button onClick={() => navigateWeek('prev')} className={styles.navButton}>
+            <button
+              onClick={() => navigateWeek('prev')}
+              className={styles.navButton}
+            >
               ← Previous Week
             </button>
             <h3 className={styles.weekTitle}>
               Week of {formatDate(getWeekStart(currentWeek))}
             </h3>
-            <button onClick={() => navigateWeek('next')} className={styles.navButton}>
+            <button
+              onClick={() => navigateWeek('next')}
+              className={styles.navButton}
+            >
               Next Week →
             </button>
           </div>
 
           <div className={styles.legend}>
             <div className={styles.legendItem}>
-              <div className={styles.legendColor} style={{ background: '#10b981' }}></div>
+              <div
+                className={styles.legendColor}
+                style={{ background: '#10b981' }}
+              ></div>
               <span>Available</span>
             </div>
             <div className={styles.legendItem}>
-              <div className={styles.legendColor} style={{ background: '#dc2626' }}></div>
+              <div
+                className={styles.legendColor}
+                style={{ background: '#dc2626' }}
+              ></div>
               <span>Busy</span>
             </div>
             <div className={styles.legendItem}>
-              <div className={styles.legendColor} style={{ background: '#f59e0b' }}></div>
+              <div
+                className={styles.legendColor}
+                style={{ background: '#f59e0b' }}
+              ></div>
               <span>Time Off</span>
             </div>
           </div>
@@ -383,7 +435,10 @@ export function CrewAvailability() {
                       {date.toLocaleDateString('en-US', { weekday: 'short' })}
                     </div>
                     <div className={styles.dayDate}>
-                      {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
                     </div>
                   </div>
 
@@ -395,10 +450,14 @@ export function CrewAvailability() {
                         key={time}
                         className={styles.slot}
                         style={{ background: getStatusColor(status) }}
-                        onClick={() => handleSlotClick(formatDate(date), time, status)}
+                        onClick={() =>
+                          handleSlotClick(formatDate(date), time, status)
+                        }
                         title={`${time} - ${getStatusLabel(status)}`}
                       >
-                        <span className={styles.slotStatus}>{getStatusLabel(status)}</span>
+                        <span className={styles.slotStatus}>
+                          {getStatusLabel(status)}
+                        </span>
                       </div>
                     );
                   })}
@@ -416,7 +475,9 @@ export function CrewAvailability() {
                 {timeOffRequests.map((request) => (
                   <div key={request.id} className={styles.requestCard}>
                     <div className={styles.requestHeader}>
-                      <span className={`${styles.statusBadge} ${styles[request.status]}`}>
+                      <span
+                        className={`${styles.statusBadge} ${styles[request.status]}`}
+                      >
                         {request.status}
                       </span>
                       <span className={styles.requestDate}>
@@ -424,8 +485,13 @@ export function CrewAvailability() {
                       </span>
                     </div>
                     <div className={styles.requestBody}>
-                      <p><strong>Dates:</strong> {request.startDate} to {request.endDate}</p>
-                      <p><strong>Reason:</strong> {request.reason}</p>
+                      <p>
+                        <strong>Dates:</strong> {request.startDate} to{' '}
+                        {request.endDate}
+                      </p>
+                      <p>
+                        <strong>Reason:</strong> {request.reason}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -436,8 +502,14 @@ export function CrewAvailability() {
       )}
 
       {showTimeOffModal && (
-        <div className={styles.modal} onClick={() => setShowTimeOffModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modal}
+          onClick={() => setShowTimeOffModal(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h3>Request Time Off</h3>
               <button onClick={() => setShowTimeOffModal(false)}>×</button>
@@ -497,8 +569,14 @@ export function CrewAvailability() {
       )}
 
       {showRecurringModal && (
-        <div className={styles.modal} onClick={() => setShowRecurringModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modal}
+          onClick={() => setShowRecurringModal(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h3>Set Recurring Availability Pattern</h3>
               <button onClick={() => setShowRecurringModal(false)}>×</button>
@@ -533,7 +611,9 @@ export function CrewAvailability() {
                     className={styles.select}
                   >
                     {timeSlots.map((time) => (
-                      <option key={time} value={time}>{time}</option>
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -547,7 +627,9 @@ export function CrewAvailability() {
                     className={styles.select}
                   >
                     {timeSlots.map((time) => (
-                      <option key={time} value={time}>{time}</option>
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
                     ))}
                   </select>
                 </div>

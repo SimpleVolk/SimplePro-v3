@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -187,7 +191,10 @@ export class AutoAssignmentService {
     }
 
     // 6. Team Preferences (5 points)
-    if (job.preferredCrew && job.preferredCrew.includes(crewMember._id.toString())) {
+    if (
+      job.preferredCrew &&
+      job.preferredCrew.includes(crewMember._id.toString())
+    ) {
       breakdown.teamPreference = 5;
       score += 5;
     }
@@ -201,10 +208,7 @@ export class AutoAssignmentService {
     _duration: number,
   ): Promise<boolean> {
     // Check if crew member is on time off
-    const isOnTimeOff = await this.timeOffService.isOnTimeOff(
-      crewId,
-      jobDate,
-    );
+    const isOnTimeOff = await this.timeOffService.isOnTimeOff(crewId, jobDate);
     if (isOnTimeOff) {
       return false;
     }

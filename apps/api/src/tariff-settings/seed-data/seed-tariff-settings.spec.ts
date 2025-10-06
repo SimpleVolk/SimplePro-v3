@@ -1,4 +1,4 @@
-// import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
 import { TariffSettings } from '../schemas/tariff-settings.schema';
 import {
@@ -68,7 +68,7 @@ describe('Tariff Settings Seed', () => {
     it('should have hourly rates for all crew sizes', () => {
       const rates = defaultTariffData.hourlyRates.rates;
       for (let i = 1; i <= 10; i++) {
-        const rate = rates.find(r => r.crewSize === i);
+        const rate = rates.find((r) => r.crewSize === i);
         expect(rate).toBeDefined();
         expect(rate!.baseRate).toBeGreaterThan(0);
       }
@@ -76,7 +76,9 @@ describe('Tariff Settings Seed', () => {
 
     it('should have crew abilities matching hourly rates', () => {
       const abilities = defaultTariffData.hourlyRates.crewAbility;
-      expect(abilities).toHaveLength(defaultTariffData.hourlyRates.rates.length);
+      expect(abilities).toHaveLength(
+        defaultTariffData.hourlyRates.rates.length,
+      );
 
       abilities.forEach((ability, index) => {
         expect(ability.crewSize).toBe(index + 1);
@@ -102,10 +104,18 @@ describe('Tariff Settings Seed', () => {
       expect(defaultTariffData.materials).toHaveLength(14);
 
       // Check material categories
-      const boxes = defaultTariffData.materials.filter(m => m.category === 'box');
-      const packing = defaultTariffData.materials.filter(m => m.category === 'packing');
-      const protection = defaultTariffData.materials.filter(m => m.category === 'protection');
-      const specialty = defaultTariffData.materials.filter(m => m.category === 'specialty');
+      const boxes = defaultTariffData.materials.filter(
+        (m) => m.category === 'box',
+      );
+      const packing = defaultTariffData.materials.filter(
+        (m) => m.category === 'packing',
+      );
+      const protection = defaultTariffData.materials.filter(
+        (m) => m.category === 'protection',
+      );
+      const specialty = defaultTariffData.materials.filter(
+        (m) => m.category === 'specialty',
+      );
 
       expect(boxes.length).toBeGreaterThan(0);
       expect(packing.length).toBeGreaterThan(0);
@@ -114,7 +124,9 @@ describe('Tariff Settings Seed', () => {
     });
 
     it('should have all materials active', () => {
-      const activeMaterials = defaultTariffData.materials.filter(m => m.isActive);
+      const activeMaterials = defaultTariffData.materials.filter(
+        (m) => m.isActive,
+      );
       expect(activeMaterials).toHaveLength(defaultTariffData.materials.length);
     });
 
@@ -122,11 +134,15 @@ describe('Tariff Settings Seed', () => {
       expect(defaultTariffData.moveSizes).toHaveLength(21);
 
       // Check specific move sizes
-      const roomOrLess = defaultTariffData.moveSizes.find(ms => ms.name === 'Room or Less');
+      const roomOrLess = defaultTariffData.moveSizes.find(
+        (ms) => ms.name === 'Room or Less',
+      );
       expect(roomOrLess).toBeDefined();
       expect(roomOrLess!.maxCubicFeet).toBe(75);
 
-      const sixBedroom = defaultTariffData.moveSizes.find(ms => ms.name === '6 Bedroom House');
+      const sixBedroom = defaultTariffData.moveSizes.find(
+        (ms) => ms.name === '6 Bedroom House',
+      );
       expect(sixBedroom).toBeDefined();
       expect(sixBedroom!.recommendedCrewSize).toBe(6);
     });
@@ -135,12 +151,16 @@ describe('Tariff Settings Seed', () => {
       expect(defaultTariffData.roomSizes).toHaveLength(7);
 
       // Check specific rooms
-      const bedroom = defaultTariffData.roomSizes.find(rs => rs.name === 'Bedroom');
+      const bedroom = defaultTariffData.roomSizes.find(
+        (rs) => rs.name === 'Bedroom',
+      );
       expect(bedroom).toBeDefined();
       expect(bedroom!.cubicFeet).toBe(153);
       expect(bedroom!.weightLbs).toBe(750);
 
-      const office = defaultTariffData.roomSizes.find(rs => rs.name === 'Office');
+      const office = defaultTariffData.roomSizes.find(
+        (rs) => rs.name === 'Office',
+      );
       expect(office).toBeDefined();
       expect(office!.cubicFeet).toBe(75);
     });
@@ -149,12 +169,16 @@ describe('Tariff Settings Seed', () => {
       expect(defaultTariffData.handicaps).toHaveLength(3);
 
       // Check specific handicaps
-      const stairs = defaultTariffData.handicaps.find(h => h.name === 'Per Flight');
+      const stairs = defaultTariffData.handicaps.find(
+        (h) => h.name === 'Per Flight',
+      );
       expect(stairs).toBeDefined();
       expect(stairs!.category).toBe('stairs');
       expect(stairs!.value).toBe(9);
 
-      const elevator = defaultTariffData.handicaps.find(h => h.name === 'Standard Elevator');
+      const elevator = defaultTariffData.handicaps.find(
+        (h) => h.name === 'Standard Elevator',
+      );
       expect(elevator).toBeDefined();
       expect(elevator!.value).toBe(18);
     });
@@ -163,11 +187,15 @@ describe('Tariff Settings Seed', () => {
       expect(defaultTariffData.distanceRates).toHaveLength(4);
 
       // Check distance tiers
-      const local = defaultTariffData.distanceRates.find(dr => dr.minMiles === 0);
+      const local = defaultTariffData.distanceRates.find(
+        (dr) => dr.minMiles === 0,
+      );
       expect(local).toBeDefined();
       expect(local!.maxMiles).toBe(50);
 
-      const crossCountry = defaultTariffData.distanceRates.find(dr => dr.minMiles === 501);
+      const crossCountry = defaultTariffData.distanceRates.find(
+        (dr) => dr.minMiles === 501,
+      );
       expect(crossCountry).toBeDefined();
       expect(crossCountry!.ratePerMile).toBe(1.75);
     });
@@ -176,12 +204,16 @@ describe('Tariff Settings Seed', () => {
       expect(defaultTariffData.pricingMethods).toHaveLength(5);
 
       // Check for default method
-      const defaultMethod = defaultTariffData.pricingMethods.find(pm => pm.isDefault);
+      const defaultMethod = defaultTariffData.pricingMethods.find(
+        (pm) => pm.isDefault,
+      );
       expect(defaultMethod).toBeDefined();
       expect(defaultMethod!.enabled).toBe(true);
 
       // Count enabled methods
-      const enabledMethods = defaultTariffData.pricingMethods.filter(pm => pm.enabled);
+      const enabledMethods = defaultTariffData.pricingMethods.filter(
+        (pm) => pm.enabled,
+      );
       expect(enabledMethods.length).toBeGreaterThan(0);
     });
 
@@ -199,7 +231,10 @@ describe('Tariff Settings Seed', () => {
     });
 
     it('should detect missing hourly rates', () => {
-      const invalidTariff = { ...mockTariff, hourlyRates: { ...mockTariff.hourlyRates, rates: [] } };
+      const invalidTariff = {
+        ...mockTariff,
+        hourlyRates: { ...mockTariff.hourlyRates, rates: [] },
+      };
       const isValid = validateSeededTariff(invalidTariff as TariffSettings);
       expect(isValid).toBe(false);
     });
@@ -225,7 +260,10 @@ describe('Tariff Settings Seed', () => {
     it('should detect missing default pricing method', () => {
       const invalidTariff = {
         ...mockTariff,
-        pricingMethods: mockTariff.pricingMethods.map((pm: any) => ({ ...pm, isDefault: false })),
+        pricingMethods: mockTariff.pricingMethods.map((pm: any) => ({
+          ...pm,
+          isDefault: false,
+        })),
       };
       const isValid = validateSeededTariff(invalidTariff as TariffSettings);
       expect(isValid).toBe(false);
@@ -286,31 +324,31 @@ describe('Tariff Settings Seed', () => {
 
   describe('Data Integrity', () => {
     it('should have unique IDs for all materials', () => {
-      const ids = defaultTariffData.materials.map(m => m.id);
+      const ids = defaultTariffData.materials.map((m) => m.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
 
     it('should have unique IDs for all move sizes', () => {
-      const ids = defaultTariffData.moveSizes.map(ms => ms.id);
+      const ids = defaultTariffData.moveSizes.map((ms) => ms.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
 
     it('should have unique IDs for all room sizes', () => {
-      const ids = defaultTariffData.roomSizes.map(rs => rs.id);
+      const ids = defaultTariffData.roomSizes.map((rs) => rs.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
 
     it('should have unique IDs for all handicaps', () => {
-      const ids = defaultTariffData.handicaps.map(h => h.id);
+      const ids = defaultTariffData.handicaps.map((h) => h.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
 
     it('should have non-negative rates', () => {
-      defaultTariffData.hourlyRates.rates.forEach(rate => {
+      defaultTariffData.hourlyRates.rates.forEach((rate) => {
         expect(rate.baseRate).toBeGreaterThanOrEqual(0);
         if (rate.weekendRate !== undefined) {
           expect(rate.weekendRate).toBeGreaterThanOrEqual(0);
@@ -319,14 +357,14 @@ describe('Tariff Settings Seed', () => {
     });
 
     it('should have valid crew sizes', () => {
-      defaultTariffData.hourlyRates.rates.forEach(rate => {
+      defaultTariffData.hourlyRates.rates.forEach((rate) => {
         expect(rate.crewSize).toBeGreaterThanOrEqual(1);
         expect(rate.crewSize).toBeLessThanOrEqual(10);
       });
     });
 
     it('should have valid move size ranges', () => {
-      defaultTariffData.moveSizes.forEach(ms => {
+      defaultTariffData.moveSizes.forEach((ms) => {
         expect(ms.minCubicFeet).toBeGreaterThanOrEqual(0);
         expect(ms.maxCubicFeet).toBeGreaterThan(ms.minCubicFeet);
         expect(ms.minWeightLbs).toBeGreaterThanOrEqual(0);
@@ -337,7 +375,7 @@ describe('Tariff Settings Seed', () => {
     });
 
     it('should have valid handicap percentages', () => {
-      defaultTariffData.handicaps.forEach(h => {
+      defaultTariffData.handicaps.forEach((h) => {
         expect(h.value).toBeGreaterThan(0);
         expect(h.value).toBeLessThanOrEqual(100);
       });

@@ -11,9 +11,7 @@ import {
  * Used for seed data to ensure reproducible IDs
  */
 function generateId(index: number): string {
-  return new Types.ObjectId(
-    Math.floor(Date.now() / 1000) + index
-  ).toString();
+  return new Types.ObjectId(Math.floor(Date.now() / 1000) + index).toString();
 }
 
 /**
@@ -34,7 +32,8 @@ export const defaultTariffData = {
   // Metadata
   // ============================
   name: 'Default Tariff Settings',
-  description: 'Production-ready tariff configuration with industry-standard rates',
+  description:
+    'Production-ready tariff configuration with industry-standard rates',
   isActive: true,
   status: TariffStatus.ACTIVE,
   version: '1.0.0',
@@ -43,7 +42,8 @@ export const defaultTariffData = {
   createdBy: 'system',
   lastModifiedBy: 'system',
   isArchived: false,
-  notes: 'Initial seed data based on industry best practices and production requirements',
+  notes:
+    'Initial seed data based on industry best practices and production requirements',
   tags: ['default', 'production', 'v1'],
 
   // ============================
@@ -58,16 +58,76 @@ export const defaultTariffData = {
     },
     rates: [
       // Standard Hourly Rates (from hourlyrate1.png)
-      { crewSize: 1, baseRate: 89, weekendRate: 89, holidayRate: 89, overtimeMultiplier: 1.5 },
-      { crewSize: 2, baseRate: 100, weekendRate: 100, holidayRate: 100, overtimeMultiplier: 1.5 },
-      { crewSize: 3, baseRate: 220, weekendRate: 200, holidayRate: 220, overtimeMultiplier: 1.5 },
-      { crewSize: 4, baseRate: 300, weekendRate: 280, holidayRate: 300, overtimeMultiplier: 1.5 },
-      { crewSize: 5, baseRate: 360, weekendRate: 340, holidayRate: 360, overtimeMultiplier: 1.5 },
-      { crewSize: 6, baseRate: 420, weekendRate: 400, holidayRate: 420, overtimeMultiplier: 1.5 },
-      { crewSize: 7, baseRate: 480, weekendRate: 460, holidayRate: 480, overtimeMultiplier: 1.5 },
-      { crewSize: 8, baseRate: 540, weekendRate: 520, holidayRate: 540, overtimeMultiplier: 1.5 },
-      { crewSize: 9, baseRate: 600, weekendRate: 580, holidayRate: 600, overtimeMultiplier: 1.5 },
-      { crewSize: 10, baseRate: 660, weekendRate: 640, holidayRate: 660, overtimeMultiplier: 1.5 },
+      {
+        crewSize: 1,
+        baseRate: 89,
+        weekendRate: 89,
+        holidayRate: 89,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 2,
+        baseRate: 100,
+        weekendRate: 100,
+        holidayRate: 100,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 3,
+        baseRate: 220,
+        weekendRate: 200,
+        holidayRate: 220,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 4,
+        baseRate: 300,
+        weekendRate: 280,
+        holidayRate: 300,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 5,
+        baseRate: 360,
+        weekendRate: 340,
+        holidayRate: 360,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 6,
+        baseRate: 420,
+        weekendRate: 400,
+        holidayRate: 420,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 7,
+        baseRate: 480,
+        weekendRate: 460,
+        holidayRate: 480,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 8,
+        baseRate: 540,
+        weekendRate: 520,
+        holidayRate: 540,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 9,
+        baseRate: 600,
+        weekendRate: 580,
+        holidayRate: 600,
+        overtimeMultiplier: 1.5,
+      },
+      {
+        crewSize: 10,
+        baseRate: 660,
+        weekendRate: 640,
+        holidayRate: 660,
+        overtimeMultiplier: 1.5,
+      },
     ],
     // Crew Ability from autopricingengine1.png (Volume capacity in cubic feet)
     crewAbility: [
@@ -91,11 +151,41 @@ export const defaultTariffData = {
     enabled: true,
     rates: [
       // From Settings-Tariffs-TariffLibrary-PackingRates-1.png
-      { itemType: '1 Crew', description: 'Single packer hourly rate', rate: 80, unit: 'hour', category: 'hourly' },
-      { itemType: '2 Crew', description: 'Two packers hourly rate', rate: 150, unit: 'hour', category: 'hourly' },
-      { itemType: '3 Crew', description: 'Three packers hourly rate', rate: 240, unit: 'hour', category: 'hourly' },
-      { itemType: '4 Crew', description: 'Four packers hourly rate', rate: 330, unit: 'hour', category: 'hourly' },
-      { itemType: 'Per Additional Crew', description: 'Additional packer rate', rate: 50, unit: 'hour', category: 'additional' },
+      {
+        itemType: '1 Crew',
+        description: 'Single packer hourly rate',
+        rate: 80,
+        unit: 'hour',
+        category: 'hourly',
+      },
+      {
+        itemType: '2 Crew',
+        description: 'Two packers hourly rate',
+        rate: 150,
+        unit: 'hour',
+        category: 'hourly',
+      },
+      {
+        itemType: '3 Crew',
+        description: 'Three packers hourly rate',
+        rate: 240,
+        unit: 'hour',
+        category: 'hourly',
+      },
+      {
+        itemType: '4 Crew',
+        description: 'Four packers hourly rate',
+        rate: 330,
+        unit: 'hour',
+        category: 'hourly',
+      },
+      {
+        itemType: 'Per Additional Crew',
+        description: 'Additional packer rate',
+        rate: 50,
+        unit: 'hour',
+        category: 'additional',
+      },
     ],
   },
 
@@ -163,7 +253,8 @@ export const defaultTariffData = {
       isActive: true,
       inStock: true,
       sku: '501',
-      notes: 'Specialty container for dishes with 45 min pack time, 20 min unpack time',
+      notes:
+        'Specialty container for dishes with 45 min pack time, 20 min unpack time',
     },
     {
       id: generateId(5),
@@ -588,7 +679,13 @@ export const defaultTariffData = {
       description: 'Standard living room',
       cubicFeet: 153,
       weightLbs: 750,
-      commonItems: ['sofa', 'coffee table', 'tv', 'entertainment center', 'end tables'],
+      commonItems: [
+        'sofa',
+        'coffee table',
+        'tv',
+        'entertainment center',
+        'end tables',
+      ],
       isActive: true,
     },
     {
@@ -676,7 +773,7 @@ export const defaultTariffData = {
       description: 'Regional moves',
       minMiles: 51,
       maxMiles: 200,
-      ratePerMile: 2.50,
+      ratePerMile: 2.5,
       minimumCharge: 250,
       isActive: true,
     },
@@ -686,7 +783,7 @@ export const defaultTariffData = {
       description: 'Interstate moves',
       minMiles: 201,
       maxMiles: 500,
-      ratePerMile: 2.00,
+      ratePerMile: 2.0,
       minimumCharge: 500,
       isActive: true,
     },

@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { ReferralsService } from './referrals.service';
 import { CreateReferralDto } from './dto/create-referral.dto';
@@ -35,7 +35,7 @@ export class ReferralsController {
     return {
       success: true,
       message: 'Referral created successfully',
-      referral
+      referral,
     };
   }
 
@@ -48,7 +48,7 @@ export class ReferralsController {
     const result = await this.referralsService.findAll(query);
     return {
       success: true,
-      ...result
+      ...result,
     };
   }
 
@@ -57,12 +57,18 @@ export class ReferralsController {
    */
   @Get('partner/:partnerId')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async findByPartner(@Param('partnerId') partnerId: string, @Query() query?: ReferralQueryDto) {
-    const referrals = await this.referralsService.findByPartner(partnerId, query);
+  async findByPartner(
+    @Param('partnerId') partnerId: string,
+    @Query() query?: ReferralQueryDto,
+  ) {
+    const referrals = await this.referralsService.findByPartner(
+      partnerId,
+      query,
+    );
     return {
       success: true,
       referrals,
-      total: referrals.length
+      total: referrals.length,
     };
   }
 
@@ -76,7 +82,7 @@ export class ReferralsController {
     return {
       success: true,
       referrals,
-      total: referrals.length
+      total: referrals.length,
     };
   }
 
@@ -88,12 +94,16 @@ export class ReferralsController {
   async getStatistics(
     @Query('partnerId') partnerId?: string,
     @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string
+    @Query('endDate') endDate?: string,
   ) {
-    const statistics = await this.referralsService.getStatistics(partnerId, startDate, endDate);
+    const statistics = await this.referralsService.getStatistics(
+      partnerId,
+      startDate,
+      endDate,
+    );
     return {
       success: true,
-      statistics
+      statistics,
     };
   }
 
@@ -105,12 +115,16 @@ export class ReferralsController {
   async getConversionFunnel(
     @Query('partnerId') partnerId?: string,
     @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string
+    @Query('endDate') endDate?: string,
   ) {
-    const funnel = await this.referralsService.getConversionFunnel(partnerId, startDate, endDate);
+    const funnel = await this.referralsService.getConversionFunnel(
+      partnerId,
+      startDate,
+      endDate,
+    );
     return {
       success: true,
-      funnel
+      funnel,
     };
   }
 
@@ -123,7 +137,7 @@ export class ReferralsController {
     const referral = await this.referralsService.findById(id);
     return {
       success: true,
-      referral
+      referral,
     };
   }
 
@@ -132,12 +146,15 @@ export class ReferralsController {
    */
   @Patch(':id')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async update(@Param('id') id: string, @Body() updateReferralDto: UpdateReferralDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateReferralDto: UpdateReferralDto,
+  ) {
     const referral = await this.referralsService.update(id, updateReferralDto);
     return {
       success: true,
       message: 'Referral updated successfully',
-      referral
+      referral,
     };
   }
 
@@ -146,12 +163,18 @@ export class ReferralsController {
    */
   @Patch(':id/status')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateReferralStatusDto) {
-    const referral = await this.referralsService.updateStatus(id, updateStatusDto);
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateReferralStatusDto,
+  ) {
+    const referral = await this.referralsService.updateStatus(
+      id,
+      updateStatusDto,
+    );
     return {
       success: true,
       message: 'Referral status updated successfully',
-      referral
+      referral,
     };
   }
 
@@ -163,13 +186,17 @@ export class ReferralsController {
   async convertToJob(
     @Param('id') id: string,
     @Body('jobId') jobId: string,
-    @Body('jobValue') jobValue: number
+    @Body('jobValue') jobValue: number,
   ) {
-    const referral = await this.referralsService.convertToJob(id, jobId, jobValue);
+    const referral = await this.referralsService.convertToJob(
+      id,
+      jobId,
+      jobValue,
+    );
     return {
       success: true,
       message: 'Referral converted to job successfully',
-      referral
+      referral,
     };
   }
 
@@ -178,12 +205,18 @@ export class ReferralsController {
    */
   @Post(':id/link-opportunity')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async linkToOpportunity(@Param('id') id: string, @Body('opportunityId') opportunityId: string) {
-    const referral = await this.referralsService.linkToOpportunity(id, opportunityId);
+  async linkToOpportunity(
+    @Param('id') id: string,
+    @Body('opportunityId') opportunityId: string,
+  ) {
+    const referral = await this.referralsService.linkToOpportunity(
+      id,
+      opportunityId,
+    );
     return {
       success: true,
       message: 'Referral linked to opportunity successfully',
-      referral
+      referral,
     };
   }
 
@@ -192,12 +225,15 @@ export class ReferralsController {
    */
   @Post(':id/link-customer')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async linkToCustomer(@Param('id') id: string, @Body('customerId') customerId: string) {
+  async linkToCustomer(
+    @Param('id') id: string,
+    @Body('customerId') customerId: string,
+  ) {
     const referral = await this.referralsService.linkToCustomer(id, customerId);
     return {
       success: true,
       message: 'Referral linked to customer successfully',
-      referral
+      referral,
     };
   }
 
@@ -207,12 +243,18 @@ export class ReferralsController {
   @Patch(':id/commission-paid')
   @Roles('super_admin', 'admin')
   @HttpCode(HttpStatus.OK)
-  async markCommissionPaid(@Param('id') id: string, @Body() markPaidDto: MarkCommissionPaidDto) {
-    const referral = await this.referralsService.markCommissionPaid(id, markPaidDto);
+  async markCommissionPaid(
+    @Param('id') id: string,
+    @Body() markPaidDto: MarkCommissionPaidDto,
+  ) {
+    const referral = await this.referralsService.markCommissionPaid(
+      id,
+      markPaidDto,
+    );
     return {
       success: true,
       message: 'Commission marked as paid successfully',
-      referral
+      referral,
     };
   }
 }

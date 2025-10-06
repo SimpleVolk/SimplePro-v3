@@ -38,7 +38,10 @@ export class SMSServiceMock {
     return message;
   }
 
-  async sendBulkSMS(recipients: string[], body: string): Promise<{
+  async sendBulkSMS(
+    recipients: string[],
+    body: string,
+  ): Promise<{
     successful: SMSMessage[];
     failed: Array<{ to: string; error: string }>;
   }> {
@@ -50,7 +53,8 @@ export class SMSServiceMock {
         const message = await this.sendSMS(recipient, body);
         successful.push(message);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         failed.push({
           to: recipient,
           error: errorMessage || 'Unknown error',

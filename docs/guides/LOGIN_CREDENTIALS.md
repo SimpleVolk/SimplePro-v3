@@ -41,6 +41,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ## Troubleshooting
 
 If login fails:
+
 1. Verify the password is exactly `Admin123!` (case-sensitive with exclamation mark)
 2. Check that the API is running on the correct port (default: 3001)
 3. Ensure MongoDB is connected (check health endpoint)

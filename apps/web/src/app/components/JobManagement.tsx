@@ -103,7 +103,6 @@ interface CreateJobDto {
   specialInstructions?: string;
 }
 
-
 export function JobManagement() {
   const { user: _user } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -184,7 +183,7 @@ export function JobManagement() {
 
       if (response.ok) {
         const result = await response.json();
-        setJobs(prev => [...prev, result.job]);
+        setJobs((prev) => [...prev, result.job]);
         resetForm();
         setShowCreateForm(false);
       } else {
@@ -212,10 +211,8 @@ export function JobManagement() {
 
       if (response.ok) {
         const result = await response.json();
-        setJobs(prev =>
-          prev.map(job =>
-            job.id === jobId ? result.job : job
-          )
+        setJobs((prev) =>
+          prev.map((job) => (job.id === jobId ? result.job : job)),
         );
       } else {
         const errorData = await response.json();
@@ -253,44 +250,56 @@ export function JobManagement() {
     });
   };
 
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = !searchTerm ||
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      !searchTerm ||
       job.jobNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.customerId.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
     const matchesType = typeFilter === 'all' || job.type === typeFilter;
-    const matchesPriority = priorityFilter === 'all' || job.priority === priorityFilter;
+    const matchesPriority =
+      priorityFilter === 'all' || job.priority === priorityFilter;
 
     return matchesSearch && matchesStatus && matchesType && matchesPriority;
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'scheduled': return '#3b82f6';
-      case 'in_progress': return '#f59e0b';
-      case 'completed': return '#10b981';
-      case 'cancelled': return '#ef4444';
-      case 'on_hold': return '#6b7280';
-      default: return '#6b7280';
+      case 'scheduled':
+        return '#3b82f6';
+      case 'in_progress':
+        return '#f59e0b';
+      case 'completed':
+        return '#10b981';
+      case 'cancelled':
+        return '#ef4444';
+      case 'on_hold':
+        return '#6b7280';
+      default:
+        return '#6b7280';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return '#10b981';
-      case 'normal': return '#3b82f6';
-      case 'high': return '#f59e0b';
-      case 'urgent': return '#ef4444';
-      default: return '#6b7280';
+      case 'low':
+        return '#10b981';
+      case 'normal':
+        return '#3b82f6';
+      case 'high':
+        return '#f59e0b';
+      case 'urgent':
+        return '#ef4444';
+      default:
+        return '#6b7280';
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
-
 
   if (loading) {
     return (
@@ -388,40 +397,67 @@ export function JobManagement() {
                 >
                   {job.priority}
                 </span>
-                <span className={styles.typeBadge}>{job.type.replace('_', ' ')}</span>
+                <span className={styles.typeBadge}>
+                  {job.type.replace('_', ' ')}
+                </span>
               </div>
             </div>
 
             <div className={styles.jobInfo}>
               <div className={styles.scheduleInfo}>
-                <p><strong>Scheduled:</strong> {formatDate(job.scheduledDate)}</p>
-                <p><strong>Time:</strong> {job.scheduledStartTime} - {job.scheduledEndTime}</p>
-                <p><strong>Duration:</strong> {job.estimatedDuration} hours</p>
+                <p>
+                  <strong>Scheduled:</strong> {formatDate(job.scheduledDate)}
+                </p>
+                <p>
+                  <strong>Time:</strong> {job.scheduledStartTime} -{' '}
+                  {job.scheduledEndTime}
+                </p>
+                <p>
+                  <strong>Duration:</strong> {job.estimatedDuration} hours
+                </p>
               </div>
 
               <div className={styles.addressInfo}>
                 <div className={styles.address}>
                   <h4>Pickup</h4>
                   <p>{job.pickupAddress.street}</p>
-                  <p>{job.pickupAddress.city}, {job.pickupAddress.state} {job.pickupAddress.zipCode}</p>
+                  <p>
+                    {job.pickupAddress.city}, {job.pickupAddress.state}{' '}
+                    {job.pickupAddress.zipCode}
+                  </p>
                   {job.pickupAddress.contactPerson && (
-                    <p><strong>Contact:</strong> {job.pickupAddress.contactPerson}</p>
+                    <p>
+                      <strong>Contact:</strong>{' '}
+                      {job.pickupAddress.contactPerson}
+                    </p>
                   )}
                 </div>
                 <div className={styles.address}>
                   <h4>Delivery</h4>
                   <p>{job.deliveryAddress.street}</p>
-                  <p>{job.deliveryAddress.city}, {job.deliveryAddress.state} {job.deliveryAddress.zipCode}</p>
+                  <p>
+                    {job.deliveryAddress.city}, {job.deliveryAddress.state}{' '}
+                    {job.deliveryAddress.zipCode}
+                  </p>
                   {job.deliveryAddress.contactPerson && (
-                    <p><strong>Contact:</strong> {job.deliveryAddress.contactPerson}</p>
+                    <p>
+                      <strong>Contact:</strong>{' '}
+                      {job.deliveryAddress.contactPerson}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className={styles.financialInfo}>
-                <p><strong>Estimated Cost:</strong> ${job.estimatedCost.toLocaleString()}</p>
+                <p>
+                  <strong>Estimated Cost:</strong> $
+                  {job.estimatedCost.toLocaleString()}
+                </p>
                 {job.actualCost && (
-                  <p><strong>Actual Cost:</strong> ${job.actualCost.toLocaleString()}</p>
+                  <p>
+                    <strong>Actual Cost:</strong> $
+                    {job.actualCost.toLocaleString()}
+                  </p>
                 )}
               </div>
 
@@ -440,7 +476,10 @@ export function JobManagement() {
 
               {job.specialInstructions && (
                 <div className={styles.instructions}>
-                  <p><strong>Special Instructions:</strong> {job.specialInstructions}</p>
+                  <p>
+                    <strong>Special Instructions:</strong>{' '}
+                    {job.specialInstructions}
+                  </p>
                 </div>
               )}
             </div>
@@ -473,7 +512,12 @@ export function JobManagement() {
               <button
                 onClick={() => {
                   setSelectedJob(job);
-                  console.log('Selected job:', selectedJob?.id || 'none', '-> new:', job.id);
+                  console.log(
+                    'Selected job:',
+                    selectedJob?.id || 'none',
+                    '-> new:',
+                    job.id,
+                  );
                 }}
                 className={styles.secondaryButton}
               >
@@ -498,7 +542,12 @@ export function JobManagement() {
               <button onClick={() => setShowCreateForm(false)}>×</button>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); createJob(); }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                createJob();
+              }}
+            >
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
                   <label>Job Title *</label>
@@ -506,7 +555,12 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -516,7 +570,12 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.customerId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, customerId: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        customerId: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -524,7 +583,12 @@ export function JobManagement() {
                   <label>Job Type *</label>
                   <select
                     value={formData.type}
-                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        type: e.target.value as any,
+                      }))
+                    }
                   >
                     <option value="local">Local</option>
                     <option value="long_distance">Long Distance</option>
@@ -537,7 +601,12 @@ export function JobManagement() {
                   <label>Priority *</label>
                   <select
                     value={formData.priority}
-                    onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as any }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        priority: e.target.value as any,
+                      }))
+                    }
                   >
                     <option value="low">Low</option>
                     <option value="normal">Normal</option>
@@ -552,7 +621,12 @@ export function JobManagement() {
                     type="date"
                     required
                     value={formData.scheduledDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        scheduledDate: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -562,7 +636,12 @@ export function JobManagement() {
                     type="time"
                     required
                     value={formData.scheduledStartTime}
-                    onChange={(e) => setFormData(prev => ({ ...prev, scheduledStartTime: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        scheduledStartTime: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -572,7 +651,12 @@ export function JobManagement() {
                     type="time"
                     required
                     value={formData.scheduledEndTime}
-                    onChange={(e) => setFormData(prev => ({ ...prev, scheduledEndTime: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        scheduledEndTime: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -584,7 +668,12 @@ export function JobManagement() {
                     min="0"
                     step="0.01"
                     value={formData.estimatedCost}
-                    onChange={(e) => setFormData(prev => ({ ...prev, estimatedCost: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        estimatedCost: parseFloat(e.target.value) || 0,
+                      }))
+                    }
                   />
                 </div>
 
@@ -598,10 +687,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.pickupAddress.street}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      pickupAddress: { ...prev.pickupAddress, street: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        pickupAddress: {
+                          ...prev.pickupAddress,
+                          street: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -611,10 +705,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.pickupAddress.city}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      pickupAddress: { ...prev.pickupAddress, city: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        pickupAddress: {
+                          ...prev.pickupAddress,
+                          city: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -624,10 +723,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.pickupAddress.state}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      pickupAddress: { ...prev.pickupAddress, state: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        pickupAddress: {
+                          ...prev.pickupAddress,
+                          state: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -637,10 +741,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.pickupAddress.zipCode}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      pickupAddress: { ...prev.pickupAddress, zipCode: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        pickupAddress: {
+                          ...prev.pickupAddress,
+                          zipCode: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -654,10 +763,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.deliveryAddress.street}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      deliveryAddress: { ...prev.deliveryAddress, street: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        deliveryAddress: {
+                          ...prev.deliveryAddress,
+                          street: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -667,10 +781,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.deliveryAddress.city}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      deliveryAddress: { ...prev.deliveryAddress, city: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        deliveryAddress: {
+                          ...prev.deliveryAddress,
+                          city: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -680,10 +799,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.deliveryAddress.state}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      deliveryAddress: { ...prev.deliveryAddress, state: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        deliveryAddress: {
+                          ...prev.deliveryAddress,
+                          state: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -693,10 +817,15 @@ export function JobManagement() {
                     type="text"
                     required
                     value={formData.deliveryAddress.zipCode}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      deliveryAddress: { ...prev.deliveryAddress, zipCode: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        deliveryAddress: {
+                          ...prev.deliveryAddress,
+                          zipCode: e.target.value,
+                        },
+                      }))
+                    }
                   />
                 </div>
 
@@ -704,14 +833,23 @@ export function JobManagement() {
                   <label>Special Instructions</label>
                   <textarea
                     value={formData.specialInstructions || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, specialInstructions: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        specialInstructions: e.target.value,
+                      }))
+                    }
                     rows={3}
                   />
                 </div>
               </div>
 
               <div className={styles.modalActions}>
-                <button type="button" onClick={() => setShowCreateForm(false)} className={styles.secondaryButton}>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateForm(false)}
+                  className={styles.secondaryButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.primaryButton}>

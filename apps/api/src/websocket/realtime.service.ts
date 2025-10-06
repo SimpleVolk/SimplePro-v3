@@ -47,11 +47,24 @@ export class RealtimeService {
     };
 
     this.webSocketGateway.broadcastJobUpdate(jobId, updateData);
-    this.webSocketGateway.broadcastToRole('admin', 'jobStatusChanged', updateData);
-    this.webSocketGateway.broadcastToRole('dispatcher', 'jobStatusChanged', updateData);
+    this.webSocketGateway.broadcastToRole(
+      'admin',
+      'jobStatusChanged',
+      updateData,
+    );
+    this.webSocketGateway.broadcastToRole(
+      'dispatcher',
+      'jobStatusChanged',
+      updateData,
+    );
   }
 
-  notifyJobProgress(jobId: string, progress: number, message: string, crewId?: string) {
+  notifyJobProgress(
+    jobId: string,
+    progress: number,
+    message: string,
+    crewId?: string,
+  ) {
     const updateData: JobUpdateData = {
       jobId,
       progress,
@@ -94,7 +107,11 @@ export class RealtimeService {
 
     this.webSocketGateway.broadcastJobUpdate(jobId, updateData);
     this.webSocketGateway.broadcastToRole('admin', 'jobCompleted', updateData);
-    this.webSocketGateway.broadcastToRole('dispatcher', 'jobCompleted', updateData);
+    this.webSocketGateway.broadcastToRole(
+      'dispatcher',
+      'jobCompleted',
+      updateData,
+    );
   }
 
   // User notifications
@@ -111,8 +128,16 @@ export class RealtimeService {
   }
 
   broadcastSystemNotification(notification: NotificationData) {
-    this.webSocketGateway.broadcastToRole('admin', 'systemNotification', notification);
-    this.webSocketGateway.broadcastToRole('dispatcher', 'systemNotification', notification);
+    this.webSocketGateway.broadcastToRole(
+      'admin',
+      'systemNotification',
+      notification,
+    );
+    this.webSocketGateway.broadcastToRole(
+      'dispatcher',
+      'systemNotification',
+      notification,
+    );
   }
 
   // Customer-related updates
@@ -132,7 +157,12 @@ export class RealtimeService {
   }
 
   // Estimate-related updates
-  notifyEstimateCalculated(customerId: string, estimateId: string, totalPrice: number, calculatedBy: string) {
+  notifyEstimateCalculated(
+    customerId: string,
+    estimateId: string,
+    totalPrice: number,
+    calculatedBy: string,
+  ) {
     const notification: NotificationData = {
       id: `estimate_${estimateId}`,
       type: 'success',
@@ -155,7 +185,11 @@ export class RealtimeService {
   }
 
   // Pricing rules updates
-  notifyPricingRuleChanged(ruleId: string, action: 'created' | 'updated' | 'deleted' | 'activated' | 'deactivated', changedBy: string) {
+  notifyPricingRuleChanged(
+    ruleId: string,
+    action: 'created' | 'updated' | 'deleted' | 'activated' | 'deactivated',
+    changedBy: string,
+  ) {
     const notification: NotificationData = {
       id: `rule_${ruleId}_${Date.now()}`,
       type: 'info',
@@ -178,7 +212,11 @@ export class RealtimeService {
   }
 
   // System health and monitoring
-  notifySystemAlert(alertType: 'warning' | 'error' | 'critical', message: string, details?: any) {
+  notifySystemAlert(
+    alertType: 'warning' | 'error' | 'critical',
+    message: string,
+    details?: any,
+  ) {
     const notification: NotificationData = {
       id: `system_alert_${Date.now()}`,
       type: alertType === 'critical' ? 'error' : alertType,
@@ -217,7 +255,11 @@ export class RealtimeService {
   }
 
   // Crew coordination
-  notifyCrewCoordination(crewId: string, coordinationType: 'meetup' | 'handoff' | 'assistance', data: any) {
+  notifyCrewCoordination(
+    crewId: string,
+    coordinationType: 'meetup' | 'handoff' | 'assistance',
+    data: any,
+  ) {
     this.webSocketGateway.broadcastToCrew(crewId, 'crewCoordination', {
       type: coordinationType,
       data,
@@ -226,7 +268,11 @@ export class RealtimeService {
   }
 
   // Emergency escalation
-  escalateEmergency(emergencyId: string, escalationType: 'supervisor' | 'management' | 'external', details: any) {
+  escalateEmergency(
+    emergencyId: string,
+    escalationType: 'supervisor' | 'management' | 'external',
+    details: any,
+  ) {
     const notification: NotificationData = {
       id: `emergency_${emergencyId}`,
       type: 'error',
@@ -259,14 +305,14 @@ export class RealtimeService {
 
   isUserOnline(userId: string): boolean {
     const connectedUsers = this.getConnectedUsers();
-    return connectedUsers.some(user => user.userId === userId);
+    return connectedUsers.some((user) => user.userId === userId);
   }
 
   getOnlineCrewMembers(crewId: string): string[] {
     const connectedUsers = this.getConnectedUsers();
     return connectedUsers
-      .filter(user => user.crewId === crewId && user.userRole === 'crew')
-      .map(user => user.userId)
-      .filter(userId => userId !== undefined) as string[];
+      .filter((user) => user.crewId === crewId && user.userRole === 'crew')
+      .map((user) => user.userId)
+      .filter((userId) => userId !== undefined) as string[];
   }
 }

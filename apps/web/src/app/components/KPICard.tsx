@@ -24,7 +24,7 @@ export const KPICard = memo(function KPICard({
   icon,
   color,
   onClick,
-  loading = false
+  loading = false,
 }: KPICardProps) {
   const formatValue = (val: string | number) => {
     if (typeof val === 'number') {
@@ -79,39 +79,34 @@ export const KPICard = memo(function KPICard({
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      } : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
     >
       <div className={styles.cardHeader}>
-        <div className={styles.cardIcon}>
-          {icon}
-        </div>
+        <div className={styles.cardIcon}>{icon}</div>
         {change !== undefined && (
           <div className={`${styles.changeIndicator} ${getTrendClass()}`}>
             <span className={styles.trendIcon}>{getTrendIcon()}</span>
             <span className={styles.changeValue}>
-              {change > 0 ? '+' : ''}{change.toFixed(1)}%
+              {change > 0 ? '+' : ''}
+              {change.toFixed(1)}%
             </span>
           </div>
         )}
       </div>
 
       <div className={styles.cardContent}>
-        <div className={styles.cardTitle}>
-          {title}
-        </div>
-        <div className={styles.cardValue}>
-          {formatValue(value)}
-        </div>
-        {subValue && (
-          <div className={styles.cardSubValue}>
-            {subValue}
-          </div>
-        )}
+        <div className={styles.cardTitle}>{title}</div>
+        <div className={styles.cardValue}>{formatValue(value)}</div>
+        {subValue && <div className={styles.cardSubValue}>{subValue}</div>}
       </div>
     </div>
   );

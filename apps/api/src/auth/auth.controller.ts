@@ -60,7 +60,7 @@ export class AuthController {
           metadata: {
             username: loginDto.username,
           },
-        }
+        },
       );
 
       return {
@@ -69,7 +69,8 @@ export class AuthController {
         message: 'Login successful',
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       // Log failed login attempt
       await this.auditLogsService.createLog({
         timestamp: new Date(),
@@ -92,7 +93,9 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    const result = await this.authService.refreshToken(refreshTokenDto.refresh_token);
+    const result = await this.authService.refreshToken(
+      refreshTokenDto.refresh_token,
+    );
     return {
       success: true,
       data: result,
@@ -121,7 +124,7 @@ export class AuthController {
       {
         severity: 'info',
         outcome: 'success',
-      }
+      },
     );
 
     return {
@@ -133,7 +136,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@CurrentUser() user: User) {
-    const { passwordHash: _, ...userProfile } = user;
+    const { passwordHash, ...userProfile } = user;
     return {
       success: true,
       data: userProfile,
@@ -146,8 +149,12 @@ export class AuthController {
     @CurrentUser() user: User,
     @Body() updateUserDto: Omit<UpdateUserDto, 'roleId' | 'isActive'>,
   ) {
-    const updatedUser = await this.authService.update(user.id, updateUserDto, user.id);
-    const { passwordHash: _, ...userProfile } = updatedUser;
+    const updatedUser = await this.authService.update(
+      user.id,
+      updateUserDto,
+      user.id,
+    );
+    const { passwordHash, ...userProfile } = updatedUser;
 
     return {
       success: true,
@@ -179,7 +186,7 @@ export class AuthController {
       {
         severity: 'warning',
         outcome: 'success',
-      }
+      },
     );
 
     return {
@@ -201,9 +208,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Delete('sessions/:sessionId')
   @HttpCode(HttpStatus.OK)
-  async revokeSession(
-    @Param('sessionId') sessionId: string,
-  ) {
+  async revokeSession(@Param('sessionId') sessionId: string) {
     await this.authService.revokeSession(sessionId);
     return {
       success: true,
@@ -216,9 +221,13 @@ export class AuthController {
   @RequirePermissions({ resource: 'users', action: 'create' })
   @Post('users')
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User, @Req() req: any) {
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+    @CurrentUser() user: User,
+    @Req() req: any,
+  ) {
     const newUser = await this.authService.create(createUserDto, user.id);
-    const { passwordHash: _, ...userProfile } = newUser;
+    const { passwordHash, ...userProfile } = newUser;
 
     // Log user creation
     await this.auditLogsService.log(
@@ -235,9 +244,13 @@ export class AuthController {
         severity: 'info',
         outcome: 'success',
         changes: {
-          after: { username: newUser.username, email: newUser.email, role: newUser.role.name },
+          after: {
+            username: newUser.username,
+            email: newUser.email,
+            role: newUser.role.name,
+          },
         },
-      }
+      },
     );
 
     return {
@@ -252,7 +265,7 @@ export class AuthController {
   @Get('users')
   async findAllUsers() {
     const users = await this.authService.findAll();
-    const sanitizedUsers = users.map(({ passwordHash: _, ...user }) => user);
+    const sanitizedUsers = users.map(({ passwordHash, ...user }) => user);
 
     return {
       success: true,
@@ -266,7 +279,7 @@ export class AuthController {
   @Get('users/:id')
   async findOneUser(@Param('id') id: string) {
     const user = await this.authService.findOne(id);
-    const { passwordHash: _, ...userProfile } = user;
+    const { passwordHash, ...userProfile } = user;
 
     return {
       success: true,
@@ -283,8 +296,12 @@ export class AuthController {
     @CurrentUser() user: User,
     @Req() req: any,
   ) {
-    const updatedUser = await this.authService.update(id, updateUserDto, user.id);
-    const { passwordHash: _, ...userProfile } = updatedUser;
+    const updatedUser = await this.authService.update(
+      id,
+      updateUserDto,
+      user.id,
+    );
+    const { passwordHash, ...userProfile } = updatedUser;
 
     // Log user update
     await this.auditLogsService.log(
@@ -303,7 +320,7 @@ export class AuthController {
         changes: {
           after: updateUserDto,
         },
-      }
+      },
     );
 
     return {
@@ -317,7 +334,11 @@ export class AuthController {
   @RequirePermissions({ resource: 'users', action: 'delete' })
   @Delete('users/:id')
   @HttpCode(HttpStatus.OK)
-  async removeUser(@Param('id') id: string, @CurrentUser() user: User, @Req() req: any) {
+  async removeUser(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+    @Req() req: any,
+  ) {
     await this.authService.remove(id);
 
     // Log user deletion
@@ -334,7 +355,7 @@ export class AuthController {
         resourceId: id,
         severity: 'warning',
         outcome: 'success',
-      }
+      },
     );
 
     return {
@@ -385,9 +406,7 @@ export class AuthController {
   @Roles('super_admin', 'admin')
   @Delete('users/:userId/sessions/:sessionId')
   @HttpCode(HttpStatus.OK)
-  async revokeUserSession(
-    @Param('sessionId') sessionId: string,
-  ) {
+  async revokeUserSession(@Param('sessionId') sessionId: string) {
     await this.authService.revokeSession(sessionId);
     return {
       success: true,

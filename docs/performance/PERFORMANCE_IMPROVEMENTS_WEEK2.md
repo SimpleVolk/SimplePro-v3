@@ -15,6 +15,7 @@ This document details the critical performance optimizations implemented across 
 3. **Cache Underutilization** (Resolved)
 
 Expected improvements:
+
 - **Dashboard load time**: 800ms → ~180ms (**77% faster**)
 - **Customer list queries**: 150ms → ~20ms (**87% faster**)
 - **Job list queries**: 180ms → ~25ms (**86% faster**)
@@ -26,6 +27,7 @@ Expected improvements:
 ## 1. N+1 Query Problem Resolution
 
 ### Problem Identified
+
 The analytics service was making sequential database queries in loops, resulting in significant performance degradation:
 
 ```typescript
@@ -39,6 +41,7 @@ for (const job of jobs) {
 ```
 
 ### Solution Implemented
+
 Replaced with MongoDB aggregation pipeline using `$lookup` for single-query data retrieval:
 
 ```typescript
@@ -50,28 +53,30 @@ const results = await this.jobModel.aggregate([
       from: 'users',
       localField: 'createdBy',
       foreignField: '_id',
-      as: 'userDetails'
-    }
+      as: 'userDetails',
+    },
   },
   {
     $lookup: {
       from: 'customers',
       localField: 'customerId',
       foreignField: '_id',
-      as: 'customer'
-    }
+      as: 'customer',
+    },
   },
   // ... additional aggregation stages
 ]);
 ```
 
 ### Files Modified
+
 - `apps/api/src/analytics/analytics.service.ts`
   - `getSalesPerformance()` - Fixed N+1 with $lookup for users and customers
   - `getDashboardMetrics()` - Added 1-minute caching
   - Used `$facet` for multiple aggregations in single query
 
 ### Performance Impact
+
 - **Before**: ~800ms for analytics queries
 - **After**: ~320ms for analytics queries
 - **Improvement**: **60% faster** (480ms saved)
@@ -81,29 +86,34 @@ const results = await this.jobModel.aggregate([
 ## 2. Response Compression Enhancement
 
 ### Implementation
+
 Enhanced existing compression middleware with optimized configuration:
 
 ```typescript
 // apps/api/src/main.ts
-app.use(compression({
-  filter: (req, res) => {
-    if (req.headers['x-no-compression']) {
-      return false; // Allow opt-out
-    }
-    return compression.filter(req, res);
-  },
-  threshold: 1024, // Only compress responses > 1KB
-  level: 6, // Balanced compression level (1-9 scale)
-}));
+app.use(
+  compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) {
+        return false; // Allow opt-out
+      }
+      return compression.filter(req, res);
+    },
+    threshold: 1024, // Only compress responses > 1KB
+    level: 6, // Balanced compression level (1-9 scale)
+  }),
+);
 ```
 
 ### Features
+
 - **Automatic compression** for all text/json responses
 - **Smart threshold**: Only compresses responses >1KB (avoids overhead for small responses)
 - **Opt-out support**: Clients can set `x-no-compression` header
 - **Balanced level**: Level 6 provides good compression without excessive CPU usage
 
 ### Performance Impact
+
 - **Payload reduction**: ~70% smaller for large responses
 - **Example**: 700KB response → ~210KB (490KB saved per request)
 - **Network time saved**: Significant for slower connections
@@ -114,9 +124,11 @@ app.use(compression({
 ## 3. Automated List Caching System
 
 ### Architecture Overview
+
 Implemented a comprehensive caching system using Redis with automatic cache management:
 
 #### Components Created
+
 1. **Cache Interceptor** (`apps/api/src/cache/interceptors/cache-list.interceptor.ts`)
    - Automatically caches GET requests
    - Uses `@CacheTTL` decorator for per-endpoint TTL configuration
@@ -160,18 +172,19 @@ async update(id: string, updateDto: UpdateCustomerDto) {
 
 ### Endpoints with Caching Enabled
 
-| Endpoint | Cache TTL | Rationale |
-|----------|-----------|-----------|
-| `GET /api/customers` | 5 min (300s) | Changes infrequently |
-| `GET /api/jobs` | 2 min (120s) | More dynamic data |
-| `GET /api/opportunities` | 5 min (300s) | Relatively stable |
-| `GET /api/estimates` | 10 min (600s) | Rarely changes once created |
-| `GET /api/analytics/dashboard` | 1 min (60s) | Real-time insights needed |
-| `GET /api/users` | 10 min (600s) | Very stable data |
-| `GET /api/crew/availability` | 3 min (180s) | Semi-dynamic |
-| `GET /api/tariffs/pricing-rules` | 15 min (900s) | Configuration data |
+| Endpoint                         | Cache TTL     | Rationale                   |
+| -------------------------------- | ------------- | --------------------------- |
+| `GET /api/customers`             | 5 min (300s)  | Changes infrequently        |
+| `GET /api/jobs`                  | 2 min (120s)  | More dynamic data           |
+| `GET /api/opportunities`         | 5 min (300s)  | Relatively stable           |
+| `GET /api/estimates`             | 10 min (600s) | Rarely changes once created |
+| `GET /api/analytics/dashboard`   | 1 min (60s)   | Real-time insights needed   |
+| `GET /api/users`                 | 10 min (600s) | Very stable data            |
+| `GET /api/crew/availability`     | 3 min (180s)  | Semi-dynamic                |
+| `GET /api/tariffs/pricing-rules` | 15 min (900s) | Configuration data          |
 
 ### Cache Strategy
+
 - **Redis primary storage** with in-memory fallback
 - **Automatic compression** for large cached objects (>1KB)
 - **Tag-based invalidation** for related resources
@@ -179,6 +192,7 @@ async update(id: string, updateDto: UpdateCustomerDto) {
 - **TTL-based expiration** prevents stale data
 
 ### Performance Impact
+
 - **First request**: Normal query time (~150ms)
 - **Cached requests**: ~5-20ms (**87-96% faster**)
 - **Expected cache hit rate**: 70-80% for typical usage
@@ -191,6 +205,7 @@ async update(id: string, updateDto: UpdateCustomerDto) {
 ### Query Improvements
 
 #### Before (Inefficient)
+
 ```typescript
 const jobs = await this.jobModel
   .find(query)
@@ -200,10 +215,13 @@ const jobs = await this.jobModel
 ```
 
 #### After (Optimized)
+
 ```typescript
 const jobs = await this.jobModel
   .find(query)
-  .select('jobNumber title status type priority customerId scheduledDate estimatedCost') // Only needed fields
+  .select(
+    'jobNumber title status type priority customerId scheduledDate estimatedCost',
+  ) // Only needed fields
   .populate('customerId', 'firstName lastName email phone') // Only needed customer fields
   .populate('assignedCrew.crewMemberId', 'firstName lastName profilePicture') // Only needed crew fields
   .lean() // Return plain JS objects (faster)
@@ -231,6 +249,7 @@ const jobs = await this.jobModel
    - Already implemented, maintained in optimizations
 
 ### Files Modified
+
 - `apps/api/src/jobs/jobs.service.ts`
   - Added field projections to `findAll()`
   - Added selective population for customer and crew
@@ -241,6 +260,7 @@ const jobs = await this.jobModel
   - Implemented lean queries for list operations
 
 ### Performance Impact
+
 - **Data transfer reduction**: ~60% less data from MongoDB
 - **Memory usage**: ~50% reduction per query
 - **Query speed**: 20-40% faster execution time
@@ -253,6 +273,7 @@ const jobs = await this.jobModel
 ### New Compound Indexes Added
 
 #### Job Schema (`apps/api/src/jobs/schemas/job.schema.ts`)
+
 ```typescript
 // New indexes for analytics and dashboard queries
 JobSchema.index({ status: 1, scheduledDate: -1 }); // Dashboard active jobs by date
@@ -261,6 +282,7 @@ JobSchema.index({ createdBy: 1, createdAt: -1 }); // Sales performance analytics
 ```
 
 #### Customer Schema (`apps/api/src/customers/schemas/customer.schema.ts`)
+
 ```typescript
 // New indexes for analytics and reporting
 CustomerSchema.index({ source: 1, createdAt: -1 }); // Referral source analytics
@@ -268,12 +290,14 @@ CustomerSchema.index({ status: 1, createdAt: -1 }); // Lead pipeline reports
 ```
 
 ### Index Strategy
+
 - **Existing indexes maintained**: Both schemas already had excellent base indexes
 - **Compound indexes added**: Support common query patterns in analytics
 - **Index direction**: Ascending (1) for equality, descending (-1) for sorting
 - **Selective indexing**: Only indexes that provide measurable benefit
 
 ### Performance Impact
+
 - **Query plan improvement**: Queries now use optimal indexes
 - **Scan reduction**: Fewer documents examined per query
 - **Sort optimization**: In-memory sorts eliminated for indexed fields
@@ -310,16 +334,19 @@ curl -w "\nTime: %{time_total}s\n" \
 ### Expected Results
 
 #### Customer List Query
+
 - **First request** (no cache): ~150ms → ~30ms after optimization
 - **Cached request**: ~5-10ms
 - **Payload size**: ~700KB → ~210KB with compression
 
 #### Job List Query
+
 - **First request** (no cache): ~180ms → ~35ms after optimization
 - **Cached request**: ~5-15ms
 - **Payload size**: ~500KB → ~150KB with compression
 
 #### Dashboard Analytics
+
 - **Before optimization**: ~800ms
 - **After optimization**: ~180ms (first request), ~20ms (cached)
 - **Payload size**: ~100KB → ~30KB with compression
@@ -384,6 +411,7 @@ INFO stats
 ```
 
 ### Expected Metrics
+
 - **Cache hit rate**: 70-80% after warmup period
 - **Memory usage**: ~100-500MB depending on data volume
 - **Average TTL**: 2-5 minutes
@@ -406,6 +434,7 @@ db.jobs.aggregate([
 ```
 
 ### Expected Index Statistics
+
 - **Index hit rate**: >95% for list queries
 - **Documents examined**: Should equal documents returned (efficient)
 - **Stage**: "IXSCAN" for index usage (not "COLLSCAN")
@@ -417,6 +446,7 @@ db.jobs.aggregate([
 ### If Issues Occur
 
 #### Disable Caching
+
 ```typescript
 // In controller, comment out interceptor
 // @UseInterceptors(CacheListInterceptor)
@@ -426,6 +456,7 @@ export class CustomersController {
 ```
 
 #### Disable Compression
+
 ```typescript
 // In apps/api/src/main.ts
 // Comment out compression middleware
@@ -433,6 +464,7 @@ export class CustomersController {
 ```
 
 #### Revert Query Optimizations
+
 ```typescript
 // Remove .lean() and .select() if causing issues
 const jobs = await this.jobModel
@@ -443,6 +475,7 @@ const jobs = await this.jobModel
 ```
 
 ### Cache Clearing
+
 ```bash
 # Clear all caches if needed
 curl -X DELETE \
@@ -458,6 +491,7 @@ redis-cli FLUSHDB
 ## Future Optimizations (Recommended)
 
 ### Short-term (Next Sprint)
+
 1. **React Query Integration** (Frontend)
    - Install `@tanstack/react-query`
    - Create custom hooks for data fetching
@@ -475,6 +509,7 @@ redis-cli FLUSHDB
    - Expected: 10-20% faster under load
 
 ### Medium-term (Next Month)
+
 1. **Read Replicas**
    - Separate read/write database instances
    - Route queries to replicas
@@ -491,6 +526,7 @@ redis-cli FLUSHDB
    - Expected: 70-90% faster for analytics
 
 ### Long-term (Next Quarter)
+
 1. **Horizontal Scaling**
    - Load balancer for multiple API instances
    - Session store in Redis
@@ -511,11 +547,13 @@ redis-cli FLUSHDB
 ## Summary of Changes
 
 ### Files Created
+
 1. `apps/api/src/cache/interceptors/cache-list.interceptor.ts`
 2. `apps/api/src/cache/decorators/cache-ttl.decorator.ts`
 3. `docs/performance/PERFORMANCE_IMPROVEMENTS_WEEK2.md`
 
 ### Files Modified
+
 1. `apps/api/src/main.ts` - Enhanced compression configuration
 2. `apps/api/src/analytics/analytics.service.ts` - Fixed N+1 queries, added caching
 3. `apps/api/src/cache/cache.module.ts` - Exported new interceptor
@@ -527,6 +565,7 @@ redis-cli FLUSHDB
 9. `apps/api/src/customers/schemas/customer.schema.ts` - Added compound indexes
 
 ### Configuration Changes
+
 - **Redis**: Already configured, no changes needed
 - **MongoDB**: Indexes will be created automatically on first query
 - **Environment**: No new environment variables required
@@ -537,16 +576,17 @@ redis-cli FLUSHDB
 
 ### Quantitative Improvements
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Dashboard Load | 800ms | ~180ms | **77% faster** |
-| Customer List | 150ms | ~20ms | **87% faster** |
-| Job List | 180ms | ~25ms | **86% faster** |
-| Analytics Queries | 800ms | ~320ms | **60% faster** |
-| Payload Size (avg) | 500KB | ~150KB | **70% smaller** |
-| Cache Hit Rate | 0% | ~75% | **New capability** |
+| Metric             | Before | After  | Improvement        |
+| ------------------ | ------ | ------ | ------------------ |
+| Dashboard Load     | 800ms  | ~180ms | **77% faster**     |
+| Customer List      | 150ms  | ~20ms  | **87% faster**     |
+| Job List           | 180ms  | ~25ms  | **86% faster**     |
+| Analytics Queries  | 800ms  | ~320ms | **60% faster**     |
+| Payload Size (avg) | 500KB  | ~150KB | **70% smaller**    |
+| Cache Hit Rate     | 0%     | ~75%   | **New capability** |
 
 ### Qualitative Improvements
+
 - ✅ **Better user experience**: Faster page loads and navigation
 - ✅ **Reduced server load**: Fewer database queries
 - ✅ **Improved scalability**: Can handle more concurrent users
@@ -570,6 +610,7 @@ All planned performance optimizations have been successfully implemented:
 The system is now production-ready with significant performance improvements. All optimizations maintain backward compatibility and include proper cache invalidation to prevent stale data issues.
 
 ### Next Steps
+
 1. Monitor performance metrics in production
 2. Adjust cache TTLs based on actual usage patterns
 3. Implement frontend React Query integration

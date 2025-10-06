@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { AutoAssignmentService, JobRequirements } from './auto-assignment.service';
+import {
+  AutoAssignmentService,
+  JobRequirements,
+} from './auto-assignment.service';
 import { CrewAssignment } from '../schemas/crew-assignment.schema';
 import { WorkloadService } from './workload.service';
 import { TimeOffService } from './time-off.service';
@@ -48,7 +51,9 @@ describe('AutoAssignmentService', () => {
     ...overrides,
   });
 
-  const createMockRequirements = (overrides: Partial<JobRequirements> = {}): JobRequirements => ({
+  const createMockRequirements = (
+    overrides: Partial<JobRequirements> = {},
+  ): JobRequirements => ({
     requiredSkills: ['packing', 'driving'],
     crewSize: 2,
     jobDate: new Date('2024-06-15T08:00:00Z'),
@@ -125,7 +130,11 @@ describe('AutoAssignmentService', () => {
         isOverloaded: false,
       });
 
-      const score = await service.scoreCrewMember(crewMember, job, requirements);
+      const score = await service.scoreCrewMember(
+        crewMember,
+        job,
+        requirements,
+      );
 
       // Skills: 30 (100% match), Availability: 20, Proximity: 20, Performance: 15, Workload: 10
       expect(score).toBeGreaterThan(90);
@@ -141,7 +150,11 @@ describe('AutoAssignmentService', () => {
         requiredSkills: ['packing', 'driving'],
       });
 
-      const score = await service.scoreCrewMember(crewMember, job, requirements);
+      const score = await service.scoreCrewMember(
+        crewMember,
+        job,
+        requirements,
+      );
 
       // Skills should be 15 points (50% of 30)
       expect(score).toBeGreaterThan(0);
@@ -155,7 +168,11 @@ describe('AutoAssignmentService', () => {
 
       mockTimeOffService.isOnTimeOff.mockResolvedValue(true);
 
-      const score = await service.scoreCrewMember(crewMember, job, requirements);
+      const score = await service.scoreCrewMember(
+        crewMember,
+        job,
+        requirements,
+      );
 
       // Availability: 0 points (on time off)
       expect(score).toBeLessThan(100); // Won't get full availability points
@@ -176,7 +193,11 @@ describe('AutoAssignmentService', () => {
       });
       const requirements = createMockRequirements();
 
-      const score = await service.scoreCrewMember(nearCrewMember, job, requirements);
+      const score = await service.scoreCrewMember(
+        nearCrewMember,
+        job,
+        requirements,
+      );
 
       expect(score).toBeGreaterThan(0);
       // Close proximity should give high proximity score (up to 20 points)
@@ -199,7 +220,11 @@ describe('AutoAssignmentService', () => {
       });
       const requirements = createMockRequirements();
 
-      const score = await service.scoreCrewMember(crewMember, job, requirements);
+      const score = await service.scoreCrewMember(
+        crewMember,
+        job,
+        requirements,
+      );
 
       expect(score).toBeGreaterThan(0);
       // Same zip code should give high proximity score
@@ -216,8 +241,16 @@ describe('AutoAssignmentService', () => {
       const job = createMockJob();
       const requirements = createMockRequirements();
 
-      const highScore = await service.scoreCrewMember(highPerformer, job, requirements);
-      const lowScore = await service.scoreCrewMember(lowPerformer, job, requirements);
+      const highScore = await service.scoreCrewMember(
+        highPerformer,
+        job,
+        requirements,
+      );
+      const lowScore = await service.scoreCrewMember(
+        lowPerformer,
+        job,
+        requirements,
+      );
 
       expect(highScore).toBeGreaterThan(lowScore);
     });
@@ -232,8 +265,16 @@ describe('AutoAssignmentService', () => {
         .mockResolvedValueOnce({ totalJobs: 2, isOverloaded: false }) // Light
         .mockResolvedValueOnce({ totalJobs: 5, isOverloaded: false }); // Heavy
 
-      const lightScore = await service.scoreCrewMember(lightWorkload, job, requirements);
-      const heavyScore = await service.scoreCrewMember(heavyWorkload, job, requirements);
+      const lightScore = await service.scoreCrewMember(
+        lightWorkload,
+        job,
+        requirements,
+      );
+      const heavyScore = await service.scoreCrewMember(
+        heavyWorkload,
+        job,
+        requirements,
+      );
 
       expect(lightScore).toBeGreaterThan(heavyScore);
     });
@@ -245,7 +286,11 @@ describe('AutoAssignmentService', () => {
       });
       const requirements = createMockRequirements();
 
-      const score = await service.scoreCrewMember(preferredCrew, job, requirements);
+      const score = await service.scoreCrewMember(
+        preferredCrew,
+        job,
+        requirements,
+      );
 
       // Should get team preference bonus (5 points)
       expect(score).toBeGreaterThan(0);
@@ -258,7 +303,11 @@ describe('AutoAssignmentService', () => {
       const job = createMockJob();
       const requirements = createMockRequirements();
 
-      const score = await service.scoreCrewMember(unskilledCrew, job, requirements);
+      const score = await service.scoreCrewMember(
+        unskilledCrew,
+        job,
+        requirements,
+      );
 
       // Skills match should be 0
       expect(score).toBeLessThan(100);
@@ -277,7 +326,11 @@ describe('AutoAssignmentService', () => {
         isOverloaded: false,
       });
 
-      const score = await service.scoreCrewMember(perfectCrew, job, requirements);
+      const score = await service.scoreCrewMember(
+        perfectCrew,
+        job,
+        requirements,
+      );
 
       expect(score).toBeLessThanOrEqual(100);
     });
@@ -292,7 +345,11 @@ describe('AutoAssignmentService', () => {
         isOverloaded: false,
       });
 
-      const result = await service.checkAvailabilityForJob(mockCrewId, jobDate, 8);
+      const result = await service.checkAvailabilityForJob(
+        mockCrewId,
+        jobDate,
+        8,
+      );
 
       expect(result).toBe(true);
     });
@@ -301,7 +358,11 @@ describe('AutoAssignmentService', () => {
       const jobDate = new Date('2024-06-15');
       mockTimeOffService.isOnTimeOff.mockResolvedValue(true);
 
-      const result = await service.checkAvailabilityForJob(mockCrewId, jobDate, 8);
+      const result = await service.checkAvailabilityForJob(
+        mockCrewId,
+        jobDate,
+        8,
+      );
 
       expect(result).toBe(false);
     });
@@ -314,7 +375,11 @@ describe('AutoAssignmentService', () => {
         isOverloaded: true,
       });
 
-      const result = await service.checkAvailabilityForJob(mockCrewId, jobDate, 8);
+      const result = await service.checkAvailabilityForJob(
+        mockCrewId,
+        jobDate,
+        8,
+      );
 
       expect(result).toBe(false);
     });
@@ -324,7 +389,11 @@ describe('AutoAssignmentService', () => {
       mockTimeOffService.isOnTimeOff.mockResolvedValue(false);
       mockWorkloadService.getCrewWorkload.mockResolvedValue(null);
 
-      const result = await service.checkAvailabilityForJob(mockCrewId, jobDate, 8);
+      const result = await service.checkAvailabilityForJob(
+        mockCrewId,
+        jobDate,
+        8,
+      );
 
       expect(result).toBe(true); // Null workload means available
     });
@@ -414,7 +483,11 @@ describe('AutoAssignmentService', () => {
             teamPreference: 0,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 2, hoursWorked: 16, utilizationRate: 0.5 },
+          currentWorkload: {
+            totalJobs: 2,
+            hoursWorked: 16,
+            utilizationRate: 0.5,
+          },
         },
         {
           crewMemberId: 'crew-002',
@@ -429,7 +502,11 @@ describe('AutoAssignmentService', () => {
             teamPreference: 5,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 3, hoursWorked: 24, utilizationRate: 0.75 },
+          currentWorkload: {
+            totalJobs: 3,
+            hoursWorked: 24,
+            utilizationRate: 0.75,
+          },
         },
       ]);
 
@@ -455,7 +532,11 @@ describe('AutoAssignmentService', () => {
             teamPreference: 0,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 2, hoursWorked: 16, utilizationRate: 0.5 },
+          currentWorkload: {
+            totalJobs: 2,
+            hoursWorked: 16,
+            utilizationRate: 0.5,
+          },
         },
         {
           crewMemberId: 'crew-002',
@@ -470,7 +551,11 @@ describe('AutoAssignmentService', () => {
             teamPreference: 5,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 3, hoursWorked: 24, utilizationRate: 0.75 },
+          currentWorkload: {
+            totalJobs: 3,
+            hoursWorked: 24,
+            utilizationRate: 0.75,
+          },
         },
         {
           crewMemberId: 'crew-003',
@@ -485,11 +570,19 @@ describe('AutoAssignmentService', () => {
             teamPreference: 5,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 1, hoursWorked: 8, utilizationRate: 0.25 },
+          currentWorkload: {
+            totalJobs: 1,
+            hoursWorked: 8,
+            utilizationRate: 0.25,
+          },
         },
       ]);
 
-      const result = await service.autoAssignCrew(mockJobId, requirements, mockAssignedBy);
+      const result = await service.autoAssignCrew(
+        mockJobId,
+        requirements,
+        mockAssignedBy,
+      );
 
       expect(result.crewMembers).toContain('crew-001');
       expect(result.crewMembers).toContain('crew-002');
@@ -518,7 +611,11 @@ describe('AutoAssignmentService', () => {
             teamPreference: 0,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 2, hoursWorked: 16, utilizationRate: 0.5 },
+          currentWorkload: {
+            totalJobs: 2,
+            hoursWorked: 16,
+            utilizationRate: 0.5,
+          },
         },
         {
           crewMemberId: 'crew-002',
@@ -533,11 +630,19 @@ describe('AutoAssignmentService', () => {
             teamPreference: 5,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 3, hoursWorked: 24, utilizationRate: 0.75 },
+          currentWorkload: {
+            totalJobs: 3,
+            hoursWorked: 24,
+            utilizationRate: 0.75,
+          },
         },
       ]);
 
-      const result = await service.autoAssignCrew(mockJobId, requirements, mockAssignedBy);
+      const result = await service.autoAssignCrew(
+        mockJobId,
+        requirements,
+        mockAssignedBy,
+      );
 
       expect(result.crewLeadId).toBe('crew-002'); // Preferred lead
     });
@@ -562,7 +667,11 @@ describe('AutoAssignmentService', () => {
             teamPreference: 0,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 2, hoursWorked: 16, utilizationRate: 0.5 },
+          currentWorkload: {
+            totalJobs: 2,
+            hoursWorked: 16,
+            utilizationRate: 0.5,
+          },
         },
         {
           crewMemberId: 'crew-002',
@@ -577,11 +686,19 @@ describe('AutoAssignmentService', () => {
             teamPreference: 5,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 3, hoursWorked: 24, utilizationRate: 0.75 },
+          currentWorkload: {
+            totalJobs: 3,
+            hoursWorked: 24,
+            utilizationRate: 0.75,
+          },
         },
       ]);
 
-      const result = await service.autoAssignCrew(mockJobId, requirements, mockAssignedBy);
+      const result = await service.autoAssignCrew(
+        mockJobId,
+        requirements,
+        mockAssignedBy,
+      );
 
       expect(result.crewMembers).not.toContain('crew-003');
     });
@@ -603,11 +720,19 @@ describe('AutoAssignmentService', () => {
             teamPreference: 0,
           },
           isAvailable: true,
-          currentWorkload: { totalJobs: 2, hoursWorked: 16, utilizationRate: 0.5 },
+          currentWorkload: {
+            totalJobs: 2,
+            hoursWorked: 16,
+            utilizationRate: 0.5,
+          },
         },
       ]);
 
-      const result = await service.autoAssignCrew(mockJobId, requirements, mockAssignedBy);
+      const result = await service.autoAssignCrew(
+        mockJobId,
+        requirements,
+        mockAssignedBy,
+      );
 
       expect(result.isConfirmed).toBe(false);
       expect(result.confirmedBy).toEqual([]);

@@ -135,7 +135,9 @@ const LoginScreen = () => {
               },
             ]}
           >
-            <Text style={{ color: colors.textSecondary, fontSize: fontSize.xl }}>
+            <Text
+              style={{ color: colors.textSecondary, fontSize: fontSize.xl }}
+            >
               SP
             </Text>
           </View>

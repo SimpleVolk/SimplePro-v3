@@ -11,14 +11,14 @@ import {
   Min,
   Max,
   Length,
-  Matches
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 enum ServiceType {
   LOCAL = 'local',
   LONG_DISTANCE = 'long_distance',
-  PACKING_ONLY = 'packing_only'
+  PACKING_ONLY = 'packing_only',
 }
 
 class SpecialItemsDto {
@@ -138,7 +138,10 @@ export class CreateEstimateDto {
   @IsOptional()
   @IsString()
   @Length(2, 100)
-  @Matches(/^[a-zA-Z\s'-]+$/, { message: 'Customer name can only contain letters, spaces, apostrophes, and hyphens' })
+  @Matches(/^[a-zA-Z\s'-]+$/, {
+    message:
+      'Customer name can only contain letters, spaces, apostrophes, and hyphens',
+  })
   customerName?: string;
 
   @IsOptional()
@@ -148,10 +151,14 @@ export class CreateEstimateDto {
   @IsOptional()
   @IsString()
   @Length(10, 20)
-  @Matches(/^[+]?[1-9][\d]{0,15}$/, { message: 'Customer phone must be a valid phone number' })
+  @Matches(/^[\+]?[1-9][\d]{0,15}$/, {
+    message: 'Customer phone must be a valid phone number',
+  })
   customerPhone?: string;
 
-  @IsEnum(ServiceType, { message: 'Service type must be local, long_distance, or packing_only' })
+  @IsEnum(ServiceType, {
+    message: 'Service type must be local, long_distance, or packing_only',
+  })
   serviceType!: ServiceType;
 
   @IsDateString({}, { message: 'Move date must be a valid ISO date string' })

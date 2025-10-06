@@ -46,7 +46,8 @@ class NotificationService {
         importance: 4,
         vibrate: true,
       },
-      (created: boolean) => console.log(`Channel 'job-updates' created: ${created}`)
+      (created: boolean) =>
+        console.log(`Channel 'job-updates' created: ${created}`),
     );
 
     PushNotification.createChannel(
@@ -59,7 +60,8 @@ class NotificationService {
         importance: 4,
         vibrate: true,
       },
-      (created: boolean) => console.log(`Channel 'messages' created: ${created}`)
+      (created: boolean) =>
+        console.log(`Channel 'messages' created: ${created}`),
     );
   }
 
@@ -70,11 +72,10 @@ class NotificationService {
     if (Platform.OS === 'android') {
       // Android 13+ requires runtime permission
       if (Platform.Version >= 33) {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { PermissionsAndroid } = require('react-native');
         try {
           await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           );
         } catch (error) {
           console.error('Failed to request notification permission:', error);

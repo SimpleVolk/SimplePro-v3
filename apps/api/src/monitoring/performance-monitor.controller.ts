@@ -1,10 +1,20 @@
-import { Controller, Get, Post, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { DatabasePerformanceService } from '../database/database-performance.service';
 import { CacheService } from '../cache/cache.service';
-import { IndexOptimizationService, IndexInfo } from '../database/index-optimization.service';
+import {
+  IndexOptimizationService,
+  IndexInfo,
+} from '../database/index-optimization.service';
 
 @Controller('admin/performance')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -13,14 +23,14 @@ export class PerformanceMonitorController {
   constructor(
     private readonly dbPerformanceService: DatabasePerformanceService,
     private readonly cacheService: CacheService,
-    private readonly indexService: IndexOptimizationService
+    private readonly indexService: IndexOptimizationService,
   ) {}
 
   @Get('database/health')
   async getDatabaseHealth() {
     return {
       success: true,
-      data: await this.dbPerformanceService.getConnectionHealth()
+      data: await this.dbPerformanceService.getConnectionHealth(),
     };
   }
 
@@ -28,7 +38,7 @@ export class PerformanceMonitorController {
   async getDatabaseStats() {
     return {
       success: true,
-      data: await this.dbPerformanceService.getPerformanceStats()
+      data: await this.dbPerformanceService.getPerformanceStats(),
     };
   }
 
@@ -37,7 +47,7 @@ export class PerformanceMonitorController {
     const thresholdMs = threshold ? parseInt(threshold, 10) : 100;
     return {
       success: true,
-      data: this.dbPerformanceService.getSlowQueries(thresholdMs)
+      data: this.dbPerformanceService.getSlowQueries(thresholdMs),
     };
   }
 
@@ -45,7 +55,7 @@ export class PerformanceMonitorController {
   async getCacheStats() {
     return {
       success: true,
-      data: this.cacheService.getStats()
+      data: this.cacheService.getStats(),
     };
   }
 
@@ -70,13 +80,14 @@ export class PerformanceMonitorController {
       default:
         return {
           success: false,
-          error: 'Invalid cache type. Use: users, jobs, customers, analytics, or all'
+          error:
+            'Invalid cache type. Use: users, jobs, customers, analytics, or all',
         };
     }
 
     return {
       success: true,
-      message: `${type || 'specified'} cache cleared successfully`
+      message: `${type || 'specified'} cache cleared successfully`,
     };
   }
 
@@ -85,7 +96,7 @@ export class PerformanceMonitorController {
     this.cacheService.resetStats();
     return {
       success: true,
-      message: 'Cache statistics reset successfully'
+      message: 'Cache statistics reset successfully',
     };
   }
 
@@ -93,7 +104,7 @@ export class PerformanceMonitorController {
   async getIndexUsage() {
     return {
       success: true,
-      data: await this.indexService.analyzeIndexUsage()
+      data: await this.indexService.analyzeIndexUsage(),
     };
   }
 
@@ -101,7 +112,7 @@ export class PerformanceMonitorController {
   async getUnusedIndexes() {
     return {
       success: true,
-      data: await this.indexService.getUnusedIndexes()
+      data: await this.indexService.getUnusedIndexes(),
     };
   }
 
@@ -111,7 +122,7 @@ export class PerformanceMonitorController {
     return {
       success: true,
       data: await this.indexService.dropUnusedIndexes(isDryRun),
-      dryRun: isDryRun
+      dryRun: isDryRun,
     };
   }
 
@@ -121,7 +132,7 @@ export class PerformanceMonitorController {
       this.dbPerformanceService.getConnectionHealth(),
       this.dbPerformanceService.getPerformanceStats(),
       this.cacheService.getStats(),
-      this.indexService.analyzeIndexUsage()
+      this.indexService.analyzeIndexUsage(),
     ]);
 
     const slowQueries = this.dbPerformanceService.getSlowQueries(100);
@@ -129,16 +140,18 @@ export class PerformanceMonitorController {
     // Calculate index efficiency
     const totalIndexes: number = Object.values(indexUsage).reduce<number>(
       (total: number, collection: IndexInfo[]) => total + collection.length,
-      0
+      0,
     );
 
     const usedIndexes: number = Object.values(indexUsage).reduce<number>(
       (used: number, collection: IndexInfo[]) =>
-        used + collection.filter((index: IndexInfo) => index.usageCount > 0).length,
-      0
+        used +
+        collection.filter((index: IndexInfo) => index.usageCount > 0).length,
+      0,
     );
 
-    const indexEfficiency: number = totalIndexes > 0 ? (usedIndexes / totalIndexes) * 100 : 0;
+    const indexEfficiency: number =
+      totalIndexes > 0 ? (usedIndexes / totalIndexes) * 100 : 0;
 
     return {
       success: true,
@@ -149,21 +162,25 @@ export class PerformanceMonitorController {
           uptime: dbHealth.uptime,
           averageQueryTime: dbStats.averageQueryTime,
           slowQueryCount: dbStats.slowQueryCount,
-          totalQueries: dbStats.totalQueries
+          totalQueries: dbStats.totalQueries,
         },
         cache: {
           hitRate: cacheStats.hitRate,
           totalHits: cacheStats.hits,
           totalMisses: cacheStats.misses,
-          totalSets: cacheStats.sets
+          totalSets: cacheStats.sets,
         },
         indexes: {
           total: totalIndexes,
           used: usedIndexes,
-          efficiency: Math.round(indexEfficiency * 100) / 100
+          efficiency: Math.round(indexEfficiency * 100) / 100,
         },
-        alerts: this.generatePerformanceAlerts(dbStats, cacheStats, slowQueries)
-      }
+        alerts: this.generatePerformanceAlerts(
+          dbStats,
+          cacheStats,
+          slowQueries,
+        ),
+      },
     };
   }
 
@@ -174,16 +191,22 @@ export class PerformanceMonitorController {
 
     return {
       success: true,
-      message: 'All performance metrics cleared successfully'
+      message: 'All performance metrics cleared successfully',
     };
   }
 
-  private generatePerformanceAlerts(dbStats: any, cacheStats: any, slowQueries: any[]): string[] {
+  private generatePerformanceAlerts(
+    dbStats: any,
+    cacheStats: any,
+    slowQueries: any[],
+  ): string[] {
     const alerts: string[] = [];
 
     // Database performance alerts
     if (dbStats.averageQueryTime > 500) {
-      alerts.push(`High average query time: ${Math.round(dbStats.averageQueryTime)}ms`);
+      alerts.push(
+        `High average query time: ${Math.round(dbStats.averageQueryTime)}ms`,
+      );
     }
 
     if (dbStats.slowQueryCount > 50) {
@@ -197,11 +220,13 @@ export class PerformanceMonitorController {
 
     // Recent slow query alerts
     const recentSlowQueries = slowQueries.filter(
-      query => Date.now() - new Date(query.timestamp || 0).getTime() < 300000 // Last 5 minutes
+      (query) => Date.now() - new Date(query.timestamp || 0).getTime() < 300000, // Last 5 minutes
     );
 
     if (recentSlowQueries.length > 10) {
-      alerts.push(`${recentSlowQueries.length} slow queries in the last 5 minutes`);
+      alerts.push(
+        `${recentSlowQueries.length} slow queries in the last 5 minutes`,
+      );
     }
 
     // Memory and performance recommendations

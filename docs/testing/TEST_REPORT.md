@@ -13,13 +13,13 @@ Comprehensive end-to-end testing has been completed for the SimplePro-v3 applica
 
 ### Test Coverage Summary
 
-| Component | Test Files | Test Cases | Status |
-|-----------|------------|------------|--------|
-| Pricing Engine | 1 file | 38 tests | ✅ PASSING |
-| MoveSizes Component | 1 file | 25+ tests | ✅ CREATED |
-| DistanceRates Component | 1 file | 30+ tests | ✅ CREATED |
-| NewOpportunity Form | 1 file | 40+ tests | ✅ CREATED |
-| Pricing Integration | 1 file | 20+ tests | ✅ CREATED |
+| Component               | Test Files | Test Cases | Status     |
+| ----------------------- | ---------- | ---------- | ---------- |
+| Pricing Engine          | 1 file     | 38 tests   | ✅ PASSING |
+| MoveSizes Component     | 1 file     | 25+ tests  | ✅ CREATED |
+| DistanceRates Component | 1 file     | 30+ tests  | ✅ CREATED |
+| NewOpportunity Form     | 1 file     | 40+ tests  | ✅ CREATED |
+| Pricing Integration     | 1 file     | 20+ tests  | ✅ CREATED |
 
 ### Overall Results
 
@@ -34,9 +34,11 @@ Comprehensive end-to-end testing has been completed for the SimplePro-v3 applica
 ## 1. Pricing Engine Tests (VERIFIED - ALL PASSING)
 
 ### Test File
+
 `D:\Claude\SimplePro-v3\packages\pricing-engine\src\estimator.test.ts`
 
 ### Results
+
 ```
 PASS src/estimator.test.ts
   DeterministicEstimator
@@ -106,17 +108,20 @@ Time:        2.361 s
 ## 2. MoveSizes Component Tests
 
 ### Test File
+
 `D:\Claude\SimplePro-v3\apps\web\__tests__\MoveSizes.test.tsx`
 
 ### Test Categories
 
 #### 2.1 Initial Rendering Tests
+
 - ✅ Renders both Move Sizes and Room Sizes tables
 - ✅ Displays initial data correctly (19 move sizes, 8 room sizes)
 - ✅ Shows "Add" buttons for both tables
 - ✅ Table headers display correctly
 
 #### 2.2 Add Operation Tests
+
 - ✅ Opens modal when "Add Move Size" clicked
 - ✅ Validates required fields (name, cubic feet, weight)
 - ✅ Adds new move size with valid data
@@ -125,6 +130,7 @@ Time:        2.361 s
 - ✅ Resets form after successful addition
 
 #### 2.3 Edit Operation Tests
+
 - ✅ Enables inline editing when Edit clicked
 - ✅ Shows Save button during edit mode
 - ✅ Updates text fields correctly
@@ -132,17 +138,20 @@ Time:        2.361 s
 - ✅ Saves changes on Save button click
 
 #### 2.4 Delete Operation Tests
+
 - ✅ Shows confirmation dialog
 - ✅ Deletes when confirmed
 - ✅ Cancels deletion when cancelled
 - ✅ Maintains data integrity after deletion
 
 #### 2.5 Room Size Tests
+
 - ✅ All CRUD operations work for room sizes
 - ✅ Separate modal and state management
 - ✅ Independent from move sizes operations
 
 #### 2.6 Data Validation Tests
+
 - ✅ Handles empty name field
 - ✅ Validates numeric values > 0
 - ✅ Parses float values correctly
@@ -151,6 +160,7 @@ Time:        2.361 s
 ### Configuration Tested
 
 **Move Sizes Available:**
+
 - Studio or Less (75 cu ft, 675 lbs)
 - Studio Apartment (250 cu ft, 2250 lbs)
 - 1 Bedroom Apartment (432 cu ft, 3888 lbs)
@@ -159,6 +169,7 @@ Time:        2.361 s
 - ... 14 more sizes
 
 **Room Sizes Available:**
+
 - Additional Room, Basement, Dining Room, Kitchen
 - Garage, Living Room, Office, Patio
 
@@ -167,17 +178,20 @@ Time:        2.361 s
 ## 3. DistanceRates Component Tests
 
 ### Test File
+
 `D:\Claude\SimplePro-v3\apps\web\__tests__\DistanceRates.test.tsx`
 
 ### Test Categories
 
 #### 3.1 Initial Rendering Tests
+
 - ✅ Renders header and description
 - ✅ Displays "New Distance Rate" button
 - ✅ Shows initial rate configuration
 - ✅ Displays rate type information cards
 
 #### 3.2 Add Distance Rate Tests
+
 - ✅ Shows form when button clicked
 - ✅ Disables button when form open
 - ✅ All three rate types available (By Weight, By Distance, Flat Rate)
@@ -186,6 +200,7 @@ Time:        2.361 s
 - ✅ Clears form after creation
 
 #### 3.3 Edit Distance Rate Tests
+
 - ✅ Populates form with existing data
 - ✅ Shows "Edit Distance Rate" title
 - ✅ Updates rate on save
@@ -193,23 +208,27 @@ Time:        2.361 s
 - ✅ Cancels edit without saving
 
 #### 3.4 Delete Distance Rate Tests
+
 - ✅ Shows confirmation with rate name
 - ✅ Deletes rate when confirmed
 - ✅ Cancels deletion when declined
 - ✅ Shows empty state after deletion
 
 #### 3.5 Empty State Tests
+
 - ✅ Displays empty state message
 - ✅ Shows "Create Your First Distance Rate" button
 - ✅ Opens form from empty state
 
 #### 3.6 Form Validation Tests
+
 - ✅ Name field required
 - ✅ Type field required
 - ✅ Description field optional
 - ✅ HTML5 validation attributes present
 
 #### 3.7 Multiple Rates Tests
+
 - ✅ Handles multiple rates correctly
 - ✅ Edits correct rate when multiple exist
 - ✅ Maintains separate state for each rate
@@ -225,11 +244,13 @@ Time:        2.361 s
 ## 4. NewOpportunity Form Integration Tests
 
 ### Test File
+
 `D:\Claude\SimplePro-v3\apps\web\__tests__\NewOpportunity.test.tsx`
 
 ### Test Categories
 
 #### 4.1 Navigation Tests
+
 - ✅ Renders with step 1 (Customer Info) active
 - ✅ Displays all 4 steps in progress indicator
 - ✅ Shows Next button on step 1
@@ -237,6 +258,7 @@ Time:        2.361 s
 - ✅ Navigation between steps works correctly
 
 #### 4.2 Step 1: Customer Information Tests
+
 - ✅ Validates required fields (firstName, lastName, email, phone)
 - ✅ Validates email format (regex validation)
 - ✅ Shows company name for commercial customers
@@ -245,6 +267,7 @@ Time:        2.361 s
 - ✅ Proceeds to step 2 with valid data
 
 #### 4.3 Step 2: Move Details Tests
+
 - ✅ Displays move details form with all fields
 - ✅ Validates pickup address required
 - ✅ Validates delivery address required
@@ -258,6 +281,7 @@ Time:        2.361 s
 - ✅ Next button proceeds to step 3
 
 #### 4.4 Step 3: Inventory Tests
+
 - ✅ Displays move size dropdown with 16+ options
 - ✅ Auto-populates weight/volume when size selected
 - ✅ Disables weight/volume inputs when size selected
@@ -270,6 +294,7 @@ Time:        2.361 s
 - ✅ Proceeds to step 4 with valid data
 
 #### 4.5 Step 4: Review & Submit Tests
+
 - ✅ Displays customer information summary
 - ✅ Displays move details summary
 - ✅ Displays inventory summary
@@ -280,6 +305,7 @@ Time:        2.361 s
 - ✅ Clears draft after successful submission
 
 #### 4.6 Price Summary Panel Tests
+
 - ✅ Displays "Estimate Summary" panel
 - ✅ Shows "Calculating estimate..." message
 - ✅ Displays estimated total when calculated
@@ -289,6 +315,7 @@ Time:        2.361 s
 - ✅ Updates in real-time as form changes
 
 #### 4.7 Form Persistence Tests
+
 - ✅ Saves draft to localStorage automatically
 - ✅ Loads draft from localStorage on mount
 - ✅ Auto-saves on every field change
@@ -310,6 +337,7 @@ Time:        2.361 s
 ## 5. Pricing Engine Integration Tests
 
 ### Test File
+
 `D:\Claude\SimplePro-v3\apps\web\__tests__\PricingEngineIntegration.test.ts`
 
 ### Test Scenarios
@@ -317,6 +345,7 @@ Time:        2.361 s
 #### 5.1 Scenario: 2 Bedroom Apartment - Weekend Move
 
 **Test Parameters:**
+
 - Customer: test-customer-123
 - Service: Local
 - Date: Saturday, October 11, 2025
@@ -330,6 +359,7 @@ Time:        2.361 s
 - Services: Packing, Assembly
 
 **Tests:**
+
 - ✅ Calculates base price correctly
 - ✅ Applies weekend surcharge (+10%)
 - ✅ Applies piano special handling charge (+$250)
@@ -344,6 +374,7 @@ Time:        2.361 s
 #### 5.2 Scenario: Large Move with Heavy Weight
 
 **Test Parameters:**
+
 - Service: Local
 - Pickup: 789 Elm St, Brookline (1st floor, long carry, extreme access, narrow hallways)
 - Delivery: 321 Pine Rd, Newton (3rd floor, no elevator, difficult access, 45 stairs, narrow hallways)
@@ -356,6 +387,7 @@ Time:        2.361 s
 - Services: Full packing, Unpacking, Assembly, Cleaning
 
 **Tests:**
+
 - ✅ Applies heavy weight surcharge (weight > 8000 lbs)
 - ✅ Applies crew size adjustment (5+ movers)
 - ✅ Handles multiple location handicaps
@@ -367,6 +399,7 @@ Time:        2.361 s
 #### 5.3 Scenario: Long Distance Move
 
 **Test Parameters:**
+
 - Service: Long Distance
 - Route: Boston, MA to New York, NY (215 miles)
 - Pickup: 100 State St (5th floor, elevator, easy access)
@@ -378,6 +411,7 @@ Time:        2.361 s
 - Services: Packing, Storage
 
 **Tests:**
+
 - ✅ Calculates long distance pricing differently than local
 - ✅ Includes transportation costs
 - ✅ Validates service type constraints (local max 50 miles)
@@ -386,6 +420,7 @@ Time:        2.361 s
 #### 5.4 Edge Cases
 
 **Tests:**
+
 - ✅ Applies minimum charge for small moves ($150 minimum)
 - ✅ Rounds prices to 2 decimal places
 - ✅ Handles zero special items gracefully
@@ -413,6 +448,7 @@ Time:        2.361 s
 ## 6. Test Execution Instructions
 
 ### Prerequisites
+
 ```bash
 Node.js >= 20.0.0
 npm >= 10.0.0
@@ -421,6 +457,7 @@ npm >= 10.0.0
 ### Running Tests
 
 #### Pricing Engine Tests (Verified Working)
+
 ```bash
 cd packages/pricing-engine
 npm test
@@ -429,6 +466,7 @@ npm test
 **Expected Output:** 38 tests passing
 
 #### Web Application Tests (Ready to Run)
+
 ```bash
 cd apps/web
 
@@ -452,6 +490,7 @@ npm test -- --coverage
 ### Settings Components
 
 #### MoveSizes Page
+
 - [ ] Navigate to Settings > Estimates > Move Sizes
 - [ ] Verify 19 move sizes displayed
 - [ ] Click "Add Move Size"
@@ -467,6 +506,7 @@ npm test -- --coverage
 - [ ] Verify size removed from table
 
 #### DistanceRates Page
+
 - [ ] Navigate to Settings > Tariffs > Distance Rates
 - [ ] Click "New Distance Rate"
 - [ ] Fill form: Name="Test Rate", Type="By Distance"
@@ -483,6 +523,7 @@ npm test -- --coverage
 ### NewOpportunity Form
 
 #### Step 1: Customer Information
+
 - [ ] Navigate to New Opportunity
 - [ ] Fill First Name: "John"
 - [ ] Fill Last Name: "Doe"
@@ -493,6 +534,7 @@ npm test -- --coverage
 - [ ] Verify navigation to Step 2
 
 #### Step 2: Move Details
+
 - [ ] Fill Pickup Address: "123 Main St, Boston, MA 02101"
 - [ ] Select Pickup Floor: 2
 - [ ] Enter Stairs Count: 20
@@ -506,6 +548,7 @@ npm test -- --coverage
 - [ ] Verify navigation to Step 3
 
 #### Step 3: Inventory
+
 - [ ] Select Move Size: "2 Bedroom Apartment"
 - [ ] Verify Weight: 5886 lbs (auto-populated)
 - [ ] Verify Volume: 654 cu ft (auto-populated)
@@ -519,6 +562,7 @@ npm test -- --coverage
 - [ ] Verify navigation to Step 4
 
 #### Step 4: Review & Submit
+
 - [ ] Verify customer name displayed: "John Doe"
 - [ ] Verify email displayed: "john.doe@example.com"
 - [ ] Verify pickup address displayed correctly
@@ -542,6 +586,7 @@ npm test -- --coverage
 ### Pricing Verification
 
 #### Weekend Surcharge Test
+
 - [ ] Create new opportunity
 - [ ] Select move date: Saturday or Sunday
 - [ ] Complete form
@@ -549,6 +594,7 @@ npm test -- --coverage
 - [ ] Verify 10% increase in price
 
 #### Heavy Weight Surcharge Test
+
 - [ ] Create new opportunity
 - [ ] Select move size: "4 Bedroom House" (11,264 lbs)
 - [ ] Complete form
@@ -556,12 +602,14 @@ npm test -- --coverage
 - [ ] Verify +$500 charge
 
 #### Stairs Handicap Test
+
 - [ ] Create opportunity with stairs count: 30
 - [ ] Verify stairs charge in Location Handicaps
 - [ ] Calculate: 30 stairs × $2 = $60
 - [ ] Verify amount matches
 
 #### Access Difficulty Test
+
 - [ ] Set pickup access: "Difficult"
 - [ ] Verify 1.2x multiplier applied
 - [ ] Set pickup access: "Extreme"
@@ -572,6 +620,7 @@ npm test -- --coverage
 ## 8. Known Issues and Recommendations
 
 ### Issues Found
+
 ✅ **None Critical** - All core functionality working as expected
 
 ### Recommendations for Future Development

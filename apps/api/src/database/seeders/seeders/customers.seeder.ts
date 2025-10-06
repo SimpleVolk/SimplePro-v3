@@ -6,13 +6,20 @@ import { faker } from '@faker-js/faker';
 export async function seedCustomers(
   CustomerModel: any,
   users: any[],
-  partners: any[]
+  partners: any[],
 ): Promise<any[]> {
   const customers: any[] = [];
   const salesReps = users.filter((u) => u.department === 'Sales');
   const customerCount = faker.number.int({ min: 25, max: 35 });
   const types = ['residential', 'commercial'];
-  const sources = ['website', 'referral', 'advertising', 'social_media', 'partner', 'other'];
+  const sources = [
+    'website',
+    'referral',
+    'advertising',
+    'social_media',
+    'partner',
+    'other',
+  ];
   const contactMethods = ['email', 'phone', 'text'];
 
   for (let i = 0; i < customerCount; i++) {
@@ -36,9 +43,10 @@ export async function seedCustomers(
     }
 
     // Assign sales rep
-    const assignedSalesRep = salesReps.length > 0
-      ? faker.helpers.arrayElement(salesReps)._id.toString()
-      : users[0]._id.toString();
+    const assignedSalesRep =
+      salesReps.length > 0
+        ? faker.helpers.arrayElement(salesReps)._id.toString()
+        : users[0]._id.toString();
 
     // Generate referral info for partner sources
     let referredBy = undefined;
@@ -52,7 +60,7 @@ export async function seedCustomers(
     } else if (source === 'referral' && faker.datatype.boolean()) {
       // Sometimes a customer referral
       const existingCustomer = faker.helpers.arrayElement(
-        customers.length > 0 ? customers : [{ _id: 'existing-customer' }]
+        customers.length > 0 ? customers : [{ _id: 'existing-customer' }],
       );
       referredBy = {
         customerId: existingCustomer._id.toString(),
@@ -65,12 +73,17 @@ export async function seedCustomers(
       lastName,
       email,
       phone: faker.phone.number(),
-      alternatePhone: faker.datatype.boolean() ? faker.phone.number() : undefined,
+      alternatePhone: faker.datatype.boolean()
+        ? faker.phone.number()
+        : undefined,
       type,
       status,
       source,
       companyName: type === 'commercial' ? faker.company.name() : undefined,
-      businessLicense: type === 'commercial' ? faker.string.alphanumeric(10).toUpperCase() : undefined,
+      businessLicense:
+        type === 'commercial'
+          ? faker.string.alphanumeric(10).toUpperCase()
+          : undefined,
       preferredContactMethod: faker.helpers.arrayElement(contactMethods),
       address: {
         street: faker.location.streetAddress(),
@@ -88,17 +101,21 @@ export async function seedCustomers(
       assignedSalesRep,
       leadScore: faker.number.int({ min: 0, max: 100 }),
       tags: faker.helpers.arrayElements(
-        ['high-value', 'vip', 'repeat-customer', 'corporate', 'seasonal', 'price-sensitive'],
-        { min: 0, max: 3 }
+        [
+          'high-value',
+          'vip',
+          'repeat-customer',
+          'corporate',
+          'seasonal',
+          'price-sensitive',
+        ],
+        { min: 0, max: 3 },
       ),
-      notes: faker.datatype.boolean()
-        ? faker.lorem.paragraph()
-        : undefined,
+      notes: faker.datatype.boolean() ? faker.lorem.paragraph() : undefined,
       estimates: [],
       jobs: [],
-      lastContactDate: status !== 'lead'
-        ? faker.date.recent({ days: 30 })
-        : undefined,
+      lastContactDate:
+        status !== 'lead' ? faker.date.recent({ days: 30 }) : undefined,
       createdBy: assignedSalesRep,
       preferredMoveDate: faker.datatype.boolean()
         ? faker.date.future({ years: 0.5 })
@@ -110,7 +127,12 @@ export async function seedCustomers(
         ? {
             name: faker.person.fullName(),
             phone: faker.phone.number(),
-            relationship: faker.helpers.arrayElement(['spouse', 'parent', 'sibling', 'friend']),
+            relationship: faker.helpers.arrayElement([
+              'spouse',
+              'parent',
+              'sibling',
+              'friend',
+            ]),
           }
         : undefined,
     });

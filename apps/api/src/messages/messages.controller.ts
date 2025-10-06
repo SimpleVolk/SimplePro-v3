@@ -26,7 +26,7 @@ import { PaginationDto } from './dto/pagination.dto';
 export class MessagesController {
   constructor(
     private readonly messagesService: MessagesService,
-    private readonly typingService: TypingService
+    private readonly typingService: TypingService,
   ) {}
 
   // ==================== Thread Endpoints ====================
@@ -71,7 +71,7 @@ export class MessagesController {
   @Get('threads/:threadId/messages')
   async getMessages(
     @Param('threadId') threadId: string,
-    @Query() pagination: PaginationDto
+    @Query() pagination: PaginationDto,
   ) {
     return this.messagesService.getMessages(threadId, pagination);
   }
@@ -80,7 +80,7 @@ export class MessagesController {
   async sendMessage(
     @Param('threadId') threadId: string,
     @Body() dto: SendMessageDto,
-    @Request() req: any
+    @Request() req: any,
   ) {
     const userId = req.user.userId;
 
@@ -94,7 +94,7 @@ export class MessagesController {
   async editMessage(
     @Param('id') id: string,
     @Body() dto: EditMessageDto,
-    @Request() req: any
+    @Request() req: any,
   ) {
     const userId = req.user.userId;
     return this.messagesService.editMessage(id, dto.content, userId);
@@ -112,12 +112,19 @@ export class MessagesController {
   async markAsRead(@Param('id') id: string, @Request() req: any) {
     const userId = req.user.userId;
     const message = await this.messagesService.getMessageById(id);
-    await this.messagesService.markAsRead(message.threadId.toString(), userId, id);
+    await this.messagesService.markAsRead(
+      message.threadId.toString(),
+      userId,
+      id,
+    );
   }
 
   @Post('threads/:threadId/read-all')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async markAllAsRead(@Param('threadId') threadId: string, @Request() req: any) {
+  async markAllAsRead(
+    @Param('threadId') threadId: string,
+    @Request() req: any,
+  ) {
     const userId = req.user.userId;
     await this.messagesService.markAsRead(threadId, userId);
   }
@@ -132,7 +139,7 @@ export class MessagesController {
   @Get('threads/:threadId/search')
   async searchMessages(
     @Param('threadId') threadId: string,
-    @Query('q') query: string
+    @Query('q') query: string,
   ) {
     return this.messagesService.searchMessages(threadId, query);
   }

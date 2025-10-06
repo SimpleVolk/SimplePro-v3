@@ -20,8 +20,12 @@ export class NotificationPreferenceService {
   /**
    * Get user notification preferences
    */
-  async getPreferences(userId: string): Promise<NotificationPreferenceDocument> {
-    const preferences = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
+  async getPreferences(
+    userId: string,
+  ): Promise<NotificationPreferenceDocument> {
+    const preferences = await this.preferenceModel
+      .findOne({ userId: new Types.ObjectId(userId) })
+      .exec();
 
     if (!preferences) {
       return await this.createDefaultPreferences(userId);
@@ -33,15 +37,24 @@ export class NotificationPreferenceService {
   /**
    * Update user notification preferences
    */
-  async updatePreferences(userId: string, dto: UpdatePreferencesDto): Promise<NotificationPreferenceDocument> {
-    let preferences: NotificationPreferenceDocument | null = await this.preferenceModel.findOne({ userId: new Types.ObjectId(userId) }).exec();
+  async updatePreferences(
+    userId: string,
+    dto: UpdatePreferencesDto,
+  ): Promise<NotificationPreferenceDocument> {
+    let preferences: NotificationPreferenceDocument | null =
+      await this.preferenceModel
+        .findOne({ userId: new Types.ObjectId(userId) })
+        .exec();
 
     if (!preferences) {
       preferences = await this.createDefaultPreferences(userId);
     }
 
     if (dto.preferences) {
-      preferences.preferences = { ...preferences.preferences, ...dto.preferences };
+      preferences.preferences = {
+        ...preferences.preferences,
+        ...dto.preferences,
+      };
     }
 
     if (dto.quietHours) {
@@ -72,7 +85,9 @@ export class NotificationPreferenceService {
   /**
    * Create default preferences for a new user
    */
-  async createDefaultPreferences(userId: string): Promise<NotificationPreferenceDocument> {
+  async createDefaultPreferences(
+    userId: string,
+  ): Promise<NotificationPreferenceDocument> {
     const defaultChannels: ChannelPreferences = {
       inApp: true,
       email: true,
@@ -94,7 +109,12 @@ export class NotificationPreferenceService {
         time_off_approved: defaultChannels,
         time_off_denied: defaultChannels,
         schedule_change: { inApp: true, email: true, sms: true, push: true },
-        document_uploaded: { inApp: true, email: false, sms: false, push: false },
+        document_uploaded: {
+          inApp: true,
+          email: false,
+          sms: false,
+          push: false,
+        },
       },
       quietHours: {
         enabled: false,
@@ -114,10 +134,15 @@ export class NotificationPreferenceService {
   /**
    * Check if notification should be sent based on user preferences
    */
-  async shouldSendNotification(userId: string, type: string, channel: 'inApp' | 'email' | 'sms' | 'push'): Promise<boolean> {
+  async shouldSendNotification(
+    userId: string,
+    type: string,
+    channel: 'inApp' | 'email' | 'sms' | 'push',
+  ): Promise<boolean> {
     const preferences = await this.getPreferences(userId);
 
-    const typePreferences = preferences.preferences[type as keyof typeof preferences.preferences];
+    const typePreferences =
+      preferences.preferences[type as keyof typeof preferences.preferences];
 
     if (!typePreferences) {
       return true; // Default to true if no specific preference

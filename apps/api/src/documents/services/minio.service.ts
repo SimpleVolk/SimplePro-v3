@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Minio from 'minio';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,10 +17,19 @@ export class MinioService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {
     const endpoint = this.configService.get<string>('MINIO_ENDPOINT', 'minio');
     const port = this.configService.get<number>('MINIO_PORT', 9000);
-    const accessKey = this.configService.get<string>('MINIO_ACCESS_KEY', 'admin');
-    const secretKey = this.configService.get<string>('MINIO_SECRET_KEY', 'simplepro_minio_2024');
+    const accessKey = this.configService.get<string>(
+      'MINIO_ACCESS_KEY',
+      'admin',
+    );
+    const secretKey = this.configService.get<string>(
+      'MINIO_SECRET_KEY',
+      'simplepro_minio_2024',
+    );
     const useSSL = this.configService.get<boolean>('MINIO_USE_SSL', false);
-    this.bucket = this.configService.get<string>('MINIO_BUCKET', 'simplepro-documents');
+    this.bucket = this.configService.get<string>(
+      'MINIO_BUCKET',
+      'simplepro-documents',
+    );
 
     this.minioClient = new Minio.Client({
       endPoint: endpoint,
@@ -25,7 +39,9 @@ export class MinioService implements OnModuleInit {
       secretKey: secretKey,
     });
 
-    this.logger.log(`MinIO client initialized: ${endpoint}:${port}, bucket: ${this.bucket}`);
+    this.logger.log(
+      `MinIO client initialized: ${endpoint}:${port}, bucket: ${this.bucket}`,
+    );
   }
 
   async onModuleInit() {
@@ -45,12 +61,18 @@ export class MinioService implements OnModuleInit {
         this.logger.log(`Bucket already exists: ${this.bucket}`);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error ensuring bucket exists: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to initialize MinIO storage');
+      this.logger.error(
+        `Error ensuring bucket exists: ${errorMessage}`,
+        errorStack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to initialize MinIO storage',
+      );
     }
   }
 
@@ -121,12 +143,15 @@ export class MinioService implements OnModuleInit {
       this.logger.log(`File uploaded: ${storageKey} (${file.length} bytes)`);
       return storageKey;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
       this.logger.error(`Error uploading file: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to upload file to storage');
+      throw new InternalServerErrorException(
+        'Failed to upload file to storage',
+      );
     }
   }
 
@@ -146,12 +171,15 @@ export class MinioService implements OnModuleInit {
         stream.on('error', (error) => reject(error));
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
       this.logger.error(`Error downloading file: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to download file from storage');
+      throw new InternalServerErrorException(
+        'Failed to download file from storage',
+      );
     }
   }
 
@@ -164,12 +192,15 @@ export class MinioService implements OnModuleInit {
       await this.minioClient.removeObject(this.bucket, storageKey);
       this.logger.log(`File deleted: ${storageKey}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
       this.logger.error(`Error deleting file: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to delete file from storage');
+      throw new InternalServerErrorException(
+        'Failed to delete file from storage',
+      );
     }
   }
 
@@ -191,12 +222,18 @@ export class MinioService implements OnModuleInit {
       );
       return url;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error generating presigned URL: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to generate download link');
+      this.logger.error(
+        `Error generating presigned URL: ${errorMessage}`,
+        errorStack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to generate download link',
+      );
     }
   }
 
@@ -220,7 +257,8 @@ export class MinioService implements OnModuleInit {
         stream.on('error', (error) => reject(error));
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
@@ -238,11 +276,15 @@ export class MinioService implements OnModuleInit {
     try {
       return await this.minioClient.statObject(this.bucket, storageKey);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error getting file stats: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Error getting file stats: ${errorMessage}`,
+        errorStack,
+      );
       throw new InternalServerErrorException('Failed to get file information');
     }
   }

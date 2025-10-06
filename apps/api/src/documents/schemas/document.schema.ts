@@ -109,7 +109,9 @@ DocumentSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const uploaderExists = await User.exists({ _id: this.uploadedBy });
       if (!uploaderExists) {
-        throw new Error(`Referenced User (uploadedBy) not found: ${this.uploadedBy}`);
+        throw new Error(
+          `Referenced User (uploadedBy) not found: ${this.uploadedBy}`,
+        );
       }
     }
 
@@ -118,7 +120,9 @@ DocumentSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const deleterExists = await User.exists({ _id: this.deletedBy });
       if (!deleterExists) {
-        throw new Error(`Referenced User (deletedBy) not found: ${this.deletedBy}`);
+        throw new Error(
+          `Referenced User (deletedBy) not found: ${this.deletedBy}`,
+        );
       }
     }
 
@@ -169,12 +173,15 @@ DocumentSchema.index({ documentType: 1 }); // Filter by document type
 DocumentSchema.index({ tags: 1 }); // Tag-based filtering
 
 // Text index for search
-DocumentSchema.index({
-  filename: 'text',
-  originalName: 'text',
-  description: 'text',
-  tags: 'text',
-}, { name: 'document_text_search' });
+DocumentSchema.index(
+  {
+    filename: 'text',
+    originalName: 'text',
+    description: 'text',
+    tags: 'text',
+  },
+  { name: 'document_text_search' },
+);
 
 // Ensure toJSON and toObject transformations
 DocumentSchema.set('toJSON', {

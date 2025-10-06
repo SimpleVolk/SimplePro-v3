@@ -22,7 +22,7 @@ export interface ResourceChanges {
   timestamps: true,
   // Make the schema immutable - prevent updates
   versionKey: false,
-  minimize: false
+  minimize: false,
 })
 export class AuditLog {
   @Prop({ required: true, index: true })
@@ -47,7 +47,7 @@ export class AuditLog {
     required: true,
     type: String,
     enum: ['info', 'warning', 'error', 'critical'],
-    index: true
+    index: true,
   })
   severity!: 'info' | 'warning' | 'error' | 'critical';
 
@@ -66,7 +66,7 @@ export class AuditLog {
   @Prop({
     required: true,
     enum: ['success', 'failure'],
-    index: true
+    index: true,
   })
   outcome!: 'success' | 'failure';
 
@@ -91,14 +91,17 @@ AuditLogSchema.index({ severity: 1, timestamp: -1 }); // Severity-based queries
 AuditLogSchema.index({ outcome: 1, timestamp: -1 }); // Outcome-based queries
 
 // TTL index - automatically delete logs older than 90 days
-AuditLogSchema.index({ timestamp: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
+AuditLogSchema.index(
+  { timestamp: 1 },
+  { expireAfterSeconds: 90 * 24 * 60 * 60 },
+);
 
 // Compound indexes for common query patterns
 AuditLogSchema.index({ userId: 1, action: 1, timestamp: -1 });
 AuditLogSchema.index({ resource: 1, action: 1, timestamp: -1 });
 
 // Make the schema immutable
-AuditLogSchema.pre('save', function(next) {
+AuditLogSchema.pre('save', function (next) {
   // Only allow creation, not modification
   if (!this.isNew) {
     next(new Error('Audit logs cannot be modified'));
@@ -108,11 +111,17 @@ AuditLogSchema.pre('save', function(next) {
 });
 
 // Prevent updates
-AuditLogSchema.pre(['updateOne', 'updateMany', 'findOneAndUpdate'], function(next) {
-  next(new Error('Audit logs cannot be modified'));
-});
+AuditLogSchema.pre(
+  ['updateOne', 'updateMany', 'findOneAndUpdate'],
+  function (next) {
+    next(new Error('Audit logs cannot be modified'));
+  },
+);
 
 // Prevent deletions (except by TTL)
-AuditLogSchema.pre(['deleteOne', 'deleteMany', 'findOneAndDelete'], function(next) {
-  next(new Error('Audit logs cannot be manually deleted'));
-});
+AuditLogSchema.pre(
+  ['deleteOne', 'deleteMany', 'findOneAndDelete'],
+  function (next) {
+    next(new Error('Audit logs cannot be manually deleted'));
+  },
+);

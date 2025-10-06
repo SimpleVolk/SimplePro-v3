@@ -10,7 +10,14 @@ export interface Document {
   mimeType: string;
   size: number;
   url: string;
-  documentType: 'contract' | 'invoice' | 'receipt' | 'estimate' | 'photo' | 'insurance' | 'other';
+  documentType:
+    | 'contract'
+    | 'invoice'
+    | 'receipt'
+    | 'estimate'
+    | 'photo'
+    | 'insurance'
+    | 'other';
   entityType?: 'customer' | 'job' | 'estimate' | 'invoice';
   entityId?: string;
   tags: string[];
@@ -79,7 +86,10 @@ export class RateLimitError extends Error {
 }
 
 export class DocumentAccessError extends Error {
-  constructor(public statusCode: number, message?: string) {
+  constructor(
+    public statusCode: number,
+    message?: string,
+  ) {
     super(message || `Document access failed with status ${statusCode}`);
     this.name = 'DocumentAccessError';
   }

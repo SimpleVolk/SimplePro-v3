@@ -9,13 +9,23 @@ interface SettingsBreadcrumbProps {
   onNavigate: (path: string) => void;
 }
 
-export function SettingsBreadcrumb({ currentPath, onNavigate }: SettingsBreadcrumbProps) {
+export function SettingsBreadcrumb({
+  currentPath,
+  onNavigate,
+}: SettingsBreadcrumbProps) {
   // Removed unused findRouteByPath function
 
-  const buildBreadcrumbPath = (routes: SettingsRoute[], targetPath: string): SettingsRoute[] => {
+  const buildBreadcrumbPath = (
+    routes: SettingsRoute[],
+    targetPath: string,
+  ): SettingsRoute[] => {
     const path: SettingsRoute[] = [];
 
-    const findPath = (routes: SettingsRoute[], target: string, currentPath: SettingsRoute[] = []): boolean => {
+    const findPath = (
+      routes: SettingsRoute[],
+      target: string,
+      currentPath: SettingsRoute[] = [],
+    ): boolean => {
       for (const route of routes) {
         const newPath = [...currentPath, route];
 
@@ -60,8 +70,12 @@ export function SettingsBreadcrumb({ currentPath, onNavigate }: SettingsBreadcru
           return (
             <li key={item.path} className={styles.breadcrumbItem}>
               {isLast ? (
-                <span className={`${styles.breadcrumbCurrent} ${styles.breadcrumbText}`}>
-                  {item.icon && <span className={styles.breadcrumbIcon}>{item.icon}</span>}
+                <span
+                  className={`${styles.breadcrumbCurrent} ${styles.breadcrumbText}`}
+                >
+                  {item.icon && (
+                    <span className={styles.breadcrumbIcon}>{item.icon}</span>
+                  )}
                   {item.label}
                 </span>
               ) : (
@@ -70,7 +84,9 @@ export function SettingsBreadcrumb({ currentPath, onNavigate }: SettingsBreadcru
                     className={styles.breadcrumbLink}
                     onClick={() => onNavigate(item.path)}
                   >
-                    {item.icon && <span className={styles.breadcrumbIcon}>{item.icon}</span>}
+                    {item.icon && (
+                      <span className={styles.breadcrumbIcon}>{item.icon}</span>
+                    )}
                     {item.label}
                   </button>
                   <span className={styles.breadcrumbSeparator}>›</span>

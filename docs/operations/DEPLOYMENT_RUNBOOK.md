@@ -24,15 +24,18 @@
 ## Overview
 
 ### Purpose
+
 This runbook provides step-by-step procedures for deploying SimplePro-v3 across all environments.
 
 ### Deployment Strategy
+
 - **Type:** Blue-Green with rolling updates
 - **Zero Downtime:** Required for production
 - **Automated Tests:** Must pass before deployment
 - **Manual Approval:** Required for production
 
 ### Key Principles
+
 1. Always deploy to staging first
 2. Never skip testing phases
 3. Always have a rollback plan
@@ -44,6 +47,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 ## Deployment Environments
 
 ### Development
+
 - **URL:** http://localhost:3009
 - **API:** http://localhost:3001
 - **Database:** Single MongoDB instance
@@ -51,6 +55,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - **Deployment:** Manual, on-demand
 
 ### Staging
+
 - **URL:** https://staging.simplepro.com
 - **API:** https://api-staging.simplepro.com
 - **Database:** Replica set (3 nodes)
@@ -59,6 +64,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - **Data:** Production-like test data
 
 ### Production
+
 - **URL:** https://app.simplepro.com
 - **API:** https://api.simplepro.com
 - **Database:** Replica set (3 nodes + backup)
@@ -71,6 +77,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 ## Pre-Deployment Checklist
 
 ### Code Review (24-48 hours before)
+
 - [ ] All code changes peer-reviewed
 - [ ] All unit tests passing (>80% coverage)
 - [ ] All integration tests passing
@@ -80,6 +87,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - [ ] Database migrations tested
 
 ### Infrastructure (12-24 hours before)
+
 - [ ] Backup infrastructure verified
 - [ ] Monitoring and alerting functional
 - [ ] Database backup completed
@@ -88,6 +96,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - [ ] SSL certificates valid (>30 days)
 
 ### Documentation (Before deployment)
+
 - [ ] Release notes prepared
 - [ ] Deployment steps documented
 - [ ] Rollback plan documented
@@ -96,6 +105,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - [ ] API changes documented
 
 ### Team Coordination (Before deployment)
+
 - [ ] Deployment team notified (24h advance)
 - [ ] Customer success team notified
 - [ ] Support team briefed on changes
@@ -104,6 +114,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - [ ] War room (Slack/Teams) created
 
 ### Testing (Must pass)
+
 - [ ] All unit tests pass
 - [ ] All integration tests pass
 - [ ] All E2E tests pass
@@ -113,6 +124,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - [ ] Mobile app compatibility verified
 
 ### Database (Critical)
+
 - [ ] Backup completed successfully
 - [ ] Backup restoration tested
 - [ ] Database migrations prepared
@@ -121,6 +133,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 - [ ] Data migration scripts tested
 
 ### Application (Final checks)
+
 - [ ] Environment variables configured
 - [ ] Feature flags configured
 - [ ] Third-party API keys valid
@@ -133,6 +146,7 @@ This runbook provides step-by-step procedures for deploying SimplePro-v3 across 
 ## Staging Deployment
 
 ### Prerequisites
+
 ```bash
 # 1. Ensure on correct branch
 git checkout main
@@ -224,6 +238,7 @@ See [Smoke Testing](#smoke-testing) section below.
 ## Production Deployment
 
 ### Deployment Window
+
 - **Preferred:** Tuesday/Wednesday, 10 AM - 2 PM EST
 - **Avoid:** Monday, Friday, weekends, holidays
 - **Duration:** 30-60 minutes
@@ -495,14 +510,16 @@ ab -n 100 -c 10 https://api.simplepro.com/api/jobs
 ### When to Rollback
 
 **Immediate Rollback Triggers:**
+
 - Application fails to start
 - Health checks fail consistently (>5 minutes)
 - Critical functionality broken
 - Data corruption detected
-- >10% error rate
+- > 10% error rate
 - Performance degradation >50%
 
 **Decision Window:**
+
 - **0-15 minutes:** Monitor closely
 - **15-30 minutes:** Prepare rollback plan
 - **30+ minutes:** Execute rollback if issues persist
@@ -594,6 +611,7 @@ docker start simplepro-api
 ### Post-Rollback Actions
 
 1. **Notify Team**
+
    ```
    Deployment of v1.2.0 rolled back to v1.1.0
    Reason: [specific reason]
@@ -644,6 +662,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ### Short-term Monitoring (First hour)
 
 Monitor in Grafana:
+
 - [ ] API request rate (normal pattern)
 - [ ] Error rate (<0.1%)
 - [ ] Response time p95 (<500ms)
@@ -665,6 +684,7 @@ Monitor in Grafana:
 ### Sign-off Checklist
 
 After 24 hours of stable operation:
+
 - [ ] No critical issues reported
 - [ ] All metrics within acceptable ranges
 - [ ] Customer support confirms no deployment-related issues
@@ -681,11 +701,13 @@ After 24 hours of stable operation:
 ### Standard Deployment Windows
 
 **Preferred Windows:**
+
 - **Tuesday:** 10:00 AM - 2:00 PM EST
 - **Wednesday:** 10:00 AM - 2:00 PM EST
 - **Thursday:** 10:00 AM - 12:00 PM EST (minor updates only)
 
 **Avoid:**
+
 - **Monday:** High traffic, weekend issues may still surface
 - **Friday:** No time to fix issues before weekend
 - **Weekends:** Reduced team availability
@@ -695,6 +717,7 @@ After 24 hours of stable operation:
 ### Emergency Windows
 
 Emergency deployments (critical security fixes, production outages) can proceed any time with:
+
 - Approval from CTO or VP Engineering
 - On-call team notified
 - Rollback plan ready
@@ -709,6 +732,7 @@ Emergency deployments (critical security fixes, production outages) can proceed 
 **To:** All stakeholders
 **Channel:** Email + Slack #announcements
 **Template:**
+
 ```
 Subject: Planned Deployment - [Date/Time]
 
@@ -737,6 +761,7 @@ Questions? Reply to this thread or reach out in #deployment-coordination
 **Channel:** Slack #deployment-war-room
 
 **Status Updates (every 15 minutes):**
+
 ```
 10:00 AM - Deployment started
 10:15 AM - Database backup complete
@@ -752,6 +777,7 @@ Questions? Reply to this thread or reach out in #deployment-coordination
 **To:** All stakeholders
 **Channel:** Email + Slack #announcements
 **Template:**
+
 ```
 Subject: Deployment Complete - v1.2.0
 
@@ -796,7 +822,9 @@ Thanks to everyone involved!
 ## Emergency Deployments
 
 ### Definition
+
 Emergency deployment required for:
+
 - **P0 incidents:** Production outage, data loss
 - **Critical security vulnerabilities**
 - **Data corruption**
@@ -837,6 +865,7 @@ Emergency deployment required for:
 ### Emergency Deployment Approvers
 
 Requires approval from at least one:
+
 - CTO
 - VP Engineering
 - Director of Engineering
@@ -846,9 +875,9 @@ Requires approval from at least one:
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | DevOps Team | Initial creation |
+| Version | Date       | Author      | Changes          |
+| ------- | ---------- | ----------- | ---------------- |
+| 1.0     | 2025-10-02 | DevOps Team | Initial creation |
 
 ---
 

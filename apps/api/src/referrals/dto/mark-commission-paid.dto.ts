@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsDateString, IsNumber, Min } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDateString,
+  IsNumber,
+  Min,
+} from 'class-validator';
 
 export class MarkCommissionPaidDto {
   @IsOptional()

@@ -1,4 +1,11 @@
-import { IsOptional, IsEnum, IsString, IsNumber, Min, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsEnum,
+  IsString,
+  IsNumber,
+  Min,
+  IsBoolean,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
 export class ReferralQueryDto {
@@ -7,7 +14,15 @@ export class ReferralQueryDto {
   partnerId?: string;
 
   @IsOptional()
-  @IsEnum(['received', 'contacted', 'qualified', 'quoted', 'won', 'lost', 'cancelled'])
+  @IsEnum([
+    'received',
+    'contacted',
+    'qualified',
+    'quoted',
+    'won',
+    'lost',
+    'cancelled',
+  ])
   status?: string;
 
   @IsOptional()

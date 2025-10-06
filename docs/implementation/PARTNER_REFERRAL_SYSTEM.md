@@ -104,49 +104,52 @@ apps/api/src/auth/
 
 **Collection**: `partners`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `companyName` | String | Partner company name (indexed) |
-| `contactName` | String | Primary contact person |
-| `email` | String | Unique email address (indexed) |
-| `phone` | String | Contact phone number |
-| `partnerType` | Enum | Partner category (real_estate_agent, property_manager, etc.) |
-| `status` | Enum | Active, inactive, pending, suspended (indexed) |
-| `commissionStructure` | Object | Commission configuration (see below) |
-| `address` | Object | Full address details |
-| `website` | String | Partner website URL |
-| `portalAccess` | Object | Portal login credentials and settings |
-| `statistics` | Object | Performance metrics (leads, conversions, revenue) |
-| `settings` | Object | Partner preferences and custom fields |
-| `contractStartDate` | Date | Contract start date |
-| `contractEndDate` | Date | Contract end date |
-| `notes` | String | Internal notes |
-| `tags` | Array[String] | Categorization tags |
-| `createdBy` | String | User ID who created partner |
-| `createdAt` | Date | Creation timestamp |
-| `updatedAt` | Date | Last update timestamp |
+| Field                 | Type          | Description                                                  |
+| --------------------- | ------------- | ------------------------------------------------------------ |
+| `companyName`         | String        | Partner company name (indexed)                               |
+| `contactName`         | String        | Primary contact person                                       |
+| `email`               | String        | Unique email address (indexed)                               |
+| `phone`               | String        | Contact phone number                                         |
+| `partnerType`         | Enum          | Partner category (real_estate_agent, property_manager, etc.) |
+| `status`              | Enum          | Active, inactive, pending, suspended (indexed)               |
+| `commissionStructure` | Object        | Commission configuration (see below)                         |
+| `address`             | Object        | Full address details                                         |
+| `website`             | String        | Partner website URL                                          |
+| `portalAccess`        | Object        | Portal login credentials and settings                        |
+| `statistics`          | Object        | Performance metrics (leads, conversions, revenue)            |
+| `settings`            | Object        | Partner preferences and custom fields                        |
+| `contractStartDate`   | Date          | Contract start date                                          |
+| `contractEndDate`     | Date          | Contract end date                                            |
+| `notes`               | String        | Internal notes                                               |
+| `tags`                | Array[String] | Categorization tags                                          |
+| `createdBy`           | String        | User ID who created partner                                  |
+| `createdAt`           | Date          | Creation timestamp                                           |
+| `updatedAt`           | Date          | Last update timestamp                                        |
 
 **Commission Structure Types**:
 
 1. **Percentage**: Fixed percentage of job value
+
    ```json
    {
      "type": "percentage",
-     "rate": 10,  // 10% commission
+     "rate": 10, // 10% commission
      "paymentTerms": "net30"
    }
    ```
 
 2. **Flat Rate**: Fixed amount per referral
+
    ```json
    {
      "type": "flat_rate",
-     "flatAmount": 250,  // $250 per referral
+     "flatAmount": 250, // $250 per referral
      "paymentTerms": "net30"
    }
    ```
 
 3. **Tiered**: Different rates based on job value
+
    ```json
    {
      "type": "tiered",
@@ -162,6 +165,7 @@ apps/api/src/auth/
 4. **Custom**: Manual commission calculation
 
 **Indexes**:
+
 - Unique: `email`
 - Compound: `partnerType + status`, `status + createdAt`
 - Performance: `statistics.totalLeadsReferred`, `statistics.totalRevenue`, `statistics.conversionRate`
@@ -173,46 +177,49 @@ apps/api/src/auth/
 
 **Collection**: `referrals`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `partnerId` | ObjectId | Reference to Partner (indexed) |
-| `opportunityId` | ObjectId | Reference to Opportunity (unique, sparse) |
-| `customerId` | ObjectId | Reference to Customer |
-| `jobId` | ObjectId | Reference to Job when converted (unique, sparse) |
-| `referralDate` | Date | Date referral was received (indexed) |
-| `status` | Enum | Received, contacted, qualified, quoted, won, lost, cancelled |
-| `leadQuality` | Enum | Hot, warm, cold |
-| `customerInfo` | Object | Customer contact details |
-| `moveDetails` | Object | Move information (date, type, addresses) |
-| `commissionDetails` | Object | Commission calculation and payment (see below) |
-| `conversionData` | Object | Conversion metrics (days to contact, quote, conversion) |
-| `notes` | String | Public notes (visible to partner) |
-| `internalNotes` | String | Internal notes (not visible to partner) |
-| `assignedSalesRep` | String | User ID of assigned sales rep |
-| `tags` | Array[String] | Categorization tags |
-| `createdAt` | Date | Creation timestamp |
-| `updatedAt` | Date | Last update timestamp |
+| Field               | Type          | Description                                                  |
+| ------------------- | ------------- | ------------------------------------------------------------ |
+| `partnerId`         | ObjectId      | Reference to Partner (indexed)                               |
+| `opportunityId`     | ObjectId      | Reference to Opportunity (unique, sparse)                    |
+| `customerId`        | ObjectId      | Reference to Customer                                        |
+| `jobId`             | ObjectId      | Reference to Job when converted (unique, sparse)             |
+| `referralDate`      | Date          | Date referral was received (indexed)                         |
+| `status`            | Enum          | Received, contacted, qualified, quoted, won, lost, cancelled |
+| `leadQuality`       | Enum          | Hot, warm, cold                                              |
+| `customerInfo`      | Object        | Customer contact details                                     |
+| `moveDetails`       | Object        | Move information (date, type, addresses)                     |
+| `commissionDetails` | Object        | Commission calculation and payment (see below)               |
+| `conversionData`    | Object        | Conversion metrics (days to contact, quote, conversion)      |
+| `notes`             | String        | Public notes (visible to partner)                            |
+| `internalNotes`     | String        | Internal notes (not visible to partner)                      |
+| `assignedSalesRep`  | String        | User ID of assigned sales rep                                |
+| `tags`              | Array[String] | Categorization tags                                          |
+| `createdAt`         | Date          | Creation timestamp                                           |
+| `updatedAt`         | Date          | Last update timestamp                                        |
 
 **Commission Details Structure**:
+
 ```json
 {
-  "commissionRate": 10,           // Percentage or tiered rate applied
-  "commissionAmount": 500,        // Calculated commission ($)
-  "finalJobValue": 5000,          // Final job value used for calculation
-  "isPaid": false,                // Payment status
-  "paidDate": null,               // Date commission was paid
-  "paymentMethod": "check",       // Payment method
+  "commissionRate": 10, // Percentage or tiered rate applied
+  "commissionAmount": 500, // Calculated commission ($)
+  "finalJobValue": 5000, // Final job value used for calculation
+  "isPaid": false, // Payment status
+  "paidDate": null, // Date commission was paid
+  "paymentMethod": "check", // Payment method
   "paymentReference": "CHK-12345" // Payment reference number
 }
 ```
 
 **Conversion Data**:
+
 - `daysToContact`: Days from referral to first contact
 - `daysToQuote`: Days from referral to quote provided
 - `daysToConversion`: Days from referral to job won
 - `lostReason`: Reason if status is 'lost'
 
 **Indexes**:
+
 - Compound: `partnerId + status`, `partnerId + referralDate`, `status + commissionDetails.isPaid`
 - Unique sparse: `opportunityId`, `jobId`
 - Performance: `assignedSalesRep + status`, `leadQuality + status`
@@ -225,6 +232,7 @@ apps/api/src/auth/
 ### Partners API (`/api/partners`)
 
 #### Create Partner (Admin Only)
+
 ```http
 POST /api/partners
 Authorization: Bearer {jwt_token}
@@ -259,6 +267,7 @@ Response: 201 Created
 ```
 
 #### List Partners
+
 ```http
 GET /api/partners?partnerType=real_estate_agent&status=active&page=1&limit=20
 Authorization: Bearer {jwt_token}
@@ -275,6 +284,7 @@ Response: 200 OK
 ```
 
 #### Get Top Performing Partners
+
 ```http
 GET /api/partners/top?limit=10&sortBy=revenue
 Authorization: Bearer {jwt_token}
@@ -288,6 +298,7 @@ Response: 200 OK
 ```
 
 #### Get Partner Details
+
 ```http
 GET /api/partners/:id
 Authorization: Bearer {jwt_token}
@@ -301,6 +312,7 @@ Response: 200 OK
 ```
 
 #### Update Partner
+
 ```http
 PATCH /api/partners/:id
 Authorization: Bearer {jwt_token}
@@ -321,6 +333,7 @@ Response: 200 OK
 ```
 
 #### Enable/Disable Portal Access
+
 ```http
 POST /api/partners/:id/portal
 Authorization: Bearer {jwt_token}
@@ -342,6 +355,7 @@ Response: 200 OK
 ```
 
 #### Calculate Commission
+
 ```http
 POST /api/partners/:id/calculate-commission
 Authorization: Bearer {jwt_token}
@@ -366,6 +380,7 @@ Response: 200 OK
 ### Referrals API (`/api/referrals`)
 
 #### Create Referral
+
 ```http
 POST /api/referrals
 Authorization: Bearer {jwt_token}
@@ -401,6 +416,7 @@ Response: 201 Created
 ```
 
 #### List Referrals
+
 ```http
 GET /api/referrals?status=received&leadQuality=hot&page=1&limit=20
 Authorization: Bearer {jwt_token}
@@ -417,6 +433,7 @@ Response: 200 OK
 ```
 
 #### Get Referrals by Partner
+
 ```http
 GET /api/referrals/partner/:partnerId?status=won
 Authorization: Bearer {jwt_token}
@@ -431,6 +448,7 @@ Response: 200 OK
 ```
 
 #### Get Pending Commissions
+
 ```http
 GET /api/referrals/pending-commissions
 Authorization: Bearer {jwt_token}
@@ -456,6 +474,7 @@ Response: 200 OK
 ```
 
 #### Update Referral Status
+
 ```http
 PATCH /api/referrals/:id/status
 Authorization: Bearer {jwt_token}
@@ -476,6 +495,7 @@ Response: 200 OK
 ```
 
 #### Convert to Job
+
 ```http
 POST /api/referrals/:id/convert-to-job
 Authorization: Bearer {jwt_token}
@@ -505,6 +525,7 @@ Response: 200 OK
 ```
 
 #### Mark Commission Paid
+
 ```http
 PATCH /api/referrals/:id/commission-paid
 Authorization: Bearer {jwt_token}
@@ -526,6 +547,7 @@ Response: 200 OK
 ```
 
 #### Get Statistics
+
 ```http
 GET /api/referrals/statistics?partnerId=...&startDate=2025-01-01&endDate=2025-12-31
 Authorization: Bearer {jwt_token}
@@ -564,6 +586,7 @@ Response: 200 OK
 ```
 
 #### Get Conversion Funnel
+
 ```http
 GET /api/referrals/conversion-funnel?partnerId=...
 Authorization: Bearer {jwt_token}
@@ -588,6 +611,7 @@ Response: 200 OK
 ### Partner Portal API (`/api/portal/partner`)
 
 #### Partner Login (Public)
+
 ```http
 POST /api/portal/partner/login
 Rate Limit: 5 attempts per 15 minutes
@@ -615,6 +639,7 @@ Response: 200 OK
 ```
 
 #### Get Dashboard
+
 ```http
 GET /api/portal/partner/dashboard
 Authorization: Bearer {partner_jwt_token}
@@ -643,6 +668,7 @@ Response: 200 OK
 ```
 
 #### Get Partner Referrals
+
 ```http
 GET /api/portal/partner/referrals
 Authorization: Bearer {partner_jwt_token}
@@ -656,6 +682,7 @@ Response: 200 OK
 ```
 
 #### Submit New Referral
+
 ```http
 POST /api/portal/partner/referrals
 Authorization: Bearer {partner_jwt_token}
@@ -686,6 +713,7 @@ Response: 201 Created
 ```
 
 #### Get Commission History
+
 ```http
 GET /api/portal/partner/commissions
 Authorization: Bearer {partner_jwt_token}
@@ -714,6 +742,7 @@ Response: 200 OK
 ```
 
 #### Get Partner Profile
+
 ```http
 GET /api/portal/partner/profile
 Authorization: Bearer {partner_jwt_token}
@@ -743,6 +772,7 @@ Response: 200 OK
 The commission calculation is performed by `PartnersService.calculateCommission(partner, jobValue)`:
 
 ### 1. Percentage Type
+
 ```typescript
 if (commissionStructure.type === 'percentage') {
   return jobValue * (commissionStructure.rate / 100);
@@ -751,6 +781,7 @@ if (commissionStructure.type === 'percentage') {
 ```
 
 ### 2. Flat Rate Type
+
 ```typescript
 if (commissionStructure.type === 'flat_rate') {
   return commissionStructure.flatAmount;
@@ -759,10 +790,11 @@ if (commissionStructure.type === 'flat_rate') {
 ```
 
 ### 3. Tiered Type
+
 ```typescript
 if (commissionStructure.type === 'tiered') {
-  const tier = tiers.find(t =>
-    jobValue >= t.minValue && jobValue <= t.maxValue
+  const tier = tiers.find(
+    (t) => jobValue >= t.minValue && jobValue <= t.maxValue,
   );
   return jobValue * (tier.rate / 100);
 }
@@ -773,6 +805,7 @@ if (commissionStructure.type === 'tiered') {
 ```
 
 ### 4. Custom Type
+
 ```typescript
 if (commissionStructure.type === 'custom') {
   return 0; // Manual calculation required
@@ -848,6 +881,7 @@ if (commissionStructure.type === 'custom') {
 ### Opportunities Module Integration
 
 **Schema Changes** (`apps/api/src/opportunities/schemas/opportunity.schema.ts`):
+
 ```typescript
 @Prop({ index: true })
 referralId?: string;
@@ -857,6 +891,7 @@ partnerId?: string;
 ```
 
 **Workflow**:
+
 1. When opportunity created from referral → link `referralId`
 2. When opportunity status changes → update referral status
 3. When opportunity won → trigger commission calculation
@@ -864,6 +899,7 @@ partnerId?: string;
 ### Customers Module Integration
 
 **Schema Changes** (`apps/api/src/customers/schemas/customer.schema.ts`):
+
 ```typescript
 @Prop({ type: Object })
 referredBy?: {
@@ -875,11 +911,13 @@ referredBy?: {
 ```
 
 **Index**:
+
 ```typescript
 CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true });
 ```
 
 **Workflow**:
+
 1. When customer created from referral → set `referredBy.partnerId`
 2. Track customer lifetime value attributed to partner
 3. Link all customer jobs back to partner for revenue tracking
@@ -889,6 +927,7 @@ CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true });
 **Future Enhancement**: Add `referralId` and `partnerId` fields to Job schema for complete tracking.
 
 **Workflow**:
+
 1. When job created from referred opportunity → link to referral
 2. When job completed → calculate final commission
 3. Link job value to partner revenue statistics
@@ -898,33 +937,39 @@ CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true });
 ## Security Considerations
 
 ### Password Security
+
 - **Hashing**: bcryptjs with 12 salt rounds
 - **Minimum Requirements**: 8 characters, uppercase, lowercase, number, special character
 - **Storage**: Only hashed passwords stored in database
 - **Never log**: Passwords never appear in logs or responses
 
 ### Authentication
+
 - **JWT Tokens**: Separate token type for partners (`type: 'partner'`)
 - **Token Expiration**: 8 hours (access), 7 days (refresh)
 - **Strategy Validation**: Partner status and portal access verified on each request
 
 ### Authorization
+
 - **Data Isolation**: Partners can only access their own referrals and data
 - **Admin Controls**: Only admins can create/modify partners
 - **Role-Based Access**: Different permissions for super_admin, admin, dispatcher, crew
 
 ### Rate Limiting
+
 - **Partner Login**: 5 attempts per 15 minutes (strict)
 - **API Calls**: 100 requests per minute (standard)
 - **Protection**: Prevents brute-force attacks
 
 ### Input Validation
+
 - **DTOs**: All inputs validated using class-validator
 - **Type Safety**: TypeScript strict type checking
 - **Enum Validation**: Partner types, statuses, commission types
 - **Email Validation**: Proper email format checking
 
 ### Audit Trail
+
 - **Creation Tracking**: `createdBy` field on all records
 - **Timestamps**: `createdAt` and `updatedAt` on all schemas
 - **Status Changes**: Conversion data tracks all status transitions
@@ -937,6 +982,7 @@ CustomerSchema.index({ 'referredBy.partnerId': 1 }, { sparse: true });
 ### Complete Integration Test
 
 #### 1. Create Partner
+
 ```bash
 POST /api/partners
 {
@@ -960,6 +1006,7 @@ POST /api/partners
 ```
 
 #### 2. Enable Portal Access
+
 ```bash
 POST /api/partners/{partnerId}/portal
 {
@@ -970,6 +1017,7 @@ POST /api/partners/{partnerId}/portal
 ```
 
 #### 3. Partner Login
+
 ```bash
 POST /api/portal/partner/login
 {
@@ -980,6 +1028,7 @@ POST /api/portal/partner/login
 ```
 
 #### 4. Submit Referral (via Portal)
+
 ```bash
 POST /api/portal/partner/referrals
 Authorization: Bearer {partner_token}
@@ -1000,6 +1049,7 @@ Authorization: Bearer {partner_token}
 ```
 
 #### 5. Update Referral Status (Admin)
+
 ```bash
 PATCH /api/referrals/{referralId}/status
 Authorization: Bearer {admin_token}
@@ -1010,6 +1060,7 @@ Authorization: Bearer {admin_token}
 ```
 
 #### 6. Create Opportunity (Link to Referral)
+
 ```bash
 POST /api/opportunities
 {
@@ -1020,6 +1071,7 @@ POST /api/opportunities
 ```
 
 #### 7. Convert Opportunity to Job
+
 ```bash
 # Update opportunity status to 'won'
 PATCH /api/opportunities/{opportunityId}
@@ -1034,6 +1086,7 @@ POST /api/jobs
 ```
 
 #### 8. Convert Referral to Job
+
 ```bash
 POST /api/referrals/{referralId}/convert-to-job
 {
@@ -1044,12 +1097,14 @@ POST /api/referrals/{referralId}/convert-to-job
 ```
 
 #### 9. View Pending Commissions
+
 ```bash
 GET /api/referrals/pending-commissions
 # Should show referral with $485 unpaid commission
 ```
 
 #### 10. Mark Commission Paid
+
 ```bash
 PATCH /api/referrals/{referralId}/commission-paid
 {
@@ -1060,6 +1115,7 @@ PATCH /api/referrals/{referralId}/commission-paid
 ```
 
 #### 11. Verify Partner Statistics
+
 ```bash
 GET /api/partners/{partnerId}
 # Verify:
@@ -1071,6 +1127,7 @@ GET /api/partners/{partnerId}
 ```
 
 #### 12. Partner Views Commission History
+
 ```bash
 GET /api/portal/partner/commissions
 Authorization: Bearer {partner_token}
@@ -1082,6 +1139,7 @@ Authorization: Bearer {partner_token}
 ## Future Enhancements
 
 ### Phase 1: Analytics & Reporting
+
 - [ ] Partner performance comparison reports
 - [ ] Referral source ROI analysis
 - [ ] Commission forecast based on pipeline
@@ -1089,6 +1147,7 @@ Authorization: Bearer {partner_token}
 - [ ] Automated monthly commission statements (PDF generation)
 
 ### Phase 2: Automation
+
 - [ ] Automated referral status updates based on opportunity/job changes
 - [ ] Email notifications to partners on referral status changes
 - [ ] Automated commission calculation on job completion
@@ -1096,6 +1155,7 @@ Authorization: Bearer {partner_token}
 - [ ] Partner engagement email campaigns
 
 ### Phase 3: Advanced Features
+
 - [ ] Multi-level commission structures (e.g., recurring commissions)
 - [ ] Partner hierarchy (sub-partners, agencies)
 - [ ] Custom commission rules engine (conditions, modifiers)
@@ -1104,6 +1164,7 @@ Authorization: Bearer {partner_token}
 - [ ] Partner contract management with e-signatures
 
 ### Phase 4: Integration & API
+
 - [ ] Webhook support for external partner systems
 - [ ] Public API for partner integrations
 - [ ] Zapier/Make integration for workflow automation
@@ -1111,6 +1172,7 @@ Authorization: Bearer {partner_token}
 - [ ] Salesforce/HubSpot CRM integration
 
 ### Phase 5: Mobile & UX
+
 - [ ] Partner mobile app for referral submission
 - [ ] QR code referral submission
 - [ ] Partner marketing materials download center
@@ -1121,38 +1183,38 @@ Authorization: Bearer {partner_token}
 
 ## API Endpoint Summary
 
-| Method | Endpoint | Description | Roles |
-|--------|----------|-------------|-------|
-| **Partners** | | | |
-| POST | `/api/partners` | Create partner | super_admin, admin |
-| GET | `/api/partners` | List partners | super_admin, admin, dispatcher |
-| GET | `/api/partners/top` | Top performers | super_admin, admin |
-| GET | `/api/partners/:id` | Get partner | super_admin, admin, dispatcher |
-| PATCH | `/api/partners/:id` | Update partner | super_admin, admin |
-| DELETE | `/api/partners/:id` | Deactivate partner | super_admin, admin |
-| POST | `/api/partners/:id/portal` | Enable portal | super_admin, admin |
-| POST | `/api/partners/:id/calculate-commission` | Calculate commission | super_admin, admin, dispatcher |
-| **Referrals** | | | |
-| POST | `/api/referrals` | Create referral | super_admin, admin, dispatcher |
-| GET | `/api/referrals` | List referrals | super_admin, admin, dispatcher |
-| GET | `/api/referrals/partner/:partnerId` | Partner referrals | super_admin, admin, dispatcher |
-| GET | `/api/referrals/pending-commissions` | Pending commissions | super_admin, admin |
-| GET | `/api/referrals/statistics` | Referral stats | super_admin, admin |
-| GET | `/api/referrals/conversion-funnel` | Conversion funnel | super_admin, admin |
-| GET | `/api/referrals/:id` | Get referral | super_admin, admin, dispatcher |
-| PATCH | `/api/referrals/:id` | Update referral | super_admin, admin, dispatcher |
-| PATCH | `/api/referrals/:id/status` | Update status | super_admin, admin, dispatcher |
-| POST | `/api/referrals/:id/convert-to-job` | Convert to job | super_admin, admin, dispatcher |
-| POST | `/api/referrals/:id/link-opportunity` | Link opportunity | super_admin, admin, dispatcher |
-| POST | `/api/referrals/:id/link-customer` | Link customer | super_admin, admin, dispatcher |
-| PATCH | `/api/referrals/:id/commission-paid` | Mark paid | super_admin, admin |
-| **Partner Portal** | | | |
-| POST | `/api/portal/partner/login` | Portal login | Public |
-| GET | `/api/portal/partner/dashboard` | Dashboard | Partner |
-| GET | `/api/portal/partner/referrals` | Partner referrals | Partner |
-| POST | `/api/portal/partner/referrals` | Submit referral | Partner |
-| GET | `/api/portal/partner/commissions` | Commission history | Partner |
-| GET | `/api/portal/partner/profile` | Partner profile | Partner |
+| Method             | Endpoint                                 | Description          | Roles                          |
+| ------------------ | ---------------------------------------- | -------------------- | ------------------------------ |
+| **Partners**       |                                          |                      |                                |
+| POST               | `/api/partners`                          | Create partner       | super_admin, admin             |
+| GET                | `/api/partners`                          | List partners        | super_admin, admin, dispatcher |
+| GET                | `/api/partners/top`                      | Top performers       | super_admin, admin             |
+| GET                | `/api/partners/:id`                      | Get partner          | super_admin, admin, dispatcher |
+| PATCH              | `/api/partners/:id`                      | Update partner       | super_admin, admin             |
+| DELETE             | `/api/partners/:id`                      | Deactivate partner   | super_admin, admin             |
+| POST               | `/api/partners/:id/portal`               | Enable portal        | super_admin, admin             |
+| POST               | `/api/partners/:id/calculate-commission` | Calculate commission | super_admin, admin, dispatcher |
+| **Referrals**      |                                          |                      |                                |
+| POST               | `/api/referrals`                         | Create referral      | super_admin, admin, dispatcher |
+| GET                | `/api/referrals`                         | List referrals       | super_admin, admin, dispatcher |
+| GET                | `/api/referrals/partner/:partnerId`      | Partner referrals    | super_admin, admin, dispatcher |
+| GET                | `/api/referrals/pending-commissions`     | Pending commissions  | super_admin, admin             |
+| GET                | `/api/referrals/statistics`              | Referral stats       | super_admin, admin             |
+| GET                | `/api/referrals/conversion-funnel`       | Conversion funnel    | super_admin, admin             |
+| GET                | `/api/referrals/:id`                     | Get referral         | super_admin, admin, dispatcher |
+| PATCH              | `/api/referrals/:id`                     | Update referral      | super_admin, admin, dispatcher |
+| PATCH              | `/api/referrals/:id/status`              | Update status        | super_admin, admin, dispatcher |
+| POST               | `/api/referrals/:id/convert-to-job`      | Convert to job       | super_admin, admin, dispatcher |
+| POST               | `/api/referrals/:id/link-opportunity`    | Link opportunity     | super_admin, admin, dispatcher |
+| POST               | `/api/referrals/:id/link-customer`       | Link customer        | super_admin, admin, dispatcher |
+| PATCH              | `/api/referrals/:id/commission-paid`     | Mark paid            | super_admin, admin             |
+| **Partner Portal** |                                          |                      |                                |
+| POST               | `/api/portal/partner/login`              | Portal login         | Public                         |
+| GET                | `/api/portal/partner/dashboard`          | Dashboard            | Partner                        |
+| GET                | `/api/portal/partner/referrals`          | Partner referrals    | Partner                        |
+| POST               | `/api/portal/partner/referrals`          | Submit referral      | Partner                        |
+| GET                | `/api/portal/partner/commissions`        | Commission history   | Partner                        |
+| GET                | `/api/portal/partner/profile`            | Partner profile      | Partner                        |
 
 **Total Endpoints**: 26 (13 Partners, 12 Referrals, 6 Portal)
 
@@ -1160,16 +1222,17 @@ Authorization: Bearer {partner_token}
 
 ## Database Collections
 
-| Collection | Description | Key Indexes |
-|------------|-------------|-------------|
-| `partners` | Partner companies and contacts | email (unique), partnerType+status, statistics.totalRevenue |
-| `referrals` | Referral tracking and commissions | partnerId+status, jobId (unique), commissionDetails.isPaid |
+| Collection  | Description                       | Key Indexes                                                 |
+| ----------- | --------------------------------- | ----------------------------------------------------------- |
+| `partners`  | Partner companies and contacts    | email (unique), partnerType+status, statistics.totalRevenue |
+| `referrals` | Referral tracking and commissions | partnerId+status, jobId (unique), commissionDetails.isPaid  |
 
 ---
 
 ## Commission Structure Examples
 
 ### Example 1: Real Estate Agent (10% of job value)
+
 ```json
 {
   "type": "percentage",
@@ -1177,11 +1240,13 @@ Authorization: Bearer {partner_token}
   "paymentTerms": "net30"
 }
 ```
+
 - $3000 job → $300 commission
 - $5000 job → $500 commission
 - $10000 job → $1000 commission
 
 ### Example 2: Property Manager (Flat $250)
+
 ```json
 {
   "type": "flat_rate",
@@ -1189,9 +1254,11 @@ Authorization: Bearer {partner_token}
   "paymentTerms": "net30"
 }
 ```
+
 - Any job value → $250 commission
 
 ### Example 3: Corporate Client (Tiered)
+
 ```json
 {
   "type": "tiered",
@@ -1203,6 +1270,7 @@ Authorization: Bearer {partner_token}
   "paymentTerms": "net60"
 }
 ```
+
 - $3000 job → $150 (5%)
 - $7500 job → $562.50 (7.5%)
 - $15000 job → $1500 (10%)
@@ -1219,6 +1287,7 @@ The system automatically tracks:
 4. **Lost Reason**: Categorization of why referrals were lost
 
 These metrics help:
+
 - Identify bottlenecks in sales process
 - Compare partner lead quality
 - Optimize follow-up timing
@@ -1257,6 +1326,7 @@ AuthModule
 ## Implementation Status
 
 ✅ **Completed**:
+
 - Partners module with full CRUD operations
 - Referrals module with conversion tracking
 - Commission calculation engine (percentage, flat, tiered, custom)
@@ -1268,10 +1338,12 @@ AuthModule
 - Input validation with DTOs
 
 ⚠️ **Known Issues**:
+
 - Build has 133 TypeScript errors (mostly from other pre-existing modules: follow-up-rules, lead-activities)
-- Partner-specific errors resolved (DTOs fixed, bcryptjs imported, _id type casting)
+- Partner-specific errors resolved (DTOs fixed, bcryptjs imported, \_id type casting)
 
 🚧 **Remaining Tasks**:
+
 - Fix TypeScript errors in follow-up-rules and lead-activities modules (pre-existing)
 - Create seed data for testing
 - Add unit tests for commission calculation
@@ -1285,14 +1357,17 @@ AuthModule
 ### For Admins:
 
 1. **View Pending Commissions**
+
    ```bash
    GET /api/referrals/pending-commissions
    ```
+
    Returns all won referrals with unpaid commissions
 
 2. **Process Payment**
    - Issue check/transfer to partner
    - Record payment details in system:
+
    ```bash
    PATCH /api/referrals/{id}/commission-paid
    {
@@ -1333,6 +1408,7 @@ The Partner/Referral Source Integration Module provides a complete solution for 
 All core functionality has been implemented with proper validation, authentication, authorization, and audit trails. The module integrates seamlessly with existing SimplePro-v3 modules and provides a foundation for future enhancements in automation, analytics, and partner engagement.
 
 **Total Implementation**:
+
 - **3 Modules**: Partners, Referrals, Partner Portal
 - **26 API Endpoints**: Full REST API coverage
 - **2 MongoDB Collections**: Comprehensive schema design

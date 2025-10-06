@@ -2,10 +2,19 @@
  * TypeScript interfaces for Partner/Referral Source Management
  */
 
-export type PartnerType = 'real_estate' | 'relocation' | 'corporate' | 'individual';
+export type PartnerType =
+  | 'real_estate'
+  | 'relocation'
+  | 'corporate'
+  | 'individual';
 export type PartnerStatus = 'active' | 'inactive';
 export type CommissionStructureType = 'percentage' | 'flat_rate' | 'tiered';
-export type ReferralStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'lost';
+export type ReferralStatus =
+  | 'new'
+  | 'contacted'
+  | 'qualified'
+  | 'converted'
+  | 'lost';
 export type CommissionStatus = 'pending' | 'calculated' | 'paid';
 
 export interface CommissionStructure {

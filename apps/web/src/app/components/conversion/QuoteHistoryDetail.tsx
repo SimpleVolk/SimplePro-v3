@@ -395,7 +395,8 @@ export default function QuoteHistoryDetail({
                     {activity.activityType.replace(/_/g, ' ')}
                   </div>
                   <div className={styles.activityMeta}>
-                    By: {activity.performedBy} | {formatDate(activity.timestamp)}
+                    By: {activity.performedBy} |{' '}
+                    {formatDate(activity.timestamp)}
                   </div>
                   {activity.outcome && (
                     <div className={styles.activityOutcome}>

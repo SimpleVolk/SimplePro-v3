@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -21,7 +25,7 @@ export class LeadActivitiesService {
 
   async createActivity(
     dto: CreateActivityDto,
-    userId: string
+    userId: string,
   ): Promise<LeadActivityDocument> {
     const activityId = dto.activityId || uuidv4();
 
@@ -29,7 +33,9 @@ export class LeadActivitiesService {
       ...dto,
       activityId,
       createdBy: userId,
-      scheduledDate: dto.scheduledDate ? new Date(dto.scheduledDate) : undefined,
+      scheduledDate: dto.scheduledDate
+        ? new Date(dto.scheduledDate)
+        : undefined,
       dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
     });
 
@@ -44,7 +50,9 @@ export class LeadActivitiesService {
     return saved;
   }
 
-  async findByOpportunity(opportunityId: string): Promise<LeadActivityDocument[]> {
+  async findByOpportunity(
+    opportunityId: string,
+  ): Promise<LeadActivityDocument[]> {
     return this.activityModel
       .find({ opportunityId })
       .sort({ createdAt: -1 })
@@ -68,13 +76,12 @@ export class LeadActivitiesService {
       filter.assignedTo = userId;
     }
 
-    return this.activityModel
-      .find(filter)
-      .sort({ dueDate: 1 })
-      .exec();
+    return this.activityModel.find(filter).sort({ dueDate: 1 }).exec();
   }
 
-  async findOverdueActivities(userId?: string): Promise<LeadActivityDocument[]> {
+  async findOverdueActivities(
+    userId?: string,
+  ): Promise<LeadActivityDocument[]> {
     const now = new Date();
     const filter: any = {
       completedDate: { $exists: false },
@@ -85,10 +92,7 @@ export class LeadActivitiesService {
       filter.assignedTo = userId;
     }
 
-    return this.activityModel
-      .find(filter)
-      .sort({ dueDate: 1 })
-      .exec();
+    return this.activityModel.find(filter).sort({ dueDate: 1 }).exec();
   }
 
   async findAll(query: ActivityQueryDto): Promise<LeadActivityDocument[]> {
@@ -133,16 +137,13 @@ export class LeadActivitiesService {
       }
     }
 
-    return this.activityModel
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .exec();
+    return this.activityModel.find(filter).sort({ createdAt: -1 }).exec();
   }
 
   async completeActivity(
     activityId: string,
     dto: CompleteActivityDto,
-    userId: string
+    userId: string,
   ): Promise<LeadActivityDocument> {
     const activity = await this.activityModel.findOne({ activityId }).exec();
 
@@ -154,7 +155,9 @@ export class LeadActivitiesService {
       throw new BadRequestException('Activity is already completed');
     }
 
-    const completedDate = dto.completedDate ? new Date(dto.completedDate) : new Date();
+    const completedDate = dto.completedDate
+      ? new Date(dto.completedDate)
+      : new Date();
 
     activity.outcome = dto.outcome;
     activity.completedDate = completedDate;
@@ -181,7 +184,7 @@ export class LeadActivitiesService {
   }
 
   async getActivityTimeline(
-    opportunityId: string
+    opportunityId: string,
   ): Promise<LeadActivityDocument[]> {
     return this.activityModel
       .find({ opportunityId })
@@ -255,11 +258,11 @@ export class LeadActivitiesService {
       overdue,
       byType: byType.reduce(
         (acc, item) => ({ ...acc, [item._id]: item.count }),
-        {}
+        {},
       ),
       byOutcome: byOutcome.reduce(
         (acc, item) => ({ ...acc, [item._id]: item.count }),
-        {}
+        {},
       ),
       avgResponseTimeHours: avgResponseTime[0]
         ? avgResponseTime[0].avgResponseTime / (1000 * 60 * 60)
@@ -274,7 +277,7 @@ export class LeadActivitiesService {
     dueDate: Date,
     assignedTo: string,
     userId: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ): Promise<LeadActivityDocument> {
     return this.createActivity(
       {
@@ -286,7 +289,7 @@ export class LeadActivitiesService {
         assignedTo,
         metadata,
       },
-      userId
+      userId,
     );
   }
 

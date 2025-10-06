@@ -121,7 +121,10 @@ export class CrewScheduleController {
 
   @Post('time-off')
   @Roles('super_admin', 'admin', 'dispatcher', 'crew')
-  async requestTimeOff(@Body() dto: TimeOffRequestDto, @Request() req: AuthenticatedRequest) {
+  async requestTimeOff(
+    @Body() dto: TimeOffRequestDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     const request = await this.timeOffService.requestTimeOff(
       dto,
       req.user.userId,
@@ -167,7 +170,10 @@ export class CrewScheduleController {
   @Delete('time-off/:id')
   @Roles('super_admin', 'admin', 'dispatcher', 'crew')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async cancelTimeOffRequest(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+  async cancelTimeOffRequest(
+    @Param('id') id: string,
+    @Request() req: AuthenticatedRequest,
+  ) {
     await this.timeOffService.cancelTimeOffRequest(id, req.user.userId);
   }
 
@@ -278,7 +284,10 @@ export class CrewScheduleController {
 
   @Patch('assignment/:id/confirm')
   @Roles('super_admin', 'admin', 'dispatcher', 'crew')
-  async confirmAssignment(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+  async confirmAssignment(
+    @Param('id') id: string,
+    @Request() req: AuthenticatedRequest,
+  ) {
     const assignment = await this.autoAssignmentService.confirmAssignment(
       id,
       req.user.userId,

@@ -113,6 +113,7 @@ async getSalesPerformance(period: 'today' | 'week' | 'month' = 'month') {
 ```
 
 **Test:**
+
 ```bash
 curl http://localhost:3001/api/analytics/sales-performance
 ```
@@ -124,11 +125,13 @@ curl http://localhost:3001/api/analytics/sales-performance
 **File:** `apps/api/src/main.ts`
 
 ### Install dependency
+
 ```bash
 npm install compression @types/compression
 ```
 
 ### Add after app creation
+
 ```typescript
 import * as compression from 'compression';
 
@@ -136,16 +139,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Add compression middleware (ADD THIS)
-  app.use(compression({
-    threshold: 1024,     // Only compress > 1KB
-    level: 6,            // Balance speed vs size
-    filter: (req, res) => {
-      if (req.headers['x-no-compression']) {
-        return false;
-      }
-      return compression.filter(req, res);
-    }
-  }));
+  app.use(
+    compression({
+      threshold: 1024, // Only compress > 1KB
+      level: 6, // Balance speed vs size
+      filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    }),
+  );
 
   // Enable CORS
   app.enableCors({
@@ -157,6 +162,7 @@ async function bootstrap() {
 ```
 
 **Test:**
+
 ```bash
 curl -H "Accept-Encoding: gzip" http://localhost:3001/api/customers | wc -c
 ```
@@ -293,6 +299,7 @@ async remove(id: string): Promise<void> {
 ```
 
 **Test:**
+
 ```bash
 # First request (cache miss)
 time curl http://localhost:3001/api/customers
@@ -308,6 +315,7 @@ time curl http://localhost:3001/api/customers
 **File:** `apps/web/package.json`
 
 ### Install dependency
+
 ```bash
 npm install @tanstack/react-query @tanstack/react-query-devtools
 ```
@@ -360,23 +368,27 @@ interface CustomerFilters {
   search?: string;
 }
 
-export function useCustomers(filters: CustomerFilters = {}, page = 1, limit = 20) {
+export function useCustomers(
+  filters: CustomerFilters = {},
+  page = 1,
+  limit = 20,
+) {
   return useQuery({
     queryKey: ['customers', filters, page, limit],
     queryFn: async () => {
       const params = new URLSearchParams({
         skip: String((page - 1) * limit),
         limit: String(limit),
-        ...filters
+        ...filters,
       });
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/customers?${params}`,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        },
       );
 
       if (!response.ok) {
@@ -400,10 +412,10 @@ export function useCreateCustomer() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
-          body: JSON.stringify(customerData)
-        }
+          body: JSON.stringify(customerData),
+        },
       );
 
       if (!response.ok) {
@@ -415,7 +427,7 @@ export function useCreateCustomer() {
     onSuccess: () => {
       // Invalidate and refetch customer lists
       queryClient.invalidateQueries({ queryKey: ['customers'] });
-    }
+    },
   });
 }
 
@@ -430,10 +442,10 @@ export function useUpdateCustomer() {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
-          body: JSON.stringify(data)
-        }
+          body: JSON.stringify(data),
+        },
       );
 
       if (!response.ok) {
@@ -446,7 +458,7 @@ export function useUpdateCustomer() {
       // Invalidate specific customer and all lists
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       queryClient.invalidateQueries({ queryKey: ['customer', variables.id] });
-    }
+    },
   });
 }
 ```
@@ -501,6 +513,7 @@ export function CustomerManagement() {
 ```
 
 **Benefits:**
+
 - Automatic caching (no duplicate requests)
 - Background refetching keeps data fresh
 - Optimistic updates for instant UI feedback
@@ -528,9 +541,10 @@ export class CacheController {
       ...stats,
       connected: this.cacheService.isConnected(),
       hitRatePercentage: `${stats.hitRate.toFixed(2)}%`,
-      recommendation: stats.hitRate < 50
-        ? 'Cache hit rate is low. Consider increasing TTL or caching more endpoints.'
-        : 'Cache performance is good.',
+      recommendation:
+        stats.hitRate < 50
+          ? 'Cache hit rate is low. Consider increasing TTL or caching more endpoints.'
+          : 'Cache performance is good.',
     };
   }
 
@@ -558,6 +572,7 @@ export class CacheModule {}
 ```
 
 **Test:**
+
 ```bash
 # Check cache statistics
 curl http://localhost:3001/api/cache/stats
@@ -592,6 +607,7 @@ After implementing each optimization:
 ## Performance Validation
 
 ### Before Optimization
+
 ```bash
 # Measure baseline performance
 time curl http://localhost:3001/api/analytics/dashboard
@@ -599,6 +615,7 @@ time curl http://localhost:3001/api/customers
 ```
 
 ### After Optimization
+
 ```bash
 # Should be 40-60% faster
 time curl http://localhost:3001/api/analytics/dashboard

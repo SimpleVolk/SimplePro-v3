@@ -6,17 +6,36 @@ import { faker } from '@faker-js/faker';
 export async function seedOpportunities(
   OpportunityModel: any,
   customers: any[],
-  users: any[]
+  users: any[],
 ): Promise<any[]> {
   const opportunities: any[] = [];
   const opportunityCount = faker.number.int({ min: 40, max: 60 });
 
   const services = ['local', 'long_distance', 'storage', 'packing_only'];
   const moveSizes = ['studio', '1br', '2br', '3br', '4br', '5br', 'custom'];
-  const buildingTypes = ['apartment', 'house', 'condo', 'office', 'warehouse', 'storage'];
-  const accessDifficulties = ['easy', 'moderate', 'difficult', 'very_difficult'];
+  const buildingTypes = [
+    'apartment',
+    'house',
+    'condo',
+    'office',
+    'warehouse',
+    'storage',
+  ];
+  const accessDifficulties = [
+    'easy',
+    'moderate',
+    'difficult',
+    'very_difficult',
+  ];
   const flexibilities = ['exact', 'week', 'month'];
-  const leadSources = ['website', 'phone', 'referral', 'partner', 'walkin', 'other'];
+  const leadSources = [
+    'website',
+    'phone',
+    'referral',
+    'partner',
+    'walkin',
+    'other',
+  ];
   const priorities = ['low', 'medium', 'high', 'urgent'];
 
   for (let i = 0; i < opportunityCount; i++) {
@@ -45,7 +64,8 @@ export async function seedOpportunities(
 
     // Generate pickup location details
     const pickupFloorLevel = faker.number.int({ min: 1, max: 10 });
-    const pickupHasElevator = pickupFloorLevel > 3 ? faker.datatype.boolean() : false;
+    const pickupHasElevator =
+      pickupFloorLevel > 3 ? faker.datatype.boolean() : false;
 
     const pickup = {
       address: faker.location.streetAddress(true),
@@ -62,14 +82,17 @@ export async function seedOpportunities(
 
     // Generate delivery location details
     const deliveryFloorLevel = faker.number.int({ min: 1, max: 10 });
-    const deliveryHasElevator = deliveryFloorLevel > 3 ? faker.datatype.boolean() : false;
+    const deliveryHasElevator =
+      deliveryFloorLevel > 3 ? faker.datatype.boolean() : false;
 
     const delivery = {
       address: faker.location.streetAddress(true),
       buildingType: faker.helpers.arrayElement(buildingTypes),
       floorLevel: deliveryFloorLevel,
       elevatorAccess: deliveryHasElevator,
-      stairsCount: deliveryHasElevator ? 0 : Math.floor(deliveryFloorLevel * 1.5),
+      stairsCount: deliveryHasElevator
+        ? 0
+        : Math.floor(deliveryFloorLevel * 1.5),
       longCarry: faker.datatype.boolean(),
       parkingDistance: faker.number.int({ min: 10, max: 200 }),
       accessDifficulty: faker.helpers.arrayElement(accessDifficulties),
@@ -91,7 +114,13 @@ export async function seedOpportunities(
 
       rooms.push({
         id: faker.string.uuid(),
-        type: faker.helpers.arrayElement(['living_room', 'bedroom', 'kitchen', 'office', 'storage']),
+        type: faker.helpers.arrayElement([
+          'living_room',
+          'bedroom',
+          'kitchen',
+          'office',
+          'storage',
+        ]),
         description: faker.lorem.sentence(),
         items: [], // Simplified for seed data
         packingRequired: faker.datatype.boolean(),
@@ -117,14 +146,17 @@ export async function seedOpportunities(
       unpacking: faker.datatype.boolean(),
       assembly: faker.datatype.boolean(),
       storage: faker.datatype.boolean(),
-      storageDuration: faker.datatype.boolean() ? faker.number.int({ min: 1, max: 12 }) : undefined,
+      storageDuration: faker.datatype.boolean()
+        ? faker.number.int({ min: 1, max: 12 })
+        : undefined,
       cleaning: faker.datatype.boolean(),
     };
 
     // Calculate distance and duration
-    const distance = service === 'long_distance'
-      ? faker.number.int({ min: 200, max: 2000 })
-      : faker.number.int({ min: 5, max: 50 });
+    const distance =
+      service === 'long_distance'
+        ? faker.number.int({ min: 200, max: 2000 })
+        : faker.number.int({ min: 5, max: 50 });
     const estimatedDuration = faker.number.int({ min: 4, max: 12 });
     const crewSize = faker.number.int({ min: 2, max: 6 });
 
@@ -133,7 +165,9 @@ export async function seedOpportunities(
     const weightFactor = (totalWeight / 1000) * 100;
     const distanceFactor = distance * (service === 'long_distance' ? 2 : 0.5);
     const crewFactor = crewSize * 150;
-    const estimatedPrice = Math.round(basePrice + weightFactor + distanceFactor + crewFactor);
+    const estimatedPrice = Math.round(
+      basePrice + weightFactor + distanceFactor + crewFactor,
+    );
 
     const salesRep = users.find((u) => u.department === 'Sales') || users[0];
 
@@ -155,18 +189,24 @@ export async function seedOpportunities(
       assignedSalesRep: salesRep._id.toString(),
       priority: faker.helpers.arrayElement(priorities),
       internalNotes: faker.datatype.boolean() ? faker.lorem.paragraph() : '',
-      followUpDate: status === 'open' || status === 'contacted'
-        ? faker.date.soon({ days: 7 })
-        : undefined,
+      followUpDate:
+        status === 'open' || status === 'contacted'
+          ? faker.date.soon({ days: 7 })
+          : undefined,
       distance,
       estimatedDuration,
       crewSize,
       isWeekend: moveDate.getDay() === 0 || moveDate.getDay() === 6,
       isHoliday: faker.datatype.boolean(0.05),
-      seasonalPeriod: faker.helpers.arrayElement(['peak', 'standard', 'off_peak']),
-      estimatedPrice: status === 'quoted' || status === 'negotiating' || status === 'won'
-        ? estimatedPrice
-        : undefined,
+      seasonalPeriod: faker.helpers.arrayElement([
+        'peak',
+        'standard',
+        'off_peak',
+      ]),
+      estimatedPrice:
+        status === 'quoted' || status === 'negotiating' || status === 'won'
+          ? estimatedPrice
+          : undefined,
       status,
       createdBy: salesRep._id.toString(),
       updatedBy: salesRep._id.toString(),

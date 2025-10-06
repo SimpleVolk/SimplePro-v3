@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards, Request } from '@nestjs/common';
 import { OpportunitiesService } from '../../opportunities/opportunities.service';
 import { CustomersService } from '../../customers/customers.service';
@@ -16,7 +23,7 @@ export class OpportunitiesResolver {
     // @ts-expect-error - Service injected for future use
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private readonly customersService: CustomersService,
-    private readonly customerDataLoader: CustomerDataLoader
+    private readonly customerDataLoader: CustomerDataLoader,
   ) {}
 
   // Queries
@@ -40,10 +47,7 @@ export class OpportunitiesResolver {
   // Mutations
   @Mutation('createOpportunity')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async createOpportunity(
-    @Args('input') input: any,
-    @Request() req: any
-  ) {
+  async createOpportunity(@Args('input') input: any, @Request() req: any) {
     const userId = req.user?.userId || 'system';
     return this.opportunitiesService.create(input, userId);
   }
@@ -53,7 +57,7 @@ export class OpportunitiesResolver {
   async updateOpportunity(
     @Args('id') id: string,
     @Args('input') input: any,
-    @Request() req: any
+    @Request() req: any,
   ) {
     const userId = req.user?.userId || 'system';
     return this.opportunitiesService.update(id, input, userId);
@@ -64,7 +68,7 @@ export class OpportunitiesResolver {
   async updateOpportunityStatus(
     @Args('id') id: string,
     @Args('status') status: string,
-    @Request() req: any
+    @Request() req: any,
   ) {
     const userId = req.user?.userId || 'system';
     return this.opportunitiesService.updateStatus(id, status, userId);
@@ -90,7 +94,7 @@ export class OpportunitiesResolver {
     // This would need a User DataLoader - for now return basic info
     return {
       id: opportunity.assignedSalesRep,
-      fullName: 'Sales Representative' // Placeholder
+      fullName: 'Sales Representative', // Placeholder
     };
   }
 }

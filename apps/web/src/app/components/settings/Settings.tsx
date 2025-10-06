@@ -14,7 +14,9 @@ const CompanyBranding = lazy(() => import('./company/CompanyBranding'));
 const Branches = lazy(() => import('./company/Branches'));
 
 const EstimateLists = lazy(() => import('./estimates/EstimateLists'));
-const EstimateConfiguration = lazy(() => import('./estimates/EstimateConfiguration'));
+const EstimateConfiguration = lazy(
+  () => import('./estimates/EstimateConfiguration'),
+);
 const ServiceTypes = lazy(() => import('./estimates/lists/ServiceTypes'));
 const PropertyTypes = lazy(() => import('./estimates/lists/PropertyTypes'));
 const InventoryItems = lazy(() => import('./estimates/lists/InventoryItems'));
@@ -31,7 +33,9 @@ interface SettingsProps {
   initialPath?: string;
 }
 
-export function Settings({ initialPath = '/settings/company/details' }: SettingsProps) {
+export function Settings({
+  initialPath = '/settings/company/details',
+}: SettingsProps) {
   const [currentPath, setCurrentPath] = useState(initialPath);
 
   const renderSettingsContent = () => {
@@ -179,8 +183,9 @@ export function Settings({ initialPath = '/settings/company/details' }: Settings
               </div>
               <h3>Settings Overview</h3>
               <p>
-                Welcome to the system settings. Use the navigation on the left to configure
-                your business operations, pricing, and system preferences.
+                Welcome to the system settings. Use the navigation on the left
+                to configure your business operations, pricing, and system
+                preferences.
               </p>
               <div className={styles.quickLinks}>
                 <h4>Quick Access</h4>
@@ -201,14 +206,18 @@ export function Settings({ initialPath = '/settings/company/details' }: Settings
                   </button>
                   <button
                     className={styles.quickLink}
-                    onClick={() => setCurrentPath('/settings/tariffs/hourly-rates')}
+                    onClick={() =>
+                      setCurrentPath('/settings/tariffs/hourly-rates')
+                    }
                   >
                     <span>💰</span>
                     Pricing Setup
                   </button>
                   <button
                     className={styles.quickLink}
-                    onClick={() => setCurrentPath('/settings/estimates/lists/service-types')}
+                    onClick={() =>
+                      setCurrentPath('/settings/estimates/lists/service-types')
+                    }
                   >
                     <span>📋</span>
                     Service Types
@@ -222,10 +231,7 @@ export function Settings({ initialPath = '/settings/company/details' }: Settings
   };
 
   return (
-    <SettingsLayout
-      currentPath={currentPath}
-      onNavigate={setCurrentPath}
-    >
+    <SettingsLayout currentPath={currentPath} onNavigate={setCurrentPath}>
       {renderSettingsContent()}
     </SettingsLayout>
   );

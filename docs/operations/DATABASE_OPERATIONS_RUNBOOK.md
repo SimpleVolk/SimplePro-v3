@@ -25,9 +25,11 @@
 ## Overview
 
 ### Purpose
+
 This runbook provides comprehensive procedures for managing the MongoDB replica set infrastructure for SimplePro-v3.
 
 ### System Architecture
+
 - **Database:** MongoDB 7.0
 - **Replica Set Name:** simplepro-rs
 - **Deployment:** Docker containerized
@@ -37,6 +39,7 @@ This runbook provides comprehensive procedures for managing the MongoDB replica 
   - Secondary 2: `mongodb-secondary2` (172.22.0.12:27017)
 
 ### Key Metrics
+
 - **RTO (Recovery Time Objective):** < 30 seconds (automatic failover)
 - **RPO (Recovery Point Objective):** < 5 minutes (with oplog backups)
 - **Backup Frequency:** Daily full backups, continuous oplog
@@ -47,6 +50,7 @@ This runbook provides comprehensive procedures for managing the MongoDB replica 
 ## Replica Set Architecture
 
 ### Configuration
+
 ```javascript
 {
   _id: "simplepro-rs",
@@ -60,6 +64,7 @@ This runbook provides comprehensive procedures for managing the MongoDB replica 
 ```
 
 ### Write Concern
+
 ```javascript
 {
   w: "majority",        // Replicate to majority of nodes
@@ -69,6 +74,7 @@ This runbook provides comprehensive procedures for managing the MongoDB replica 
 ```
 
 ### Read Preference
+
 - **Application:** `secondaryPreferred` (distribute reads)
 - **Transactions:** `primary` (consistency required)
 - **Analytics:** `secondary` (offload reporting queries)
@@ -80,6 +86,7 @@ This runbook provides comprehensive procedures for managing the MongoDB replica 
 ### Starting the Replica Set
 
 #### Standard Startup
+
 ```bash
 # 1. Navigate to project root
 cd D:\Claude\SimplePro-v3
@@ -99,6 +106,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 #### First-Time Setup
+
 ```bash
 # Run the setup script (handles initialization)
 ./scripts/mongodb/setup-replica-set.sh
@@ -110,6 +118,7 @@ scripts\mongodb\setup-replica-set.bat
 ### Graceful Shutdown
 
 #### Standard Shutdown
+
 ```bash
 # 1. Stop application to prevent new connections
 docker stop simplepro-api
@@ -132,6 +141,7 @@ docker-compose -f docker-compose.mongodb-replica.yml down
 ```
 
 #### Emergency Shutdown
+
 ```bash
 # Only use in emergency situations (data loss possible)
 docker stop simplepro-mongodb-primary simplepro-mongodb-secondary1 simplepro-mongodb-secondary2
@@ -167,6 +177,7 @@ docker start simplepro-mongodb-secondary2
 **Location:** `/backups/mongodb/YYYYMMDD_HHMMSS`
 
 #### Manual Backup
+
 ```bash
 # Run backup script
 ./scripts/backup/mongodb-backup.sh
@@ -179,6 +190,7 @@ cat /backups/mongodb/$(date +%Y%m%d*)/backup-metadata.json
 ```
 
 #### Automated Backup (Cron)
+
 ```bash
 # Add to crontab
 crontab -e
@@ -356,11 +368,13 @@ docker start simplepro-api
 MongoDB replica set automatically elects new primary when current primary fails.
 
 **Expected Behavior:**
+
 - Detection: 10-30 seconds (heartbeat timeout)
 - Election: 5-15 seconds (voting process)
 - Total RTO: < 30 seconds
 
 **Monitoring During Failover:**
+
 ```bash
 # Watch replica set status
 watch -n 1 'docker exec simplepro-mongodb-secondary1 mongosh -u admin -p <password> \
@@ -594,13 +608,15 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ### Connection Pool Tuning
 
 Current settings (in `database.module.ts`):
+
 ```typescript
-maxPoolSize: 100
-minPoolSize: 10
-maxIdleTimeMS: 300000  // 5 minutes
+maxPoolSize: 100;
+minPoolSize: 10;
+maxIdleTimeMS: 300000; // 5 minutes
 ```
 
 **Monitoring Pool Usage:**
+
 ```bash
 docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
   --authenticationDatabase admin --eval "
@@ -700,6 +716,7 @@ docker exec simprepro-mongodb-primary mongosh -u admin -p <password> \
 Metrics available at: `http://localhost:9216/metrics`
 
 Key metrics:
+
 - `mongodb_up` - Replica set availability
 - `mongodb_rs_members_health` - Member health status
 - `mongodb_rs_members_optimeDate` - Replication lag
@@ -713,16 +730,19 @@ Key metrics:
 ### Issue: Replica Set Member Down
 
 **Symptoms:**
+
 - Health check shows member with health: 0
 - "No primary found" errors in application logs
 
 **Diagnosis:**
+
 ```bash
 ./scripts/mongodb/check-replica-health.sh
 docker logs simplepro-mongodb-primary
 ```
 
 **Solution:**
+
 ```bash
 # Restart failed member
 docker restart simplepro-mongodb-primary
@@ -737,10 +757,12 @@ docker exec simprepro-mongodb-primary mongod --dbpath=/data/db --repair
 ### Issue: High Replication Lag
 
 **Symptoms:**
+
 - Secondary lag > 60 seconds
 - "Replication lag too high" alerts
 
 **Diagnosis:**
+
 ```bash
 # Check oplog window
 docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
@@ -758,6 +780,7 @@ docker exec simplepro-mongodb-secondary1 mongosh -u admin -p <password> \
 ```
 
 **Solutions:**
+
 1. **Increase oplog size** (if window < 24 hours)
 2. **Optimize slow queries** (reducing load on primary)
 3. **Add more secondaries** (distribute read load)
@@ -766,10 +789,12 @@ docker exec simplepro-mongodb-secondary1 mongosh -u admin -p <password> \
 ### Issue: Out of Disk Space
 
 **Symptoms:**
+
 - "No space left on device" errors
 - Database write failures
 
 **Immediate Actions:**
+
 ```bash
 # Check disk usage
 docker exec simplepro-mongodb-primary df -h
@@ -793,10 +818,12 @@ find /backups/mongodb -type d -mtime +30 -exec rm -rf {} \;
 ### Issue: Connection Pool Exhausted
 
 **Symptoms:**
+
 - "No connection available" errors
 - Application timeouts
 
 **Diagnosis:**
+
 ```bash
 # Check current connections
 docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
@@ -815,6 +842,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 **Solutions:**
+
 1. **Increase pool size** (update `MONGODB_MAX_POOL_SIZE`)
 2. **Kill long-running queries**
 3. **Optimize slow queries**
@@ -823,10 +851,12 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ### Issue: Authentication Failed
 
 **Symptoms:**
+
 - "Authentication failed" errors
 - Cannot connect to database
 
 **Solutions:**
+
 ```bash
 # Verify credentials
 docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
@@ -877,9 +907,9 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | DevOps Team | Initial creation |
+| Version | Date       | Author      | Changes          |
+| ------- | ---------- | ----------- | ---------------- |
+| 1.0     | 2025-10-02 | DevOps Team | Initial creation |
 
 ---
 

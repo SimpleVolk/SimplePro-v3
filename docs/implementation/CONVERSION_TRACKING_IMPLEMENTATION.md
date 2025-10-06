@@ -13,6 +13,7 @@ This document provides a comprehensive summary of the Quote History and Conversi
 #### 1. **Quote History Module** (`apps/api/src/quote-history/`)
 
 **MongoDB Schemas:**
+
 - **QuoteHistory Schema** - Complete quote lifecycle tracking with:
   - Quote metadata (ID, number, version, status)
   - Pricing data (total price, breakdown, terms, validity)
@@ -24,6 +25,7 @@ This document provides a comprehensive summary of the Quote History and Conversi
   - Revision history (version control, price changes, modifications)
 
 **Service Methods:**
+
 - CRUD operations (create, find, update quote history)
 - Status management (draft → sent → viewed → accepted/rejected)
 - Interaction tracking (customer views, downloads, questions)
@@ -32,6 +34,7 @@ This document provides a comprehensive summary of the Quote History and Conversi
 - Analytics queries (conversion by price range, avg decision time, win/loss reasons)
 
 **REST API Endpoints:**
+
 ```
 POST   /api/quote-history                          - Create quote history
 GET    /api/quote-history/:id                      - Get quote details
@@ -56,12 +59,14 @@ GET    /api/quote-history/analytics/avg-days-to-decision - Average decision time
 **MongoDB Schemas:**
 
 **ConversionEvent Schema:**
+
 - Event tracking for all conversion milestones
 - Event types: lead_created, opportunity_created, quote_sent, quote_viewed, quote_accepted, quote_rejected, job_created, job_completed, payment_received
 - Source channel attribution (website, phone, referral, partner, social media, email)
 - Multi-touch attribution tracking (first-touch, last-touch, all touchpoints)
 
 **ConversionMetrics Schema:**
+
 - Aggregated metrics by period (daily, weekly, monthly, quarterly)
 - Funnel metrics (leads, opportunities, quotes, jobs)
 - Conversion rates at each stage
@@ -71,6 +76,7 @@ GET    /api/quote-history/analytics/avg-days-to-decision - Average decision time
 - Sales performance tracking per rep
 
 **Service Methods:**
+
 - Event tracking (trackEvent, trackTouchpoint)
 - Funnel analysis (getConversionFunnel, getConversionRates)
 - Attribution reporting (getAttributionReport - first-touch, last-touch)
@@ -79,6 +85,7 @@ GET    /api/quote-history/analytics/avg-days-to-decision - Average decision time
 - Sales rep performance (individual and leaderboard)
 
 **REST API Endpoints:**
+
 ```
 POST   /api/conversion-tracking/track-event        - Track conversion event
 GET    /api/conversion-tracking/funnel             - Get conversion funnel
@@ -96,6 +103,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 #### 3. **Event-Driven Automation** (`conversion-tracking/listeners/`)
 
 **Automated Event Listeners:**
+
 - `opportunity.created` → Track opportunity event + first touchpoint
 - `estimate.sent` → Track quote sent + create quote history
 - `estimate.viewed` → Track quote viewed + update interactions
@@ -106,6 +114,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 - `sales.follow_up` → Track follow-up activities
 
 **Key Features:**
+
 - Automatic quote history creation when estimates are sent
 - Real-time interaction tracking when customers view quotes
 - Automatic win/loss marking when jobs are created or quotes rejected
@@ -114,6 +123,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 #### 4. **Background Job Scheduling** (`conversion-tracking/conversion-tracking.scheduler.ts`)
 
 **Automated Cron Jobs:**
+
 - **Daily Metrics (1 AM)** - Calculate yesterday's conversion metrics
 - **Weekly Metrics (Sunday 2 AM)** - Calculate previous week's aggregated metrics
 - **Monthly Metrics (1st of month, 3 AM)** - Calculate previous month's metrics
@@ -128,6 +138,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 #### 1. **ConversionFunnel Component** (`apps/web/src/app/components/conversion/ConversionFunnel.tsx`)
 
 **Features:**
+
 - Visual funnel representation with stages: Leads → Opportunities → Quotes Sent → Quotes Accepted → Jobs Created
 - Conversion rate display at each stage
 - Total count and value metrics per stage
@@ -136,6 +147,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 - Real-time data fetching with date range filtering
 
 **Design:**
+
 - Gradient purple stages with hover effects
 - Responsive design (mobile-first)
 - Loading and error states
@@ -144,6 +156,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 #### 2. **WinLossAnalysis Component** (`apps/web/src/app/components/conversion/WinLossAnalysis.tsx`)
 
 **Features:**
+
 - Summary cards: Total Quotes, Quotes Won, Quotes Lost, Win Rate
 - Interactive pie charts for win reasons and loss reasons (using Recharts)
 - Detailed reason breakdown with counts and percentages
@@ -151,11 +164,13 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 - Custom tooltips with detailed metrics
 
 **Analytics Displayed:**
+
 - Win reasons: best_price, best_service, reputation, timing, relationship, unique_capabilities
 - Loss reasons: price_too_high, competitor_chosen, timing, service_not_needed, budget_constraints, other
 - Percentage distribution and absolute counts
 
 **Design:**
+
 - Dark theme with gradient backgrounds
 - Responsive grid layout
 - Interactive charts with hover effects
@@ -164,6 +179,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 #### 3. **SalesPerformance Component** (`apps/web/src/app/components/conversion/SalesPerformance.tsx`)
 
 **Features:**
+
 - Summary metrics: Total Revenue, Total Quotes, Total Jobs, Avg Win Rate
 - Revenue bar chart by sales rep (using Recharts)
 - Leaderboard table with rankings (🥇🥈🥉 medals for top 3)
@@ -171,12 +187,14 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 - Detailed performance metrics (quotes, jobs, win rate, revenue)
 
 **Metrics Tracked:**
+
 - Revenue per sales rep
 - Quote-to-job conversion rate
 - Individual win rates
 - Top performers ranking
 
 **Design:**
+
 - Professional leaderboard UI with rank badges
 - Gradient card backgrounds
 - Responsive table layout
@@ -185,6 +203,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 #### 4. **QuoteHistoryDetail Component** (`apps/web/src/app/components/conversion/QuoteHistoryDetail.tsx`)
 
 **Features:**
+
 - Complete quote lifecycle view
 - Status badge with color coding (draft, sent, viewed, accepted, rejected, expired, revised)
 - Version tracking display
@@ -195,6 +214,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 - Sales activity feed (calls, emails, meetings, outcomes)
 
 **Information Displayed:**
+
 - Quote metadata and pricing
 - Customer engagement timeline
 - Decision-making metrics (days to first view, days to decision)
@@ -202,6 +222,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 - Complete audit trail of interactions
 
 **Design:**
+
 - Comprehensive detail view with sections
 - Timeline visualization
 - Activity feed with icons
@@ -299,6 +320,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 ```
 
 **Indexes:**
+
 - `estimateId` (unique)
 - `opportunityId`
 - `customerId + createdAt` (compound)
@@ -343,6 +365,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 ```
 
 **Indexes:**
+
 - `eventId` (unique)
 - `customerId + eventDate` (compound)
 - `opportunityId + eventType` (compound)
@@ -424,6 +447,7 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 ```
 
 **Indexes:**
+
 - `period.startDate + granularity` (compound)
 
 ---
@@ -431,53 +455,62 @@ GET    /api/conversion-tracking/dashboard          - Complete dashboard data
 ## Key Features & Capabilities
 
 ### 1. **Complete Quote Lifecycle Tracking**
+
 - From draft creation to final decision (won/lost)
 - Version control for quote revisions
 - Automatic status transitions
 - Expiration tracking and auto-update
 
 ### 2. **Customer Interaction Timeline**
+
 - Track every customer touchpoint (views, downloads, questions)
 - Calculate engagement metrics (days to first view, total views)
 - Identify quote abandonment patterns
 
 ### 3. **Win/Loss Analysis**
+
 - Detailed reason tracking for both wins and losses
 - Competitive intelligence (competitor info, price comparison)
 - Lessons learned documentation
 - Key selling points identification
 
 ### 4. **Multi-Touch Attribution**
+
 - First-touch attribution (original lead source)
 - Last-touch attribution (final conversion source)
 - Full touchpoint journey tracking
 - Channel-based revenue attribution
 
 ### 5. **Conversion Funnel Visualization**
+
 - Stage-by-stage conversion tracking
 - Visual funnel representation
 - Conversion rate calculation at each stage
 - Value tracking through the funnel
 
 ### 6. **Pipeline Velocity Metrics**
+
 - Average time at each funnel stage
 - Overall cycle time (lead to job)
 - Bottleneck identification
 - Forecasting based on historical velocity
 
 ### 7. **Sales Rep Performance Tracking**
+
 - Individual quota tracking
 - Win rate comparison
 - Revenue attribution
 - Leaderboard rankings
 
 ### 8. **Automated Metrics Calculation**
+
 - Daily, weekly, monthly aggregation
 - Historical trend analysis
 - Performance benchmarking
 - Automated reporting
 
 ### 9. **Revenue Forecasting**
+
 - Pipeline-based revenue projection
 - Conversion rate trending
 - Seasonal pattern recognition
@@ -737,31 +770,37 @@ export default function QuoteDetailModal({ quoteHistoryId, onClose }) {
 ## Benefits & Business Impact
 
 ### 1. **Sales Process Optimization**
+
 - Identify bottlenecks in the sales funnel
 - Reduce time-to-close by understanding conversion patterns
 - Optimize follow-up timing based on historical data
 
 ### 2. **Competitive Intelligence**
+
 - Track why quotes are lost to competitors
 - Identify pricing sweet spots
 - Understand competitive advantages/disadvantages
 
 ### 3. **Revenue Forecasting**
+
 - Accurate pipeline-based revenue predictions
 - Historical conversion rate trending
 - Seasonal pattern recognition
 
 ### 4. **Sales Team Performance**
+
 - Individual performance tracking
 - Best practice identification from top performers
 - Targeted coaching based on metrics
 
 ### 5. **Customer Behavior Insights**
+
 - Engagement pattern analysis
 - Quote abandonment identification
 - Optimal follow-up timing
 
 ### 6. **Data-Driven Decision Making**
+
 - Evidence-based pricing strategies
 - Resource allocation optimization
 - Marketing channel ROI analysis
@@ -805,24 +844,28 @@ export default function QuoteDetailModal({ quoteHistoryId, onClose }) {
 ## Technical Notes
 
 ### Performance Considerations
+
 - All schemas use appropriate indexes for query optimization
 - Aggregated metrics are pre-calculated via cron jobs
 - Real-time data fetched only for current period
 - Historical data served from pre-calculated metrics
 
 ### Scalability
+
 - Event-driven architecture allows horizontal scaling
 - MongoDB collections designed for sharding
 - Cron jobs can be distributed across workers
 - API endpoints support pagination for large datasets
 
 ### Data Retention
+
 - Quote history: Indefinite (audit trail requirement)
 - Conversion events: 2 years active, then archived
 - Aggregated metrics: Indefinite (small storage footprint)
 - Old events cleaned up via scheduled jobs
 
 ### Security
+
 - All endpoints protected by JWT authentication
 - Role-based access control for sensitive analytics
 - PII data encrypted at rest
@@ -833,6 +876,7 @@ export default function QuoteDetailModal({ quoteHistoryId, onClose }) {
 ## Files Created
 
 ### Backend Files (API)
+
 ```
 apps/api/src/quote-history/
 ├── schemas/
@@ -860,6 +904,7 @@ apps/api/src/app.module.ts (updated)
 ```
 
 ### Frontend Files (Web)
+
 ```
 apps/web/src/app/components/conversion/
 ├── ConversionFunnel.tsx
@@ -874,6 +919,7 @@ apps/web/src/app/components/conversion/
 ```
 
 ### Documentation
+
 ```
 CONVERSION_TRACKING_IMPLEMENTATION.md (this file)
 ```

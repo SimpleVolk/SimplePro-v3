@@ -105,17 +105,19 @@ export class DocumentsService {
 
       await document.save();
 
-      this.logger.log(
-        `Document uploaded: ${document._id} by user ${userId}`,
-      );
+      this.logger.log(`Document uploaded: ${document._id} by user ${userId}`);
 
       return document.toObject() as IDocument;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error uploading document: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Error uploading document: ${errorMessage}`,
+        errorStack,
+      );
 
       if (error instanceof BadRequestException) {
         throw error;
@@ -179,7 +181,8 @@ export class DocumentsService {
 
       return documents as unknown as IDocument[];
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
@@ -208,11 +211,15 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error finding document by ID: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Error finding document by ID: ${errorMessage}`,
+        errorStack,
+      );
       throw new InternalServerErrorException('Failed to retrieve document');
     }
   }
@@ -220,7 +227,10 @@ export class DocumentsService {
   /**
    * Find documents by entity
    */
-  async findByEntity(entityType: EntityType, entityId: string): Promise<IDocument[]> {
+  async findByEntity(
+    entityType: EntityType,
+    entityId: string,
+  ): Promise<IDocument[]> {
     try {
       const documents = await this.documentModel
         .find({
@@ -235,11 +245,15 @@ export class DocumentsService {
 
       return documents as unknown as IDocument[];
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error finding documents by entity: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Error finding documents by entity: ${errorMessage}`,
+        errorStack,
+      );
       throw new InternalServerErrorException('Failed to retrieve documents');
     }
   }
@@ -261,11 +275,15 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error downloading document: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Error downloading document: ${errorMessage}`,
+        errorStack,
+      );
       throw new InternalServerErrorException('Failed to download document');
     }
   }
@@ -295,7 +313,8 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
@@ -325,7 +344,8 @@ export class DocumentsService {
       const token = uuidv4();
 
       // Set expiration (default: 7 days from now)
-      const expiresAt = dto.expiresAt || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const expiresAt =
+        dto.expiresAt || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
       // Hash password if provided
       let hashedPassword: string | undefined;
@@ -353,11 +373,15 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error creating share link: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Error creating share link: ${errorMessage}`,
+        errorStack,
+      );
       throw new InternalServerErrorException('Failed to create share link');
     }
   }
@@ -385,7 +409,7 @@ export class DocumentsService {
       if (!document) {
         // SECURITY AUDIT: Log failed access attempt with invalid token
         this.logger.warn(
-          `Document share access failed: Invalid or expired token '${token.substring(0, 8)}...'`
+          `Document share access failed: Invalid or expired token '${token.substring(0, 8)}...'`,
         );
         throw new NotFoundException('Shared link not found or expired');
       }
@@ -394,7 +418,7 @@ export class DocumentsService {
       if (document.shareExpiresAt && new Date() > document.shareExpiresAt) {
         // SECURITY AUDIT: Log access attempt with expired token
         this.logger.warn(
-          `Document share access failed: Expired link for document ${document._id} (token: ${token.substring(0, 8)}...)`
+          `Document share access failed: Expired link for document ${document._id} (token: ${token.substring(0, 8)}...)`,
         );
         throw new UnauthorizedException('Share link has expired');
       }
@@ -404,16 +428,21 @@ export class DocumentsService {
         if (!password) {
           // SECURITY AUDIT: Log access attempt without required password
           this.logger.warn(
-            `Document share access failed: Password required but not provided for document ${document._id} (token: ${token.substring(0, 8)}...)`
+            `Document share access failed: Password required but not provided for document ${document._id} (token: ${token.substring(0, 8)}...)`,
           );
-          throw new UnauthorizedException('Password required to access this document');
+          throw new UnauthorizedException(
+            'Password required to access this document',
+          );
         }
 
-        const isPasswordValid = await bcrypt.compare(password, document.sharePassword);
+        const isPasswordValid = await bcrypt.compare(
+          password,
+          document.sharePassword,
+        );
         if (!isPasswordValid) {
           // SECURITY AUDIT: Log failed password attempt
           this.logger.warn(
-            `Document share access failed: Invalid password for document ${document._id} (token: ${token.substring(0, 8)}...)`
+            `Document share access failed: Invalid password for document ${document._id} (token: ${token.substring(0, 8)}...)`,
           );
           throw new UnauthorizedException('Invalid password');
         }
@@ -424,14 +453,14 @@ export class DocumentsService {
         { _id: document._id },
         {
           $inc: { shareAccessCount: 1 },
-          $set: { lastAccessedAt: new Date() }
+          $set: { lastAccessedAt: new Date() },
         },
       );
 
       // SECURITY AUDIT: Log successful document access
       const duration = Date.now() - startTime;
       this.logger.log(
-        `Document share access successful: Document ${document._id} accessed via token (duration: ${duration}ms, total accesses: ${document.shareAccessCount + 1})`
+        `Document share access successful: Document ${document._id} accessed via token (duration: ${duration}ms, total accesses: ${document.shareAccessCount + 1})`,
       );
 
       return document as unknown as IDocument;
@@ -442,22 +471,25 @@ export class DocumentsService {
       ) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error accessing shared document: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to access shared document');
+      this.logger.error(
+        `Error accessing shared document: ${errorMessage}`,
+        errorStack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to access shared document',
+      );
     }
   }
 
   /**
    * Update document metadata
    */
-  async updateDocument(
-    id: string,
-    dto: UpdateDocumentDto,
-  ): Promise<IDocument> {
+  async updateDocument(id: string, dto: UpdateDocumentDto): Promise<IDocument> {
     try {
       const document = await this.documentModel
         .findOneAndUpdate(
@@ -486,7 +518,8 @@ export class DocumentsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
@@ -561,12 +594,18 @@ export class DocumentsService {
 
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Error getting storage statistics: ${errorMessage}`, errorStack);
-      throw new InternalServerErrorException('Failed to get storage statistics');
+      this.logger.error(
+        `Error getting storage statistics: ${errorMessage}`,
+        errorStack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to get storage statistics',
+      );
     }
   }
 }

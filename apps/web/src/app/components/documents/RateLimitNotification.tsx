@@ -30,7 +30,7 @@ export function RateLimitNotification({
         if (!isNaN(retryDate.getTime())) {
           retrySeconds = Math.max(
             0,
-            Math.ceil((retryDate.getTime() - now.getTime()) / 1000)
+            Math.ceil((retryDate.getTime() - now.getTime()) / 1000),
           );
         }
       }
@@ -71,7 +71,9 @@ export function RateLimitNotification({
   return (
     <div className={styles.notification} role="alert" aria-live="assertive">
       <div className={styles.iconWrapper}>
-        <span className={styles.icon} aria-hidden="true">⏱️</span>
+        <span className={styles.icon} aria-hidden="true">
+          ⏱️
+        </span>
       </div>
       <div className={styles.content}>
         <h3 className={styles.title}>Too Many Attempts</h3>
@@ -90,7 +92,8 @@ export function RateLimitNotification({
               />
             </div>
             <p className={styles.timeRemaining}>
-              Please try again in <strong>{formatTime(remainingSeconds)}</strong>
+              Please try again in{' '}
+              <strong>{formatTime(remainingSeconds)}</strong>
             </p>
           </div>
         )}

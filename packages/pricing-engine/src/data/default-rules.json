@@ -128,7 +128,7 @@
       "actions": [
         {
           "type": "add_percentage",
-          "amount": 0.10,
+          "amount": 0.1,
           "description": "10% surcharge for high-volume shipments over 1,500 cu ft"
         }
       ],
@@ -335,7 +335,7 @@
       "actions": [
         {
           "type": "add_percentage",
-          "amount": 0.10,
+          "amount": 0.1,
           "description": "10% weekend surcharge"
         }
       ],

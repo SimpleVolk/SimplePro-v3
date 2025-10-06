@@ -22,7 +22,9 @@ import NotificationService from '../services/notification.service';
 import { useAppSelector } from '../store/hooks';
 
 const AppContent = () => {
-  const { isAuthenticated, accessToken } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, accessToken } = useAppSelector(
+    (state) => state.auth,
+  );
 
   useEffect(() => {
     // Initialize network listener for offline detection

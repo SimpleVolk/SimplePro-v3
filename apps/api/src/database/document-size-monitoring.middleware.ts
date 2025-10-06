@@ -58,13 +58,13 @@ function formatBytes(bytes: number): string {
  * @returns Mongoose pre-save middleware function
  */
 export function createSizeMonitoringMiddleware(
-  options: SizeMonitoringOptions = {}
+  options: SizeMonitoringOptions = {},
 ) {
   const config = { ...DEFAULT_OPTIONS, ...options };
   const maxSizeBytes = config.maxSizeMB * 1024 * 1024;
   const warnSizeBytes = maxSizeBytes * (config.warnThresholdPercent / 100);
 
-  return async function (this: any, next: any) {
+  return async function (this: any, next: Function) {
     try {
       const docSizeBytes = calculateDocumentSize(this);
 
@@ -87,13 +87,16 @@ export function createSizeMonitoringMiddleware(
       // Check if approaching limit
       if (docSizeBytes > warnSizeBytes && config.logWarnings) {
         const percentUsed = ((docSizeBytes / maxSizeBytes) * 100).toFixed(1);
-        console.warn(`[SIZE WARNING] Document approaching size limit: ${formatBytes(docSizeBytes)} (${percentUsed}% of ${config.maxSizeMB}MB limit)`, {
-          collection: this.collection?.name,
-          id: this._id,
-          size: formatBytes(docSizeBytes),
-          limit: `${config.maxSizeMB}MB`,
-          percentUsed: `${percentUsed}%`,
-        });
+        console.warn(
+          `[SIZE WARNING] Document approaching size limit: ${formatBytes(docSizeBytes)} (${percentUsed}% of ${config.maxSizeMB}MB limit)`,
+          {
+            collection: this.collection?.name,
+            id: this._id,
+            size: formatBytes(docSizeBytes),
+            limit: `${config.maxSizeMB}MB`,
+            percentUsed: `${percentUsed}%`,
+          },
+        );
       }
 
       next();
@@ -112,9 +115,9 @@ export function createSizeMonitoringMiddleware(
  */
 export function createArraySizeMonitoringMiddleware(
   arrayFields: string[],
-  maxArraySize = 1000
+  maxArraySize = 1000,
 ) {
-  return async function (this: any, next: any) {
+  return async function (this: any, next: Function) {
     try {
       for (const fieldName of arrayFields) {
         const arrayValue = this[fieldName];
@@ -135,15 +138,21 @@ export function createArraySizeMonitoringMiddleware(
         // Warn at 70% of limit
         const warnThreshold = maxArraySize * 0.7;
         if (Array.isArray(arrayValue) && arrayValue.length > warnThreshold) {
-          const percentUsed = ((arrayValue.length / maxArraySize) * 100).toFixed(1);
-          console.warn(`[ARRAY SIZE WARNING] Array '${fieldName}' approaching size limit: ${arrayValue.length} items (${percentUsed}% of ${maxArraySize} limit)`, {
-            collection: this.collection?.name,
-            id: this._id,
-            field: fieldName,
-            size: arrayValue.length,
-            limit: maxArraySize,
-            percentUsed: `${percentUsed}%`,
-          });
+          const percentUsed = (
+            (arrayValue.length / maxArraySize) *
+            100
+          ).toFixed(1);
+          console.warn(
+            `[ARRAY SIZE WARNING] Array '${fieldName}' approaching size limit: ${arrayValue.length} items (${percentUsed}% of ${maxArraySize} limit)`,
+            {
+              collection: this.collection?.name,
+              id: this._id,
+              field: fieldName,
+              size: arrayValue.length,
+              limit: maxArraySize,
+              percentUsed: `${percentUsed}%`,
+            },
+          );
         }
       }
 

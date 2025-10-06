@@ -15,11 +15,15 @@ export function EstimateResult({ result }: EstimateResultProps) {
       <div className={styles.summary}>
         <div className={styles.totalPrice}>
           <span className={styles.label}>Total Price:</span>
-          <span className={styles.price}>${result.calculations.finalPrice.toFixed(2)}</span>
+          <span className={styles.price}>
+            ${result.calculations.finalPrice.toFixed(2)}
+          </span>
         </div>
         <div className={styles.hash}>
           <span className={styles.label}>Calculation ID:</span>
-          <span className={styles.hashValue}>{result.metadata.hash.substring(0, 12)}...</span>
+          <span className={styles.hashValue}>
+            {result.metadata.hash.substring(0, 12)}...
+          </span>
         </div>
       </div>
 
@@ -40,28 +44,36 @@ export function EstimateResult({ result }: EstimateResultProps) {
         {result.calculations.breakdown.transportation > 0 && (
           <div className={styles.breakdownItem}>
             <span>Transportation:</span>
-            <span>${result.calculations.breakdown.transportation.toFixed(2)}</span>
+            <span>
+              ${result.calculations.breakdown.transportation.toFixed(2)}
+            </span>
           </div>
         )}
 
         {result.calculations.breakdown.locationHandicaps > 0 && (
           <div className={styles.breakdownItem}>
             <span>Location Handicaps:</span>
-            <span>${result.calculations.breakdown.locationHandicaps.toFixed(2)}</span>
+            <span>
+              ${result.calculations.breakdown.locationHandicaps.toFixed(2)}
+            </span>
           </div>
         )}
 
         {result.calculations.breakdown.specialServices > 0 && (
           <div className={styles.breakdownItem}>
             <span>Special Services:</span>
-            <span>${result.calculations.breakdown.specialServices.toFixed(2)}</span>
+            <span>
+              ${result.calculations.breakdown.specialServices.toFixed(2)}
+            </span>
           </div>
         )}
 
         {result.calculations.breakdown.seasonalAdjustment !== 0 && (
           <div className={styles.breakdownItem}>
             <span>Seasonal Adjustment:</span>
-            <span>${result.calculations.breakdown.seasonalAdjustment.toFixed(2)}</span>
+            <span>
+              ${result.calculations.breakdown.seasonalAdjustment.toFixed(2)}
+            </span>
           </div>
         )}
 
@@ -77,9 +89,18 @@ export function EstimateResult({ result }: EstimateResultProps) {
           </div>
         )}
 
-        <div className={styles.breakdownItem} style={{ borderTop: '2px solid #4a9eff', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
+        <div
+          className={styles.breakdownItem}
+          style={{
+            borderTop: '2px solid #4a9eff',
+            paddingTop: '0.5rem',
+            marginTop: '0.5rem',
+          }}
+        >
           <span style={{ fontWeight: '600' }}>Total:</span>
-          <span style={{ fontWeight: '600', color: '#48bb78' }}>${result.calculations.breakdown.total.toFixed(2)}</span>
+          <span style={{ fontWeight: '600', color: '#48bb78' }}>
+            ${result.calculations.breakdown.total.toFixed(2)}
+          </span>
         </div>
       </div>
 
@@ -104,9 +125,12 @@ export function EstimateResult({ result }: EstimateResultProps) {
           {result.calculations.locationHandicaps.map((handicap, index) => (
             <div key={index} className={styles.handicap}>
               <div className={styles.handicapName}>{handicap.name}</div>
-              <div className={styles.handicapDescription}>{handicap.description}</div>
+              <div className={styles.handicapDescription}>
+                {handicap.description}
+              </div>
               <div className={styles.handicapImpact}>
-                {handicap.priceImpact >= 0 ? '+' : ''}${handicap.priceImpact.toFixed(2)}
+                {handicap.priceImpact >= 0 ? '+' : ''}$
+                {handicap.priceImpact.toFixed(2)}
               </div>
             </div>
           ))}
@@ -137,9 +161,14 @@ export function EstimateResult({ result }: EstimateResultProps) {
         <h4>Important Notes</h4>
         <ul>
           <li>This estimate is binding when all details are accurate</li>
-          <li>Final price may vary if actual inventory differs significantly</li>
+          <li>
+            Final price may vary if actual inventory differs significantly
+          </li>
           <li>Additional charges may apply for unforeseen circumstances</li>
-          <li>This calculation is deterministic - same inputs will always produce the same result</li>
+          <li>
+            This calculation is deterministic - same inputs will always produce
+            the same result
+          </li>
         </ul>
       </div>
     </div>

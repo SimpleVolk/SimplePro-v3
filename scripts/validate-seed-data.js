@@ -16,20 +16,28 @@ const validationRules = {
     required: ['email', 'firstName', 'lastName', 'role', 'password'],
     email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     roles: ['super_admin', 'admin', 'dispatcher', 'crew'],
-    passwordMinLength: 8
+    passwordMinLength: 8,
   },
   customers: {
     required: ['firstName', 'lastName', 'email', 'phone', 'type', 'status'],
     email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     types: ['residential', 'commercial'],
-    statuses: ['lead', 'prospect', 'active', 'inactive']
+    statuses: ['lead', 'prospect', 'active', 'inactive'],
   },
   jobs: {
     required: ['title', 'description', 'type', 'status', 'customerId'],
     types: ['local', 'long_distance', 'storage', 'packing_only'],
-    statuses: ['draft', 'scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'on_hold'],
-    priorities: ['low', 'normal', 'high', 'urgent']
-  }
+    statuses: [
+      'draft',
+      'scheduled',
+      'confirmed',
+      'in_progress',
+      'completed',
+      'cancelled',
+      'on_hold',
+    ],
+    priorities: ['low', 'normal', 'high', 'urgent'],
+  },
 };
 
 // Validation functions
@@ -52,7 +60,9 @@ function validateEmail(email, itemType, index) {
 
 function validateEnum(value, allowedValues, field, itemType, index) {
   if (value && !allowedValues.includes(value)) {
-    return [`${itemType}[${index}] invalid ${field}: ${value}. Allowed: ${allowedValues.join(', ')}`];
+    return [
+      `${itemType}[${index}] invalid ${field}: ${value}. Allowed: ${allowedValues.join(', ')}`,
+    ];
   }
   return [];
 }
@@ -60,7 +70,9 @@ function validateEnum(value, allowedValues, field, itemType, index) {
 function validatePasswordStrength(password, itemType, index) {
   const errors = [];
   if (password.length < validationRules.users.passwordMinLength) {
-    errors.push(`${itemType}[${index}] password too short (min ${validationRules.users.passwordMinLength} chars)`);
+    errors.push(
+      `${itemType}[${index}] password too short (min ${validationRules.users.passwordMinLength} chars)`,
+    );
   }
 
   // Check for at least one uppercase, one lowercase, one number, one special char
@@ -74,7 +86,9 @@ function validatePasswordStrength(password, itemType, index) {
     errors.push(`${itemType}[${index}] password must contain number`);
   }
   if (!/[!@#$%^&*]/.test(password)) {
-    errors.push(`${itemType}[${index}] password must contain special character`);
+    errors.push(
+      `${itemType}[${index}] password must contain special character`,
+    );
   }
 
   return errors;
@@ -87,7 +101,9 @@ function validateUsers(users) {
 
   users.forEach((user, index) => {
     // Required fields
-    errors.push(...validateRequired(user, validationRules.users.required, 'users', index));
+    errors.push(
+      ...validateRequired(user, validationRules.users.required, 'users', index),
+    );
 
     // Email validation and uniqueness
     if (user.email) {
@@ -99,7 +115,15 @@ function validateUsers(users) {
     }
 
     // Role validation
-    errors.push(...validateEnum(user.role, validationRules.users.roles, 'role', 'users', index));
+    errors.push(
+      ...validateEnum(
+        user.role,
+        validationRules.users.roles,
+        'role',
+        'users',
+        index,
+      ),
+    );
 
     // Password validation
     if (user.password) {
@@ -121,7 +145,14 @@ function validateCustomers(customers) {
 
   customers.forEach((customer, index) => {
     // Required fields
-    errors.push(...validateRequired(customer, validationRules.customers.required, 'customers', index));
+    errors.push(
+      ...validateRequired(
+        customer,
+        validationRules.customers.required,
+        'customers',
+        index,
+      ),
+    );
 
     // Email validation and uniqueness
     if (customer.email) {
@@ -133,10 +164,26 @@ function validateCustomers(customers) {
     }
 
     // Type validation
-    errors.push(...validateEnum(customer.type, validationRules.customers.types, 'type', 'customers', index));
+    errors.push(
+      ...validateEnum(
+        customer.type,
+        validationRules.customers.types,
+        'type',
+        'customers',
+        index,
+      ),
+    );
 
     // Status validation
-    errors.push(...validateEnum(customer.status, validationRules.customers.statuses, 'status', 'customers', index));
+    errors.push(
+      ...validateEnum(
+        customer.status,
+        validationRules.customers.statuses,
+        'status',
+        'customers',
+        index,
+      ),
+    );
 
     // Address validation
     if (customer.address && typeof customer.address !== 'object') {
@@ -153,22 +200,50 @@ function validateJobs(jobs, customerEmails) {
 
   jobs.forEach((job, index) => {
     // Required fields
-    errors.push(...validateRequired(job, validationRules.jobs.required, 'jobs', index));
+    errors.push(
+      ...validateRequired(job, validationRules.jobs.required, 'jobs', index),
+    );
 
     // Type validation
-    errors.push(...validateEnum(job.type, validationRules.jobs.types, 'type', 'jobs', index));
+    errors.push(
+      ...validateEnum(
+        job.type,
+        validationRules.jobs.types,
+        'type',
+        'jobs',
+        index,
+      ),
+    );
 
     // Status validation
-    errors.push(...validateEnum(job.status, validationRules.jobs.statuses, 'status', 'jobs', index));
+    errors.push(
+      ...validateEnum(
+        job.status,
+        validationRules.jobs.statuses,
+        'status',
+        'jobs',
+        index,
+      ),
+    );
 
     // Priority validation
     if (job.priority) {
-      errors.push(...validateEnum(job.priority, validationRules.jobs.priorities, 'priority', 'jobs', index));
+      errors.push(
+        ...validateEnum(
+          job.priority,
+          validationRules.jobs.priorities,
+          'priority',
+          'jobs',
+          index,
+        ),
+      );
     }
 
     // Customer ID validation (should exist in customers)
     if (job.customerId && !customerEmails.has(job.customerId)) {
-      errors.push(`jobs[${index}] references non-existent customer: ${job.customerId}`);
+      errors.push(
+        `jobs[${index}] references non-existent customer: ${job.customerId}`,
+      );
     }
 
     // Job number uniqueness (if present)
@@ -206,7 +281,7 @@ async function validateSeedData() {
     const [usersData, customersData, jobsData] = await Promise.all([
       fs.readFile(path.join(__dirname, 'seed-data', 'users.json'), 'utf8'),
       fs.readFile(path.join(__dirname, 'seed-data', 'customers.json'), 'utf8'),
-      fs.readFile(path.join(__dirname, 'seed-data', 'jobs.json'), 'utf8')
+      fs.readFile(path.join(__dirname, 'seed-data', 'jobs.json'), 'utf8'),
     ]);
 
     const users = JSON.parse(usersData);
@@ -223,7 +298,7 @@ async function validateSeedData() {
     const userErrors = validateUsers(users);
     if (userErrors.length > 0) {
       console.log('❌ User validation errors:');
-      userErrors.forEach(error => console.log(`   ${error}`));
+      userErrors.forEach((error) => console.log(`   ${error}`));
       totalErrors += userErrors.length;
     } else {
       console.log('✅ Users validation passed');
@@ -235,7 +310,7 @@ async function validateSeedData() {
     const customerErrors = validateCustomers(customers);
     if (customerErrors.length > 0) {
       console.log('❌ Customer validation errors:');
-      customerErrors.forEach(error => console.log(`   ${error}`));
+      customerErrors.forEach((error) => console.log(`   ${error}`));
       totalErrors += customerErrors.length;
     } else {
       console.log('✅ Customers validation passed');
@@ -244,11 +319,11 @@ async function validateSeedData() {
 
     // Validate jobs
     console.log('💼 Validating jobs...');
-    const customerEmails = new Set(customers.map(c => c.email));
+    const customerEmails = new Set(customers.map((c) => c.email));
     const jobErrors = validateJobs(jobs, customerEmails);
     if (jobErrors.length > 0) {
       console.log('❌ Job validation errors:');
-      jobErrors.forEach(error => console.log(`   ${error}`));
+      jobErrors.forEach((error) => console.log(`   ${error}`));
       totalErrors += jobErrors.length;
     } else {
       console.log('✅ Jobs validation passed');
@@ -278,10 +353,11 @@ async function validateSeedData() {
       console.log('   3. Start API: npm run dev:api');
       console.log('   4. Start Web: npm run dev:web');
     } else {
-      console.log(`❌ Validation failed with ${totalErrors} error(s). Please fix the issues above.`);
+      console.log(
+        `❌ Validation failed with ${totalErrors} error(s). Please fix the issues above.`,
+      );
       process.exit(1);
     }
-
   } catch (error) {
     console.error('❌ Error during validation:', error.message);
     process.exit(1);

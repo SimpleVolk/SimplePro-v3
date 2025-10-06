@@ -48,7 +48,7 @@ export const uploadPhoto = createAsyncThunk(
       photoUri: string;
       fileName: string;
     },
-    { getState, dispatch }: any
+    { getState, dispatch }: any,
   ) => {
     const state = getState() as RootState;
 
@@ -62,7 +62,7 @@ export const uploadPhoto = createAsyncThunk(
           type: data.photoType,
           uri: data.photoUri,
           fileName: data.fileName,
-        })
+        }),
       );
       throw new Error('Offline - photo queued for upload');
     }
@@ -72,7 +72,7 @@ export const uploadPhoto = createAsyncThunk(
       throw new Error('No access token');
     }
     return await documentsApi.uploadPhoto(auth.accessToken, data);
-  }
+  },
 );
 
 export const uploadSignature = createAsyncThunk(
@@ -83,7 +83,7 @@ export const uploadSignature = createAsyncThunk(
       signatureData: string;
       documentType: string;
     },
-    { getState, dispatch }: any
+    { getState, dispatch }: any,
   ) => {
     const state = getState() as RootState;
 
@@ -97,7 +97,7 @@ export const uploadSignature = createAsyncThunk(
           type: data.documentType,
           uri: data.signatureData,
           fileName: `signature_${Date.now()}.png`,
-        })
+        }),
       );
       throw new Error('Offline - signature queued for upload');
     }
@@ -107,7 +107,7 @@ export const uploadSignature = createAsyncThunk(
       throw new Error('No access token');
     }
     return await documentsApi.uploadSignature(auth.accessToken, data);
-  }
+  },
 );
 
 export const fetchJobDocuments = createAsyncThunk(
@@ -115,7 +115,7 @@ export const fetchJobDocuments = createAsyncThunk(
   async (jobId: string, { getState }: any) => {
     const { auth } = getState();
     return await documentsApi.getJobDocuments(auth.accessToken, jobId);
-  }
+  },
 );
 
 // Slice
@@ -128,7 +128,7 @@ const documentsSlice = createSlice({
     },
     removePendingUpload: (state, action) => {
       state.pendingUploads = state.pendingUploads.filter(
-        (upload) => upload.localId !== action.payload
+        (upload) => upload.localId !== action.payload,
       );
     },
   },

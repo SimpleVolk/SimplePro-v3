@@ -12,12 +12,12 @@ SimplePro-v3 currently has **38 passing unit tests** focused primarily on the pr
 
 ### Current Test Distribution
 
-| Layer | Tests | Coverage | Status |
-|-------|-------|----------|--------|
-| **Unit Tests** | 38 | ~45% | ⚠️ Partial |
-| **Integration Tests** | 9 test files | ~15% | ⚠️ Minimal |
-| **E2E Tests** | 1 | <5% | ❌ Insufficient |
-| **Component Tests** | 4 | <10% | ❌ Insufficient |
+| Layer                 | Tests        | Coverage | Status          |
+| --------------------- | ------------ | -------- | --------------- |
+| **Unit Tests**        | 38           | ~45%     | ⚠️ Partial      |
+| **Integration Tests** | 9 test files | ~15%     | ⚠️ Minimal      |
+| **E2E Tests**         | 1            | <5%      | ❌ Insufficient |
+| **Component Tests**   | 4            | <10%     | ❌ Insufficient |
 
 **Overall Assessment:** 🟡 **NEEDS IMPROVEMENT** - Critical production gaps identified
 
@@ -32,6 +32,7 @@ SimplePro-v3 currently has **38 passing unit tests** focused primarily on the pr
 **Coverage:** 45.66% statements, 36.13% branches, 58.18% functions
 
 #### ✅ Strengths
+
 - Comprehensive input validation tests (5 tests)
 - Deterministic calculation verification (3 tests)
 - Base price calculations for all service types (4 tests)
@@ -43,17 +44,20 @@ SimplePro-v3 currently has **38 passing unit tests** focused primarily on the pr
 - Calculation metadata verification (3 tests)
 
 #### Example Test Quality
+
 ```typescript
 it('should maintain determinism across multiple executions', () => {
   const results = [];
   for (let i = 0; i < 5; i++) {
-    results.push(estimator.calculateEstimate(sampleInputs.weekendChallenge, 'test-user'));
+    results.push(
+      estimator.calculateEstimate(sampleInputs.weekendChallenge, 'test-user'),
+    );
   }
 
   const firstPrice = results[0].calculations.finalPrice;
   const firstHash = results[0].metadata.hash;
 
-  results.forEach(result => {
+  results.forEach((result) => {
     expect(result.calculations.finalPrice).toBe(firstPrice);
     expect(result.metadata.hash).toBe(firstHash);
   });
@@ -61,6 +65,7 @@ it('should maintain determinism across multiple executions', () => {
 ```
 
 #### ⚠️ Coverage Gaps
+
 - **Uncovered Lines:** 254-260, 268-272, 283-295, 317-318, 326-440, 475, 497, 501-520, 562, 572-578, 602-626, 661-686
 - **Missing Scenarios:**
   - Storage service pricing
@@ -81,6 +86,7 @@ it('should maintain determinism across multiple executions', () => {
 **Coverage:** ~70% estimated
 
 ✅ **Well-Tested Areas:**
+
 - User login flow with JWT token generation
 - Token refresh mechanisms
 - Session management and cleanup
@@ -92,6 +98,7 @@ it('should maintain determinism across multiple executions', () => {
 - Security edge cases (malformed tokens, token reuse)
 
 ❌ **Missing Tests:**
+
 - Rate limiting enforcement
 - Concurrent session limits
 - Password reset flow
@@ -106,6 +113,7 @@ it('should maintain determinism across multiple executions', () => {
 **Test Count:** ~30 integration tests
 
 ✅ **Covered Scenarios:**
+
 - Complete authentication flow
 - User registration and management
 - Profile updates
@@ -115,6 +123,7 @@ it('should maintain determinism across multiple executions', () => {
 - Performance testing (10 concurrent requests)
 
 ❌ **Missing Integration Tests:**
+
 - Customer management full workflow
 - Job lifecycle from creation to completion
 - Estimate calculation API integration
@@ -127,16 +136,16 @@ it('should maintain determinism across multiple executions', () => {
 
 ### 1.3 Other API Services (Incomplete)
 
-| Service | Test File | Status | Priority |
-|---------|-----------|--------|----------|
-| **Customers** | `customers.service.spec.ts` | ⚠️ Partial | HIGH |
-| **Jobs** | `jobs.service.spec.ts` | ⚠️ Partial | HIGH |
-| **Analytics** | `analytics.service.spec.ts` | ⚠️ Partial | MEDIUM |
-| **Estimates** | `estimates.controller.spec.ts` | ❌ Minimal | HIGH |
-| **Health** | `health.service.spec.ts` | ✅ Good | LOW |
-| **Tariff Settings** | No tests | ❌ None | HIGH |
-| **Pricing Rules** | No tests | ❌ None | HIGH |
-| **Audit Logs** | No tests | ❌ None | MEDIUM |
+| Service             | Test File                      | Status     | Priority |
+| ------------------- | ------------------------------ | ---------- | -------- |
+| **Customers**       | `customers.service.spec.ts`    | ⚠️ Partial | HIGH     |
+| **Jobs**            | `jobs.service.spec.ts`         | ⚠️ Partial | HIGH     |
+| **Analytics**       | `analytics.service.spec.ts`    | ⚠️ Partial | MEDIUM   |
+| **Estimates**       | `estimates.controller.spec.ts` | ❌ Minimal | HIGH     |
+| **Health**          | `health.service.spec.ts`       | ✅ Good    | LOW      |
+| **Tariff Settings** | No tests                       | ❌ None    | HIGH     |
+| **Pricing Rules**   | No tests                       | ❌ None    | HIGH     |
+| **Audit Logs**      | No tests                       | ❌ None    | MEDIUM   |
 
 ---
 
@@ -149,6 +158,7 @@ it('should maintain determinism across multiple executions', () => {
 #### ✅ Existing Tests
 
 **1. NewOpportunity.test.tsx (Comprehensive)**
+
 - 629 lines of thorough component testing
 - Multi-step form workflow validation
 - Customer information validation
@@ -159,6 +169,7 @@ it('should maintain determinism across multiple executions', () => {
 - API error handling
 
 **2. PricingEngineIntegration.test.ts**
+
 - Cross-platform pricing engine validation
 - 2BR apartment weekend move scenario
 - Heavy move complex calculations
@@ -166,6 +177,7 @@ it('should maintain determinism across multiple executions', () => {
 - Edge cases and rounding
 
 **3. Basic Tests**
+
 - `index.spec.tsx` - Minimal page render test
 - `MoveSizes.test.tsx` - Component exists
 - `DistanceRates.test.tsx` - Component exists
@@ -173,6 +185,7 @@ it('should maintain determinism across multiple executions', () => {
 #### ❌ **CRITICAL MISSING COMPONENT TESTS**
 
 **No tests exist for:**
+
 - Dashboard.tsx (main landing page)
 - Sidebar.tsx (navigation)
 - AppLayout.tsx (layout wrapper)
@@ -196,6 +209,7 @@ it('should maintain determinism across multiple executions', () => {
 **Status:** ❌ Placeholder only
 
 Current test:
+
 ```typescript
 test('has title', async ({ page }) => {
   await page.goto('/');
@@ -212,6 +226,7 @@ This is not production-ready E2E testing.
 ### 2.1 ✅ Good Patterns Observed
 
 1. **AAA Pattern (Arrange-Act-Assert)**
+
 ```typescript
 it('should create user successfully', async () => {
   // Arrange
@@ -222,30 +237,38 @@ it('should create user successfully', async () => {
   const result = await service.create(createUserDto, 'admin123');
 
   // Assert
-  expect(result).toEqual(expect.objectContaining({
-    username: 'newuser',
-    email: 'newuser@example.com'
-  }));
+  expect(result).toEqual(
+    expect.objectContaining({
+      username: 'newuser',
+      email: 'newuser@example.com',
+    }),
+  );
 });
 ```
 
 2. **Comprehensive Test Factories**
+
 ```typescript
 export const TestDataFactories = {
   createUserData: (overrides = {}) => ({ ...defaults, ...overrides }),
   createCustomerData: (overrides = {}) => ({ ...defaults, ...overrides }),
-  createJobData: (customerId, overrides = {}) => ({ ...defaults, ...overrides }),
+  createJobData: (customerId, overrides = {}) => ({
+    ...defaults,
+    ...overrides,
+  }),
   createEstimateData: (overrides = {}) => ({ ...defaults, ...overrides }),
 };
 ```
 
 3. **Proper Mock Setup**
+
 - bcryptjs mocking for password hashing
 - JWT service mocking for token operations
 - MongoDB in-memory database for integration tests
 - Fetch API mocking for frontend tests
 
 4. **Descriptive Test Names**
+
 - "should apply weekend surcharge for weekend moves"
 - "should reject duplicate email addresses"
 - "should handle concurrent login attempts"
@@ -253,21 +276,25 @@ export const TestDataFactories = {
 ### 2.2 ⚠️ Areas for Improvement
 
 1. **Test Organization**
+
 - Some tests mix unit and integration concerns
 - Inconsistent file naming (`.test.ts` vs `.spec.ts`)
 - Missing test suites for critical modules
 
 2. **Mock Strategies**
+
 - Over-mocking in some unit tests (reduces confidence)
 - Missing integration test coverage for real database operations
 - No contract testing for API boundaries
 
 3. **Test Data Management**
+
 - Limited seed data for development/testing
 - No fixture management system
 - Hard-coded test values scattered across files
 
 4. **Performance Testing**
+
 - Only basic performance tests (10 concurrent requests)
 - No load testing infrastructure
 - No stress testing for pricing calculations
@@ -281,6 +308,7 @@ export const TestDataFactories = {
 **Setup Infrastructure:** `apps/api/test/integration-setup.ts`
 
 ✅ **Excellent Integration Test Utilities:**
+
 - MongoDB memory server setup
 - Authentication helper functions
 - Test data factories
@@ -289,6 +317,7 @@ export const TestDataFactories = {
 - Authenticated request helpers
 
 **Integration Test Files:**
+
 1. `auth.integration.spec.ts` - ✅ Comprehensive (30+ tests)
 2. `customers.integration.spec.ts` - ⚠️ Exists but incomplete
 3. `jobs.integration.spec.ts` - ⚠️ Exists but incomplete
@@ -299,6 +328,7 @@ export const TestDataFactories = {
 ### 3.2 ❌ Missing Integration Tests
 
 **Critical Workflows Not Tested:**
+
 1. Complete opportunity creation flow:
    - Create customer → Generate estimate → Create job → Assign crew → Complete job
 2. Settings changes affecting pricing:
@@ -457,21 +487,23 @@ apps/web-e2e/
 ### 6.1 ✅ Good Practices
 
 **1. Service Mocking**
+
 ```typescript
 const mockUserModel = {
   findOne: jest.fn(),
   findById: jest.fn(),
   find: jest.fn(),
   constructor: jest.fn().mockImplementation(() => ({
-    save: jest.fn().mockResolvedValue(mockUser)
-  }))
+    save: jest.fn().mockResolvedValue(mockUser),
+  })),
 };
 ```
 
 **2. Authentication Helpers**
+
 ```typescript
 export async function createAuthenticatedTestUser(
-  userData: Partial<any> = {}
+  userData: Partial<any> = {},
 ): Promise<TestAuthData> {
   const testUserData = TestDataFactories.createUserData(userData);
   await createTestUser(testUserData);
@@ -480,6 +512,7 @@ export async function createAuthenticatedTestUser(
 ```
 
 **3. Response Assertions**
+
 ```typescript
 export const ResponseAssertions = {
   assertSuccessResponse: (response: any, expectedData?: any) => {
@@ -496,6 +529,7 @@ export const ResponseAssertions = {
 ### 6.2 ❌ Missing Test Data Infrastructure
 
 **Needed:**
+
 1. **Seed Data System**
    - Realistic customer profiles
    - Sample job histories
@@ -519,6 +553,7 @@ export const ResponseAssertions = {
 ### 7.1 Current Configuration
 
 **Jest Setup:**
+
 ```json
 {
   "coverageThreshold": {
@@ -559,104 +594,111 @@ export const ResponseAssertions = {
 ### 8.1 API Services
 
 #### Pricing Rules Service (NO TESTS)
+
 ```typescript
 // CRITICAL: Zero test coverage
 describe('Pricing Rules Service', () => {
-  it('should create new pricing rule')
-  it('should update existing rule')
-  it('should deactivate rule')
-  it('should validate rule conditions')
-  it('should check rule conflicts')
-  it('should apply rules in priority order')
-  it('should handle invalid rule JSON')
-  it('should audit rule changes')
+  it('should create new pricing rule');
+  it('should update existing rule');
+  it('should deactivate rule');
+  it('should validate rule conditions');
+  it('should check rule conflicts');
+  it('should apply rules in priority order');
+  it('should handle invalid rule JSON');
+  it('should audit rule changes');
 });
 ```
 
 #### Tariff Settings Service (NO TESTS)
+
 ```typescript
 // CRITICAL: Zero test coverage
 describe('Tariff Settings Service', () => {
-  it('should update distance rates')
-  it('should update handicap multipliers')
-  it('should update packing rates')
-  it('should validate rate ranges')
-  it('should seed default settings')
-  it('should apply settings to estimates')
-  it('should track settings history')
+  it('should update distance rates');
+  it('should update handicap multipliers');
+  it('should update packing rates');
+  it('should validate rate ranges');
+  it('should seed default settings');
+  it('should apply settings to estimates');
+  it('should track settings history');
 });
 ```
 
 #### Audit Logs Service (NO TESTS)
+
 ```typescript
 // IMPORTANT: Zero test coverage
 describe('Audit Logs Service', () => {
-  it('should log user actions')
-  it('should log data changes')
-  it('should track field-level changes')
-  it('should query logs by date range')
-  it('should filter logs by entity type')
-  it('should export audit trail')
+  it('should log user actions');
+  it('should log data changes');
+  it('should track field-level changes');
+  it('should query logs by date range');
+  it('should filter logs by entity type');
+  it('should export audit trail');
 });
 ```
 
 ### 8.2 Frontend Components
 
 #### Dashboard Component (NO TESTS)
+
 ```typescript
 describe('Dashboard Component', () => {
-  it('should display KPI cards')
-  it('should fetch real-time metrics')
-  it('should handle loading states')
-  it('should display error messages')
-  it('should navigate to sections')
-  it('should filter by date range')
-  it('should update on data refresh')
+  it('should display KPI cards');
+  it('should fetch real-time metrics');
+  it('should handle loading states');
+  it('should display error messages');
+  it('should navigate to sections');
+  it('should filter by date range');
+  it('should update on data refresh');
 });
 ```
 
 #### CustomerManagement Component (NO TESTS)
+
 ```typescript
 describe('CustomerManagement Component', () => {
-  it('should list customers with pagination')
-  it('should filter by status')
-  it('should search by name/email')
-  it('should create new customer')
-  it('should update customer details')
-  it('should deactivate customer')
-  it('should display customer history')
-  it('should handle API errors gracefully')
+  it('should list customers with pagination');
+  it('should filter by status');
+  it('should search by name/email');
+  it('should create new customer');
+  it('should update customer details');
+  it('should deactivate customer');
+  it('should display customer history');
+  it('should handle API errors gracefully');
 });
 ```
 
 #### CalendarDispatch Component (NO TESTS)
+
 ```typescript
 describe('CalendarDispatch Component', () => {
-  it('should render month view')
-  it('should switch to week view')
-  it('should display jobs on calendar')
-  it('should create new job')
-  it('should drag and drop job')
-  it('should assign crew to job')
-  it('should update job status')
-  it('should filter jobs by status')
+  it('should render month view');
+  it('should switch to week view');
+  it('should display jobs on calendar');
+  it('should create new job');
+  it('should drag and drop job');
+  it('should assign crew to job');
+  it('should update job status');
+  it('should filter jobs by status');
 });
 ```
 
 ### 8.3 Integration Scenarios
 
 #### Complete Workflow Tests (MISSING)
+
 ```typescript
 describe('Complete Opportunity to Job Workflow', () => {
-  it('should create opportunity from NewOpportunity form')
-  it('should generate estimate with pricing engine')
-  it('should convert opportunity to customer')
-  it('should create job from estimate')
-  it('should assign crew to job')
-  it('should update job status')
-  it('should record actual costs')
-  it('should generate invoice')
-  it('should track profitability')
+  it('should create opportunity from NewOpportunity form');
+  it('should generate estimate with pricing engine');
+  it('should convert opportunity to customer');
+  it('should create job from estimate');
+  it('should assign crew to job');
+  it('should update job status');
+  it('should record actual costs');
+  it('should generate invoice');
+  it('should track profitability');
 });
 ```
 
@@ -667,11 +709,13 @@ describe('Complete Opportunity to Job Workflow', () => {
 ### 9.1 Current Performance
 
 **Pricing Engine Tests:**
+
 - ✅ Fast execution (~3.4 seconds for 38 tests)
 - ✅ No flaky tests observed
 - ✅ Deterministic results
 
 **API Integration Tests:**
+
 - ⚠️ Slower (MongoDB memory server startup)
 - ⚠️ No performance benchmarks
 - ⚠️ Potential for timeout issues
@@ -684,6 +728,7 @@ describe('Complete Opportunity to Job Workflow', () => {
    - Use test sharding for large suites
 
 2. **Performance Benchmarking**
+
 ```typescript
 describe('Pricing Engine Performance', () => {
   it('should calculate 1000 estimates in under 1 second', () => {
@@ -729,9 +774,11 @@ describe('Pricing Engine Performance', () => {
 ### Priority 1: CRITICAL (Blockers)
 
 #### 1.1 Frontend Component Tests
+
 **Impact:** HIGH | **Effort:** HIGH | **Timeline:** 2-3 weeks
 
 **Action Items:**
+
 - [ ] Create test utilities (render helpers, mock providers)
 - [ ] Test Dashboard component (KPI display, navigation)
 - [ ] Test CustomerManagement (CRUD operations, filtering)
@@ -742,6 +789,7 @@ describe('Pricing Engine Performance', () => {
 - [ ] Test Settings components (30+ pages)
 
 **Example Test Template:**
+
 ```typescript
 // apps/web/__tests__/unit/components/Dashboard.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
@@ -781,9 +829,11 @@ describe('Dashboard Component', () => {
 ```
 
 #### 1.2 API Service Unit Tests
+
 **Impact:** HIGH | **Effort:** MEDIUM | **Timeline:** 1-2 weeks
 
 **Action Items:**
+
 - [ ] Test PricingRulesService (create, update, validate, apply)
 - [ ] Test TariffSettingsService (CRUD, seed data, validation)
 - [ ] Test AuditLogsService (logging, querying, export)
@@ -792,6 +842,7 @@ describe('Dashboard Component', () => {
 - [ ] Complete EstimatesController tests (calculation, history)
 
 **Example Test:**
+
 ```typescript
 // apps/api/src/pricing-rules/pricing-rules.service.spec.ts
 describe('PricingRulesService', () => {
@@ -808,7 +859,10 @@ describe('PricingRulesService', () => {
 
     expect(result.id).toBeDefined();
     expect(result.name).toBe('Holiday Surcharge');
-    expect(mockAuditLog).toHaveBeenCalledWith('RULE_CREATED', expect.any(Object));
+    expect(mockAuditLog).toHaveBeenCalledWith(
+      'RULE_CREATED',
+      expect.any(Object),
+    );
   });
 
   it('should detect conflicting rules', async () => {
@@ -819,17 +873,19 @@ describe('PricingRulesService', () => {
       priority: 50,
     };
 
-    await expect(service.create(conflictingRule, 'admin-user'))
-      .rejects
-      .toThrow('Conflicting rule detected');
+    await expect(service.create(conflictingRule, 'admin-user')).rejects.toThrow(
+      'Conflicting rule detected',
+    );
   });
 });
 ```
 
 #### 1.3 E2E Critical User Journeys
+
 **Impact:** HIGH | **Effort:** HIGH | **Timeline:** 2 weeks
 
 **Action Items:**
+
 - [ ] Opportunity creation flow (customer → estimate → job)
 - [ ] Job management flow (create → assign → complete)
 - [ ] Settings update flow (change tariffs → verify estimate)
@@ -837,6 +893,7 @@ describe('PricingRulesService', () => {
 - [ ] Authentication flow (login → access control → logout)
 
 **Example E2E Test:**
+
 ```typescript
 // apps/web-e2e/tests/opportunities/complete-flow.spec.ts
 import { test, expect } from '@playwright/test';
@@ -863,7 +920,10 @@ test.describe('Complete Opportunity Creation Flow', () => {
 
     // Step 4: Fill Move Details
     await page.fill('[name="pickupAddress"]', '123 Main St, Boston, MA 02101');
-    await page.fill('[name="deliveryAddress"]', '456 Oak Ave, Cambridge, MA 02138');
+    await page.fill(
+      '[name="deliveryAddress"]',
+      '456 Oak Ave, Cambridge, MA 02138',
+    );
     await page.selectOption('[name="serviceType"]', 'local');
     await page.click('button:has-text("Next")');
 
@@ -877,7 +937,9 @@ test.describe('Complete Opportunity Creation Flow', () => {
     await page.click('button:has-text("Create Opportunity")');
 
     // Step 7: Verify Success
-    await expect(page.locator('text=Opportunity created successfully')).toBeVisible();
+    await expect(
+      page.locator('text=Opportunity created successfully'),
+    ).toBeVisible();
 
     // Step 8: Verify Customer Created
     await page.goto('/customers');
@@ -889,6 +951,7 @@ test.describe('Complete Opportunity Creation Flow', () => {
 ### Priority 2: HIGH (Production Quality)
 
 #### 2.1 Integration Test Completion
+
 **Impact:** HIGH | **Effort:** MEDIUM | **Timeline:** 1 week
 
 - [ ] Complete customers.integration.spec.ts (all CRUD operations)
@@ -898,6 +961,7 @@ test.describe('Complete Opportunity Creation Flow', () => {
 - [ ] Add cross-module integration tests (customer + job + estimate)
 
 #### 2.2 Test Infrastructure Improvements
+
 **Impact:** MEDIUM | **Effort:** LOW | **Timeline:** 3 days
 
 - [ ] Fix web Jest configuration (setupFilesAfterEnv error)
@@ -909,6 +973,7 @@ test.describe('Complete Opportunity Creation Flow', () => {
 ### Priority 3: MEDIUM (Quality Enhancements)
 
 #### 3.1 Performance Testing
+
 **Impact:** MEDIUM | **Effort:** LOW | **Timeline:** 3 days
 
 - [ ] Pricing engine performance benchmarks
@@ -918,6 +983,7 @@ test.describe('Complete Opportunity Creation Flow', () => {
 - [ ] Memory leak detection tests
 
 #### 3.2 Visual Regression Testing
+
 **Impact:** MEDIUM | **Effort:** MEDIUM | **Timeline:** 1 week
 
 - [ ] Setup Playwright screenshot testing
@@ -929,6 +995,7 @@ test.describe('Complete Opportunity Creation Flow', () => {
 ### Priority 4: LOW (Nice to Have)
 
 #### 4.1 Accessibility Testing
+
 - [ ] ARIA label validation
 - [ ] Keyboard navigation tests
 - [ ] Screen reader compatibility
@@ -936,6 +1003,7 @@ test.describe('Complete Opportunity Creation Flow', () => {
 - [ ] Focus management tests
 
 #### 4.2 Security Testing
+
 - [ ] SQL injection prevention tests
 - [ ] XSS vulnerability tests
 - [ ] CSRF token validation
@@ -1411,7 +1479,11 @@ describe('CustomerManagement Component', () => {
 // apps/api/src/pricing-rules/pricing-rules.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PricingRulesService } from './pricing-rules.service';
 import { PricingRule } from './schemas/pricing-rule.schema';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
@@ -1426,12 +1498,8 @@ describe('PricingRulesService', () => {
     id: 'weekend_surcharge',
     name: 'Weekend Surcharge',
     description: 'Additional charge for weekend moves',
-    conditions: [
-      { field: 'isWeekend', operator: 'equals', value: true },
-    ],
-    actions: [
-      { type: 'add_percentage', value: 10 },
-    ],
+    conditions: [{ field: 'isWeekend', operator: 'equals', value: true }],
+    actions: [{ type: 'add_percentage', value: 10 }],
     priority: 50,
     isActive: true,
     applicableServices: ['local', 'long_distance'],
@@ -1485,12 +1553,8 @@ describe('PricingRulesService', () => {
       id: 'holiday_surcharge',
       name: 'Holiday Surcharge',
       description: 'Extra charge for holiday moves',
-      conditions: [
-        { field: 'isHoliday', operator: 'equals', value: true },
-      ],
-      actions: [
-        { type: 'add_percentage', value: 15 },
-      ],
+      conditions: [{ field: 'isHoliday', operator: 'equals', value: true }],
+      actions: [{ type: 'add_percentage', value: 15 }],
       priority: 60,
       applicableServices: ['local'],
     };
@@ -1520,22 +1584,20 @@ describe('PricingRulesService', () => {
     it('should throw ConflictException for duplicate rule ID', async () => {
       mockRuleModel.findOne.mockResolvedValue(mockRule);
 
-      await expect(service.create(createRuleDto, 'admin-user'))
-        .rejects
-        .toThrow(ConflictException);
+      await expect(service.create(createRuleDto, 'admin-user')).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('should validate rule conditions format', async () => {
       const invalidRuleDto = {
         ...createRuleDto,
-        conditions: [
-          { field: 'invalid', operator: 'unknown', value: 'bad' },
-        ],
+        conditions: [{ field: 'invalid', operator: 'unknown', value: 'bad' }],
       };
 
-      await expect(service.create(invalidRuleDto, 'admin-user'))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        service.create(invalidRuleDto, 'admin-user'),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should validate priority range', async () => {
@@ -1544,9 +1606,9 @@ describe('PricingRulesService', () => {
         priority: 150, // Out of range (0-100)
       };
 
-      await expect(service.create(invalidPriorityDto, 'admin-user'))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        service.create(invalidPriorityDto, 'admin-user'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -1605,18 +1667,16 @@ describe('PricingRulesService', () => {
     it('should throw NotFoundException for non-existent rule', async () => {
       mockRuleModel.findById.mockResolvedValue(null);
 
-      await expect(service.findById('nonexistent'))
-        .rejects
-        .toThrow(NotFoundException);
+      await expect(service.findById('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('update', () => {
     const updateRuleDto = {
       name: 'Updated Weekend Surcharge',
-      actions: [
-        { type: 'add_percentage', value: 12 },
-      ],
+      actions: [{ type: 'add_percentage', value: 12 }],
     };
 
     it('should update existing rule', async () => {
@@ -1626,7 +1686,11 @@ describe('PricingRulesService', () => {
       };
       mockRuleModel.findById.mockResolvedValue(mockUpdatableRule);
 
-      const result = await service.update('rule123', updateRuleDto, 'admin-user');
+      const result = await service.update(
+        'rule123',
+        updateRuleDto,
+        'admin-user',
+      );
 
       expect(result.name).toBe('Updated Weekend Surcharge');
       expect(mockAuditLogsService.log).toHaveBeenCalledWith({
@@ -1641,23 +1705,21 @@ describe('PricingRulesService', () => {
     it('should throw NotFoundException for non-existent rule', async () => {
       mockRuleModel.findById.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent', updateRuleDto, 'admin-user'))
-        .rejects
-        .toThrow(NotFoundException);
+      await expect(
+        service.update('nonexistent', updateRuleDto, 'admin-user'),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should validate updated conditions format', async () => {
       const invalidUpdateDto = {
-        conditions: [
-          { field: 'bad', operator: 'invalid', value: 'wrong' },
-        ],
+        conditions: [{ field: 'bad', operator: 'invalid', value: 'wrong' }],
       };
 
       mockRuleModel.findById.mockResolvedValue(mockRule);
 
-      await expect(service.update('rule123', invalidUpdateDto, 'admin-user'))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        service.update('rule123', invalidUpdateDto, 'admin-user'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -1685,9 +1747,9 @@ describe('PricingRulesService', () => {
     it('should throw NotFoundException for non-existent rule', async () => {
       mockRuleModel.findById.mockResolvedValue(null);
 
-      await expect(service.deactivate('nonexistent', 'admin-user'))
-        .rejects
-        .toThrow(NotFoundException);
+      await expect(
+        service.deactivate('nonexistent', 'admin-user'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -1715,9 +1777,7 @@ describe('PricingRulesService', () => {
         conditions: [
           { field: 'totalWeight', operator: 'greaterThan', value: 1000 },
         ],
-        actions: [
-          { type: 'add_fixed', value: 100 },
-        ],
+        actions: [{ type: 'add_fixed', value: 100 }],
         priority: 50,
       };
 
@@ -1734,9 +1794,7 @@ describe('PricingRulesService', () => {
         conditions: [
           { field: 'totalWeight', operator: 'invalid_op', value: 1000 },
         ],
-        actions: [
-          { type: 'add_fixed', value: 100 },
-        ],
+        actions: [{ type: 'add_fixed', value: 100 }],
         priority: 50,
       };
 
@@ -1753,9 +1811,7 @@ describe('PricingRulesService', () => {
         conditions: [
           { field: 'totalWeight', operator: 'greaterThan', value: 1000 },
         ],
-        actions: [
-          { type: 'invalid_action', value: 100 },
-        ],
+        actions: [{ type: 'invalid_action', value: 100 }],
         priority: 50,
       };
 
@@ -1770,12 +1826,8 @@ describe('PricingRulesService', () => {
     it('should detect conflicting rules', async () => {
       const newRule = {
         id: 'duplicate_weekend',
-        conditions: [
-          { field: 'isWeekend', operator: 'equals', value: true },
-        ],
-        actions: [
-          { type: 'add_percentage', value: 15 },
-        ],
+        conditions: [{ field: 'isWeekend', operator: 'equals', value: true }],
+        actions: [{ type: 'add_percentage', value: 15 }],
         priority: 50,
       };
 
@@ -1792,12 +1844,8 @@ describe('PricingRulesService', () => {
     it('should not detect conflicts for different conditions', async () => {
       const newRule = {
         id: 'weekday_discount',
-        conditions: [
-          { field: 'isWeekend', operator: 'equals', value: false },
-        ],
-        actions: [
-          { type: 'subtract_percentage', value: 5 },
-        ],
+        conditions: [{ field: 'isWeekend', operator: 'equals', value: false }],
+        actions: [{ type: 'subtract_percentage', value: 5 }],
         priority: 50,
       };
 
@@ -2037,6 +2085,7 @@ SimplePro-v3 has a **solid foundation** in testing with the pricing engine demon
 ### Production Readiness Score: 🟡 60/100
 
 **Breakdown:**
+
 - Unit Tests: 70/100 (good coverage in pricing engine, gaps elsewhere)
 - Integration Tests: 50/100 (infrastructure exists, incomplete coverage)
 - E2E Tests: 20/100 (minimal coverage, placeholder tests)
@@ -2060,12 +2109,14 @@ SimplePro-v3 has a **solid foundation** in testing with the pricing engine demon
 ### 30-Day Roadmap
 
 **Week 3: Component Test Completion**
+
 - CalendarDispatch tests
 - AnalyticsDashboard tests
 - Settings components tests
 - EstimateForm/Result tests
 
 **Week 4: Integration + Performance**
+
 - Complete all integration tests
 - Add performance benchmarks
 - Setup CI/CD pipeline
@@ -2074,11 +2125,13 @@ SimplePro-v3 has a **solid foundation** in testing with the pricing engine demon
 ### Success Metrics
 
 **Target Test Distribution (Production Ready):**
+
 - 70% Unit Tests (currently ~45%)
 - 20% Integration Tests (currently ~15%)
 - 10% E2E Tests (currently <5%)
 
 **Coverage Targets:**
+
 - Overall: 80%+ (currently ~40%)
 - Pricing Engine: 90%+ (currently 45%)
 - API Services: 85%+ (currently ~60%)
@@ -2091,6 +2144,7 @@ SimplePro-v3 has a **solid foundation** in testing with the pricing engine demon
 The lack of frontend component tests and E2E coverage represents a **significant production risk**. While the pricing engine is well-tested, the user-facing interfaces and critical workflows remain largely untested. Recommend dedicating **2-4 weeks** to comprehensive test coverage before production release.
 
 **Next Steps:**
+
 1. Review this analysis with development team
 2. Prioritize test creation based on business-critical features
 3. Implement CI/CD pipeline with quality gates

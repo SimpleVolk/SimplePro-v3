@@ -1,7 +1,16 @@
-import { Injectable, NotFoundException, Logger, forwardRef, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Notification, NotificationDocument } from './schemas/notification.schema';
+import {
+  Notification,
+  NotificationDocument,
+} from './schemas/notification.schema';
 import { CreateNotificationDto, NotificationFiltersDto } from './dto';
 import { NotificationTemplateService } from './services/notification-template.service';
 import { NotificationPreferenceService } from './services/notification-preference.service';
@@ -13,7 +22,8 @@ export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
 
   constructor(
-    @InjectModel(Notification.name) private notificationModel: Model<NotificationDocument>,
+    @InjectModel(Notification.name)
+    private notificationModel: Model<NotificationDocument>,
     private templateService: NotificationTemplateService,
     private preferenceService: NotificationPreferenceService,
     @Inject(forwardRef(() => NotificationDeliveryService))
@@ -27,17 +37,27 @@ export class NotificationsService {
   async createNotification(dto: CreateNotificationDto): Promise<Notification> {
     try {
       // Render notification from template
-      const rendered = await this.templateService.renderNotification(dto.type, dto.data || {});
+      const rendered = await this.templateService.renderNotification(
+        dto.type,
+        dto.data || {},
+      );
 
       // Get user preferences to determine delivery channels
-      const preferences = await this.preferenceService.getPreferences(dto.recipientId);
+      const preferences = await this.preferenceService.getPreferences(
+        dto.recipientId,
+      );
 
       // Determine which channels to use
-      const userChannelPrefs = preferences.preferences[dto.type as keyof typeof preferences.preferences];
+      const userChannelPrefs =
+        preferences.preferences[
+          dto.type as keyof typeof preferences.preferences
+        ];
       const deliveryChannels = userChannelPrefs || rendered.defaultChannels;
 
       // Check quiet hours
-      const isQuietHours = await this.preferenceService.isQuietHours(dto.recipientId);
+      const isQuietHours = await this.preferenceService.isQuietHours(
+        dto.recipientId,
+      );
       if (isQuietHours && dto.priority !== 'urgent') {
         // During quiet hours, only send in-app notifications unless urgent
         deliveryChannels.email = false;
@@ -53,7 +73,9 @@ export class NotificationsService {
         type: dto.type,
         priority: dto.priority || rendered.defaultPriority,
         relatedEntityType: dto.relatedEntityType,
-        relatedEntityId: dto.relatedEntityId ? new Types.ObjectId(dto.relatedEntityId) : undefined,
+        relatedEntityId: dto.relatedEntityId
+          ? new Types.ObjectId(dto.relatedEntityId)
+          : undefined,
         actionData: dto.actionData,
         deliveryChannels,
         deliveryStatus: {},
@@ -64,7 +86,10 @@ export class NotificationsService {
 
       // Send notification through appropriate channels asynchronously
       this.sendNotification(notification).catch((error) => {
-        this.logger.error(`Failed to send notification ${notification.id}:`, error);
+        this.logger.error(
+          `Failed to send notification ${notification.id}:`,
+          error,
+        );
       });
 
       return notification;
@@ -83,19 +108,27 @@ export class NotificationsService {
     const deliveryPromises: Promise<void>[] = [];
 
     if (deliveryChannels.inApp) {
-      deliveryPromises.push(this.deliveryService.sendInAppNotification(notification));
+      deliveryPromises.push(
+        this.deliveryService.sendInAppNotification(notification),
+      );
     }
 
     if (deliveryChannels.email) {
-      deliveryPromises.push(this.deliveryService.sendEmailNotification(notification));
+      deliveryPromises.push(
+        this.deliveryService.sendEmailNotification(notification),
+      );
     }
 
     if (deliveryChannels.sms) {
-      deliveryPromises.push(this.deliveryService.sendSmsNotification(notification));
+      deliveryPromises.push(
+        this.deliveryService.sendSmsNotification(notification),
+      );
     }
 
     if (deliveryChannels.push) {
-      deliveryPromises.push(this.deliveryService.sendPushNotification(notification));
+      deliveryPromises.push(
+        this.deliveryService.sendPushNotification(notification),
+      );
     }
 
     await Promise.allSettled(deliveryPromises);
@@ -104,7 +137,10 @@ export class NotificationsService {
   /**
    * Find all notifications for a user with filters
    */
-  async findAll(userId: string, filters: NotificationFiltersDto): Promise<Notification[]> {
+  async findAll(
+    userId: string,
+    filters: NotificationFiltersDto,
+  ): Promise<Notification[]> {
     const query: any = { recipientId: new Types.ObjectId(userId) };
 
     if (filters.unreadOnly) {
@@ -181,7 +217,7 @@ export class NotificationsService {
             readAt: new Date(),
           },
         },
-        { session }
+        { session },
       );
 
       this.logger.debug(

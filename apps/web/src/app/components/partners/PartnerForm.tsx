@@ -3,7 +3,12 @@
 import { useState, useEffect } from 'react';
 import { getApiUrl } from '../../../lib/config';
 import styles from './PartnerForm.module.css';
-import type { Partner, CreatePartnerDto, PartnerType, CommissionStructureType } from './types';
+import type {
+  Partner,
+  CreatePartnerDto,
+  PartnerType,
+  CommissionStructureType,
+} from './types';
 
 interface PartnerFormProps {
   partner?: Partner | null;
@@ -70,7 +75,7 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
@@ -91,30 +96,33 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
   };
 
   const handleInputChange = (field: keyof CreatePartnerDto, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleCommissionTypeChange = (type: CommissionStructureType) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       commissionStructure: {
         type,
         value: type === 'tiered' ? undefined : 10,
-        tiers: type === 'tiered' ? [
-          { minValue: 0, maxValue: 5000, rate: 5 },
-          { minValue: 5000, maxValue: 10000, rate: 7 },
-          { minValue: 10000, rate: 10 },
-        ] : undefined,
+        tiers:
+          type === 'tiered'
+            ? [
+                { minValue: 0, maxValue: 5000, rate: 5 },
+                { minValue: 5000, maxValue: 10000, rate: 7 },
+                { minValue: 10000, rate: 10 },
+              ]
+            : undefined,
       },
     }));
   };
 
   const addServiceArea = () => {
     if (serviceAreaInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         serviceAreas: [...(prev.serviceAreas || []), serviceAreaInput.trim()],
       }));
@@ -123,29 +131,35 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
   };
 
   const removeServiceArea = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       serviceAreas: (prev.serviceAreas || []).filter((_, i) => i !== index),
     }));
   };
 
   const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    const password = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    setFormData(prev => ({ ...prev, portalPassword: password }));
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    const password = Array.from(
+      { length: 12 },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join('');
+    setFormData((prev) => ({ ...prev, portalPassword: password }));
   };
 
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{partner ? 'Edit Partner' : 'New Partner'}</h2>
-          <button className={styles.closeButton} onClick={onClose}>×</button>
+          <h2 className={styles.title}>
+            {partner ? 'Edit Partner' : 'New Partner'}
+          </h2>
+          <button className={styles.closeButton} onClick={onClose}>
+            ×
+          </button>
         </div>
 
-        {error && (
-          <div className={styles.error}>{error}</div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.section}>
@@ -200,7 +214,9 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
                 <select
                   className={styles.select}
                   value={formData.type}
-                  onChange={(e) => handleInputChange('type', e.target.value as PartnerType)}
+                  onChange={(e) =>
+                    handleInputChange('type', e.target.value as PartnerType)
+                  }
                   required
                 >
                   <option value="individual">👤 Individual</option>
@@ -242,29 +258,41 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
             {formData.commissionStructure.type !== 'tiered' && (
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  {formData.commissionStructure.type === 'percentage' ? 'Percentage (%)' : 'Amount ($)'}
+                  {formData.commissionStructure.type === 'percentage'
+                    ? 'Percentage (%)'
+                    : 'Amount ($)'}
                 </label>
                 <input
                   type="number"
                   className={styles.input}
                   value={formData.commissionStructure.value || ''}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    commissionStructure: {
-                      ...prev.commissionStructure,
-                      value: parseFloat(e.target.value) || 0,
-                    },
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      commissionStructure: {
+                        ...prev.commissionStructure,
+                        value: parseFloat(e.target.value) || 0,
+                      },
+                    }))
+                  }
                   min="0"
-                  step={formData.commissionStructure.type === 'percentage' ? '0.1' : '1'}
+                  step={
+                    formData.commissionStructure.type === 'percentage'
+                      ? '0.1'
+                      : '1'
+                  }
                 />
               </div>
             )}
 
             {formData.commissionStructure.type === 'tiered' && (
               <div className={styles.tiersInfo}>
-                <p className={styles.tiersText}>Tiered commission structure configured</p>
-                <p className={styles.tiersSubtext}>Contact admin to modify tier settings</p>
+                <p className={styles.tiersText}>
+                  Tiered commission structure configured
+                </p>
+                <p className={styles.tiersSubtext}>
+                  Contact admin to modify tier settings
+                </p>
               </div>
             )}
           </div>
@@ -277,7 +305,9 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
                 <input
                   type="checkbox"
                   checked={formData.portalAccess}
-                  onChange={(e) => handleInputChange('portalAccess', e.target.checked)}
+                  onChange={(e) =>
+                    handleInputChange('portalAccess', e.target.checked)
+                  }
                 />
                 <span>Enable partner portal access</span>
               </label>
@@ -291,7 +321,9 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
                     type="text"
                     className={styles.input}
                     value={formData.portalPassword}
-                    onChange={(e) => handleInputChange('portalPassword', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('portalPassword', e.target.value)
+                    }
                     placeholder="Enter password or generate"
                   />
                   <button
@@ -315,7 +347,9 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
                 type="url"
                 className={styles.input}
                 value={formData.agreementUrl}
-                onChange={(e) => handleInputChange('agreementUrl', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange('agreementUrl', e.target.value)
+                }
                 placeholder="https://..."
               />
             </div>
@@ -329,7 +363,9 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
                   value={serviceAreaInput}
                   onChange={(e) => setServiceAreaInput(e.target.value)}
                   placeholder="Enter service area (e.g., Los Angeles, CA)"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addServiceArea())}
+                  onKeyPress={(e) =>
+                    e.key === 'Enter' && (e.preventDefault(), addServiceArea())
+                  }
                 />
                 <button
                   type="button"
@@ -383,7 +419,11 @@ export function PartnerForm({ partner, onClose, onSubmit }: PartnerFormProps) {
               className={styles.submitButton}
               disabled={loading}
             >
-              {loading ? 'Saving...' : partner ? 'Update Partner' : 'Create Partner'}
+              {loading
+                ? 'Saving...'
+                : partner
+                  ? 'Update Partner'
+                  : 'Create Partner'}
             </button>
           </div>
         </form>

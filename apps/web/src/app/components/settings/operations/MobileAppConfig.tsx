@@ -102,9 +102,9 @@ export default function MobileAppConfig() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/mobile-app'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -137,7 +137,7 @@ export default function MobileAppConfig() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -154,14 +154,16 @@ export default function MobileAppConfig() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving mobile app settings:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const updateFormData = (path: string[], value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = JSON.parse(JSON.stringify(prev));
       let current = updated;
 
@@ -184,21 +186,36 @@ export default function MobileAppConfig() {
       {error && (
         <div className={styles.errorMessage}>
           <span>{error}</span>
-          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+          <button onClick={() => setError(null)} className={styles.closeError}>
+            ×
+          </button>
         </div>
       )}
 
       {success && (
         <div className={styles.successMessage}>
           <span>{success}</span>
-          <button onClick={() => setSuccess(null)} className={styles.closeSuccess}>×</button>
+          <button
+            onClick={() => setSuccess(null)}
+            className={styles.closeSuccess}
+          >
+            ×
+          </button>
         </div>
       )}
 
       {loading ? (
-        <div className={styles.loadingMessage}>Loading mobile app settings...</div>
+        <div className={styles.loadingMessage}>
+          Loading mobile app settings...
+        </div>
       ) : (
-        <form className={styles.formSection} onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+        <form
+          className={styles.formSection}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
           <h4>Feature Toggles</h4>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
@@ -206,7 +223,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.gpsTracking}
-                  onChange={(e) => updateFormData(['features', 'gpsTracking'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'gpsTracking'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 GPS Tracking
               </label>
@@ -217,7 +239,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.photoUpload}
-                  onChange={(e) => updateFormData(['features', 'photoUpload'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'photoUpload'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Photo Upload
               </label>
@@ -228,7 +255,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.signatureCapture}
-                  onChange={(e) => updateFormData(['features', 'signatureCapture'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'signatureCapture'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Signature Capture
               </label>
@@ -239,7 +271,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.inventoryChecklist}
-                  onChange={(e) => updateFormData(['features', 'inventoryChecklist'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'inventoryChecklist'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Inventory Checklist
               </label>
@@ -250,7 +287,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.timeTracking}
-                  onChange={(e) => updateFormData(['features', 'timeTracking'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'timeTracking'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Time Tracking
               </label>
@@ -261,7 +303,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.customerCommunication}
-                  onChange={(e) => updateFormData(['features', 'customerCommunication'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'customerCommunication'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Customer Communication
               </label>
@@ -272,7 +319,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.features.offlineMode}
-                  onChange={(e) => updateFormData(['features', 'offlineMode'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['features', 'offlineMode'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Offline Mode
               </label>
@@ -284,13 +336,20 @@ export default function MobileAppConfig() {
               <h4>GPS Settings</h4>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label htmlFor="trackingFrequencyMinutes">Tracking Frequency (minutes)</label>
+                  <label htmlFor="trackingFrequencyMinutes">
+                    Tracking Frequency (minutes)
+                  </label>
                   <input
                     id="trackingFrequencyMinutes"
                     type="number"
                     min="1"
                     value={formData.gpsSettings.trackingFrequencyMinutes}
-                    onChange={(e) => updateFormData(['gpsSettings', 'trackingFrequencyMinutes'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['gpsSettings', 'trackingFrequencyMinutes'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -300,7 +359,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.gpsSettings.requireLocationPermission}
-                      onChange={(e) => updateFormData(['gpsSettings', 'requireLocationPermission'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['gpsSettings', 'requireLocationPermission'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Require Location Permission
                   </label>
@@ -311,7 +375,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.gpsSettings.showRouteOnMap}
-                      onChange={(e) => updateFormData(['gpsSettings', 'showRouteOnMap'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['gpsSettings', 'showRouteOnMap'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Show Route on Map
                   </label>
@@ -329,7 +398,12 @@ export default function MobileAppConfig() {
                   <select
                     id="uploadQuality"
                     value={formData.photoSettings.uploadQuality}
-                    onChange={(e) => updateFormData(['photoSettings', 'uploadQuality'], e.target.value)}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['photoSettings', 'uploadQuality'],
+                        e.target.value,
+                      )
+                    }
                     className={styles.select}
                   >
                     <option value="low">Low (Faster Upload)</option>
@@ -345,7 +419,12 @@ export default function MobileAppConfig() {
                     type="number"
                     min="1"
                     value={formData.photoSettings.maxPhotosPerJob}
-                    onChange={(e) => updateFormData(['photoSettings', 'maxPhotosPerJob'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['photoSettings', 'maxPhotosPerJob'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -355,7 +434,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.photoSettings.requireBeforeAfterPhotos}
-                      onChange={(e) => updateFormData(['photoSettings', 'requireBeforeAfterPhotos'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['photoSettings', 'requireBeforeAfterPhotos'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Require Before/After Photos
                   </label>
@@ -366,7 +450,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.photoSettings.compressPhotos}
-                      onChange={(e) => updateFormData(['photoSettings', 'compressPhotos'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['photoSettings', 'compressPhotos'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Compress Photos
                   </label>
@@ -380,13 +469,20 @@ export default function MobileAppConfig() {
               <h4>Offline Mode Settings</h4>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label htmlFor="syncFrequencyMinutes">Sync Frequency (minutes)</label>
+                  <label htmlFor="syncFrequencyMinutes">
+                    Sync Frequency (minutes)
+                  </label>
                   <input
                     id="syncFrequencyMinutes"
                     type="number"
                     min="5"
                     value={formData.offlineSettings.syncFrequencyMinutes}
-                    onChange={(e) => updateFormData(['offlineSettings', 'syncFrequencyMinutes'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['offlineSettings', 'syncFrequencyMinutes'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -398,7 +494,12 @@ export default function MobileAppConfig() {
                     type="number"
                     min="1"
                     value={formData.offlineSettings.maxOfflineHours}
-                    onChange={(e) => updateFormData(['offlineSettings', 'maxOfflineHours'], parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateFormData(
+                        ['offlineSettings', 'maxOfflineHours'],
+                        parseInt(e.target.value),
+                      )
+                    }
                     className={styles.input}
                   />
                 </div>
@@ -408,7 +509,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.offlineSettings.autoSyncOnConnection}
-                      onChange={(e) => updateFormData(['offlineSettings', 'autoSyncOnConnection'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['offlineSettings', 'autoSyncOnConnection'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Auto-Sync on Connection
                   </label>
@@ -424,7 +530,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.checkInCheckOut.requirePhotoOnCheckIn}
-                  onChange={(e) => updateFormData(['checkInCheckOut', 'requirePhotoOnCheckIn'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['checkInCheckOut', 'requirePhotoOnCheckIn'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Require Photo on Check-In
               </label>
@@ -435,7 +546,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.checkInCheckOut.requireLocationOnCheckIn}
-                  onChange={(e) => updateFormData(['checkInCheckOut', 'requireLocationOnCheckIn'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['checkInCheckOut', 'requireLocationOnCheckIn'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Require Location on Check-In
               </label>
@@ -446,7 +562,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.checkInCheckOut.requireSignatureOnCheckOut}
-                  onChange={(e) => updateFormData(['checkInCheckOut', 'requireSignatureOnCheckOut'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['checkInCheckOut', 'requireSignatureOnCheckOut'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Require Signature on Check-Out
               </label>
@@ -457,7 +578,12 @@ export default function MobileAppConfig() {
                 <input
                   type="checkbox"
                   checked={formData.checkInCheckOut.allowEarlyCheckIn}
-                  onChange={(e) => updateFormData(['checkInCheckOut', 'allowEarlyCheckIn'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['checkInCheckOut', 'allowEarlyCheckIn'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Allow Early Check-In
               </label>
@@ -465,13 +591,20 @@ export default function MobileAppConfig() {
 
             {formData.checkInCheckOut.allowEarlyCheckIn && (
               <div className={styles.formGroup}>
-                <label htmlFor="earlyCheckInMinutes">Early Check-In Window (minutes)</label>
+                <label htmlFor="earlyCheckInMinutes">
+                  Early Check-In Window (minutes)
+                </label>
                 <input
                   id="earlyCheckInMinutes"
                   type="number"
                   min="0"
                   value={formData.checkInCheckOut.earlyCheckInMinutes}
-                  onChange={(e) => updateFormData(['checkInCheckOut', 'earlyCheckInMinutes'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['checkInCheckOut', 'earlyCheckInMinutes'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                 />
               </div>
@@ -487,7 +620,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.signatureSettings.requireCustomerName}
-                      onChange={(e) => updateFormData(['signatureSettings', 'requireCustomerName'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['signatureSettings', 'requireCustomerName'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Require Customer Name
                   </label>
@@ -498,7 +636,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.signatureSettings.requireEmail}
-                      onChange={(e) => updateFormData(['signatureSettings', 'requireEmail'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['signatureSettings', 'requireEmail'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Require Email Address
                   </label>
@@ -509,7 +652,12 @@ export default function MobileAppConfig() {
                     <input
                       type="checkbox"
                       checked={formData.signatureSettings.sendCopyToCustomer}
-                      onChange={(e) => updateFormData(['signatureSettings', 'sendCopyToCustomer'], e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          ['signatureSettings', 'sendCopyToCustomer'],
+                          e.target.checked,
+                        )
+                      }
                     />
                     Send Copy to Customer
                   </label>

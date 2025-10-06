@@ -3,6 +3,7 @@
 ## 🚀 Quick Start
 
 ### Start the System
+
 ```bash
 # Start MongoDB and infrastructure
 npm run docker:dev
@@ -12,6 +13,7 @@ npm run dev:api
 ```
 
 ### Seed Default Rules
+
 ```typescript
 import { seedDefaultFollowUpRules } from './database/seeds/default-follow-up-rules.seed';
 import { InjectModel } from '@nestjs/mongoose';
@@ -96,17 +98,18 @@ GET /api/follow-up-rules/active
 
 ## 🔄 Event Types
 
-| Event | When Emitted | Use Case |
-|-------|--------------|----------|
-| `opportunity.created` | New opportunity saved | Immediate lead follow-up |
-| `opportunity.status_changed` | Status updated | Won/lost workflows |
-| `estimate.created` | Quote sent | Post-quote follow-up |
-| `activity.completed` | Activity marked done | Outcome-based automation |
-| `opportunity.stale_detected` | No activity 7+ days | Re-engagement |
+| Event                        | When Emitted          | Use Case                 |
+| ---------------------------- | --------------------- | ------------------------ |
+| `opportunity.created`        | New opportunity saved | Immediate lead follow-up |
+| `opportunity.status_changed` | Status updated        | Won/lost workflows       |
+| `estimate.created`           | Quote sent            | Post-quote follow-up     |
+| `activity.completed`         | Activity marked done  | Outcome-based automation |
+| `opportunity.stale_detected` | No activity 7+ days   | Re-engagement            |
 
 ## 🎯 Rule Conditions
 
 ### Operators
+
 - `equals`: Exact match
 - `not_equals`: Not equal
 - `contains`: String contains
@@ -116,6 +119,7 @@ GET /api/follow-up-rules/active
 - `not_in`: Value not in array
 
 ### Example Conditions
+
 ```typescript
 // Single condition
 { field: "leadSource", operator: "equals", value: "website" }
@@ -129,40 +133,43 @@ GET /api/follow-up-rules/active
 
 ## ⚙️ Action Types
 
-| Action | Description | Parameters |
-|--------|-------------|------------|
-| `create_activity` | Create follow-up activity | activityType, subject, assignTo, delay |
-| `send_email` | Send email (placeholder) | template, assignTo |
-| `send_notification` | Send notification | template, assignTo |
-| `update_status` | Update opportunity status | status |
-| `assign_sales_rep` | Assign sales rep | assignTo |
-| `create_job` | Create job record | jobDetails |
+| Action              | Description               | Parameters                             |
+| ------------------- | ------------------------- | -------------------------------------- |
+| `create_activity`   | Create follow-up activity | activityType, subject, assignTo, delay |
+| `send_email`        | Send email (placeholder)  | template, assignTo                     |
+| `send_notification` | Send notification         | template, assignTo                     |
+| `update_status`     | Update opportunity status | status                                 |
+| `assign_sales_rep`  | Assign sales rep          | assignTo                               |
+| `create_job`        | Create job record         | jobDetails                             |
 
 ## 📅 Cron Jobs Schedule
 
-| Schedule | Job | Description |
-|----------|-----|-------------|
-| Every hour | Overdue check | Find and notify overdue activities |
-| Every 6 hours | Stale check | Detect inactive opportunities |
-| Every 30 min | Upcoming check | Remind about activities due soon |
-| Every 15 min | Rule processor | Event-driven checkpoint |
-| Daily 2 AM | Cleanup | Archive old activities |
-| Daily 8 AM | Summary | Generate daily report |
+| Schedule      | Job            | Description                        |
+| ------------- | -------------- | ---------------------------------- |
+| Every hour    | Overdue check  | Find and notify overdue activities |
+| Every 6 hours | Stale check    | Detect inactive opportunities      |
+| Every 30 min  | Upcoming check | Remind about activities due soon   |
+| Every 15 min  | Rule processor | Event-driven checkpoint            |
+| Daily 2 AM    | Cleanup        | Archive old activities             |
+| Daily 8 AM    | Summary        | Generate daily report              |
 
 ## 🔐 Role Permissions
 
 ### Super Admin / Admin
+
 - ✅ Create/edit/delete rules
 - ✅ View all activities
 - ✅ Access all statistics
 - ✅ Delete activities
 
 ### Dispatcher
+
 - ✅ View all activities
 - ✅ View rules (read-only)
 - ❌ Create/edit rules
 
 ### Sales
+
 - ✅ View assigned activities only
 - ✅ Complete own activities
 - ❌ View other users' activities
@@ -171,6 +178,7 @@ GET /api/follow-up-rules/active
 ## 🧪 Testing Workflow
 
 ### 1. Test Activity Creation
+
 ```bash
 # Create opportunity
 POST /api/opportunities
@@ -185,6 +193,7 @@ GET /api/lead-activities/opportunity/:opportunityId
 ```
 
 ### 2. Test Callback Automation
+
 ```bash
 # Complete activity with callback outcome
 PATCH /api/lead-activities/:id/complete
@@ -197,6 +206,7 @@ GET /api/lead-activities/pending
 ```
 
 ### 3. Test Rule Matching
+
 ```bash
 # Test without executing
 POST /api/follow-up-rules/:ruleId/test
@@ -216,6 +226,7 @@ POST /api/follow-up-rules/:ruleId/test
 ## 🐛 Debugging
 
 ### Check Logs
+
 ```bash
 # Look for rule evaluation
 "Evaluating X rules for event type: opportunity_created"
@@ -234,17 +245,20 @@ POST /api/follow-up-rules/:ruleId/test
 ### Common Issues
 
 **Activities not auto-created?**
+
 - Check if rule is active: `GET /api/follow-up-rules/active`
 - Verify event is emitted in service logs
 - Check rule conditions match event data
 - Test rule manually: `POST /api/follow-up-rules/:id/test`
 
 **Cron jobs not running?**
+
 - Verify ScheduleModule imported in FollowUpSchedulerModule
 - Check server logs for cron execution messages
 - Manually trigger: `schedulerService.triggerOverdueCheck()`
 
 **Events not triggering?**
+
 - Verify EventEmitterModule imported in AppModule
 - Check EventEmitter2 injected in services
 - Verify @OnEvent decorators in FollowUpRulesService
@@ -252,6 +266,7 @@ POST /api/follow-up-rules/:ruleId/test
 ## 📊 Activity Types & Outcomes
 
 ### Activity Types
+
 - `call`: Phone call
 - `email`: Email communication
 - `meeting`: In-person or video meeting
@@ -261,6 +276,7 @@ POST /api/follow-up-rules/:ruleId/test
 - `status_change`: Status update
 
 ### Outcomes
+
 - `successful`: Objective achieved
 - `no_answer`: Customer didn't answer
 - `voicemail`: Left voicemail
@@ -271,6 +287,7 @@ POST /api/follow-up-rules/:ruleId/test
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 # In .env.local
 MONGODB_URI=mongodb://localhost:27017/simplepro
@@ -279,6 +296,7 @@ NODE_ENV=development
 ```
 
 ### Default Delays (hours)
+
 - Urgent lead: 0 (immediate)
 - Website lead: 1 hour
 - Referral lead: 2 hours
@@ -289,6 +307,7 @@ NODE_ENV=development
 ## 📈 Performance Tips
 
 ### Query Optimization
+
 ```typescript
 // Use indexes - these are already created
 .find({ opportunityId })  // Uses index
@@ -300,31 +319,35 @@ NODE_ENV=development
 ```
 
 ### Bulk Operations
+
 ```typescript
 // Instead of multiple creates
 for (const activity of activities) {
-  await create(activity);  // N queries
+  await create(activity); // N queries
 }
 
 // Use bulk insert
-await activityModel.insertMany(activities);  // 1 query
+await activityModel.insertMany(activities); // 1 query
 ```
 
 ## 🆘 Support
 
 ### Documentation
+
 - **User Guide**: LEAD_TRACKING_SYSTEM.md
 - **Architecture**: AUTOMATION_ARCHITECTURE.md
 - **Implementation**: LEAD_AUTOMATION_SUMMARY.md
 - **This Guide**: QUICK_REFERENCE_LEAD_AUTOMATION.md
 
 ### Key Files
+
 - Lead Activities: `apps/api/src/lead-activities/`
 - Follow-up Rules: `apps/api/src/follow-up-rules/`
 - Scheduler: `apps/api/src/follow-up-scheduler/`
 - Default Rules: `apps/api/src/database/seeds/default-follow-up-rules.seed.ts`
 
 ### Getting Help
+
 1. Check logs for error messages
 2. Review event emission in opportunities.service.ts
 3. Test rules with test endpoint

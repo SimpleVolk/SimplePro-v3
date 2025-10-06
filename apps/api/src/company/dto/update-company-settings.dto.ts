@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsEmail, Length, Matches, ValidateNested } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsEmail,
+  Length,
+  Matches,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { AddressDto } from './address.dto';
 import { BusinessHoursDto } from './business-hours.dto';
@@ -19,7 +26,7 @@ export class UpdateCompanySettingsDto {
   @IsOptional()
   @IsString()
   @Matches(/^\d{2}-\d{7}$/, {
-    message: 'Tax ID must be in format XX-XXXXXXX (e.g., 12-3456789)'
+    message: 'Tax ID must be in format XX-XXXXXXX (e.g., 12-3456789)',
   })
   taxId?: string;
 
@@ -31,14 +38,15 @@ export class UpdateCompanySettingsDto {
   @IsOptional()
   @IsString()
   @Matches(/^\+?1?\s*\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/, {
-    message: 'Phone must be a valid US phone number (e.g., (555) 123-4567 or 555-123-4567)'
+    message:
+      'Phone must be a valid US phone number (e.g., (555) 123-4567 or 555-123-4567)',
   })
   phone?: string;
 
   @IsOptional()
   @IsString()
-  @Matches(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, {
-    message: 'Website must be a valid URL'
+  @Matches(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, {
+    message: 'Website must be a valid URL',
   })
   website?: string;
 

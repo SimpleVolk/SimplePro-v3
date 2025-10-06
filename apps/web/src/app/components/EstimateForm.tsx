@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
+import {
+  DeterministicEstimator,
+  defaultRules,
+} from '@simplepro/pricing-engine';
 import type { EstimateInput, EstimateResult } from '@simplepro/pricing-engine';
 import styles from './EstimateForm.module.css';
 
@@ -12,7 +15,9 @@ interface EstimateFormProps {
 export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [formData, setFormData] = useState<Partial<EstimateInput>>({
     customerId: 'web-customer-001',
     moveDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
@@ -30,7 +35,7 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
       parkingDistance: 20,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     delivery: {
       address: '',
@@ -40,7 +45,7 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
       parkingDistance: 20,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     totalWeight: 2000,
     totalVolume: 400,
@@ -51,16 +56,16 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
       antiques: false,
       artwork: false,
       fragileItems: 0,
-      valuableItems: 0
+      valuableItems: 0,
     },
     additionalServices: {
       packing: false,
       unpacking: false,
       assembly: false,
       storage: false,
-      cleaning: false
+      cleaning: false,
     },
-    rooms: []
+    rooms: [],
   });
 
   const validateForm = (): boolean => {
@@ -91,13 +96,15 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
 
     // Business logic validation
     if (formData.totalWeight && formData.totalWeight > 50000) {
-      errors.totalWeight = 'Maximum weight is 50,000 lbs. Please contact us for larger moves.';
+      errors.totalWeight =
+        'Maximum weight is 50,000 lbs. Please contact us for larger moves.';
     }
     if (formData.crewSize && formData.crewSize > 8) {
       errors.crewSize = 'Maximum crew size is 8 members';
     }
     if (formData.distance && formData.distance > 2000) {
-      errors.distance = 'Maximum distance is 2,000 miles. Please contact us for longer moves.';
+      errors.distance =
+        'Maximum distance is 2,000 miles. Please contact us for longer moves.';
     }
 
     setValidationErrors(errors);
@@ -123,15 +130,19 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
 
     try {
       // Create basic room data if none provided
-      const rooms = formData.rooms?.length ? formData.rooms : [{
-        id: 'default-room',
-        type: 'mixed',
-        description: 'Combined room inventory',
-        items: [],
-        packingRequired: formData.additionalServices?.packing || false,
-        totalWeight: formData.totalWeight || 0,
-        totalVolume: formData.totalVolume || 0
-      }];
+      const rooms = formData.rooms?.length
+        ? formData.rooms
+        : [
+            {
+              id: 'default-room',
+              type: 'mixed',
+              description: 'Combined room inventory',
+              items: [],
+              packingRequired: formData.additionalServices?.packing || false,
+              totalWeight: formData.totalWeight || 0,
+              totalVolume: formData.totalVolume || 0,
+            },
+          ];
 
       const estimateInput: EstimateInput = {
         ...formData,
@@ -141,7 +152,7 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
 
       const estimator = new DeterministicEstimator(
         defaultRules.pricingRules as any,
-        defaultRules.locationHandicaps as any
+        defaultRules.locationHandicaps as any,
       );
 
       const result = estimator.calculateEstimate(estimateInput, 'web-user');
@@ -151,9 +162,10 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
       setError(null);
     } catch (error) {
       console.error('Error calculating estimate:', error);
-      const errorMessage = error instanceof Error
-        ? `Calculation failed: ${error.message}`
-        : 'An unexpected error occurred while calculating your estimate. Please try again.';
+      const errorMessage =
+        error instanceof Error
+          ? `Calculation failed: ${error.message}`
+          : 'An unexpected error occurred while calculating your estimate. Please try again.';
       setError(errorMessage);
     } finally {
       setIsCalculating(false);
@@ -161,13 +173,20 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
   };
 
   const updateFormData = (field: string, value: string | number | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const updateNestedField = (parent: string, field: string, value: string | number | boolean) => {
-    setFormData(prev => ({
+  const updateNestedField = (
+    parent: string,
+    field: string,
+    value: string | number | boolean,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [parent]: { ...(prev[parent as keyof typeof prev] as Record<string, unknown>), [field]: value }
+      [parent]: {
+        ...(prev[parent as keyof typeof prev] as Record<string, unknown>),
+        [field]: value,
+      },
     }));
   };
 
@@ -216,7 +235,11 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
           <input
             id="moveDate"
             type="date"
-            value={typeof formData.moveDate === 'string' ? formData.moveDate : formData.moveDate?.toISOString().split('T')[0] || ''}
+            value={
+              typeof formData.moveDate === 'string'
+                ? formData.moveDate
+                : formData.moveDate?.toISOString().split('T')[0] || ''
+            }
             onChange={(e) => updateFormData('moveDate', e.target.value)}
             required
           />
@@ -234,7 +257,9 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             required
           />
           {validationErrors.distance && (
-            <div className={styles.errorMessage}>{validationErrors.distance}</div>
+            <div className={styles.errorMessage}>
+              {validationErrors.distance}
+            </div>
           )}
         </div>
       </div>
@@ -248,13 +273,17 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             id="pickupAddress"
             type="text"
             value={formData.pickup?.address}
-            onChange={(e) => updateNestedField('pickup', 'address', e.target.value)}
+            onChange={(e) =>
+              updateNestedField('pickup', 'address', e.target.value)
+            }
             placeholder="123 Main St, City, State ZIP"
             className={validationErrors.pickupAddress ? styles.fieldError : ''}
             required
           />
           {validationErrors.pickupAddress && (
-            <div className={styles.errorMessage}>{validationErrors.pickupAddress}</div>
+            <div className={styles.errorMessage}>
+              {validationErrors.pickupAddress}
+            </div>
           )}
         </div>
 
@@ -265,7 +294,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="pickupFloor"
               type="number"
               value={formData.pickup?.floorLevel}
-              onChange={(e) => updateNestedField('pickup', 'floorLevel', Number(e.target.value))}
+              onChange={(e) =>
+                updateNestedField(
+                  'pickup',
+                  'floorLevel',
+                  Number(e.target.value),
+                )
+              }
               min="1"
             />
           </div>
@@ -276,7 +311,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="pickupStairs"
               type="number"
               value={formData.pickup?.stairsCount}
-              onChange={(e) => updateNestedField('pickup', 'stairsCount', Number(e.target.value))}
+              onChange={(e) =>
+                updateNestedField(
+                  'pickup',
+                  'stairsCount',
+                  Number(e.target.value),
+                )
+              }
               min="0"
             />
           </div>
@@ -287,7 +328,9 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
           <select
             id="pickupAccess"
             value={formData.pickup?.accessDifficulty}
-            onChange={(e) => updateNestedField('pickup', 'accessDifficulty', e.target.value)}
+            onChange={(e) =>
+              updateNestedField('pickup', 'accessDifficulty', e.target.value)
+            }
           >
             <option value="easy">Easy</option>
             <option value="moderate">Moderate</option>
@@ -306,13 +349,19 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             id="deliveryAddress"
             type="text"
             value={formData.delivery?.address}
-            onChange={(e) => updateNestedField('delivery', 'address', e.target.value)}
+            onChange={(e) =>
+              updateNestedField('delivery', 'address', e.target.value)
+            }
             placeholder="456 Oak Ave, City, State ZIP"
-            className={validationErrors.deliveryAddress ? styles.fieldError : ''}
+            className={
+              validationErrors.deliveryAddress ? styles.fieldError : ''
+            }
             required
           />
           {validationErrors.deliveryAddress && (
-            <div className={styles.errorMessage}>{validationErrors.deliveryAddress}</div>
+            <div className={styles.errorMessage}>
+              {validationErrors.deliveryAddress}
+            </div>
           )}
         </div>
 
@@ -323,7 +372,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="deliveryFloor"
               type="number"
               value={formData.delivery?.floorLevel}
-              onChange={(e) => updateNestedField('delivery', 'floorLevel', Number(e.target.value))}
+              onChange={(e) =>
+                updateNestedField(
+                  'delivery',
+                  'floorLevel',
+                  Number(e.target.value),
+                )
+              }
               min="1"
             />
           </div>
@@ -334,7 +389,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="deliveryStairs"
               type="number"
               value={formData.delivery?.stairsCount}
-              onChange={(e) => updateNestedField('delivery', 'stairsCount', Number(e.target.value))}
+              onChange={(e) =>
+                updateNestedField(
+                  'delivery',
+                  'stairsCount',
+                  Number(e.target.value),
+                )
+              }
               min="0"
             />
           </div>
@@ -351,13 +412,17 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="totalWeight"
               type="number"
               value={formData.totalWeight}
-              onChange={(e) => updateFormData('totalWeight', Number(e.target.value))}
+              onChange={(e) =>
+                updateFormData('totalWeight', Number(e.target.value))
+              }
               min="1"
               className={validationErrors.totalWeight ? styles.fieldError : ''}
               required
             />
             {validationErrors.totalWeight && (
-              <div className={styles.errorMessage}>{validationErrors.totalWeight}</div>
+              <div className={styles.errorMessage}>
+                {validationErrors.totalWeight}
+              </div>
             )}
           </div>
 
@@ -367,13 +432,17 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="totalVolume"
               type="number"
               value={formData.totalVolume}
-              onChange={(e) => updateFormData('totalVolume', Number(e.target.value))}
+              onChange={(e) =>
+                updateFormData('totalVolume', Number(e.target.value))
+              }
               min="1"
               className={validationErrors.totalVolume ? styles.fieldError : ''}
               required
             />
             {validationErrors.totalVolume && (
-              <div className={styles.errorMessage}>{validationErrors.totalVolume}</div>
+              <div className={styles.errorMessage}>
+                {validationErrors.totalVolume}
+              </div>
             )}
           </div>
         </div>
@@ -392,7 +461,9 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <option value={5}>5+ movers</option>
           </select>
           {validationErrors.crewSize && (
-            <div className={styles.errorMessage}>{validationErrors.crewSize}</div>
+            <div className={styles.errorMessage}>
+              {validationErrors.crewSize}
+            </div>
           )}
         </div>
       </div>
@@ -405,7 +476,9 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.specialItems?.piano}
-              onChange={(e) => updateNestedField('specialItems', 'piano', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField('specialItems', 'piano', e.target.checked)
+              }
             />
             Piano
           </label>
@@ -414,7 +487,9 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.specialItems?.antiques}
-              onChange={(e) => updateNestedField('specialItems', 'antiques', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField('specialItems', 'antiques', e.target.checked)
+              }
             />
             Antiques
           </label>
@@ -423,7 +498,9 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.specialItems?.artwork}
-              onChange={(e) => updateNestedField('specialItems', 'artwork', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField('specialItems', 'artwork', e.target.checked)
+              }
             />
             Artwork
           </label>
@@ -436,7 +513,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="fragileItems"
               type="number"
               value={formData.specialItems?.fragileItems}
-              onChange={(e) => updateNestedField('specialItems', 'fragileItems', Number(e.target.value))}
+              onChange={(e) =>
+                updateNestedField(
+                  'specialItems',
+                  'fragileItems',
+                  Number(e.target.value),
+                )
+              }
               min="0"
             />
           </div>
@@ -447,7 +530,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
               id="valuableItems"
               type="number"
               value={formData.specialItems?.valuableItems}
-              onChange={(e) => updateNestedField('specialItems', 'valuableItems', Number(e.target.value))}
+              onChange={(e) =>
+                updateNestedField(
+                  'specialItems',
+                  'valuableItems',
+                  Number(e.target.value),
+                )
+              }
               min="0"
             />
           </div>
@@ -462,7 +551,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.additionalServices?.packing}
-              onChange={(e) => updateNestedField('additionalServices', 'packing', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField(
+                  'additionalServices',
+                  'packing',
+                  e.target.checked,
+                )
+              }
             />
             Packing
           </label>
@@ -471,7 +566,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.additionalServices?.unpacking}
-              onChange={(e) => updateNestedField('additionalServices', 'unpacking', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField(
+                  'additionalServices',
+                  'unpacking',
+                  e.target.checked,
+                )
+              }
             />
             Unpacking
           </label>
@@ -480,7 +581,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.additionalServices?.assembly}
-              onChange={(e) => updateNestedField('additionalServices', 'assembly', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField(
+                  'additionalServices',
+                  'assembly',
+                  e.target.checked,
+                )
+              }
             />
             Assembly/Disassembly
           </label>
@@ -489,7 +596,13 @@ export function EstimateForm({ onEstimateComplete }: EstimateFormProps) {
             <input
               type="checkbox"
               checked={formData.additionalServices?.storage}
-              onChange={(e) => updateNestedField('additionalServices', 'storage', e.target.checked)}
+              onChange={(e) =>
+                updateNestedField(
+                  'additionalServices',
+                  'storage',
+                  e.target.checked,
+                )
+              }
             />
             Storage
           </label>

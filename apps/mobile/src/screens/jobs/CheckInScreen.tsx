@@ -45,13 +45,16 @@ export const CheckInScreen = ({ route, navigation }: any) => {
             title: 'Location Permission',
             message: 'SimplePro needs access to your location for check-in',
             buttonPositive: 'OK',
-          }
+          },
         );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           getCurrentLocation();
         } else {
-          Alert.alert('Permission Denied', 'Location permission is required for check-in');
+          Alert.alert(
+            'Permission Denied',
+            'Location permission is required for check-in',
+          );
           navigation.goBack();
         }
       } catch (err) {
@@ -79,7 +82,7 @@ export const CheckInScreen = ({ route, navigation }: any) => {
             currentLocation.latitude,
             currentLocation.longitude,
             jobLocation.latitude,
-            jobLocation.longitude
+            jobLocation.longitude,
           );
           setDistance(dist);
         }
@@ -94,7 +97,7 @@ export const CheckInScreen = ({ route, navigation }: any) => {
         enableHighAccuracy: true,
         timeout: 15000,
         maximumAge: 10000,
-      }
+      },
     );
   };
 
@@ -102,7 +105,7 @@ export const CheckInScreen = ({ route, navigation }: any) => {
     lat1: number,
     lon1: number,
     lat2: number,
-    lon2: number
+    lon2: number,
   ): number => {
     const R = 6371e3; // Earth's radius in meters
     const φ1 = (lat1 * Math.PI) / 180;
@@ -133,7 +136,7 @@ export const CheckInScreen = ({ route, navigation }: any) => {
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Check In Anyway', onPress: performCheckIn },
-        ]
+        ],
       );
     } else {
       performCheckIn();
@@ -151,7 +154,7 @@ export const CheckInScreen = ({ route, navigation }: any) => {
           jobId,
           location,
           timestamp: new Date().toISOString(),
-        })
+        }),
       ).unwrap();
 
       Alert.alert(
@@ -159,7 +162,7 @@ export const CheckInScreen = ({ route, navigation }: any) => {
         isOnline
           ? 'Checked in successfully!'
           : 'Checked in - will sync when online',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK', onPress: () => navigation.goBack() }],
       );
     } catch (error: any) {
       if (error.message?.includes('queued')) {

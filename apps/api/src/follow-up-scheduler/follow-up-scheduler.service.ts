@@ -23,7 +23,8 @@ export class FollowUpSchedulerService {
     this.logger.log('Running overdue follow-ups check...');
 
     try {
-      const overdueActivities = await this.activitiesService.findOverdueActivities();
+      const overdueActivities =
+        await this.activitiesService.findOverdueActivities();
 
       if (overdueActivities.length === 0) {
         this.logger.log('No overdue activities found');
@@ -33,13 +34,16 @@ export class FollowUpSchedulerService {
       this.logger.log(`Found ${overdueActivities.length} overdue activities`);
 
       // Group by assigned user
-      const byUser = overdueActivities.reduce((acc, activity) => {
-        if (!acc[activity.assignedTo]) {
-          acc[activity.assignedTo] = [];
-        }
-        acc[activity.assignedTo].push(activity);
-        return acc;
-      }, {} as Record<string, any[]>);
+      const byUser = overdueActivities.reduce(
+        (acc, activity) => {
+          if (!acc[activity.assignedTo]) {
+            acc[activity.assignedTo] = [];
+          }
+          acc[activity.assignedTo].push(activity);
+          return acc;
+        },
+        {} as Record<string, any[]>,
+      );
 
       // Send notifications to each user
       for (const [userId, activities] of Object.entries(byUser)) {
@@ -50,7 +54,7 @@ export class FollowUpSchedulerService {
         });
 
         this.logger.log(
-          `Notified user ${userId} about ${activities.length} overdue activities`
+          `Notified user ${userId} about ${activities.length} overdue activities`,
         );
       }
     } catch (error) {
@@ -92,8 +96,11 @@ export class FollowUpSchedulerService {
         this.eventEmitter.emit('opportunity.stale_detected', {
           opportunity,
           daysSinceUpdate: Math.floor(
-            (Date.now() - new Date(opportunity.updatedAt || opportunity.createdAt).getTime()) /
-              (1000 * 60 * 60 * 24)
+            (Date.now() -
+              new Date(
+                opportunity.updatedAt || opportunity.createdAt,
+              ).getTime()) /
+              (1000 * 60 * 60 * 24),
           ),
         });
       }
@@ -132,7 +139,7 @@ export class FollowUpSchedulerService {
       });
 
       this.logger.log(
-        `Found ${oldActivities.length} completed activities older than 1 year`
+        `Found ${oldActivities.length} completed activities older than 1 year`,
       );
 
       // TODO: Implement archiving logic
@@ -165,7 +172,8 @@ export class FollowUpSchedulerService {
       });
 
       // Get overdue activities
-      const overdueActivities = await this.activitiesService.findOverdueActivities();
+      const overdueActivities =
+        await this.activitiesService.findOverdueActivities();
 
       // Emit event for daily summary
       this.eventEmitter.emit('notification.daily_summary', {
@@ -176,7 +184,7 @@ export class FollowUpSchedulerService {
       });
 
       this.logger.log(
-        `Daily summary: ${todaysActivities.length} scheduled, ${overdueActivities.length} overdue`
+        `Daily summary: ${todaysActivities.length} scheduled, ${overdueActivities.length} overdue`,
       );
     } catch (error) {
       this.logger.error('Error generating daily summary:', error);
@@ -195,7 +203,8 @@ export class FollowUpSchedulerService {
       const now = new Date();
       const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
-      const pendingActivities = await this.activitiesService.findPendingFollowUps();
+      const pendingActivities =
+        await this.activitiesService.findPendingFollowUps();
 
       const upcomingActivities = pendingActivities.filter((activity) => {
         if (!activity.dueDate) return false;
@@ -205,17 +214,20 @@ export class FollowUpSchedulerService {
 
       if (upcomingActivities.length > 0) {
         this.logger.log(
-          `${upcomingActivities.length} activities due in the next hour`
+          `${upcomingActivities.length} activities due in the next hour`,
         );
 
         // Group by user and send reminders
-        const byUser = upcomingActivities.reduce((acc, activity) => {
-          if (!acc[activity.assignedTo]) {
-            acc[activity.assignedTo] = [];
-          }
-          acc[activity.assignedTo].push(activity);
-          return acc;
-        }, {} as Record<string, any[]>);
+        const byUser = upcomingActivities.reduce(
+          (acc, activity) => {
+            if (!acc[activity.assignedTo]) {
+              acc[activity.assignedTo] = [];
+            }
+            acc[activity.assignedTo].push(activity);
+            return acc;
+          },
+          {} as Record<string, any[]>,
+        );
 
         for (const [userId, activities] of Object.entries(byUser)) {
           this.eventEmitter.emit('notification.upcoming_activities', {

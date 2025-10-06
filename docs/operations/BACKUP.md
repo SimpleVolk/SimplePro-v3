@@ -18,12 +18,12 @@ SimplePro-v3 implements a comprehensive backup strategy to protect against data 
 
 SimplePro-v3 backups include:
 
-| Component | Data Type | Criticality | Backup Frequency |
-|-----------|-----------|-------------|------------------|
-| **MongoDB** | Business data (customers, jobs, estimates) | CRITICAL | Hourly |
-| **MinIO S3** | Documents, photos, signatures | HIGH | Daily |
-| **Configuration** | Docker configs, environment files | MEDIUM | On change |
-| **Application Logs** | System and audit logs | LOW | Weekly |
+| Component            | Data Type                                  | Criticality | Backup Frequency |
+| -------------------- | ------------------------------------------ | ----------- | ---------------- |
+| **MongoDB**          | Business data (customers, jobs, estimates) | CRITICAL    | Hourly           |
+| **MinIO S3**         | Documents, photos, signatures              | HIGH        | Daily            |
+| **Configuration**    | Docker configs, environment files          | MEDIUM      | On change        |
+| **Application Logs** | System and audit logs                      | LOW         | Weekly           |
 
 ## Backup Strategy
 
@@ -59,6 +59,7 @@ Backup all components with a single command:
 ```
 
 This creates backups of:
+
 - MongoDB database
 - MinIO S3 buckets
 - Configuration files
@@ -226,6 +227,7 @@ mongosh mongodb://localhost:27018/simplepro --eval "db.users.countDocuments()"
 ```
 
 **Recommended Testing Schedule:**
+
 - **Weekly**: Verify backup integrity (checksums)
 - **Monthly**: Test MongoDB restore to staging
 - **Quarterly**: Complete disaster recovery drill
@@ -235,6 +237,7 @@ mongosh mongodb://localhost:27018/simplepro --eval "db.users.countDocuments()"
 ### Local Storage Requirements
 
 **Minimum Storage:**
+
 - MongoDB: 5GB (typical database size: 1-2GB)
 - MinIO: 50GB (document storage varies)
 - Configuration: 100MB
@@ -302,13 +305,13 @@ gsutil -m rsync -r -d ./backups gs://simplepro-backups-prod/
 
 ### Backup Retention Schedule
 
-| Backup Type | Frequency | Retention Period | Storage Tier |
-|-------------|-----------|------------------|--------------|
-| Hourly | Every hour | 7 days | Local disk |
-| Daily | 2 AM daily | 30 days | Local + Cloud |
-| Weekly | Sunday 3 AM | 90 days | Cloud (Standard) |
-| Monthly | 1st of month | 1 year | Cloud (Archive) |
-| Yearly | Jan 1st | 7 years | Cold storage |
+| Backup Type | Frequency    | Retention Period | Storage Tier     |
+| ----------- | ------------ | ---------------- | ---------------- |
+| Hourly      | Every hour   | 7 days           | Local disk       |
+| Daily       | 2 AM daily   | 30 days          | Local + Cloud    |
+| Weekly      | Sunday 3 AM  | 90 days          | Cloud (Standard) |
+| Monthly     | 1st of month | 1 year           | Cloud (Archive)  |
+| Yearly      | Jan 1st      | 7 years          | Cold storage     |
 
 ### Automatic Cleanup
 
@@ -425,6 +428,7 @@ mc ls local/
 ## Support
 
 For backup-related issues:
+
 - Check logs: `/var/log/simplepro/backup.log`
 - Review script output for error messages
 - Verify service status: `docker ps`

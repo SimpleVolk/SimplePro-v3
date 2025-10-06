@@ -7,7 +7,12 @@ import styles from './PartnerManagement.module.css';
 import { PartnerForm } from './PartnerForm';
 import { ReferralTracking } from './ReferralTracking';
 import { CommissionManagement } from './CommissionManagement';
-import type { Partner, PartnerDashboardStats, PartnerType, PartnerStatus } from './types';
+import type {
+  Partner,
+  PartnerDashboardStats,
+  PartnerType,
+  PartnerStatus,
+} from './types';
 
 type TabType = 'partners' | 'referrals' | 'commissions';
 
@@ -20,7 +25,9 @@ export function PartnerManagement() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PartnerStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<PartnerStatus | 'all'>(
+    'all',
+  );
   const [typeFilter, setTypeFilter] = useState<PartnerType | 'all'>('all');
   const [stats, setStats] = useState<PartnerDashboardStats | null>(null);
 
@@ -37,7 +44,7 @@ export function PartnerManagement() {
 
       const response = await fetch(getApiUrl('/partners'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -61,18 +68,31 @@ export function PartnerManagement() {
 
   // Calculate dashboard statistics
   const calculateStats = (partnersData: Partner[]) => {
-    const activePartners = partnersData.filter(p => p.status === 'active');
-    const totalReferrals = partnersData.reduce((sum, p) => sum + (p.totalReferrals || 0), 0);
-    const convertedReferrals = partnersData.reduce((sum, p) => sum + (p.convertedReferrals || 0), 0);
-    const pendingCommissions = partnersData.reduce((sum, p) => sum + (p.pendingCommission || 0), 0);
-    const totalRevenue = partnersData.reduce((sum, p) => sum + (p.totalCommission || 0), 0);
+    const activePartners = partnersData.filter((p) => p.status === 'active');
+    const totalReferrals = partnersData.reduce(
+      (sum, p) => sum + (p.totalReferrals || 0),
+      0,
+    );
+    const convertedReferrals = partnersData.reduce(
+      (sum, p) => sum + (p.convertedReferrals || 0),
+      0,
+    );
+    const pendingCommissions = partnersData.reduce(
+      (sum, p) => sum + (p.pendingCommission || 0),
+      0,
+    );
+    const totalRevenue = partnersData.reduce(
+      (sum, p) => sum + (p.totalCommission || 0),
+      0,
+    );
 
     setStats({
       totalPartners: partnersData.length,
       activePartners: activePartners.length,
       totalReferrals,
       activeReferrals: totalReferrals - convertedReferrals,
-      conversionRate: totalReferrals > 0 ? (convertedReferrals / totalReferrals) * 100 : 0,
+      conversionRate:
+        totalReferrals > 0 ? (convertedReferrals / totalReferrals) * 100 : 0,
       pendingCommissions,
       totalRevenue,
       monthOverMonthGrowth: 0, // TODO: Calculate from historical data
@@ -84,20 +104,25 @@ export function PartnerManagement() {
   }, []);
 
   // Filter partners
-  const filteredPartners = partners.filter(partner => {
+  const filteredPartners = partners.filter((partner) => {
     const matchesSearch =
       partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (partner.company && partner.company.toLowerCase().includes(searchTerm.toLowerCase()));
+      (partner.company &&
+        partner.company.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesStatus = statusFilter === 'all' || partner.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'all' || partner.status === statusFilter;
     const matchesType = typeFilter === 'all' || partner.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
   });
 
   // Handle partner status toggle
-  const handleToggleStatus = async (partnerId: string, currentStatus: PartnerStatus) => {
+  const handleToggleStatus = async (
+    partnerId: string,
+    currentStatus: PartnerStatus,
+  ) => {
     try {
       const token = localStorage.getItem('accessToken');
       const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -105,7 +130,7 @@ export function PartnerManagement() {
       const response = await fetch(getApiUrl(`/partners/${partnerId}/status`), {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
@@ -137,7 +162,10 @@ export function PartnerManagement() {
   // Get commission structure display
   const getCommissionDisplay = (partner: Partner): string => {
     const { commissionStructure } = partner;
-    if (commissionStructure.type === 'percentage' && commissionStructure.value) {
+    if (
+      commissionStructure.type === 'percentage' &&
+      commissionStructure.value
+    ) {
       return `💵 ${commissionStructure.value}%`;
     }
     if (commissionStructure.type === 'flat_rate' && commissionStructure.value) {
@@ -167,7 +195,9 @@ export function PartnerManagement() {
           <div className={styles.statContent}>
             <div className={styles.statValue}>{stats.activePartners}</div>
             <div className={styles.statLabel}>Active Partners</div>
-            <div className={styles.statSubtext}>of {stats.totalPartners} total</div>
+            <div className={styles.statSubtext}>
+              of {stats.totalPartners} total
+            </div>
           </div>
         </div>
 
@@ -176,14 +206,18 @@ export function PartnerManagement() {
           <div className={styles.statContent}>
             <div className={styles.statValue}>{stats.activeReferrals}</div>
             <div className={styles.statLabel}>Active Referrals</div>
-            <div className={styles.statSubtext}>of {stats.totalReferrals} total</div>
+            <div className={styles.statSubtext}>
+              of {stats.totalReferrals} total
+            </div>
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={styles.statIcon}>💰</div>
           <div className={styles.statContent}>
-            <div className={styles.statValue}>${stats.pendingCommissions.toLocaleString()}</div>
+            <div className={styles.statValue}>
+              ${stats.pendingCommissions.toLocaleString()}
+            </div>
             <div className={styles.statLabel}>Pending Commissions</div>
             <div className={styles.statSubtext}>awaiting payment</div>
           </div>
@@ -192,9 +226,13 @@ export function PartnerManagement() {
         <div className={styles.statCard}>
           <div className={styles.statIcon}>📈</div>
           <div className={styles.statContent}>
-            <div className={styles.statValue}>{stats.conversionRate.toFixed(1)}%</div>
+            <div className={styles.statValue}>
+              {stats.conversionRate.toFixed(1)}%
+            </div>
             <div className={styles.statLabel}>Conversion Rate</div>
-            <div className={styles.statSubtext}>${stats.totalRevenue.toLocaleString()} revenue</div>
+            <div className={styles.statSubtext}>
+              ${stats.totalRevenue.toLocaleString()} revenue
+            </div>
           </div>
         </div>
       </div>
@@ -217,20 +255,26 @@ export function PartnerManagement() {
 
     return (
       <div className={styles.partnerGrid}>
-        {filteredPartners.map(partner => (
+        {filteredPartners.map((partner) => (
           <div key={partner.id} className={styles.partnerCard}>
             <div className={styles.partnerHeader}>
               <div className={styles.partnerInfo}>
-                <div className={styles.partnerType}>{getTypeIcon(partner.type)}</div>
+                <div className={styles.partnerType}>
+                  {getTypeIcon(partner.type)}
+                </div>
                 <div>
                   <h3 className={styles.partnerName}>{partner.name}</h3>
                   {partner.company && (
-                    <div className={styles.partnerCompany}>{partner.company}</div>
+                    <div className={styles.partnerCompany}>
+                      {partner.company}
+                    </div>
                   )}
                 </div>
               </div>
               <div className={styles.partnerActions}>
-                <span className={`${styles.statusBadge} ${styles[partner.status]}`}>
+                <span
+                  className={`${styles.statusBadge} ${styles[partner.status]}`}
+                >
                   {partner.status}
                 </span>
               </div>
@@ -247,18 +291,24 @@ export function PartnerManagement() {
               </div>
               <div className={styles.contactItem}>
                 <span className={styles.contactLabel}>Commission:</span>
-                <span className={styles.contactValue}>{getCommissionDisplay(partner)}</span>
+                <span className={styles.contactValue}>
+                  {getCommissionDisplay(partner)}
+                </span>
               </div>
             </div>
 
             <div className={styles.partnerStats}>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>{partner.totalReferrals || 0}</div>
+                <div className={styles.statNumber}>
+                  {partner.totalReferrals || 0}
+                </div>
                 <div className={styles.statText}>Referrals</div>
               </div>
               <div className={styles.statItem}>
                 <div className={styles.statNumber}>
-                  {partner.conversionRate ? `${partner.conversionRate.toFixed(1)}%` : 'N/A'}
+                  {partner.conversionRate
+                    ? `${partner.conversionRate.toFixed(1)}%`
+                    : 'N/A'}
                 </div>
                 <div className={styles.statText}>Conversion</div>
               </div>
@@ -339,7 +389,9 @@ export function PartnerManagement() {
             <select
               className={styles.filterSelect}
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as PartnerStatus | 'all')}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as PartnerStatus | 'all')
+              }
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -349,7 +401,9 @@ export function PartnerManagement() {
             <select
               className={styles.filterSelect}
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value as PartnerType | 'all')}
+              onChange={(e) =>
+                setTypeFilter(e.target.value as PartnerType | 'all')
+              }
             >
               <option value="all">All Types</option>
               <option value="real_estate">Real Estate</option>
@@ -364,7 +418,10 @@ export function PartnerManagement() {
       )}
 
       {activeTab === 'referrals' && (
-        <ReferralTracking partners={partners} onReferralUpdate={fetchPartners} />
+        <ReferralTracking
+          partners={partners}
+          onReferralUpdate={fetchPartners}
+        />
       )}
 
       {activeTab === 'commissions' && (

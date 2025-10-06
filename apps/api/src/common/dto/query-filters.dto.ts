@@ -1,4 +1,14 @@
-import { IsOptional, IsString, IsMongoId, Matches, MaxLength, IsEnum, IsNumber, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsMongoId,
+  Matches,
+  MaxLength,
+  IsEnum,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -12,7 +22,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
  * - Type-safe transformations
  */
 export class QueryFiltersDto {
-  @ApiPropertyOptional({ description: 'Search term (alphanumeric, spaces, and basic punctuation only)' })
+  @ApiPropertyOptional({
+    description:
+      'Search term (alphanumeric, spaces, and basic punctuation only)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -20,22 +33,27 @@ export class QueryFiltersDto {
     if (typeof value !== 'string') return value;
     // Remove MongoDB operators and special characters that could be used for injection
     return value
-      .replace(/[${}[\]]/g, '') // Remove $, {}, []
+      .replace(/[\$\{\}\[\]]/g, '') // Remove $, {}, []
       .replace(/[^\w\s.-]/g, '') // Only allow word chars, spaces, dots, hyphens
       .trim();
   })
   search?: string;
 
-  @ApiPropertyOptional({ description: 'MongoDB ObjectId (must be valid 24-char hex)' })
+  @ApiPropertyOptional({
+    description: 'MongoDB ObjectId (must be valid 24-char hex)',
+  })
   @IsOptional()
   @IsMongoId()
   id?: string;
 
-  @ApiPropertyOptional({ description: 'Status filter (alphanumeric and underscores only)' })
+  @ApiPropertyOptional({
+    description: 'Status filter (alphanumeric and underscores only)',
+  })
   @IsOptional()
   @IsString()
   @Matches(/^[a-zA-Z0-9_-]+$/, {
-    message: 'Status must contain only letters, numbers, underscores, and hyphens'
+    message:
+      'Status must contain only letters, numbers, underscores, and hyphens',
   })
   status?: string;
 
@@ -58,7 +76,7 @@ export class QueryFiltersDto {
   @IsOptional()
   @IsString()
   @Matches(/^[a-zA-Z0-9_]+$/, {
-    message: 'Sort field must contain only letters, numbers, and underscores'
+    message: 'Sort field must contain only letters, numbers, and underscores',
   })
   sortBy?: string;
 
@@ -87,8 +105,21 @@ export class CustomerQueryFiltersDto extends QueryFiltersDto {
 
   @ApiPropertyOptional({ description: 'Lead source filter' })
   @IsOptional()
-  @IsEnum(['website', 'referral', 'advertising', 'social_media', 'partner', 'other'])
-  source?: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  @IsEnum([
+    'website',
+    'referral',
+    'advertising',
+    'social_media',
+    'partner',
+    'other',
+  ])
+  source?:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
 
   @ApiPropertyOptional({ description: 'Assigned sales representative ID' })
   @IsOptional()
@@ -150,7 +181,12 @@ export class JobQueryFiltersDto extends QueryFiltersDto {
   @Transform(({ value }) => {
     return typeof value === 'string' ? value.toLowerCase() : value;
   })
-  declare status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+  declare status?:
+    | 'scheduled'
+    | 'in_progress'
+    | 'completed'
+    | 'cancelled'
+    | 'on_hold';
 
   @ApiPropertyOptional({ description: 'Job type filter' })
   @IsOptional()
@@ -215,7 +251,7 @@ export function sanitizeMongoQuery(query: any): any {
       sanitized[key] = sanitizeMongoQuery(value);
     } else if (typeof value === 'string') {
       // Sanitize string values
-      sanitized[key] = value.replace(/[${}[\]]/g, '');
+      sanitized[key] = value.replace(/[\$\{\}\[\]]/g, '');
     } else {
       sanitized[key] = value;
     }

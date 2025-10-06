@@ -22,35 +22,173 @@ interface RoomSize {
 export default function MoveSizes() {
   // Initial move sizes data based on screenshots
   const [moveSizes, setMoveSizes] = useState<MoveSize[]>([
-    { id: '1', name: 'Studio or Less', description: 'Under 400 Sq Ft', cubicFeet: 75, weight: 675 },
-    { id: '2', name: 'Studio Apartment', description: '400 - 500 Sq Ft', cubicFeet: 250, weight: 2250 },
-    { id: '3', name: '1 Bedroom Apartment', description: '500 - 800 Sq Ft', cubicFeet: 432, weight: 3888 },
-    { id: '4', name: '2 Bedroom Apartment', description: '650 - 1000 Sq Ft', cubicFeet: 654, weight: 5886 },
-    { id: '5', name: '3 Bedroom Apartment', description: '1000 - 2000 Sq Ft', cubicFeet: 1236, weight: 4074 },
-    { id: '6', name: '1 Bedroom House', description: '800 - 1000 Sq Ft', cubicFeet: 576, weight: 4512 },
-    { id: '7', name: '2 Bedroom House (Small)', description: '1000 - 1200 Sq Ft', cubicFeet: 1152, weight: 9108 },
-    { id: '8', name: '2 Bedroom House', description: '1400 - 1600 Sq Ft', cubicFeet: 1458, weight: 7668 },
-    { id: '9', name: '2 Bedroom House (Large)', description: '1600 - 1800 Sq Ft', cubicFeet: 1632, weight: 8064 },
-    { id: '10', name: '3+ Br Storage Unit', description: '-', cubicFeet: 630, weight: 2860 },
-    { id: '11', name: '3 Bedroom House', description: '2000 - 2200 Sq Ft', cubicFeet: 1840, weight: 10880 },
-    { id: '12', name: '3 Bedroom House (Large)', description: '2200 - 2400 Sq Ft', cubicFeet: 1944, weight: 10488 },
-    { id: '13', name: '4 Bedroom House', description: '2400 - 2800 Sq Ft', cubicFeet: 1872, weight: 11264 },
-    { id: '14', name: '4 Bedroom House (Large)', description: '2800 - 3200 Sq Ft', cubicFeet: 2626, weight: 11832 },
-    { id: '15', name: '5 Bedroom House', description: '3200 - 3800 Sq Ft', cubicFeet: 2568, weight: 12476 },
-    { id: '16', name: '5 Bedroom House (Large)', description: '3800 - 4000 Sq Ft', cubicFeet: 3896, weight: 24732 },
-    { id: '17', name: '5+ Br Storage Unit', description: '-', cubicFeet: 620, weight: 4260 },
-    { id: '18', name: '6+ Br Storage Unit', description: '-', cubicFeet: 880, weight: 5400 },
-    { id: '19', name: '6+ Br Storage Unit', description: '-', cubicFeet: 1000, weight: 6600 },
+    {
+      id: '1',
+      name: 'Studio or Less',
+      description: 'Under 400 Sq Ft',
+      cubicFeet: 75,
+      weight: 675,
+    },
+    {
+      id: '2',
+      name: 'Studio Apartment',
+      description: '400 - 500 Sq Ft',
+      cubicFeet: 250,
+      weight: 2250,
+    },
+    {
+      id: '3',
+      name: '1 Bedroom Apartment',
+      description: '500 - 800 Sq Ft',
+      cubicFeet: 432,
+      weight: 3888,
+    },
+    {
+      id: '4',
+      name: '2 Bedroom Apartment',
+      description: '650 - 1000 Sq Ft',
+      cubicFeet: 654,
+      weight: 5886,
+    },
+    {
+      id: '5',
+      name: '3 Bedroom Apartment',
+      description: '1000 - 2000 Sq Ft',
+      cubicFeet: 1236,
+      weight: 4074,
+    },
+    {
+      id: '6',
+      name: '1 Bedroom House',
+      description: '800 - 1000 Sq Ft',
+      cubicFeet: 576,
+      weight: 4512,
+    },
+    {
+      id: '7',
+      name: '2 Bedroom House (Small)',
+      description: '1000 - 1200 Sq Ft',
+      cubicFeet: 1152,
+      weight: 9108,
+    },
+    {
+      id: '8',
+      name: '2 Bedroom House',
+      description: '1400 - 1600 Sq Ft',
+      cubicFeet: 1458,
+      weight: 7668,
+    },
+    {
+      id: '9',
+      name: '2 Bedroom House (Large)',
+      description: '1600 - 1800 Sq Ft',
+      cubicFeet: 1632,
+      weight: 8064,
+    },
+    {
+      id: '10',
+      name: '3+ Br Storage Unit',
+      description: '-',
+      cubicFeet: 630,
+      weight: 2860,
+    },
+    {
+      id: '11',
+      name: '3 Bedroom House',
+      description: '2000 - 2200 Sq Ft',
+      cubicFeet: 1840,
+      weight: 10880,
+    },
+    {
+      id: '12',
+      name: '3 Bedroom House (Large)',
+      description: '2200 - 2400 Sq Ft',
+      cubicFeet: 1944,
+      weight: 10488,
+    },
+    {
+      id: '13',
+      name: '4 Bedroom House',
+      description: '2400 - 2800 Sq Ft',
+      cubicFeet: 1872,
+      weight: 11264,
+    },
+    {
+      id: '14',
+      name: '4 Bedroom House (Large)',
+      description: '2800 - 3200 Sq Ft',
+      cubicFeet: 2626,
+      weight: 11832,
+    },
+    {
+      id: '15',
+      name: '5 Bedroom House',
+      description: '3200 - 3800 Sq Ft',
+      cubicFeet: 2568,
+      weight: 12476,
+    },
+    {
+      id: '16',
+      name: '5 Bedroom House (Large)',
+      description: '3800 - 4000 Sq Ft',
+      cubicFeet: 3896,
+      weight: 24732,
+    },
+    {
+      id: '17',
+      name: '5+ Br Storage Unit',
+      description: '-',
+      cubicFeet: 620,
+      weight: 4260,
+    },
+    {
+      id: '18',
+      name: '6+ Br Storage Unit',
+      description: '-',
+      cubicFeet: 880,
+      weight: 5400,
+    },
+    {
+      id: '19',
+      name: '6+ Br Storage Unit',
+      description: '-',
+      cubicFeet: 1000,
+      weight: 6600,
+    },
   ]);
 
   // Initial room sizes data based on screenshots
   const [roomSizes, setRoomSizes] = useState<RoomSize[]>([
-    { id: '1', name: 'Additional Room', description: '-', cubicFeet: 350, weight: 550 },
-    { id: '2', name: 'Basement', description: '-', cubicFeet: 350, weight: 550 },
-    { id: '3', name: 'Dining Room', description: '-', cubicFeet: 250, weight: 450 },
+    {
+      id: '1',
+      name: 'Additional Room',
+      description: '-',
+      cubicFeet: 350,
+      weight: 550,
+    },
+    {
+      id: '2',
+      name: 'Basement',
+      description: '-',
+      cubicFeet: 350,
+      weight: 550,
+    },
+    {
+      id: '3',
+      name: 'Dining Room',
+      description: '-',
+      cubicFeet: 250,
+      weight: 450,
+    },
     { id: '4', name: 'Kitchen', description: '-', cubicFeet: 500, weight: 350 },
     { id: '5', name: 'Garage', description: '-', cubicFeet: 350, weight: 550 },
-    { id: '6', name: 'Living Room', description: '-', cubicFeet: 400, weight: 500 },
+    {
+      id: '6',
+      name: 'Living Room',
+      description: '-',
+      cubicFeet: 400,
+      weight: 500,
+    },
     { id: '7', name: 'Office', description: '-', cubicFeet: 75, weight: 125 },
     { id: '8', name: 'Patio', description: '-', cubicFeet: 300, weight: 350 },
   ]);
@@ -105,19 +243,27 @@ export default function MoveSizes() {
     }
   };
 
-  const handleUpdateMoveSize = (id: string, field: keyof MoveSize, value: string | number) => {
+  const handleUpdateMoveSize = (
+    id: string,
+    field: keyof MoveSize,
+    value: string | number,
+  ) => {
     setMoveSizes(
       moveSizes.map((size) =>
-        size.id === id ? { ...size, [field]: value } : size
-      )
+        size.id === id ? { ...size, [field]: value } : size,
+      ),
     );
   };
 
-  const handleUpdateRoomSize = (id: string, field: keyof RoomSize, value: string | number) => {
+  const handleUpdateRoomSize = (
+    id: string,
+    field: keyof RoomSize,
+    value: string | number,
+  ) => {
     setRoomSizes(
       roomSizes.map((size) =>
-        size.id === id ? { ...size, [field]: value } : size
-      )
+        size.id === id ? { ...size, [field]: value } : size,
+      ),
     );
   };
 
@@ -184,7 +330,11 @@ export default function MoveSizes() {
                         type="text"
                         value={size.description}
                         onChange={(e) =>
-                          handleUpdateMoveSize(size.id, 'description', e.target.value)
+                          handleUpdateMoveSize(
+                            size.id,
+                            'description',
+                            e.target.value,
+                          )
                         }
                         className={styles.input}
                       />
@@ -201,7 +351,7 @@ export default function MoveSizes() {
                           handleUpdateMoveSize(
                             size.id,
                             'cubicFeet',
-                            parseFloat(e.target.value) || 0
+                            parseFloat(e.target.value) || 0,
                           )
                         }
                         className={styles.input}
@@ -219,7 +369,7 @@ export default function MoveSizes() {
                           handleUpdateMoveSize(
                             size.id,
                             'weight',
-                            parseFloat(e.target.value) || 0
+                            parseFloat(e.target.value) || 0,
                           )
                         }
                         className={styles.input}
@@ -311,7 +461,11 @@ export default function MoveSizes() {
                         type="text"
                         value={size.description}
                         onChange={(e) =>
-                          handleUpdateRoomSize(size.id, 'description', e.target.value)
+                          handleUpdateRoomSize(
+                            size.id,
+                            'description',
+                            e.target.value,
+                          )
                         }
                         className={styles.input}
                       />
@@ -328,7 +482,7 @@ export default function MoveSizes() {
                           handleUpdateRoomSize(
                             size.id,
                             'cubicFeet',
-                            parseFloat(e.target.value) || 0
+                            parseFloat(e.target.value) || 0,
                           )
                         }
                         className={styles.input}
@@ -346,7 +500,7 @@ export default function MoveSizes() {
                           handleUpdateRoomSize(
                             size.id,
                             'weight',
-                            parseFloat(e.target.value) || 0
+                            parseFloat(e.target.value) || 0,
                           )
                         }
                         className={styles.input}
@@ -421,7 +575,10 @@ export default function MoveSizes() {
                   type="text"
                   value={newMoveSize.description}
                   onChange={(e) =>
-                    setNewMoveSize({ ...newMoveSize, description: e.target.value })
+                    setNewMoveSize({
+                      ...newMoveSize,
+                      description: e.target.value,
+                    })
                   }
                   className={styles.input}
                   placeholder="e.g., 500 - 800 Sq Ft"
@@ -465,7 +622,10 @@ export default function MoveSizes() {
               >
                 Cancel
               </button>
-              <button className={styles.confirmButton} onClick={handleAddMoveSize}>
+              <button
+                className={styles.confirmButton}
+                onClick={handleAddMoveSize}
+              >
                 Add Move Size
               </button>
             </div>
@@ -505,7 +665,10 @@ export default function MoveSizes() {
                   type="text"
                   value={newRoomSize.description}
                   onChange={(e) =>
-                    setNewRoomSize({ ...newRoomSize, description: e.target.value })
+                    setNewRoomSize({
+                      ...newRoomSize,
+                      description: e.target.value,
+                    })
                   }
                   className={styles.input}
                   placeholder="Optional"
@@ -549,7 +712,10 @@ export default function MoveSizes() {
               >
                 Cancel
               </button>
-              <button className={styles.confirmButton} onClick={handleAddRoomSize}>
+              <button
+                className={styles.confirmButton}
+                onClick={handleAddRoomSize}
+              >
                 Add Room Size
               </button>
             </div>

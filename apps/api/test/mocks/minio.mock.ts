@@ -43,7 +43,7 @@ export class MinIOServiceMock {
     bucketName: string,
     objectName: string,
     data: Buffer | Readable | string,
-    metadata?: Record<string, string>
+    metadata?: Record<string, string>,
   ): Promise<{ etag: string }> {
     if (!this.buckets.has(bucketName)) {
       throw new Error(`Bucket ${bucketName} does not exist`);
@@ -105,7 +105,7 @@ export class MinIOServiceMock {
 
   async statObject(
     bucketName: string,
-    objectName: string
+    objectName: string,
   ): Promise<{
     size: number;
     etag: string;
@@ -142,7 +142,7 @@ export class MinIOServiceMock {
 
   async listObjects(
     bucketName: string,
-    prefix?: string
+    prefix?: string,
   ): Promise<
     Array<{
       name: string;
@@ -180,7 +180,7 @@ export class MinIOServiceMock {
   async presignedGetObject(
     bucketName: string,
     objectName: string,
-    expiry?: number
+    expiry?: number,
   ): Promise<string> {
     if (!this.buckets.has(bucketName)) {
       throw new Error(`Bucket ${bucketName} does not exist`);
@@ -203,7 +203,7 @@ export class MinIOServiceMock {
   async presignedPutObject(
     bucketName: string,
     objectName: string,
-    expiry?: number
+    expiry?: number,
   ): Promise<string> {
     if (!this.buckets.has(bucketName)) {
       throw new Error(`Bucket ${bucketName} does not exist`);
@@ -216,7 +216,10 @@ export class MinIOServiceMock {
   }
 
   // Test helpers
-  getStoredFile(bucketName: string, objectName: string): StoredFile | undefined {
+  getStoredFile(
+    bucketName: string,
+    objectName: string,
+  ): StoredFile | undefined {
     const bucketStorage = this.storage.get(bucketName);
     return bucketStorage?.get(objectName);
   }

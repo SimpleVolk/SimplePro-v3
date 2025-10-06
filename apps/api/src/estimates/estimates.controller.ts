@@ -13,7 +13,7 @@ export class EstimatesController {
   @Post('calculate')
   @RequirePermissions(
     { resource: 'estimates', action: 'create' },
-    { resource: 'estimates', action: 'read' }
+    { resource: 'estimates', action: 'read' },
   )
   calculateEstimate(@Body() createEstimateDto: CreateEstimateDto) {
     return this.estimatesService.calculateEstimate(createEstimateDto);

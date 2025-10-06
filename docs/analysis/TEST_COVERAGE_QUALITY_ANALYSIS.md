@@ -13,6 +13,7 @@
 **Status:** MODERATE RISK - Platform is production-ready but test coverage is insufficient for long-term maintainability and confidence in changes.
 
 **Key Findings:**
+
 - ✅ **Pricing Engine:** Excellent coverage (38/38 tests passing, 100% critical path coverage)
 - ⚠️ **API Backend:** Moderate coverage (93/159 tests, 58% pass rate, significant gaps)
 - ❌ **Web Frontend:** Minimal coverage (<5% estimated, only 6 test files for 115+ components)
@@ -21,6 +22,7 @@
 - ❌ **Integration Tests:** Limited (7 integration test files, missing critical scenarios)
 
 **Critical Gaps:**
+
 1. **36 service files without tests** (47 services total, only 11 have test files)
 2. **26 controllers without tests** (26 controllers total, 0 controller-specific test files)
 3. **7 GraphQL resolvers without tests** (0% coverage)
@@ -34,17 +36,19 @@
 ### 1.1 API Backend Coverage (apps/api)
 
 #### Current Test Statistics
-| Metric | Coverage | Status |
-|--------|----------|--------|
-| **Test Suites** | 15 test files | ⚠️ Moderate |
-| **Total Tests** | 159 tests | ⚠️ Moderate |
-| **Passing Tests** | 93 tests (58%) | ⚠️ Moderate |
-| **Failing Tests** | 66 tests (42%) | ❌ Critical |
-| **Service Coverage** | 11/47 services (23%) | ❌ Critical |
-| **Controller Coverage** | 0/26 controllers (0%) | ❌ Critical |
-| **Resolver Coverage** | 3/7 resolvers (43% partial) | ⚠️ Moderate |
+
+| Metric                  | Coverage                    | Status      |
+| ----------------------- | --------------------------- | ----------- |
+| **Test Suites**         | 15 test files               | ⚠️ Moderate |
+| **Total Tests**         | 159 tests                   | ⚠️ Moderate |
+| **Passing Tests**       | 93 tests (58%)              | ⚠️ Moderate |
+| **Failing Tests**       | 66 tests (42%)              | ❌ Critical |
+| **Service Coverage**    | 11/47 services (23%)        | ❌ Critical |
+| **Controller Coverage** | 0/26 controllers (0%)       | ❌ Critical |
+| **Resolver Coverage**   | 3/7 resolvers (43% partial) | ⚠️ Moderate |
 
 #### Test Files Present (15 total)
+
 ```
 ✅ apps/api/src/auth/auth.service.spec.ts (746 lines, comprehensive)
 ✅ apps/api/src/customers/customers.service.spec.ts (821 lines, comprehensive)
@@ -65,6 +69,7 @@
 ```
 
 #### Integration Test Files (7 total)
+
 ```
 ✅ apps/api/test/auth.integration.spec.ts
 ✅ apps/api/test/customers.integration.spec.ts
@@ -345,6 +350,7 @@
 ```
 
 **GraphQL Testing Gaps:**
+
 - No query resolver tests
 - No mutation resolver tests
 - No subscription resolver tests
@@ -357,6 +363,7 @@
 ### 1.5 Web Frontend Coverage (apps/web) ❌
 
 #### Current Test Statistics
+
 ```
 Total Components: 115+ TSX/TS files
 Test Files: 6 files (5% coverage)
@@ -366,6 +373,7 @@ Coverage: <5% (estimated)
 ```
 
 #### Test Files Present
+
 ```
 ✅ apps/web/__tests__/PricingEngineIntegration.test.ts (pricing engine integration)
 ⚠️ apps/web-e2e/src/opportunity-workflow.spec.ts (comprehensive E2E, 299 lines)
@@ -375,6 +383,7 @@ Coverage: <5% (estimated)
 #### Critical Untested Components (109+ components)
 
 **Tier 1: Core Business Components (0/25 tested)**
+
 ```typescript
 1. apps/web/src/app/components/EstimateForm.tsx
    - Risk: HIGH - Primary estimate creation interface
@@ -459,6 +468,7 @@ Status: NOT STARTED
 ```
 
 **Critical Missing Tests:**
+
 - Component rendering tests
 - Navigation tests
 - Offline functionality tests
@@ -481,6 +491,7 @@ Status: PRODUCTION READY
 ```
 
 **Test Categories:**
+
 ```
 ✅ Input Validation (5 tests)
 ✅ Deterministic Calculations (3 tests)
@@ -494,6 +505,7 @@ Status: PRODUCTION READY
 ```
 
 **Coverage Gaps (Non-Critical):**
+
 ```
 Uncovered Lines: 17-85, 91, 254-260, 268-272, 283-295, etc.
 Reason: Helper functions, error handling, edge cases
@@ -509,6 +521,7 @@ Risk: LOW - Core logic fully tested
 #### High-Quality Tests ✅
 
 **1. auth.service.spec.ts (746 lines)**
+
 ```
 Quality Score: 9/10
 Strengths:
@@ -526,6 +539,7 @@ Weaknesses:
 ```
 
 **2. customers.service.spec.ts (821 lines)**
+
 ```
 Quality Score: 9/10
 Strengths:
@@ -542,6 +556,7 @@ Weaknesses:
 ```
 
 **3. pricing-engine/estimator.test.ts (38 tests)**
+
 ```
 Quality Score: 10/10
 Strengths:
@@ -557,6 +572,7 @@ Strengths:
 #### Medium-Quality Tests ⚠️
 
 **4. analytics.service.spec.ts**
+
 ```
 Quality Score: 6/10
 Strengths:
@@ -571,6 +587,7 @@ Weaknesses:
 ```
 
 **5. websocket.gateway.spec.ts**
+
 ```
 Quality Score: 5/10
 Strengths:
@@ -587,6 +604,7 @@ Weaknesses:
 #### Low-Quality/Missing Tests ❌
 
 **6. GraphQL Resolver Tests**
+
 ```
 Quality Score: 2/10
 Issues:
@@ -602,6 +620,7 @@ Issues:
 #### Defect Detection Capability: **MODERATE (5/10)**
 
 **Current Test Suite Would NOT Catch:**
+
 ```
 1. Business Logic Errors
    - Incorrect pricing rule application (untested in estimates.service)
@@ -630,6 +649,7 @@ Issues:
 ```
 
 **Current Test Suite WOULD Catch:**
+
 ```
 ✅ Authentication failures (comprehensive auth tests)
 ✅ Customer CRUD errors (comprehensive customer tests)
@@ -643,6 +663,7 @@ Issues:
 **Isolation Score: 7/10** ⚠️
 
 **Good Practices:**
+
 ```
 ✅ Proper mock setup with Jest
 ✅ beforeEach cleanup in most tests
@@ -652,6 +673,7 @@ Issues:
 ```
 
 **Issues:**
+
 ```
 ❌ Integration tests may have MongoDB state leakage
 ⚠️ Some tests rely on in-memory storage (not real MongoDB)
@@ -664,6 +686,7 @@ Issues:
 **Mock Quality Score: 7/10** ⚠️
 
 **Well-Mocked:**
+
 ```
 ✅ MongoDB models (proper constructor mocking)
 ✅ JwtService (clean interface mocking)
@@ -672,6 +695,7 @@ Issues:
 ```
 
 **Over-Mocked:**
+
 ```
 ⚠️ Some services mock ALL database operations (bypasses Mongoose validation)
 ⚠️ Integration tests should use real database more
@@ -679,6 +703,7 @@ Issues:
 ```
 
 **Under-Mocked:**
+
 ```
 ❌ Controllers not mocked at all (no controller tests)
 ❌ HTTP requests not mocked in integration tests
@@ -690,6 +715,7 @@ Issues:
 **Test Data Score: 8/10** ✅
 
 **Strengths:**
+
 ```
 ✅ Realistic customer data (auth.service.spec.ts, customers.service.spec.ts)
 ✅ Comprehensive pricing scenarios (pricing-engine test data)
@@ -698,6 +724,7 @@ Issues:
 ```
 
 **Weaknesses:**
+
 ```
 ⚠️ Limited production-like data volumes
 ⚠️ Missing stress test data
@@ -710,6 +737,7 @@ Issues:
 **Assertion Quality Score: 7/10** ⚠️
 
 **Strong Assertions:**
+
 ```
 ✅ auth.service.spec.ts - thorough property checks
 ✅ customers.service.spec.ts - comprehensive validation
@@ -717,6 +745,7 @@ Issues:
 ```
 
 **Weak Assertions:**
+
 ```
 ⚠️ Many tests only check "toBeDefined()"
 ⚠️ Missing negative assertions (what should NOT happen)
@@ -729,6 +758,7 @@ Issues:
 **Edge Case Score: 6/10** ⚠️
 
 **Well-Covered Edge Cases:**
+
 ```
 ✅ Password change required (auth)
 ✅ Token reuse detection (auth)
@@ -739,6 +769,7 @@ Issues:
 ```
 
 **Missing Edge Cases:**
+
 ```
 ❌ Concurrent user updates (race conditions)
 ❌ Database connection timeout
@@ -757,6 +788,7 @@ Issues:
 ### 3.1 Test Configuration Quality: **7/10** ⚠️
 
 **Strengths:**
+
 ```
 ✅ Jest configured for all projects
 ✅ Proper test environments (jsdom for web, node for api)
@@ -766,6 +798,7 @@ Issues:
 ```
 
 **Issues:**
+
 ```
 ⚠️ Validation warnings in Jest config (unknown options)
 ⚠️ Test timeout configuration inconsistent
@@ -774,6 +807,7 @@ Issues:
 ```
 
 **Config Warnings:**
+
 ```
 Unknown option "moduleNameMapping" (should be "moduleNameMapper")
 Unknown option "testTimeout" in some configs
@@ -783,6 +817,7 @@ Unknown option "passWithNoTests" in mobile config
 ### 3.2 CI/CD Test Integration: **4/10** ❌
 
 **Current State:**
+
 ```
 ✅ npm run test:ci script exists
 ✅ Can run all tests in parallel
@@ -794,6 +829,7 @@ Unknown option "passWithNoTests" in mobile config
 ```
 
 **Missing CI/CD Components:**
+
 ```
 ❌ .github/workflows/test.yml
 ❌ .github/workflows/coverage.yml
@@ -806,6 +842,7 @@ Unknown option "passWithNoTests" in mobile config
 ### 3.3 Test Performance
 
 **Test Execution Time:**
+
 ```
 Pricing Engine: ~7.9s (38 tests) - ✅ Excellent
 API Tests: ~15-30s (159 tests) - ✅ Good
@@ -814,6 +851,7 @@ Mobile: N/A (no tests) - ❌
 ```
 
 **Performance Issues:**
+
 ```
 ⚠️ Some integration tests are slow (database setup)
 ⚠️ E2E tests don't use test parallelization
@@ -824,6 +862,7 @@ Mobile: N/A (no tests) - ❌
 ### 3.4 Test Flakiness: **UNKNOWN** ⚠️
 
 **Flakiness Detection:**
+
 ```
 ❌ No flakiness tracking
 ❌ No test retry configuration
@@ -837,6 +876,7 @@ Mobile: N/A (no tests) - ❌
 ### 3.5 Test Reporting and Visibility: **3/10** ❌
 
 **Current Reporting:**
+
 ```
 ✅ Console output with pass/fail
 ✅ Coverage reports generated locally
@@ -854,6 +894,7 @@ Mobile: N/A (no tests) - ❌
 ### 4.1 HIGH RISK Untested Code (Must Fix)
 
 #### 1. Estimate Calculation Service
+
 ```typescript
 File: apps/api/src/estimates/estimates.service.ts
 Risk: CRITICAL
@@ -879,6 +920,7 @@ Effort Estimate: 8-12 hours (comprehensive suite)
 ```
 
 #### 2. Opportunity Service
+
 ```typescript
 File: apps/api/src/opportunities/opportunities.service.ts
 Risk: CRITICAL
@@ -904,6 +946,7 @@ Effort Estimate: 10-14 hours
 ```
 
 #### 3. Pricing Rules Service
+
 ```typescript
 File: apps/api/src/pricing-rules/pricing-rules.service.ts
 Risk: CRITICAL
@@ -928,6 +971,7 @@ Effort Estimate: 6-8 hours
 ```
 
 #### 4. Tariff Settings Service
+
 ```typescript
 File: apps/api/src/tariff-settings/tariff-settings.service.ts
 Risk: CRITICAL
@@ -952,6 +996,7 @@ Effort Estimate: 8-10 hours
 ```
 
 #### 5. Security Service
+
 ```typescript
 File: apps/api/src/security/security.service.ts
 Risk: CRITICAL
@@ -978,6 +1023,7 @@ Effort Estimate: 6-8 hours
 ### 4.2 MODERATE RISK Untested Code
 
 #### 6. Notification Delivery Service
+
 ```typescript
 File: apps/api/src/notifications/services/notification-delivery.service.ts
 Risk: MODERATE
@@ -996,6 +1042,7 @@ Effort Estimate: 8-10 hours
 ```
 
 #### 7. Crew Auto-Assignment Service
+
 ```typescript
 File: apps/api/src/crew-schedule/services/auto-assignment.service.ts
 Risk: MODERATE
@@ -1016,6 +1063,7 @@ Effort Estimate: 4-6 hours (expand existing tests)
 ```
 
 #### 8. Document/MinIO Service
+
 ```typescript
 File: apps/api/src/documents/services/minio.service.ts
 Risk: MODERATE
@@ -1036,6 +1084,7 @@ Effort Estimate: 6-8 hours
 ### 4.3 LOW RISK Untested Code
 
 **Infrastructure Services (9 services):**
+
 - cache-metrics.service.ts
 - cache-warmer.service.ts
 - database-performance.service.ts
@@ -1055,6 +1104,7 @@ Effort Estimate: 6-8 hours
 **Missing: 36/47 services (77%)**
 
 **Required Service Tests:**
+
 ```
 Priority P0 (Immediate):
 1. estimates.service.spec.ts
@@ -1079,6 +1129,7 @@ Priority P2 (Medium):
 **Missing: 26/26 controllers (100%)**
 
 **Required Controller Tests:**
+
 ```
 Priority P0:
 1. estimates.controller.spec.ts
@@ -1097,6 +1148,7 @@ Priority P2:
 ```
 
 **Controller Test Requirements:**
+
 ```typescript
 // Example: estimates.controller.spec.ts
 describe('EstimatesController', () => {
@@ -1128,6 +1180,7 @@ describe('EstimatesController', () => {
 **Missing: 15+ critical integration scenarios**
 
 **Required Integration Tests:**
+
 ```
 Priority P0:
 1. Opportunity → Job Conversion Flow
@@ -1176,6 +1229,7 @@ Priority P2:
 **Missing: 8+ critical user workflows**
 
 **Existing E2E Test:**
+
 ```
 ✅ opportunity-workflow.spec.ts
    - Customer creation
@@ -1188,6 +1242,7 @@ Priority P2:
 ```
 
 **Required Additional E2E Tests:**
+
 ```
 Priority P0:
 1. e2e/complete-moving-job.spec.ts
@@ -1238,6 +1293,7 @@ Priority P2:
 **Missing: 109+ component tests**
 
 **Required Component Tests:**
+
 ```
 Priority P0 (Core Business):
 1. EstimateForm.test.tsx
@@ -1263,6 +1319,7 @@ Priority P3 (Supporting):
 ```
 
 **Component Test Example:**
+
 ```typescript
 // EstimateForm.test.tsx
 describe('EstimateForm', () => {
@@ -1292,6 +1349,7 @@ describe('EstimateForm', () => {
 **Missing: Complete GraphQL testing suite**
 
 **Required GraphQL Tests:**
+
 ```
 Priority P1:
 1. graphql/queries.test.ts
@@ -1322,6 +1380,7 @@ Priority P1:
 **Missing: All performance testing**
 
 **Required Performance Tests:**
+
 ```
 Priority P1:
 1. performance/api-load.test.ts
@@ -1361,6 +1420,7 @@ Priority P2:
 **Missing: Security-focused testing**
 
 **Required Security Tests:**
+
 ```
 Priority P0:
 1. security/authentication.test.ts
@@ -1406,6 +1466,7 @@ Priority P1:
 ### 6.1 Current Organization Issues
 
 **Problems:**
+
 ```
 ❌ Inconsistent test file locations
    - Some in src/*/**.spec.ts
@@ -1515,6 +1576,7 @@ SimplePro-v3/
 ### 6.3 Naming Conventions
 
 **Recommended Naming:**
+
 ```
 Unit Tests:       *.spec.ts / *.test.tsx
 Integration:      *.integration.spec.ts
@@ -1555,9 +1617,11 @@ export const renderWithProviders = (component, options?) => {
 ## 7. Prioritized Test Creation Plan
 
 ### Phase 1: CRITICAL - Business Logic (P0) 🔴
+
 **Timeline:** Week 1-2 (40-60 hours)
 
 **Services (5 files):**
+
 ```
 1. estimates.service.spec.ts                    [12h]
    - Estimate calculation
@@ -1588,6 +1652,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Controllers (4 files):**
+
 ```
 6. estimates.controller.spec.ts                 [4h]
    - Input validation
@@ -1604,6 +1669,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Integration Tests (3 files):**
+
 ```
 10. opportunity-job-conversion.integration.spec.ts  [6h]
 11. estimate-pipeline.integration.spec.ts           [5h]
@@ -1615,9 +1681,11 @@ export const renderWithProviders = (component, options?) => {
 ---
 
 ### Phase 2: HIGH - Feature Completion (P1) 🟡
+
 **Timeline:** Week 3-4 (50-70 hours)
 
 **Services (8 files):**
+
 ```
 1. conversion-tracking.service.spec.ts          [8h]
 2. quote-history.service.spec.ts                [6h]
@@ -1630,6 +1698,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Controllers (8 files):**
+
 ```
 9-16. pricing-rules, tariff-settings, analytics,
       crew-schedule, notifications, messages,
@@ -1637,6 +1706,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Frontend Components (7 files):**
+
 ```
 17. EstimateForm.test.tsx                       [8h]
 18. EstimateResult.test.tsx                     [5h]
@@ -1648,6 +1718,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **E2E Tests (3 files):**
+
 ```
 24. complete-moving-job.e2e.spec.ts             [10h]
 25. crew-daily-workflow.e2e.spec.ts             [10h]
@@ -1659,19 +1730,23 @@ export const renderWithProviders = (component, options?) => {
 ---
 
 ### Phase 3: MEDIUM - Coverage Expansion (P2) 🟢
+
 **Timeline:** Week 5-8 (80-100 hours)
 
 **Remaining Services (15 files):**
+
 ```
 1-15. All Tier 2 and Tier 3 services            [60h total, 4h each]
 ```
 
 **Remaining Controllers (14 files):**
+
 ```
 16-29. All remaining controllers                [42h total, 3h each]
 ```
 
 **GraphQL Tests (4 files):**
+
 ```
 30. queries.test.ts                             [8h]
 31. mutations.test.ts                           [8h]
@@ -1680,6 +1755,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Frontend Components (20 files):**
+
 ```
 34-53. Settings components, crew components     [60h total, 3h each]
 ```
@@ -1689,9 +1765,11 @@ export const renderWithProviders = (component, options?) => {
 ---
 
 ### Phase 4: ADVANCED - Quality Assurance (P3) 🔵
+
 **Timeline:** Week 9-12 (60-80 hours)
 
 **Performance Tests (5 files):**
+
 ```
 1. api-load.perf.spec.ts                        [12h]
 2. database-queries.perf.spec.ts                [10h]
@@ -1701,6 +1779,7 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Security Tests (6 files):**
+
 ```
 6. authentication.sec.spec.ts                   [8h]
 7. authorization.sec.spec.ts                    [8h]
@@ -1711,11 +1790,13 @@ export const renderWithProviders = (component, options?) => {
 ```
 
 **Mobile Tests (10 files):**
+
 ```
 12-21. Mobile component and E2E tests           [40h total]
 ```
 
 **Additional E2E (5 files):**
+
 ```
 22-26. Remaining workflow E2E tests             [30h total]
 ```
@@ -1738,6 +1819,7 @@ TOTAL:                        570 hours  (~14.5 weeks for 1 developer)
 ```
 
 **Recommended Approach:**
+
 ```
 Option A: Single Developer
 - Timeline: ~4 months
@@ -1764,6 +1846,7 @@ Option C: 4 Developers
 **Issue:** Unknown options in Jest config
 
 **Files to Update:**
+
 ```
 1. packages/pricing-engine/jest.config.js
 2. apps/api/jest.config.js
@@ -1772,6 +1855,7 @@ Option C: 4 Developers
 ```
 
 **Changes Needed:**
+
 ```javascript
 // Fix: Change "moduleNameMapping" to "moduleNameMapper"
 module.exports = {
@@ -1835,6 +1919,7 @@ module.exports = {
 ```
 
 **Update package.json:**
+
 ```json
 {
   "scripts": {
@@ -1978,12 +2063,14 @@ jobs:
 ### 8.4 Add Pre-commit Hooks
 
 **Install Husky:**
+
 ```bash
 npm install --save-dev husky lint-staged
 npx husky install
 ```
 
 **Create:** `.husky/pre-commit`
+
 ```bash
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
@@ -1996,16 +2083,12 @@ npm run test:changed
 ```
 
 **Update:** `package.json`
+
 ```json
 {
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.spec.ts": [
-      "jest --bail --findRelatedTests"
-    ]
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.spec.ts": ["jest --bail --findRelatedTests"]
   },
   "scripts": {
     "test:changed": "jest --bail --onlyChanged",
@@ -2027,7 +2110,9 @@ npm run test:changed
 import { faker } from '@faker-js/faker';
 import { CreateCustomerDto } from '../../src/customers/interfaces/customer.interface';
 
-export const createCustomerDto = (overrides?: Partial<CreateCustomerDto>): CreateCustomerDto => ({
+export const createCustomerDto = (
+  overrides?: Partial<CreateCustomerDto>,
+): CreateCustomerDto => ({
   firstName: faker.person.firstName(),
   lastName: faker.person.lastName(),
   email: faker.internet.email(),
@@ -2056,6 +2141,7 @@ export const createEstimateInput = (overrides?) => {
 ```
 
 **Usage in Tests:**
+
 ```typescript
 import { createCustomerDto } from '../../../test-utils/factories/customer.factory';
 
@@ -2073,12 +2159,14 @@ it('should create customer', async () => {
 ### 8.6 Setup Test Coverage Dashboard
 
 **Option A: Codecov (Recommended)**
+
 ```bash
 # .github/workflows/test.yml already includes Codecov upload
 # Just add codecov.yml configuration
 ```
 
 **Create:** `codecov.yml`
+
 ```yaml
 coverage:
   status:
@@ -2091,12 +2179,13 @@ coverage:
         target: 80%
 
 comment:
-  layout: "reach,diff,flags,tree"
+  layout: 'reach,diff,flags,tree'
   behavior: default
   require_changes: false
 ```
 
 **Option B: Local Coverage Reports**
+
 ```json
 // package.json
 {
@@ -2114,11 +2203,13 @@ comment:
 ### 8.7 Implement Mutation Testing
 
 **Install Stryker:**
+
 ```bash
 npm install --save-dev @stryker-mutator/core @stryker-mutator/jest-runner
 ```
 
 **Create:** `stryker.conf.json`
+
 ```json
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
@@ -2128,11 +2219,7 @@ npm install --save-dev @stryker-mutator/core @stryker-mutator/jest-runner
   "jest": {
     "configFile": "jest.config.js"
   },
-  "mutate": [
-    "src/**/*.ts",
-    "!src/**/*.spec.ts",
-    "!src/**/*.test.ts"
-  ],
+  "mutate": ["src/**/*.ts", "!src/**/*.spec.ts", "!src/**/*.test.ts"],
   "thresholds": {
     "high": 80,
     "low": 60,
@@ -2142,6 +2229,7 @@ npm install --save-dev @stryker-mutator/core @stryker-mutator/jest-runner
 ```
 
 **Add Script:**
+
 ```json
 {
   "scripts": {
@@ -2233,7 +2321,9 @@ describe('EstimatesService', () => {
         },
       };
 
-      mockTariffSettingsService.getCurrentSettings.mockResolvedValue(mockSettings);
+      mockTariffSettingsService.getCurrentSettings.mockResolvedValue(
+        mockSettings,
+      );
       mockEstimator.calculateEstimate.mockReturnValue(mockResult);
 
       const result = await service.calculateEstimate(validInput, 'user-123');
@@ -2249,17 +2339,23 @@ describe('EstimatesService', () => {
         throw new Error('Negative weight not allowed');
       });
 
-      await expect(service.calculateEstimate(invalidInput, 'user-123')).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(
+        service.calculateEstimate(invalidInput, 'user-123'),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should store estimate in database', async () => {
-      const mockSettings = { /* ... */ };
-      const mockResult = { /* ... */ };
+      const mockSettings = {
+        /* ... */
+      };
+      const mockResult = {
+        /* ... */
+      };
       const mockSavedEstimate = { _id: 'db-123', ...mockResult };
 
-      mockTariffSettingsService.getCurrentSettings.mockResolvedValue(mockSettings);
+      mockTariffSettingsService.getCurrentSettings.mockResolvedValue(
+        mockSettings,
+      );
       mockEstimator.calculateEstimate.mockReturnValue(mockResult);
       mockEstimateModel.mockImplementation(() => ({
         save: jest.fn().mockResolvedValue(mockSavedEstimate),
@@ -2282,7 +2378,7 @@ describe('EstimatesService', () => {
       });
 
       await expect(service.verifyEstimate('est-123')).rejects.toThrow(
-        'Estimate hash mismatch - data may have been tampered'
+        'Estimate hash mismatch - data may have been tampered',
       );
     });
   });
@@ -2363,20 +2459,25 @@ describe('EstimatesController', () => {
       };
       service.calculateEstimate.mockResolvedValue(mockResult);
 
-      const result = await controller.calculate(validDto, { user: { id: 'user-123' } });
+      const result = await controller.calculate(validDto, {
+        user: { id: 'user-123' },
+      });
 
       expect(result.success).toBe(true);
       expect(result.estimate.calculations.finalPrice).toBe(900);
-      expect(service.calculateEstimate).toHaveBeenCalledWith(validDto, 'user-123');
+      expect(service.calculateEstimate).toHaveBeenCalledWith(
+        validDto,
+        'user-123',
+      );
     });
 
     it('should validate required fields', async () => {
       const invalidDto = { ...validDto };
       delete invalidDto.serviceType;
 
-      await expect(controller.calculate(invalidDto, { user: { id: 'user-123' } })).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(
+        controller.calculate(invalidDto, { user: { id: 'user-123' } }),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should sanitize NoSQL injection attempts', async () => {
@@ -2402,7 +2503,9 @@ describe('EstimatesController', () => {
     it('should return proper error response for service errors', async () => {
       service.calculateEstimate.mockRejectedValue(new Error('Database error'));
 
-      const result = await controller.calculate(validDto, { user: { id: 'user-123' } });
+      const result = await controller.calculate(validDto, {
+        user: { id: 'user-123' },
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
@@ -2656,12 +2759,14 @@ describe('EstimateForm', () => {
 The SimplePro-v3 platform is **production-ready from a functionality standpoint**, but test coverage is **insufficient for long-term maintainability and confidence in code changes**.
 
 **Strengths:**
+
 - ✅ Pricing engine has excellent test coverage (38/38 tests, 100% critical path)
 - ✅ Core services (auth, customers) have comprehensive tests
 - ✅ E2E workflow test covers complete user journey
 - ✅ Good test isolation and mock usage
 
 **Critical Weaknesses:**
+
 - ❌ 77% of services lack ANY tests (36/47 untested)
 - ❌ 100% of controllers lack dedicated tests (0/26 tested)
 - ❌ <5% frontend component coverage (6/115+ components)
@@ -2882,6 +2987,7 @@ Defect Detection:
 ```
 
 **Success Criteria:**
+
 - ✅ All P0 services have 90%+ coverage
 - ✅ All P0 controllers have 80%+ coverage
 - ✅ Critical user workflows covered by E2E tests
@@ -2899,6 +3005,7 @@ Defect Detection:
 SimplePro-v3 is functionally complete and can be deployed to production. However, the lack of comprehensive testing creates **significant risk for future development and maintenance**.
 
 **Deployment Recommendation:**
+
 - ✅ Safe to deploy to production NOW
 - ⚠️ Implement monitoring and error tracking
 - ⚠️ Plan for test implementation ASAP
@@ -2906,11 +3013,13 @@ SimplePro-v3 is functionally complete and can be deployed to production. However
 - ⚠️ Use feature flags for new features
 
 **Business Impact:**
+
 - **Short-term:** Low risk (platform is stable)
 - **Medium-term:** Moderate risk (changes become risky)
 - **Long-term:** High risk (technical debt accumulates)
 
 **ROI of Testing:**
+
 - **Investment:** ~570 hours (~$50-100K depending on rates)
 - **Return:** Reduced bugs, faster development, confident deployments
 - **Break-even:** 3-6 months (reduced debugging + faster feature velocity)
@@ -2920,31 +3029,20 @@ SimplePro-v3 is functionally complete and can be deployed to production. However
 ### 10.7 Next Steps
 
 **Week 1-2:**
+
 1. Review this analysis with team
 2. Prioritize P0 test implementation
 3. Assign resources (QA engineer or developers)
 4. Setup CI/CD test pipeline
 5. Fix Jest configuration warnings
 
-**Week 3-4:**
-6. Implement P0 service tests (estimates, opportunities, pricing-rules, tariff-settings, security)
-7. Implement P0 controller tests
-8. Add coverage thresholds
+**Week 3-4:** 6. Implement P0 service tests (estimates, opportunities, pricing-rules, tariff-settings, security) 7. Implement P0 controller tests 8. Add coverage thresholds
 
-**Month 2:**
-9. Implement P1 tests
-10. Expand E2E coverage
-11. Create test data factories
+**Month 2:** 9. Implement P1 tests 10. Expand E2E coverage 11. Create test data factories
 
-**Month 3-6:**
-12. Complete Phase 3 tests
-13. Implement performance testing
-14. Achieve 70% overall coverage
+**Month 3-6:** 12. Complete Phase 3 tests 13. Implement performance testing 14. Achieve 70% overall coverage
 
-**Ongoing:**
-15. Maintain tests as new features are added
-16. Monitor test quality metrics
-17. Refactor and optimize tests
+**Ongoing:** 15. Maintain tests as new features are added 16. Monitor test quality metrics 17. Refactor and optimize tests
 
 ---
 
@@ -2955,6 +3053,7 @@ SimplePro-v3 is functionally complete and can be deployed to production. However
 **Existing Test Files (52 total):**
 
 **API Tests (15 files):**
+
 - auth.service.spec.ts ✅
 - customers.service.spec.ts ✅
 - jobs.service.spec.ts ✅
@@ -2973,6 +3072,7 @@ SimplePro-v3 is functionally complete and can be deployed to production. However
 - notifications.resolver.spec.ts ⚠️ (partial)
 
 **Integration Tests (7 files):**
+
 - auth.integration.spec.ts ✅
 - customers.integration.spec.ts ✅
 - jobs.integration.spec.ts ✅
@@ -2982,14 +3082,17 @@ SimplePro-v3 is functionally complete and can be deployed to production. However
 - api.integration.spec.ts ✅
 
 **Web Tests (3 files):**
+
 - PricingEngineIntegration.test.ts ✅
 - opportunity-workflow.spec.ts ✅ (E2E)
 - example.spec.ts ⚠️ (E2E)
 
 **Pricing Engine Tests (1 file):**
+
 - estimator.test.ts ✅ (EXCELLENT - 38 tests)
 
 **Mobile Tests (0 files):**
+
 - None ❌
 
 ---

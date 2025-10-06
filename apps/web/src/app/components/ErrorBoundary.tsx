@@ -62,12 +62,15 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className={styles.icon}>⚠️</div>
             <h1 className={styles.title}>Something went wrong</h1>
             <p className={styles.message}>
-              We apologize for the inconvenience. An unexpected error has occurred.
+              We apologize for the inconvenience. An unexpected error has
+              occurred.
             </p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className={styles.errorDetails}>
-                <summary className={styles.errorSummary}>Error Details (Development)</summary>
+                <summary className={styles.errorSummary}>
+                  Error Details (Development)
+                </summary>
                 <pre className={styles.errorText}>
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack && (
@@ -86,7 +89,11 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 className={styles.retryButton}
                 onClick={() => {
-                  this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+                  this.setState({
+                    hasError: false,
+                    error: undefined,
+                    errorInfo: undefined,
+                  });
                 }}
                 aria-label="Try again"
               >

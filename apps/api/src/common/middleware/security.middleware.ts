@@ -28,9 +28,17 @@ export class SecurityMiddleware implements NestMiddleware {
       rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
       rateLimitMaxRequests: process.env.NODE_ENV === 'production' ? 100 : 1000, // Lower limit in production
       trustedProxies: process.env.TRUSTED_PROXIES?.split(',') || [],
-      allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3008'],
-      adminEndpoints: ['/api/auth/users', '/api/auth/roles', '/api/system', '/api/pricing-rules'],
-      adminRateLimitMaxRequests: process.env.NODE_ENV === 'production' ? 20 : 100,
+      allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',') || [
+        'http://localhost:3008',
+      ],
+      adminEndpoints: [
+        '/api/auth/users',
+        '/api/auth/roles',
+        '/api/system',
+        '/api/pricing-rules',
+      ],
+      adminRateLimitMaxRequests:
+        process.env.NODE_ENV === 'production' ? 20 : 100,
     };
 
     this.initializeRateLimiters();
@@ -49,7 +57,9 @@ export class SecurityMiddleware implements NestMiddleware {
       standardHeaders: true,
       legacyHeaders: false,
       handler: (req: Request, res: Response) => {
-        this.logger.warn(`Rate limit exceeded for IP: ${this.getClientIp(req)}, Path: ${req.path}`);
+        this.logger.warn(
+          `Rate limit exceeded for IP: ${this.getClientIp(req)}, Path: ${req.path}`,
+        );
         res.status(429).json({
           error: 'Too many requests from this IP, please try again later.',
           statusCode: 429,
@@ -75,9 +85,12 @@ export class SecurityMiddleware implements NestMiddleware {
       standardHeaders: true,
       legacyHeaders: false,
       handler: (req: Request, res: Response) => {
-        this.logger.error(`SECURITY ALERT: Admin rate limit exceeded for IP: ${this.getClientIp(req)}, Path: ${req.path}, User: ${(req as any).user?.username || 'Anonymous'}`);
+        this.logger.error(
+          `SECURITY ALERT: Admin rate limit exceeded for IP: ${this.getClientIp(req)}, Path: ${req.path}, User: ${(req as any).user?.username || 'Anonymous'}`,
+        );
         res.status(429).json({
-          error: 'Too many admin requests from this IP, please try again later.',
+          error:
+            'Too many admin requests from this IP, please try again later.',
           statusCode: 429,
           timestamp: new Date().toISOString(),
           retryAfter: Math.ceil(this.config.rateLimitWindowMs / 1000),
@@ -97,7 +110,11 @@ export class SecurityMiddleware implements NestMiddleware {
     }
   }
 
-  private applyHelmetSecurity(req: Request, res: Response, next: NextFunction): void {
+  private applyHelmetSecurity(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void {
     const helmetConfig = helmet({
       // Content Security Policy
       contentSecurityPolicy: {
@@ -106,16 +123,16 @@ export class SecurityMiddleware implements NestMiddleware {
           styleSrc: [
             "'self'",
             "'unsafe-inline'", // Required for Swagger UI
-            "https://cdnjs.cloudflare.com",
+            'https://cdnjs.cloudflare.com',
           ],
           scriptSrc: [
             "'self'",
             "'unsafe-inline'", // Required for Swagger UI
-            "https://cdnjs.cloudflare.com",
+            'https://cdnjs.cloudflare.com',
           ],
-          imgSrc: ["'self'", "data:", "https:"],
+          imgSrc: ["'self'", 'data:', 'https:'],
           connectSrc: ["'self'"],
-          fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+          fontSrc: ["'self'", 'https://cdnjs.cloudflare.com'],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
           frameSrc: ["'none'"],
@@ -186,11 +203,18 @@ export class SecurityMiddleware implements NestMiddleware {
     helmetConfig(req, res, next);
   }
 
-  private applyAdditionalSecurity(req: Request, res: Response, next: NextFunction): void {
+  private applyAdditionalSecurity(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void {
     // Add custom security headers
     res.setHeader('X-API-Version', '1.0.0');
     res.setHeader('X-Request-ID', this.generateRequestId());
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, private',
+    );
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
@@ -208,10 +232,14 @@ export class SecurityMiddleware implements NestMiddleware {
     }
   }
 
-  private applyRateLimit(req: Request, res: Response, next: NextFunction): void {
+  private applyRateLimit(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void {
     // Check if this is an admin endpoint
-    const isAdminEndpoint = this.config.adminEndpoints.some(endpoint =>
-      req.path.startsWith(endpoint)
+    const isAdminEndpoint = this.config.adminEndpoints.some((endpoint) =>
+      req.path.startsWith(endpoint),
     );
 
     if (isAdminEndpoint) {
@@ -221,13 +249,19 @@ export class SecurityMiddleware implements NestMiddleware {
     }
   }
 
-  private validateRequest(req: Request, res: Response, next: NextFunction): void {
+  private validateRequest(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void {
     const clientIp = this.getClientIp(req);
     const userAgent = req.get('User-Agent') || 'Unknown';
 
     // Log security-relevant requests
     if (req.path.startsWith('/api/auth')) {
-      this.logger.log(`Auth request: ${req.method} ${req.path} from IP: ${clientIp}`);
+      this.logger.log(
+        `Auth request: ${req.method} ${req.path} from IP: ${clientIp}`,
+      );
     }
 
     // Check for suspicious patterns
@@ -236,8 +270,14 @@ export class SecurityMiddleware implements NestMiddleware {
     // Validate Content-Type for POST/PUT/PATCH requests
     if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
       const contentType = req.get('Content-Type');
-      if (!contentType || (!contentType.includes('application/json') && !contentType.includes('multipart/form-data'))) {
-        this.logger.warn(`Suspicious request with invalid Content-Type: ${contentType} from IP: ${clientIp}`);
+      if (
+        !contentType ||
+        (!contentType.includes('application/json') &&
+          !contentType.includes('multipart/form-data'))
+      ) {
+        this.logger.warn(
+          `Suspicious request with invalid Content-Type: ${contentType} from IP: ${clientIp}`,
+        );
         res.status(415).json({
           error: 'Unsupported Media Type',
           statusCode: 415,
@@ -258,7 +298,11 @@ export class SecurityMiddleware implements NestMiddleware {
     next();
   }
 
-  private detectSuspiciousActivity(req: Request, clientIp: string, userAgent: string): void {
+  private detectSuspiciousActivity(
+    req: Request,
+    clientIp: string,
+    userAgent: string,
+  ): void {
     const suspiciousPatterns = [
       // SQL injection patterns
       /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/i,
@@ -274,15 +318,30 @@ export class SecurityMiddleware implements NestMiddleware {
 
     for (const pattern of suspiciousPatterns) {
       if (pattern.test(requestData)) {
-        this.logger.error(`SECURITY ALERT: Suspicious pattern detected in request from IP: ${clientIp}, Pattern: ${pattern}, URL: ${req.url}`);
+        this.logger.error(
+          `SECURITY ALERT: Suspicious pattern detected in request from IP: ${clientIp}, Pattern: ${pattern}, URL: ${req.url}`,
+        );
         break;
       }
     }
 
     // Check for suspicious User-Agent strings
-    const suspiciousUserAgents = ['sqlmap', 'nikto', 'nmap', 'nessus', 'burp', 'zap'];
-    if (suspiciousUserAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
-      this.logger.error(`SECURITY ALERT: Suspicious User-Agent detected: ${userAgent} from IP: ${clientIp}`);
+    const suspiciousUserAgents = [
+      'sqlmap',
+      'nikto',
+      'nmap',
+      'nessus',
+      'burp',
+      'zap',
+    ];
+    if (
+      suspiciousUserAgents.some((agent) =>
+        userAgent.toLowerCase().includes(agent),
+      )
+    ) {
+      this.logger.error(
+        `SECURITY ALERT: Suspicious User-Agent detected: ${userAgent} from IP: ${clientIp}`,
+      );
     }
 
     // Check for rapid requests (potential DoS)
@@ -290,20 +349,26 @@ export class SecurityMiddleware implements NestMiddleware {
     const requestKey = `req_${clientIp}`;
     const lastRequest = (global as any).lastRequestTimes?.[requestKey] || 0;
 
-    if (!((global as any).lastRequestTimes)) {
+    if (!(global as any).lastRequestTimes) {
       (global as any).lastRequestTimes = {};
     }
 
-    if (now - lastRequest < 100) { // Less than 100ms between requests
-      this.logger.warn(`Rapid requests detected from IP: ${clientIp}, Time diff: ${now - lastRequest}ms`);
+    if (now - lastRequest < 100) {
+      // Less than 100ms between requests
+      this.logger.warn(
+        `Rapid requests detected from IP: ${clientIp}, Time diff: ${now - lastRequest}ms`,
+      );
     }
 
     (global as any).lastRequestTimes[requestKey] = now;
 
     // Clean up old entries periodically
-    if (Math.random() < 0.01) { // 1% chance to clean up
+    if (Math.random() < 0.01) {
+      // 1% chance to clean up
       const cutoff = now - 60000; // 1 minute ago
-      for (const [key, timestamp] of Object.entries((global as any).lastRequestTimes)) {
+      for (const [key, timestamp] of Object.entries(
+        (global as any).lastRequestTimes,
+      )) {
         if ((timestamp as number) < cutoff) {
           delete (global as any).lastRequestTimes[key];
         }
@@ -315,7 +380,7 @@ export class SecurityMiddleware implements NestMiddleware {
     // Check for trusted proxy headers in order of preference
     const forwarded = req.get('X-Forwarded-For');
     if (forwarded) {
-      const ips = forwarded.split(',').map(ip => ip.trim());
+      const ips = forwarded.split(',').map((ip) => ip.trim());
       return ips[0]; // First IP is the original client
     }
 
@@ -343,7 +408,7 @@ export class SecurityMiddleware implements NestMiddleware {
     const whitelist = process.env.ADMIN_IP_WHITELIST?.split(',') || [];
     if (whitelist.length === 0) return true; // No whitelist means all IPs allowed
 
-    return whitelist.some(whitelistedIp => {
+    return whitelist.some((whitelistedIp) => {
       // Support CIDR notation in the future
       return ip === whitelistedIp.trim();
     });
@@ -364,7 +429,8 @@ export class SecurityMiddleware implements NestMiddleware {
     return {
       rateLimitEnabled: this.config.enableRateLimit,
       helmetEnabled: this.config.enableHelmet,
-      activeConnections: Object.keys((global as any).lastRequestTimes || {}).length,
+      activeConnections: Object.keys((global as any).lastRequestTimes || {})
+        .length,
     };
   }
 }

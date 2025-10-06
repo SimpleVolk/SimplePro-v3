@@ -7,7 +7,14 @@ import styles from './NotificationBell.module.css';
 
 interface Notification {
   id: string;
-  type: 'job_assigned' | 'shift_reminder' | 'customer_inquiry' | 'quote_request' | 'job_completed' | 'payment_received' | 'system_alert';
+  type:
+    | 'job_assigned'
+    | 'shift_reminder'
+    | 'customer_inquiry'
+    | 'quote_request'
+    | 'job_completed'
+    | 'payment_received'
+    | 'system_alert';
   priority: 'low' | 'normal' | 'high' | 'urgent';
   title: string;
   message: string;
@@ -48,7 +55,7 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
 
       const response = await fetch(getApiUrl('notifications?limit=5&page=1'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -74,16 +81,22 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
     if (!socket || !isConnected) return;
 
     const handleNotificationCreated = (notification: Notification) => {
-      setNotifications(prev => [notification, ...prev.slice(0, 4)]);
-      setUnreadCount(prev => prev + 1);
+      setNotifications((prev) => [notification, ...prev.slice(0, 4)]);
+      setUnreadCount((prev) => prev + 1);
 
       // Play sound for urgent notifications
       if (notification.priority === 'urgent' && audioRef.current) {
-        audioRef.current.play().catch(err => console.error('Audio play error:', err));
+        audioRef.current
+          .play()
+          .catch((err) => console.error('Audio play error:', err));
       }
 
       // Show browser notification if permitted
-      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      if (
+        typeof window !== 'undefined' &&
+        'Notification' in window &&
+        Notification.permission === 'granted'
+      ) {
         new Notification(notification.title, {
           body: notification.message,
           icon: '/favicon.ico',
@@ -93,11 +106,13 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
     };
 
     const handleNotificationUpdated = (updatedNotification: Notification) => {
-      setNotifications(prev =>
-        prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === updatedNotification.id ? updatedNotification : n,
+        ),
       );
       if (updatedNotification.read) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     };
 
@@ -113,7 +128,10 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
   // Click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -129,7 +147,11 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
 
   // Request notification permission on mount
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+    if (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      Notification.permission === 'default'
+    ) {
       Notification.requestPermission();
     }
   }, []);
@@ -140,20 +162,23 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
       const token = localStorage.getItem('access_token');
       if (!token) return;
 
-      const response = await fetch(getApiUrl(`notifications/${notificationId}/read`), {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`notifications/${notificationId}/read`),
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ read: true }),
         },
-        body: JSON.stringify({ read: true }),
-      });
+      );
 
       if (response.ok) {
-        setNotifications(prev =>
-          prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
         );
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (err) {
       console.error('Error marking notification as read:', err);
@@ -213,9 +238,7 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
           </div>
 
           <div className={styles.notificationList}>
-            {loading && (
-              <div className={styles.loading}>Loading...</div>
-            )}
+            {loading && <div className={styles.loading}>Loading...</div>}
 
             {!loading && notifications.length === 0 && (
               <div className={styles.empty}>
@@ -224,24 +247,33 @@ export function NotificationBell({ onNavigate }: NotificationBellProps) {
               </div>
             )}
 
-            {!loading && notifications.map(notification => (
-              <button
-                key={notification.id}
-                className={`${styles.notificationItem} ${!notification.read ? styles.unread : ''}`}
-                onClick={() => handleNotificationClick(notification)}
-                type="button"
-              >
-                <div className={styles.notificationIcon}>
-                  {NOTIFICATION_TYPE_ICONS[notification.type]}
-                </div>
-                <div className={styles.notificationContent}>
-                  <div className={styles.notificationTitle}>{notification.title}</div>
-                  <div className={styles.notificationMessage}>{notification.message}</div>
-                  <div className={styles.notificationTime}>{formatTimestamp(notification.createdAt)}</div>
-                </div>
-                {!notification.read && <div className={styles.unreadDot}></div>}
-              </button>
-            ))}
+            {!loading &&
+              notifications.map((notification) => (
+                <button
+                  key={notification.id}
+                  className={`${styles.notificationItem} ${!notification.read ? styles.unread : ''}`}
+                  onClick={() => handleNotificationClick(notification)}
+                  type="button"
+                >
+                  <div className={styles.notificationIcon}>
+                    {NOTIFICATION_TYPE_ICONS[notification.type]}
+                  </div>
+                  <div className={styles.notificationContent}>
+                    <div className={styles.notificationTitle}>
+                      {notification.title}
+                    </div>
+                    <div className={styles.notificationMessage}>
+                      {notification.message}
+                    </div>
+                    <div className={styles.notificationTime}>
+                      {formatTimestamp(notification.createdAt)}
+                    </div>
+                  </div>
+                  {!notification.read && (
+                    <div className={styles.unreadDot}></div>
+                  )}
+                </button>
+              ))}
           </div>
 
           <div className={styles.dropdownFooter}>

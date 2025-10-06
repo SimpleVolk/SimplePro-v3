@@ -20,18 +20,22 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          padding: '20px',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          backgroundColor: '#1a1a1a',
-          color: '#ffffff'
-        }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Something went wrong!</h1>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            padding: '20px',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            backgroundColor: '#1a1a1a',
+            color: '#ffffff',
+          }}
+        >
+          <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+            Something went wrong!
+          </h1>
           <p style={{ marginBottom: '2rem', color: '#999' }}>
             An unexpected error has occurred. Please try again.
           </p>

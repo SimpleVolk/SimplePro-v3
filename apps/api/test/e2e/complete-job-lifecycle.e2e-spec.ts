@@ -126,7 +126,9 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
           serviceType: 'local',
           status: 'new',
           priority: 'high',
-          estimatedMoveDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks from now
+          estimatedMoveDate: new Date(
+            Date.now() + 14 * 24 * 60 * 60 * 1000,
+          ).toISOString(), // 2 weeks from now
           pickupLocation: {
             address: '123 Main St, San Francisco, CA 94102',
             accessDifficulty: 'medium',
@@ -148,13 +150,23 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
                 items: [
                   { name: 'Sofa', quantity: 1, weight: 150, cubicFeet: 50 },
                   { name: 'TV', quantity: 1, weight: 30, cubicFeet: 10 },
-                  { name: 'Coffee Table', quantity: 1, weight: 40, cubicFeet: 15 },
+                  {
+                    name: 'Coffee Table',
+                    quantity: 1,
+                    weight: 40,
+                    cubicFeet: 15,
+                  },
                 ],
               },
               {
                 roomType: 'bedroom',
                 items: [
-                  { name: 'Queen Bed', quantity: 1, weight: 200, cubicFeet: 80 },
+                  {
+                    name: 'Queen Bed',
+                    quantity: 1,
+                    weight: 200,
+                    cubicFeet: 80,
+                  },
                   { name: 'Dresser', quantity: 1, weight: 120, cubicFeet: 40 },
                 ],
               },
@@ -219,7 +231,7 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
             ruleName: expect.any(String),
             priceImpact: expect.any(Number),
           }),
-        ])
+        ]),
       );
       expect(response.body.estimate.metadata.deterministic).toBe(true);
       expect(response.body.estimate.metadata.hash).toBeTruthy();
@@ -247,7 +259,9 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
           serviceType: 'local',
           status: 'scheduled',
           priority: 'high',
-          scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week from now
+          scheduledDate: new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(), // 1 week from now
           pickupAddress: {
             street: '123 Main St',
             city: 'San Francisco',
@@ -296,7 +310,7 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
 
       // Verify crew lead is assigned (should have highest score)
       const crewLeadAssignment = response.body.assignedCrew.find(
-        (assignment: any) => assignment.crewMemberId === crewMemberId
+        (assignment: any) => assignment.crewMemberId === crewMemberId,
       );
       expect(crewLeadAssignment).toBeDefined();
       expect(crewLeadAssignment.score).toBeGreaterThanOrEqual(80);
@@ -341,7 +355,7 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
             jobId,
             isRead: false,
           }),
-        ])
+        ]),
       );
     });
 
@@ -436,7 +450,8 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
         .set('Authorization', `Bearer ${crewAuthToken}`)
         .send({
           jobId,
-          signatureData: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+          signatureData:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
           signedBy: 'Jane Doe',
           signatureType: 'completion',
           timestamp: new Date().toISOString(),
@@ -481,12 +496,12 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
             totalPay: expect.any(Number),
             overtime: expect.any(Boolean),
           }),
-        ])
+        ]),
       );
 
       // Regular pay for 6.5 hours (assuming $25/hour base rate)
       const crewPayroll = response.body.payroll.find(
-        (p: any) => p.crewMemberId === crewMemberId
+        (p: any) => p.crewMemberId === crewMemberId,
       );
       expect(crewPayroll.totalPay).toBe(6.5 * crewPayroll.hourlyRate);
     });
@@ -499,7 +514,8 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
           recipientId: customerId,
           type: 'job_completed',
           title: 'Your Move is Complete',
-          message: 'Thank you for choosing our service. Your move has been completed successfully.',
+          message:
+            'Thank you for choosing our service. Your move has been completed successfully.',
           jobId,
           channels: ['email'],
           includeInvoice: true,
@@ -541,13 +557,13 @@ describe('Complete Moving Job Lifecycle (E2E)', () => {
 
       // Verify signatures
       const signature = response.body.documents.find(
-        (doc: any) => doc.documentType === 'signature'
+        (doc: any) => doc.documentType === 'signature',
       );
       expect(signature).toBeDefined();
 
       // Verify photos
       const photos = response.body.documents.filter(
-        (doc: any) => doc.documentType === 'job_photo'
+        (doc: any) => doc.documentType === 'job_photo',
       );
       expect(photos.length).toBeGreaterThan(0);
     });

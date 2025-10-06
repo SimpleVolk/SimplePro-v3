@@ -23,7 +23,14 @@ export enum ActionType {
 
 export interface RuleCondition {
   field: string;
-  operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'in' | 'not_in';
+  operator:
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'greater_than'
+    | 'less_than'
+    | 'in'
+    | 'not_in';
   value: any;
 }
 

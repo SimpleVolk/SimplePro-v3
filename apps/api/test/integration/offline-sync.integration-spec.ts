@@ -171,7 +171,8 @@ describe('Offline Mobile App Sync (Integration)', () => {
         crewMemberId,
         timestamp: new Date().toISOString(),
         data: {
-          signatureData: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB...',
+          signatureData:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB...',
           signedBy: 'Customer Name',
           signatureType: 'completion',
         },
@@ -191,7 +192,8 @@ describe('Offline Mobile App Sync (Integration)', () => {
         crewMemberId,
         timestamp: new Date().toISOString(),
         data: {
-          notes: 'Customer requested extra care with antique furniture. Completed without issues.',
+          notes:
+            'Customer requested extra care with antique furniture. Completed without issues.',
           category: 'completion',
         },
         retryCount: 0,
@@ -206,7 +208,9 @@ describe('Offline Mobile App Sync (Integration)', () => {
       pendingActions.forEach((action) => {
         expect(action).toMatchObject({
           actionId: expect.any(String),
-          type: expect.stringMatching(/^(checkin|photo_upload|signature|add_notes)$/),
+          type: expect.stringMatching(
+            /^(checkin|photo_upload|signature|add_notes)$/,
+          ),
           jobId: expect.any(String),
           crewMemberId: expect.any(String),
           timestamp: expect.any(String),
@@ -236,12 +240,16 @@ describe('Offline Mobile App Sync (Integration)', () => {
       });
 
       // Remove from queue after successful sync
-      pendingActions = pendingActions.filter((a) => a.actionId !== checkinAction.actionId);
+      pendingActions = pendingActions.filter(
+        (a) => a.actionId !== checkinAction.actionId,
+      );
       expect(pendingActions.length).toBe(5);
     });
 
     it('should sync all photo uploads sequentially', async () => {
-      const photoActions = pendingActions.filter((a) => a.type === 'photo_upload');
+      const photoActions = pendingActions.filter(
+        (a) => a.type === 'photo_upload',
+      );
 
       for (const photoAction of photoActions) {
         const response = await request(app.getHttpServer())
@@ -263,14 +271,18 @@ describe('Offline Mobile App Sync (Integration)', () => {
         });
 
         // Remove from queue after successful sync
-        pendingActions = pendingActions.filter((a) => a.actionId !== photoAction.actionId);
+        pendingActions = pendingActions.filter(
+          (a) => a.actionId !== photoAction.actionId,
+        );
       }
 
       expect(pendingActions.length).toBe(2); // Only signature and notes left
     });
 
     it('should sync signature capture', async () => {
-      const signatureAction = pendingActions.find((a) => a.type === 'signature');
+      const signatureAction = pendingActions.find(
+        (a) => a.type === 'signature',
+      );
 
       const response = await request(app.getHttpServer())
         .post('/api/documents/signature')
@@ -290,7 +302,9 @@ describe('Offline Mobile App Sync (Integration)', () => {
         documentType: 'signature',
       });
 
-      pendingActions = pendingActions.filter((a) => a.actionId !== signatureAction.actionId);
+      pendingActions = pendingActions.filter(
+        (a) => a.actionId !== signatureAction.actionId,
+      );
       expect(pendingActions.length).toBe(1); // Only notes left
     });
 
@@ -310,7 +324,9 @@ describe('Offline Mobile App Sync (Integration)', () => {
       });
       expect(response.body.notes).toContain(notesAction.data.notes);
 
-      pendingActions = pendingActions.filter((a) => a.actionId !== notesAction.actionId);
+      pendingActions = pendingActions.filter(
+        (a) => a.actionId !== notesAction.actionId,
+      );
       expect(pendingActions.length).toBe(0); // Queue is now empty
     });
 
@@ -325,15 +341,22 @@ describe('Offline Mobile App Sync (Integration)', () => {
       expect(response.body.checkins.length).toBeGreaterThan(0);
 
       // Verify photos exist
-      const photos = response.body.documents?.filter((d: any) => d.documentType === 'job_photo') || [];
+      const photos =
+        response.body.documents?.filter(
+          (d: any) => d.documentType === 'job_photo',
+        ) || [];
       expect(photos.length).toBe(3);
 
       // Verify signature exists
-      const signature = response.body.documents?.find((d: any) => d.documentType === 'signature');
+      const signature = response.body.documents?.find(
+        (d: any) => d.documentType === 'signature',
+      );
       expect(signature).toBeDefined();
 
       // Verify notes exist
-      expect(response.body.notes).toContain('Customer requested extra care with antique furniture');
+      expect(response.body.notes).toContain(
+        'Customer requested extra care with antique furniture',
+      );
     });
 
     it('should handle retry logic for failed sync attempts', async () => {

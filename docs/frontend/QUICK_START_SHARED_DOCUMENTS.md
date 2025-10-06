@@ -60,6 +60,7 @@ npm run dev:web
 ## File Locations
 
 ### Components
+
 ```
 apps/web/src/app/components/documents/
 ├── SharedDocumentAccess.tsx           # Main component
@@ -70,6 +71,7 @@ apps/web/src/app/components/documents/
 ```
 
 ### Services
+
 ```
 apps/web/src/services/
 ├── documents.service.ts               # API client
@@ -77,6 +79,7 @@ apps/web/src/services/
 ```
 
 ### Routes
+
 ```
 apps/web/src/app/shared/
 └── [token]/
@@ -89,7 +92,10 @@ apps/web/src/app/shared/
 
 ```typescript
 import { accessSharedDocument } from '@/services/documents.service';
-import { RateLimitError, DocumentAccessError } from '@/app/components/documents/types';
+import {
+  RateLimitError,
+  DocumentAccessError,
+} from '@/app/components/documents/types';
 
 async function handleAccess(token: string, password: string) {
   try {
@@ -126,15 +132,17 @@ function MyPage({ token }: { token: string }) {
 ```typescript
 async function accessSharedDocument(
   token: string,
-  password: string
-): Promise<AccessSharedDocumentResponse>
+  password: string,
+): Promise<AccessSharedDocumentResponse>;
 ```
 
 **Parameters:**
+
 - `token`: Share token from URL
 - `password`: Document password
 
 **Returns:**
+
 ```typescript
 {
   documentUrl: string;      // Presigned download URL
@@ -147,6 +155,7 @@ async function accessSharedDocument(
 ```
 
 **Throws:**
+
 - `RateLimitError` - Too many attempts (429)
 - `DocumentAccessError` - Other errors (401, 403, 404, 410)
 
@@ -159,8 +168,8 @@ Same as above but without password parameter. Used for non-password-protected do
 ```typescript
 async function downloadDocument(
   documentUrl: string,
-  filename: string
-): Promise<void>
+  filename: string,
+): Promise<void>;
 ```
 
 Helper function to download document from presigned URL.
@@ -232,12 +241,14 @@ Code Splitting: Yes (route-based)
 ## Security Notes
 
 ✅ **What's Secure:**
+
 - Passwords sent via POST body (not URL)
 - Rate limiting prevents brute force
 - Generic error messages
 - CSRF-safe (no state-changing GET requests)
 
 ⚠️ **User Responsibility:**
+
 - Users may share passwords insecurely (email, SMS)
 - Share links can be forwarded
 - Recommend setting expiration dates
@@ -259,6 +270,7 @@ Code Splitting: Yes (route-based)
 ## Support
 
 Questions? Check:
+
 1. This quick start guide
 2. Migration guide (comprehensive)
 3. Component architecture (detailed diagrams)
@@ -268,6 +280,7 @@ Questions? Check:
 ## Contributing
 
 When adding features:
+
 1. Follow existing patterns (see SharedDocumentAccess.tsx)
 2. Add TypeScript types
 3. Include error handling

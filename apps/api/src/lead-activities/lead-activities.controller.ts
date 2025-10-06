@@ -28,11 +28,11 @@ export class LeadActivitiesController {
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
   async createActivity(
     @Body() createDto: CreateActivityDto,
-    @Request() req: AuthenticatedRequest
+    @Request() req: AuthenticatedRequest,
   ) {
     const activity = await this.activitiesService.createActivity(
       createDto,
-      req.user.userId
+      req.user.userId,
     );
 
     return {
@@ -43,7 +43,10 @@ export class LeadActivitiesController {
 
   @Get()
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
-  async findAll(@Query() query: ActivityQueryDto, @Request() req: AuthenticatedRequest) {
+  async findAll(
+    @Query() query: ActivityQueryDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     // If not admin, only show user's own activities
     if (!['super_admin', 'admin'].includes(req.user.role)) {
       query.assignedTo = req.user.userId;
@@ -61,7 +64,8 @@ export class LeadActivitiesController {
   @Get('opportunity/:opportunityId')
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
   async findByOpportunity(@Param('opportunityId') opportunityId: string) {
-    const activities = await this.activitiesService.findByOpportunity(opportunityId);
+    const activities =
+      await this.activitiesService.findByOpportunity(opportunityId);
 
     return {
       success: true,
@@ -89,7 +93,8 @@ export class LeadActivitiesController {
       ? undefined
       : req.user.userId;
 
-    const activities = await this.activitiesService.findPendingFollowUps(userId);
+    const activities =
+      await this.activitiesService.findPendingFollowUps(userId);
 
     return {
       success: true,
@@ -105,7 +110,8 @@ export class LeadActivitiesController {
       ? undefined
       : req.user.userId;
 
-    const activities = await this.activitiesService.findOverdueActivities(userId);
+    const activities =
+      await this.activitiesService.findOverdueActivities(userId);
 
     return {
       success: true,
@@ -116,7 +122,10 @@ export class LeadActivitiesController {
 
   @Get('statistics')
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
-  async getStatistics(@Request() req: AuthenticatedRequest, @Query('userId') userId?: string) {
+  async getStatistics(
+    @Request() req: AuthenticatedRequest,
+    @Query('userId') userId?: string,
+  ) {
     // If not admin, only show user's own stats
     const targetUserId = ['super_admin', 'admin'].includes(req.user.role)
       ? userId
@@ -133,7 +142,8 @@ export class LeadActivitiesController {
   @Get('timeline/:opportunityId')
   @Roles('super_admin', 'admin', 'dispatcher', 'sales')
   async getTimeline(@Param('opportunityId') opportunityId: string) {
-    const timeline = await this.activitiesService.getActivityTimeline(opportunityId);
+    const timeline =
+      await this.activitiesService.getActivityTimeline(opportunityId);
 
     return {
       success: true,
@@ -158,12 +168,12 @@ export class LeadActivitiesController {
   async completeActivity(
     @Param('activityId') activityId: string,
     @Body() completeDto: CompleteActivityDto,
-    @Request() req: AuthenticatedRequest
+    @Request() req: AuthenticatedRequest,
   ) {
     const activity = await this.activitiesService.completeActivity(
       activityId,
       completeDto,
-      req.user.userId
+      req.user.userId,
     );
 
     return {

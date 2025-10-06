@@ -10,7 +10,7 @@ export class PricingMethodDefault {
   @Prop({
     required: true,
     type: String,
-    enum: Object.values(PricingMethodType)
+    enum: Object.values(PricingMethodType),
   })
   method!: PricingMethodType;
 
@@ -24,4 +24,5 @@ export class PricingMethodDefault {
   configuration?: Record<string, any>;
 }
 
-export const PricingMethodDefaultSchema = SchemaFactory.createForClass(PricingMethodDefault);
+export const PricingMethodDefaultSchema =
+  SchemaFactory.createForClass(PricingMethodDefault);

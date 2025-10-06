@@ -13,7 +13,7 @@ export class EstimatesResolver {
   @Mutation('calculateEstimate')
   @RequirePermissions(
     { resource: 'estimates', action: 'create' },
-    { resource: 'estimates', action: 'read' }
+    { resource: 'estimates', action: 'read' },
   )
   async calculateEstimate(@Args('input') input: any) {
     return this.estimatesService.calculateEstimate(input);

@@ -35,7 +35,8 @@ export class BusinessHoursDay {
   closeTime?: string; // Format: "HH:mm" (e.g., "18:00")
 }
 
-export const BusinessHoursDaySchema = SchemaFactory.createForClass(BusinessHoursDay);
+export const BusinessHoursDaySchema =
+  SchemaFactory.createForClass(BusinessHoursDay);
 
 @Schema({ _id: false })
 export class BusinessHours {
@@ -137,7 +138,8 @@ export class CompanySettings {
   updatedAt?: Date;
 }
 
-export const CompanySettingsSchema = SchemaFactory.createForClass(CompanySettings);
+export const CompanySettingsSchema =
+  SchemaFactory.createForClass(CompanySettings);
 
 // Create index to ensure only one settings document exists
 CompanySettingsSchema.index({ companyName: 1 }, { unique: false });

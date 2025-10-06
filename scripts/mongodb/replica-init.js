@@ -20,27 +20,27 @@ try {
     print('Initializing replica set...');
 
     const config = {
-      _id: "simplepro-rs",
+      _id: 'simplepro-rs',
       version: 1,
       members: [
         {
           _id: 0,
-          host: "mongodb-primary:27017",
+          host: 'mongodb-primary:27017',
           priority: 2,
-          tags: { role: "primary" }
+          tags: { role: 'primary' },
         },
         {
           _id: 1,
-          host: "mongodb-secondary1:27017",
+          host: 'mongodb-secondary1:27017',
           priority: 1,
-          tags: { role: "secondary" }
+          tags: { role: 'secondary' },
         },
         {
           _id: 2,
-          host: "mongodb-secondary2:27017",
+          host: 'mongodb-secondary2:27017',
           priority: 1,
-          tags: { role: "secondary" }
-        }
+          tags: { role: 'secondary' },
+        },
       ],
       settings: {
         electionTimeoutMillis: 10000,
@@ -49,10 +49,10 @@ try {
         catchUpTimeoutMillis: 60000,
         chainingAllowed: true,
         getLastErrorDefaults: {
-          w: "majority",
-          wtimeout: 10000
-        }
-      }
+          w: 'majority',
+          wtimeout: 10000,
+        },
+      },
     };
 
     const result = rs.initiate(config);
@@ -76,12 +76,14 @@ try {
   while (attempts < 30 && !isPrimary) {
     try {
       const status = rs.status();
-      const primary = status.members.find(m => m.stateStr === 'PRIMARY');
+      const primary = status.members.find((m) => m.stateStr === 'PRIMARY');
       if (primary) {
         print('✓ Primary elected: ' + primary.name);
         isPrimary = true;
       } else {
-        print('Waiting for primary election... (attempt ' + (attempts + 1) + '/30)');
+        print(
+          'Waiting for primary election... (attempt ' + (attempts + 1) + '/30)',
+        );
         sleep(2000);
         attempts++;
       }
@@ -116,15 +118,17 @@ try {
         { role: 'userAdminAnyDatabase', db: 'admin' },
         { role: 'readWriteAnyDatabase', db: 'admin' },
         { role: 'dbAdminAnyDatabase', db: 'admin' },
-        { role: 'clusterAdmin', db: 'admin' }
-      ]
+        { role: 'clusterAdmin', db: 'admin' },
+      ],
     });
     print('✓ Admin user created successfully');
   }
 
   // Create application database and user
   print('Setting up application database...');
-  const simpleproDb = db.getSiblingDB(process.env.MONGO_INITDB_DATABASE || 'simplepro');
+  const simpleproDb = db.getSiblingDB(
+    process.env.MONGO_INITDB_DATABASE || 'simplepro',
+  );
 
   try {
     const appUser = simpleproDb.getUser('simplepro_app');
@@ -137,9 +141,15 @@ try {
       user: 'simplepro_app',
       pwd: process.env.MONGO_INITDB_ROOT_PASSWORD, // Use same password or create separate env var
       roles: [
-        { role: 'readWrite', db: process.env.MONGO_INITDB_DATABASE || 'simplepro' },
-        { role: 'dbAdmin', db: process.env.MONGO_INITDB_DATABASE || 'simplepro' }
-      ]
+        {
+          role: 'readWrite',
+          db: process.env.MONGO_INITDB_DATABASE || 'simplepro',
+        },
+        {
+          role: 'dbAdmin',
+          db: process.env.MONGO_INITDB_DATABASE || 'simplepro',
+        },
+      ],
     });
     print('✓ Application user created successfully');
   }
@@ -159,8 +169,8 @@ try {
       roles: [
         { role: 'clusterMonitor', db: 'admin' },
         { role: 'read', db: 'local' },
-        { role: 'read', db: process.env.MONGO_INITDB_DATABASE || 'simplepro' }
-      ]
+        { role: 'read', db: process.env.MONGO_INITDB_DATABASE || 'simplepro' },
+      ],
     });
     print('✓ Monitoring user created successfully');
   }
@@ -173,14 +183,27 @@ try {
   const finalStatus = rs.status();
   print('Replica Set Name: ' + finalStatus.set);
   print('Members:');
-  finalStatus.members.forEach(function(member) {
-    print('  - ' + member.name + ': ' + member.stateStr + ' (health: ' + member.health + ')');
+  finalStatus.members.forEach(function (member) {
+    print(
+      '  - ' +
+        member.name +
+        ': ' +
+        member.stateStr +
+        ' (health: ' +
+        member.health +
+        ')',
+    );
   });
   print('');
   print('Connection String (Application):');
-  print('mongodb://' + process.env.MONGO_INITDB_ROOT_USERNAME + ':***@mongodb-primary:27017,mongodb-secondary1:27017,mongodb-secondary2:27017/' + (process.env.MONGO_INITDB_DATABASE || 'simplepro') + '?replicaSet=simplepro-rs&authSource=admin&retryWrites=true&w=majority');
+  print(
+    'mongodb://' +
+      process.env.MONGO_INITDB_ROOT_USERNAME +
+      ':***@mongodb-primary:27017,mongodb-secondary1:27017,mongodb-secondary2:27017/' +
+      (process.env.MONGO_INITDB_DATABASE || 'simplepro') +
+      '?replicaSet=simplepro-rs&authSource=admin&retryWrites=true&w=majority',
+  );
   print('===============================================');
-
 } catch (error) {
   print('✗ Error during replica set initialization:');
   print(error);

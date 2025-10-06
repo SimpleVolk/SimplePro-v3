@@ -102,9 +102,7 @@ describe('HealthService', () => {
       expect(result.service).toBe('simplepro-api');
       expect(result.details?.level).toBe(HealthCheckLevel.BASIC);
       expect(healthCheckService.check).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.any(Function),
-        ])
+        expect.arrayContaining([expect.any(Function)]),
       );
     });
 
@@ -143,7 +141,7 @@ describe('HealthService', () => {
           expect.any(Function), // redis
           expect.any(Function), // memory
           expect.any(Function), // disk
-        ])
+        ]),
       );
     });
   });
@@ -151,11 +149,21 @@ describe('HealthService', () => {
   describe('fullHealthCheck', () => {
     it('should perform full health check with external services', async () => {
       const mockExternalServices = [
-        { key: 'external-api', url: 'https://api.example.com/health', timeout: 5000 },
-        { key: 'stripe-api', url: 'https://status.stripe.com/api/v2/status.json', timeout: 5000 },
+        {
+          key: 'external-api',
+          url: 'https://api.example.com/health',
+          timeout: 5000,
+        },
+        {
+          key: 'stripe-api',
+          url: 'https://status.stripe.com/api/v2/status.json',
+          timeout: 5000,
+        },
       ];
 
-      externalServiceHealthIndicator.getConfiguredServices.mockReturnValue(mockExternalServices);
+      externalServiceHealthIndicator.getConfiguredServices.mockReturnValue(
+        mockExternalServices,
+      );
 
       const mockResult = {
         status: 'ok' as const,
@@ -175,7 +183,9 @@ describe('HealthService', () => {
 
       expect(result.status).toBe('ok');
       expect(result.details?.level).toBe(HealthCheckLevel.FULL);
-      expect(externalServiceHealthIndicator.getConfiguredServices).toHaveBeenCalled();
+      expect(
+        externalServiceHealthIndicator.getConfiguredServices,
+      ).toHaveBeenCalled();
     });
 
     it('should perform full health check without external services', async () => {

@@ -1,4 +1,5 @@
 # E2E Testing Summary - Quick Reference
+
 Date: October 1, 2025
 
 ## Status at a Glance
@@ -18,6 +19,7 @@ The super_admin user cannot access ANY tariff-settings endpoints (packing rates,
 The backend forgot to add `tariff_settings` permissions when initializing the super_admin role.
 
 **Impact:**
+
 - Settings → Tariffs section is completely broken
 - Users see "Failed to fetch" errors
 - Cannot configure pricing parameters
@@ -39,6 +41,7 @@ The backend forgot to add `tariff_settings` permissions when initializing the su
 ```
 
 **Then:**
+
 1. Restart the API server
 2. Delete the admin user from MongoDB (or update permissions manually)
 3. Let the system recreate the admin user with correct permissions
@@ -73,6 +76,7 @@ The backend forgot to add `tariff_settings` permissions when initializing the su
 ## Evidence
 
 **API Response (Before Fix):**
+
 ```json
 {
   "statusCode": 403,
@@ -82,6 +86,7 @@ The backend forgot to add `tariff_settings` permissions when initializing the su
 ```
 
 **User Permissions (Current):**
+
 - ✅ users:create, users:read, users:update, users:delete
 - ✅ customers:create, customers:read, customers:update, customers:delete
 - ✅ jobs:create, jobs:read, jobs:update, jobs:delete
@@ -96,6 +101,7 @@ The backend forgot to add `tariff_settings` permissions when initializing the su
 ## Frontend Code Quality Assessment
 
 The PackingRates and LocationHandicaps components have **GOOD implementation**:
+
 - ✅ Proper error handling with try/catch
 - ✅ Loading states with spinners
 - ✅ User-friendly error messages
@@ -126,15 +132,15 @@ The PackingRates and LocationHandicaps components have **GOOD implementation**:
 
 ## Severity Metrics
 
-| Metric | Rating |
-|--------|--------|
-| Bug Severity | 🔴 CRITICAL |
-| User Impact | 🔴 COMPLETE BLOCKER |
-| Business Impact | 🔴 HIGH |
-| Fix Complexity | 🟢 LOW (5 lines of code) |
-| Fix Risk | 🟢 LOW (well-defined system) |
-| Estimated Fix Time | 🟢 10 minutes |
-| Estimated Test Time | 🟡 30-45 minutes |
+| Metric              | Rating                       |
+| ------------------- | ---------------------------- |
+| Bug Severity        | 🔴 CRITICAL                  |
+| User Impact         | 🔴 COMPLETE BLOCKER          |
+| Business Impact     | 🔴 HIGH                      |
+| Fix Complexity      | 🟢 LOW (5 lines of code)     |
+| Fix Risk            | 🟢 LOW (well-defined system) |
+| Estimated Fix Time  | 🟢 10 minutes                |
+| Estimated Test Time | 🟡 30-45 minutes             |
 
 ## Quick Commands for Verification
 

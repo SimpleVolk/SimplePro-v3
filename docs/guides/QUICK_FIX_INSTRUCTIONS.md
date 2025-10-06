@@ -163,17 +163,20 @@ Use this checklist to confirm the fix is complete:
 If the fix causes issues, rollback with these steps:
 
 1. **Restore original code:**
+
    ```bash
    git checkout apps/api/src/auth/auth.service.ts
    ```
 
 2. **Restart API server:**
+
    ```bash
    # Ctrl+C to stop, then:
    npm run dev
    ```
 
 3. **Clear MongoDB (if needed):**
+
    ```bash
    docker exec -it simplepro-mongodb mongosh
    use simplepro
@@ -196,6 +199,7 @@ If the fix causes issues, rollback with these steps:
 ## Questions?
 
 Refer to detailed reports:
+
 - `E2E_TEST_REPORT_2025-10-01.md` - Full technical analysis
 - `E2E_TESTING_SUMMARY.md` - Quick reference summary
 - `PERMISSION_BUG_DIAGRAM.md` - Visual diagrams and flow charts

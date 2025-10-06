@@ -8,7 +8,7 @@ import {
   ValidateNested,
   IsNotEmpty,
   Min,
-  Max
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -24,7 +24,7 @@ export enum OperatorType {
   NOT_IN = 'not_in',
   CONTAINS = 'contains',
   STARTS_WITH = 'starts_with',
-  ENDS_WITH = 'ends_with'
+  ENDS_WITH = 'ends_with',
 }
 
 export enum ActionType {
@@ -34,14 +34,14 @@ export enum ActionType {
   SUBTRACT_PERCENTAGE = 'subtract_percentage',
   MULTIPLY = 'multiply',
   SET_FIXED = 'set_fixed',
-  SET_PERCENTAGE = 'set_percentage'
+  SET_PERCENTAGE = 'set_percentage',
 }
 
 export enum ServiceType {
   LOCAL = 'local',
   LONG_DISTANCE = 'long_distance',
   STORAGE = 'storage',
-  PACKING_ONLY = 'packing_only'
+  PACKING_ONLY = 'packing_only',
 }
 
 export enum RuleCategory {
@@ -52,7 +52,7 @@ export enum RuleCategory {
   TIMING = 'timing',
   SPECIAL_ITEMS = 'special_items',
   LOCATION_HANDICAPS = 'location_handicaps',
-  ADDITIONAL_SERVICES = 'additional_services'
+  ADDITIONAL_SERVICES = 'additional_services',
 }
 
 // Condition DTO

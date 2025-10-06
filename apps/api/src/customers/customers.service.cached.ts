@@ -41,13 +41,17 @@ export async function findAllCached(
     if (filters.status) query.status = filters.status;
     if (filters.type) query.type = filters.type;
     if (filters.source) query.source = filters.source;
-    if (filters.assignedSalesRep) query.assignedSalesRep = filters.assignedSalesRep;
+    if (filters.assignedSalesRep)
+      query.assignedSalesRep = filters.assignedSalesRep;
 
     if (filters.tags && filters.tags.length > 0) {
       query.tags = { $in: filters.tags };
     }
 
-    if (filters.leadScoreMin !== undefined || filters.leadScoreMax !== undefined) {
+    if (
+      filters.leadScoreMin !== undefined ||
+      filters.leadScoreMax !== undefined
+    ) {
       query.leadScore = {};
       if (filters.leadScoreMin !== undefined) {
         query.leadScore.$gte = filters.leadScoreMin;
@@ -65,8 +69,10 @@ export async function findAllCached(
 
     if (filters.lastContactAfter || filters.lastContactBefore) {
       query.lastContactDate = {};
-      if (filters.lastContactAfter) query.lastContactDate.$gte = filters.lastContactAfter;
-      if (filters.lastContactBefore) query.lastContactDate.$lte = filters.lastContactBefore;
+      if (filters.lastContactAfter)
+        query.lastContactDate.$gte = filters.lastContactAfter;
+      if (filters.lastContactBefore)
+        query.lastContactDate.$lte = filters.lastContactBefore;
     }
 
     if (filters.search) {
@@ -85,7 +91,9 @@ export async function findAllCached(
       .exec(),
   ]);
 
-  const data = customers.map((customer: any) => this.convertCustomerDocument(customer));
+  const data = customers.map((customer: any) =>
+    this.convertCustomerDocument(customer),
+  );
   const page = Math.floor(skip / limit) + 1;
   const totalPages = Math.ceil(total / limit);
 
@@ -111,10 +119,7 @@ export async function findAllCached(
  * TTL: 10 minutes
  * Invalidated when: Customer is updated/deleted
  */
-export async function findOneCached(
-  this: any,
-  id: string
-): Promise<Customer> {
+export async function findOneCached(this: any, id: string): Promise<Customer> {
   const cacheService: CacheService = this.cacheService;
 
   // Try cache first
@@ -144,7 +149,7 @@ export async function findOneCached(
  */
 export async function findByEmailCached(
   this: any,
-  email: string
+  email: string,
 ): Promise<Customer | null> {
   const cacheService: CacheService = this.cacheService;
 
@@ -155,9 +160,11 @@ export async function findByEmailCached(
     return cached;
   }
 
-  const customer = await this.customerModel.findOne({
-    email: new RegExp(`^${email}$`, 'i')
-  }).exec();
+  const customer = await this.customerModel
+    .findOne({
+      email: new RegExp(`^${email}$`, 'i'),
+    })
+    .exec();
 
   const result = customer ? this.convertCustomerDocument(customer) : null;
 
@@ -184,19 +191,22 @@ export async function getCustomerStatsCached(this: any) {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const [totalCount, recentCount, statusCounts, typeCounts, sourceCounts] = await Promise.all([
-    this.customerModel.countDocuments().exec(),
-    this.customerModel.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }).exec(),
-    this.customerModel.aggregate([
-      { $group: { _id: '$status', count: { $sum: 1 } } }
-    ]).exec(),
-    this.customerModel.aggregate([
-      { $group: { _id: '$type', count: { $sum: 1 } } }
-    ]).exec(),
-    this.customerModel.aggregate([
-      { $group: { _id: '$source', count: { $sum: 1 } } }
-    ]).exec()
-  ]);
+  const [totalCount, recentCount, statusCounts, typeCounts, sourceCounts] =
+    await Promise.all([
+      this.customerModel.countDocuments().exec(),
+      this.customerModel
+        .countDocuments({ createdAt: { $gte: thirtyDaysAgo } })
+        .exec(),
+      this.customerModel
+        .aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }])
+        .exec(),
+      this.customerModel
+        .aggregate([{ $group: { _id: '$type', count: { $sum: 1 } } }])
+        .exec(),
+      this.customerModel
+        .aggregate([{ $group: { _id: '$source', count: { $sum: 1 } } }])
+        .exec(),
+    ]);
 
   const stats = {
     total: totalCount,
@@ -219,7 +229,10 @@ export async function getCustomerStatsCached(this: any) {
   });
 
   // Cache for 5 minutes
-  await cacheService.set(cacheKey, stats, { ttl: 300, tags: ['customers', 'analytics'] });
+  await cacheService.set(cacheKey, stats, {
+    ttl: 300,
+    tags: ['customers', 'analytics'],
+  });
 
   return stats;
 }
@@ -239,7 +252,10 @@ export async function invalidateCacheOnCreate(cacheService: CacheService) {
  * CACHE INVALIDATION for update
  * Invalidate specific customer cache, list caches, and stats
  */
-export async function invalidateCacheOnUpdate(cacheService: CacheService, customerId: string) {
+export async function invalidateCacheOnUpdate(
+  cacheService: CacheService,
+  customerId: string,
+) {
   await Promise.all([
     cacheService.del(`customer:${customerId}`),
     cacheService.deletePattern('customer:email:*'),
@@ -252,7 +268,10 @@ export async function invalidateCacheOnUpdate(cacheService: CacheService, custom
  * CACHE INVALIDATION for delete
  * Invalidate all customer-related caches
  */
-export async function invalidateCacheOnDelete(cacheService: CacheService, customerId: string) {
+export async function invalidateCacheOnDelete(
+  cacheService: CacheService,
+  customerId: string,
+) {
   await Promise.all([
     cacheService.del(`customer:${customerId}`),
     cacheService.deletePattern('customer:email:*'),

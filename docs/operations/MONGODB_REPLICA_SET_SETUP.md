@@ -22,6 +22,7 @@
 ### What is a Replica Set?
 
 A MongoDB replica set is a group of MongoDB servers that maintain the same data set, providing:
+
 - **High Availability:** Automatic failover when primary fails
 - **Data Redundancy:** Multiple copies of data across nodes
 - **Read Scaling:** Distribute read operations across secondaries
@@ -82,12 +83,12 @@ A MongoDB replica set is a group of MongoDB servers that maintain the same data 
 
 ### Network Configuration
 
-| Member | Container | IP | Port (Host) | Port (Container) | Role |
-|--------|-----------|--------|-------------|------------------|------|
-| Primary | mongodb-primary | 172.22.0.10 | 27017 | 27017 | Primary |
-| Secondary 1 | mongodb-secondary1 | 172.22.0.11 | 27018 | 27017 | Secondary |
-| Secondary 2 | mongodb-secondary2 | 172.22.0.12 | 27019 | 27017 | Secondary |
-| Exporter | mongodb-exporter | - | 9216 | 9216 | Monitoring |
+| Member      | Container          | IP          | Port (Host) | Port (Container) | Role       |
+| ----------- | ------------------ | ----------- | ----------- | ---------------- | ---------- |
+| Primary     | mongodb-primary    | 172.22.0.10 | 27017       | 27017            | Primary    |
+| Secondary 1 | mongodb-secondary1 | 172.22.0.11 | 27018       | 27017            | Secondary  |
+| Secondary 2 | mongodb-secondary2 | 172.22.0.12 | 27019       | 27017            | Secondary  |
+| Exporter    | mongodb-exporter   | -           | 9216        | 9216             | Monitoring |
 
 ### Data Flow
 
@@ -114,12 +115,14 @@ A MongoDB replica set is a group of MongoDB servers that maintain the same data 
 ### System Requirements
 
 **Hardware (per node):**
+
 - CPU: 2+ cores
 - RAM: 4 GB minimum, 8 GB recommended
 - Disk: 50 GB+ SSD (depends on data size)
 - Network: 1 Gbps LAN
 
 **Software:**
+
 - Docker: 20.10+
 - Docker Compose: 1.29+
 - OpenSSL: For keyfile generation
@@ -143,18 +146,21 @@ A MongoDB replica set is a group of MongoDB servers that maintain the same data 
 The keyfile ensures secure communication between replica set members.
 
 **Linux/Mac:**
+
 ```bash
 cd D:\Claude\SimplePro-v3
 ./scripts/mongodb/generate-keyfile.sh
 ```
 
 **Windows:**
+
 ```cmd
 cd D:\Claude\SimplePro-v3
 scripts\mongodb\generate-keyfile.bat
 ```
 
 **Manual (if OpenSSL not available):**
+
 ```bash
 # Generate 756 bytes of random data, base64 encoded
 openssl rand -base64 756 > scripts/mongodb/keyfile
@@ -162,6 +168,7 @@ chmod 400 scripts/mongodb/keyfile
 ```
 
 **Important:**
+
 - ⚠️ Keep keyfile secure (never commit to version control)
 - ⚠️ Same keyfile must be used on all replica set members
 - ⚠️ File permissions must be 400 or 600
@@ -197,18 +204,21 @@ MONGODB_AUTH_SOURCE=admin
 The setup script handles everything automatically.
 
 **Linux/Mac:**
+
 ```bash
 cd D:\Claude\SimplePro-v3
 ./scripts/mongodb/setup-replica-set.sh
 ```
 
 **Windows:**
+
 ```cmd
 cd D:\Claude\SimplePro-v3
 scripts\mongodb\setup-replica-set.bat
 ```
 
 **What the script does:**
+
 1. Generates keyfile (if not exists)
 2. Creates Docker network
 3. Starts replica set containers
@@ -220,6 +230,7 @@ scripts\mongodb\setup-replica-set.bat
 9. Displays status and connection strings
 
 **Expected output:**
+
 ```
 ================================================
 MongoDB Replica Set Setup for SimplePro-v3
@@ -301,6 +312,7 @@ MONGODB_URI=mongodb://admin:password@172.22.0.10:27017,172.22.0.11:27017,172.22.
 ```
 
 The application (`apps/api/src/database/database.module.ts`) is already configured for replica sets with:
+
 - Read preference: `secondaryPreferred`
 - Write concern: `w:majority, j:true`
 - Automatic failover handling
@@ -486,6 +498,7 @@ curl http://localhost:9216/metrics | grep mongodb_up
    - Select Prometheus data source
 
 **Key Panels:**
+
 - Replica set status
 - Replication lag
 - Operations per second
@@ -499,6 +512,7 @@ curl http://localhost:9216/metrics | grep mongodb_up
 Alerts are configured in `monitoring/prometheus/mongodb.rules.yml`:
 
 **Critical Alerts:**
+
 - Replica set member down
 - No primary in replica set
 - Critical replication lag (>5 minutes)
@@ -506,6 +520,7 @@ Alerts are configured in `monitoring/prometheus/mongodb.rules.yml`:
 - Disk space <10%
 
 **Warning Alerts:**
+
 - High replication lag (>30 seconds)
 - High connections (>800)
 - Slow queries
@@ -520,6 +535,7 @@ Alerts are configured in `monitoring/prometheus/mongodb.rules.yml`:
 **Problem:** `rs.initiate()` fails
 
 **Solutions:**
+
 ```bash
 # 1. Check containers are running
 docker ps | grep mongodb
@@ -551,6 +567,7 @@ docker exec simplepro-mongodb-primary mongosh --eval "
 **Problem:** Cannot connect with credentials
 
 **Solutions:**
+
 ```bash
 # 1. Verify user exists
 docker exec simprepro-mongodb-primary mongosh --eval "
@@ -575,6 +592,7 @@ docker exec simplepro-mongodb-primary mongosh --eval "
 **Problem:** Secondary lagging behind primary
 
 **Solutions:**
+
 ```bash
 # 1. Check secondary performance
 docker stats simplepro-mongodb-secondary1
@@ -601,6 +619,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 **Problem:** New member stuck in STARTUP or RECOVERING
 
 **Solutions:**
+
 ```bash
 # 1. Check member can reach primary
 docker exec simplepro-mongodb-secondary1 ping -c 3 mongodb-primary
@@ -625,9 +644,9 @@ docker exec simprepro-mongodb-primary mongosh -u admin -p <password> \
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | DevOps Team | Initial creation |
+| Version | Date       | Author      | Changes          |
+| ------- | ---------- | ----------- | ---------------- |
+| 1.0     | 2025-10-02 | DevOps Team | Initial creation |
 
 ---
 

@@ -88,9 +88,8 @@ export class ConversionTrackingController {
   async getDailyMetrics(@Query() dto: MetricsQueryDto) {
     const date = new Date(dto.date);
 
-    const metrics = await this.conversionTrackingService.calculateDailyMetrics(
-      date,
-    );
+    const metrics =
+      await this.conversionTrackingService.calculateDailyMetrics(date);
 
     return {
       success: true,
@@ -114,8 +113,7 @@ export class ConversionTrackingController {
 
   @Get('pipeline-velocity')
   async getPipelineVelocity() {
-    const velocity =
-      await this.conversionTrackingService.getPipelineVelocity();
+    const velocity = await this.conversionTrackingService.getPipelineVelocity();
 
     return {
       success: true,
@@ -192,7 +190,8 @@ export class ConversionTrackingController {
     const totalLeads = stages.find((s: any) => s.stage === 'Leads')?.count || 0;
     const totalQuotes =
       stages.find((s: any) => s.stage === 'Quotes Sent')?.count || 0;
-    const totalJobs = stages.find((s: any) => s.stage === 'Jobs Created')?.count || 0;
+    const totalJobs =
+      stages.find((s: any) => s.stage === 'Jobs Created')?.count || 0;
     const totalQuoteValue =
       stages.find((s: any) => s.stage === 'Quotes Sent')?.value || 0;
     const totalJobValue =

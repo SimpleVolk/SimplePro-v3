@@ -7,9 +7,11 @@ A complete, production-ready real-time notifications and messaging system has be
 ## Created Components
 
 ### 1. NotificationCenter Component
+
 **Location:** `apps/web/src/app/components/notifications/NotificationCenter.tsx`
 
 **Features:**
+
 - Paginated notification list with infinite scroll
 - Filter tabs: All, Unread, Job Updates, Customer Inquiries, System
 - Real-time updates via WebSocket
@@ -21,15 +23,18 @@ A complete, production-ready real-time notifications and messaging system has be
 - Mobile-responsive design
 
 **Files:**
+
 - `NotificationCenter.tsx` (13,869 bytes)
 - `NotificationCenter.module.css` (5,348 bytes)
 
 ---
 
 ### 2. NotificationBell Component
+
 **Location:** `apps/web/src/app/components/notifications/NotificationBell.tsx`
 
 **Features:**
+
 - Bell icon with unread badge count
 - Dropdown panel showing 5 most recent notifications
 - Real-time badge updates via WebSocket
@@ -40,6 +45,7 @@ A complete, production-ready real-time notifications and messaging system has be
 - Auto-refresh notification list
 
 **Files:**
+
 - `NotificationBell.tsx` (8,810 bytes)
 - `NotificationBell.module.css` (4,926 bytes)
 
@@ -49,9 +55,11 @@ A complete, production-ready real-time notifications and messaging system has be
 ---
 
 ### 3. NotificationPreferences Component
+
 **Location:** `apps/web/src/app/components/notifications/NotificationPreferences.tsx`
 
 **Features:**
+
 - Channel toggles per notification type (In-App, Email, SMS, Push)
 - Seven notification types supported:
   - Job Assigned (📋)
@@ -67,15 +75,18 @@ A complete, production-ready real-time notifications and messaging system has be
 - Responsive table layout with mobile optimization
 
 **Files:**
+
 - `NotificationPreferences.tsx` (14,232 bytes)
 - `NotificationPreferences.module.css` (5,787 bytes)
 
 ---
 
 ### 4. NotificationToast Component
+
 **Location:** `apps/web/src/app/components/notifications/NotificationToast.tsx`
 
 **Features:**
+
 - Auto-dismiss after 5 seconds (except urgent notifications)
 - Stack multiple toasts (max 3)
 - Priority-based positioning (urgent at top)
@@ -87,6 +98,7 @@ A complete, production-ready real-time notifications and messaging system has be
 - Priority-based styling with pulsing animation for urgent
 
 **Files:**
+
 - `NotificationToast.tsx` (4,887 bytes)
 - `NotificationToast.module.css` (3,259 bytes)
 
@@ -96,9 +108,11 @@ A complete, production-ready real-time notifications and messaging system has be
 ---
 
 ### 5. MessageThread Component
+
 **Location:** `apps/web/src/app/components/notifications/MessageThread.tsx`
 
 **Features:**
+
 - Real-time messaging between crew and dispatchers
 - Message list with timestamps
 - Send message input with multi-line support
@@ -116,12 +130,14 @@ A complete, production-ready real-time notifications and messaging system has be
 - Responsive mobile design
 
 **Files:**
+
 - `MessageThread.tsx` (12,178 bytes)
 - `MessageThread.module.css` (6,483 bytes)
 
 ---
 
 ### 6. Export Index
+
 **Location:** `apps/web/src/app/components/notifications/index.ts`
 
 Centralized export for all notification components.
@@ -129,9 +145,11 @@ Centralized export for all notification components.
 ---
 
 ### 7. Documentation
+
 **Location:** `apps/web/src/app/components/notifications/README.md`
 
 Comprehensive documentation (12,002 bytes) covering:
+
 - Component usage and features
 - API integration requirements
 - WebSocket events
@@ -145,9 +163,11 @@ Comprehensive documentation (12,002 bytes) covering:
 ## Integration Points
 
 ### 1. TopBar Component
+
 **File:** `apps/web/src/app/components/TopBar.tsx`
 
 **Changes:**
+
 - Added `NotificationBell` import
 - Added `useRouter` hook for navigation
 - Integrated NotificationBell with navigation callback
@@ -156,15 +176,17 @@ Comprehensive documentation (12,002 bytes) covering:
 import { NotificationBell } from './notifications/NotificationBell';
 import { useRouter } from 'next/navigation';
 
-<NotificationBell onNavigate={(path) => router.push(path)} />
+<NotificationBell onNavigate={(path) => router.push(path)} />;
 ```
 
 ---
 
 ### 2. AppLayout Component
+
 **File:** `apps/web/src/app/components/AppLayout.tsx`
 
 **Changes:**
+
 - Added `NotificationToast` import
 - Added `useRouter` hook for navigation
 - Integrated NotificationToast for real-time alerts
@@ -173,16 +195,18 @@ import { useRouter } from 'next/navigation';
 import { NotificationToast } from './notifications/NotificationToast';
 import { useRouter } from 'next/navigation';
 
-<NotificationToast onNavigate={(path) => router.push(path)} />
+<NotificationToast onNavigate={(path) => router.push(path)} />;
 ```
 
 ---
 
 ### 3. WebSocketContext
+
 **File:** `apps/web/src/app/contexts/WebSocketContext.tsx`
 
 **Changes:**
 Added event handlers for:
+
 - `notification.created` - New notification received
 - `notification.updated` - Notification status changed
 - `message.created` - New message in thread
@@ -193,9 +217,11 @@ All events are dispatched as custom window events for component flexibility.
 ---
 
 ### 4. Existing Bug Fix
+
 **File:** `apps/web/src/app/components/conversion/WinLossAnalysis.tsx`
 
 **Fixed:** TypeScript error in Recharts label prop
+
 ```tsx
 // Before
 label={({ percentage }) => `${percentage.toFixed(1)}%`}
@@ -231,6 +257,7 @@ Total: 12 files, ~92 KB
 ## Design System
 
 ### Color Palette
+
 - **Background:** `#0a0e1a`, `#1a1f2e`, `#0f1419`
 - **Borders:** `#2d3748`
 - **Text:** `#ffffff`, `#e5e7eb`, `#9ca3af`, `#6b7280`
@@ -240,12 +267,14 @@ Total: 12 files, ~92 KB
 - **Error/Urgent:** `#ef4444`
 
 ### Priority Colors
+
 - **Low:** Gray (`#6b7280`)
 - **Normal:** Blue (`#3b82f6`)
 - **High:** Orange (`#f97316`)
 - **Urgent:** Red (`#ef4444`) with pulsing animation
 
 ### Typography
+
 - **Titles:** 1.5-2rem, font-weight 700
 - **Body:** 0.875rem, line-height 1.5
 - **Small text:** 0.75rem
@@ -256,6 +285,7 @@ Total: 12 files, ~92 KB
 ## API Endpoints Required
 
 ### Notifications API
+
 ```
 GET    /api/notifications              - List notifications (paginated)
 PATCH  /api/notifications/:id/read     - Mark as read/unread
@@ -267,6 +297,7 @@ POST   /api/notifications/test         - Send test notification
 ```
 
 ### Messages API
+
 ```
 GET    /api/messages/threads/:id              - Get thread and messages
 GET    /api/messages/threads/job/:jobId       - Get/create job thread
@@ -276,6 +307,7 @@ PATCH  /api/messages/:id/read                 - Mark message as read
 ```
 
 ### WebSocket Events
+
 ```
 // Server → Client
 notification.created    - New notification
@@ -295,12 +327,19 @@ stopTyping             - Stop typing indicator
 ## TypeScript Interfaces
 
 ### Notification
+
 ```typescript
 interface Notification {
   id: string;
   userId: string;
-  type: 'job_assigned' | 'shift_reminder' | 'customer_inquiry' |
-        'quote_request' | 'job_completed' | 'payment_received' | 'system_alert';
+  type:
+    | 'job_assigned'
+    | 'shift_reminder'
+    | 'customer_inquiry'
+    | 'quote_request'
+    | 'job_completed'
+    | 'payment_received'
+    | 'system_alert';
   priority: 'low' | 'normal' | 'high' | 'urgent';
   title: string;
   message: string;
@@ -313,6 +352,7 @@ interface Notification {
 ```
 
 ### Message
+
 ```typescript
 interface Message {
   id: string;
@@ -329,6 +369,7 @@ interface Message {
 ```
 
 ### MessageThread
+
 ```typescript
 interface MessageThread {
   id: string;
@@ -346,6 +387,7 @@ interface MessageThread {
 ```
 
 ### NotificationPreferences
+
 ```typescript
 interface NotificationPreferences {
   id?: string;
@@ -376,11 +418,13 @@ interface NotificationPreferences {
 ## Additional Files Created
 
 ### 1. Notification Sound Documentation
+
 **Location:** `apps/web/public/notification-sound-readme.md`
 
 Instructions for adding a notification sound file (`notification-sound.mp3`) to the public directory.
 
 **Recommended specs:**
+
 - Duration: 0.5 - 1.5 seconds
 - Format: MP3
 - File size: < 50KB
@@ -391,11 +435,13 @@ Instructions for adding a notification sound file (`notification-sound.mp3`) to 
 ## Mobile Responsiveness
 
 All components are fully responsive with breakpoints:
+
 - **Desktop:** Default styles
 - **Tablet:** 768px and below
 - **Mobile:** 480px and below
 
 **Mobile optimizations:**
+
 - Collapsible/stacked layouts
 - Touch-friendly button sizes (minimum 2.5rem)
 - Full-width cards on small screens
@@ -421,7 +467,9 @@ All components are fully responsive with breakpoints:
 ## Next Steps for Backend Implementation
 
 ### 1. Notifications Module (NestJS)
+
 Create `apps/api/src/notifications/` module with:
+
 - Notifications controller
 - Notifications service
 - Notification schema (MongoDB)
@@ -429,7 +477,9 @@ Create `apps/api/src/notifications/` module with:
 - WebSocket gateway integration
 
 ### 2. Messages Module (NestJS)
+
 Create `apps/api/src/messages/` module with:
+
 - Messages controller
 - Messages service
 - Message schema (MongoDB)
@@ -437,21 +487,27 @@ Create `apps/api/src/messages/` module with:
 - WebSocket gateway for real-time messaging
 
 ### 3. WebSocket Gateway Updates
+
 Update `apps/api/src/websocket/` to handle:
+
 - Notification broadcasting
 - Message delivery
 - Typing indicators
 - Thread management
 
 ### 4. Database Schemas
+
 Create MongoDB schemas for:
+
 - Notifications (with TTL index for auto-cleanup)
 - NotificationPreferences
 - Messages
 - MessageThreads
 
 ### 5. Background Jobs
+
 Implement background jobs for:
+
 - Email notifications
 - SMS notifications
 - Digest compilation
@@ -491,6 +547,7 @@ Implement background jobs for:
 ## Performance Considerations
 
 ### Optimizations Implemented
+
 - **Infinite scroll** instead of loading all notifications
 - **Pagination** with configurable page size (20 items)
 - **Debounced typing** indicators (2s timeout)
@@ -502,6 +559,7 @@ Implement background jobs for:
 - **Limited toast stack** (max 3) to prevent overload
 
 ### Recommended Backend Optimizations
+
 - Cache notification counts in Redis
 - Index MongoDB collections appropriately
 - Implement rate limiting on WebSocket events
@@ -514,6 +572,7 @@ Implement background jobs for:
 ## Security Considerations
 
 ### Implemented
+
 - **JWT authentication** required for all API calls
 - **WebSocket authentication** with token
 - **User-specific** notification filtering
@@ -521,6 +580,7 @@ Implement background jobs for:
 - **XSS prevention** via React automatic escaping
 
 ### Recommended
+
 - Validate notification metadata on backend
 - Sanitize message content before storage
 - Implement rate limiting on message sending
@@ -552,6 +612,7 @@ Implement background jobs for:
 ## Known Limitations & Future Enhancements
 
 ### Current Limitations
+
 - Notification sound requires manual file addition
 - No notification grouping/threading
 - No notification snooze feature
@@ -560,6 +621,7 @@ Implement background jobs for:
 - No message editing/deletion
 
 ### Future Enhancements
+
 - [ ] Notification grouping by type
 - [ ] Snooze notifications
 - [ ] Search notifications
@@ -577,15 +639,15 @@ Implement background jobs for:
 
 ## File Sizes
 
-| Component | TypeScript | CSS | Total |
-|-----------|-----------|-----|-------|
-| NotificationCenter | 13,869 bytes | 5,348 bytes | 19,217 bytes |
-| NotificationBell | 8,810 bytes | 4,926 bytes | 13,736 bytes |
-| NotificationPreferences | 14,232 bytes | 5,787 bytes | 20,019 bytes |
-| NotificationToast | 4,887 bytes | 3,259 bytes | 8,146 bytes |
-| MessageThread | 12,178 bytes | 6,483 bytes | 18,661 bytes |
-| Other files | 12,291 bytes | - | 12,291 bytes |
-| **Total** | **66,267 bytes** | **25,803 bytes** | **92,070 bytes** |
+| Component               | TypeScript       | CSS              | Total            |
+| ----------------------- | ---------------- | ---------------- | ---------------- |
+| NotificationCenter      | 13,869 bytes     | 5,348 bytes      | 19,217 bytes     |
+| NotificationBell        | 8,810 bytes      | 4,926 bytes      | 13,736 bytes     |
+| NotificationPreferences | 14,232 bytes     | 5,787 bytes      | 20,019 bytes     |
+| NotificationToast       | 4,887 bytes      | 3,259 bytes      | 8,146 bytes      |
+| MessageThread           | 12,178 bytes     | 6,483 bytes      | 18,661 bytes     |
+| Other files             | 12,291 bytes     | -                | 12,291 bytes     |
+| **Total**               | **66,267 bytes** | **25,803 bytes** | **92,070 bytes** |
 
 ---
 

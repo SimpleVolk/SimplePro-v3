@@ -19,11 +19,41 @@ export default function CancellationReasons() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [reasons, setReasons] = useState<CancellationReason[]>([
-    { id: '1', reason: 'Customer found cheaper option', category: 'customer', active: true, usageCount: 12 },
-    { id: '2', reason: 'Customer changed move date', category: 'customer', active: true, usageCount: 8 },
-    { id: '3', reason: 'Unable to staff crew', category: 'company', active: true, usageCount: 3 },
-    { id: '4', reason: 'Weather conditions', category: 'circumstances', active: true, usageCount: 2 },
-    { id: '5', reason: 'Property sale fell through', category: 'circumstances', active: true, usageCount: 5 },
+    {
+      id: '1',
+      reason: 'Customer found cheaper option',
+      category: 'customer',
+      active: true,
+      usageCount: 12,
+    },
+    {
+      id: '2',
+      reason: 'Customer changed move date',
+      category: 'customer',
+      active: true,
+      usageCount: 8,
+    },
+    {
+      id: '3',
+      reason: 'Unable to staff crew',
+      category: 'company',
+      active: true,
+      usageCount: 3,
+    },
+    {
+      id: '4',
+      reason: 'Weather conditions',
+      category: 'circumstances',
+      active: true,
+      usageCount: 2,
+    },
+    {
+      id: '5',
+      reason: 'Property sale fell through',
+      category: 'circumstances',
+      active: true,
+      usageCount: 5,
+    },
   ]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -42,9 +72,9 @@ export default function CancellationReasons() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/cancellation-reasons'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -77,7 +107,7 @@ export default function CancellationReasons() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ reasons }),
       });
@@ -94,7 +124,9 @@ export default function CancellationReasons() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving cancellation reasons:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -128,9 +160,9 @@ export default function CancellationReasons() {
 
   const handleUpdate = () => {
     if (editingId) {
-      setReasons(reasons.map(r =>
-        r.id === editingId ? { ...r, ...editForm } : r
-      ));
+      setReasons(
+        reasons.map((r) => (r.id === editingId ? { ...r, ...editForm } : r)),
+      );
       setEditingId(null);
       setEditForm({});
       setSuccess('Cancellation reason updated');
@@ -140,7 +172,7 @@ export default function CancellationReasons() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this cancellation reason?')) {
-      setReasons(reasons.filter(r => r.id !== id));
+      setReasons(reasons.filter((r) => r.id !== id));
       setSuccess('Cancellation reason deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -148,10 +180,14 @@ export default function CancellationReasons() {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'customer': return '#3b82f6';
-      case 'company': return '#ef4444';
-      case 'circumstances': return '#f59e0b';
-      default: return '#6b7280';
+      case 'customer':
+        return '#3b82f6';
+      case 'company':
+        return '#ef4444';
+      case 'circumstances':
+        return '#f59e0b';
+      default:
+        return '#6b7280';
     }
   };
 
@@ -194,7 +230,9 @@ export default function CancellationReasons() {
                 id="reason"
                 type="text"
                 value={editForm.reason || ''}
-                onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, reason: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., Customer relocated unexpectedly"
               />
@@ -205,7 +243,9 @@ export default function CancellationReasons() {
               <select
                 id="category"
                 value={editForm.category || ''}
-                onChange={(e) => setEditForm({ ...editForm, category: e.target.value as any })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, category: e.target.value as any })
+                }
                 className={styles.select}
               >
                 <option value="">Select category</option>
@@ -234,14 +274,16 @@ export default function CancellationReasons() {
             </tr>
           </thead>
           <tbody>
-            {reasons.map(reason => (
+            {reasons.map((reason) => (
               <tr key={reason.id}>
                 <td>
                   {editingId === reason.id ? (
                     <input
                       type="text"
                       value={editForm.reason || ''}
-                      onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, reason: e.target.value })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -252,25 +294,43 @@ export default function CancellationReasons() {
                   {editingId === reason.id ? (
                     <select
                       value={editForm.category || ''}
-                      onChange={(e) => setEditForm({ ...editForm, category: e.target.value as any })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          category: e.target.value as any,
+                        })
+                      }
                       className={styles.select}
                     >
                       <option value="customer">Customer Decision</option>
                       <option value="company">Company Issue</option>
-                      <option value="circumstances">External Circumstances</option>
+                      <option value="circumstances">
+                        External Circumstances
+                      </option>
                     </select>
                   ) : (
                     <span
                       className={styles.tagBadge}
-                      style={{ backgroundColor: getCategoryColor(reason.category) + '20', color: getCategoryColor(reason.category) }}
+                      style={{
+                        backgroundColor:
+                          getCategoryColor(reason.category) + '20',
+                        color: getCategoryColor(reason.category),
+                      }}
                     >
-                      {reason.category.charAt(0).toUpperCase() + reason.category.slice(1)}
+                      {reason.category.charAt(0).toUpperCase() +
+                        reason.category.slice(1)}
                     </span>
                   )}
                 </td>
                 <td>{reason.usageCount}</td>
                 <td>
-                  <span className={reason.active ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      reason.active
+                        ? styles.statusActive
+                        : styles.statusInactive
+                    }
+                  >
                     {reason.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -278,19 +338,38 @@ export default function CancellationReasons() {
                   <div className={styles.actions}>
                     {editingId === reason.id ? (
                       <>
-                        <button className={styles.actionButton} onClick={handleUpdate} title="Save">
+                        <button
+                          className={styles.actionButton}
+                          onClick={handleUpdate}
+                          title="Save"
+                        >
                           💾
                         </button>
-                        <button className={styles.actionButton} onClick={() => { setEditingId(null); setEditForm({}); }} title="Cancel">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditForm({});
+                          }}
+                          title="Cancel"
+                        >
                           ✕
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className={styles.actionButton} onClick={() => handleEdit(reason)} title="Edit">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleEdit(reason)}
+                          title="Edit"
+                        >
                           ✏️
                         </button>
-                        <button className={styles.actionButton} onClick={() => handleDelete(reason.id)} title="Delete">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(reason.id)}
+                          title="Delete"
+                        >
                           🗑️
                         </button>
                       </>
@@ -304,7 +383,11 @@ export default function CancellationReasons() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

@@ -22,9 +22,7 @@ export interface CrewMember {
 
 @Injectable({ scope: Scope.REQUEST })
 export class CrewDataLoader {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   private readonly batchCrewMembers = new DataLoader<string, CrewMember | null>(
     async (crewMemberIds: readonly string[]) => {
@@ -32,7 +30,7 @@ export class CrewDataLoader {
       const users = await this.userModel
         .find({
           _id: { $in: crewMemberIds as string[] },
-          role: { $in: ['crew', 'crew_lead', 'driver'] }
+          role: { $in: ['crew', 'crew_lead', 'driver'] },
         })
         .lean()
         .exec();
@@ -44,8 +42,8 @@ export class CrewDataLoader {
       });
 
       // Return crew members in the same order as requested IDs
-      return crewMemberIds.map(id => crewMap.get(id) || null);
-    }
+      return crewMemberIds.map((id) => crewMap.get(id) || null);
+    },
   );
 
   async load(crewMemberId: string): Promise<CrewMember | null> {
@@ -53,7 +51,9 @@ export class CrewDataLoader {
   }
 
   async loadMany(crewMemberIds: string[]): Promise<(CrewMember | null)[]> {
-    return this.batchCrewMembers.loadMany(crewMemberIds) as Promise<(CrewMember | null)[]>;
+    return this.batchCrewMembers.loadMany(crewMemberIds) as Promise<
+      (CrewMember | null)[]
+    >;
   }
 
   async loadAvailableCrew(_date: Date): Promise<CrewMember[]> {
@@ -62,12 +62,12 @@ export class CrewDataLoader {
     const users = await this.userModel
       .find({
         role: { $in: ['crew', 'crew_lead', 'driver'] },
-        isActive: true
+        isActive: true,
       })
       .lean()
       .exec();
 
-    return users.map(user => this.convertUserToCrewMember(user));
+    return users.map((user) => this.convertUserToCrewMember(user));
   }
 
   private convertUserToCrewMember(user: any): CrewMember {
@@ -76,14 +76,17 @@ export class CrewDataLoader {
       userId: user._id?.toString() || user.id,
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      fullName: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+      fullName:
+        user.firstName && user.lastName
+          ? `${user.firstName} ${user.lastName}`
+          : user.username,
       email: user.email,
       phone: user.phone,
       role: user.role,
       status: user.isActive ? 'active' : 'inactive',
       skills: user.skills || [],
       certifications: user.certifications || [],
-      availability: user.availability || {}
+      availability: user.availability || {},
     };
   }
 }

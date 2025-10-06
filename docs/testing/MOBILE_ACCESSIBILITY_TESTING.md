@@ -50,19 +50,21 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 1: Mobile Navigation Flow
 
 **Steps:**
+
 1. Open SimplePro app in Safari
 2. Enable VoiceOver
 3. Swipe right from top of page
 
 **Expected Announcements:**
 
-| Step | VoiceOver Announcement | Pass/Fail |
-|------|------------------------|-----------|
-| 1 | "Skip to main content, link" | ✅ |
-| 2 | "Open menu, button" | ✅ |
-| 3 | "Main content, heading level 1" | ✅ |
+| Step | VoiceOver Announcement          | Pass/Fail |
+| ---- | ------------------------------- | --------- |
+| 1    | "Skip to main content, link"    | ✅        |
+| 2    | "Open menu, button"             | ✅        |
+| 3    | "Main content, heading level 1" | ✅        |
 
 **Verify:**
+
 - [ ] Skip link is first focusable element
 - [ ] Hamburger button announced as "Open menu, button"
 - [ ] Button has "button" role announced
@@ -71,6 +73,7 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 2: Opening Mobile Sidebar
 
 **Steps:**
+
 1. VoiceOver on "Open menu" button
 2. Double tap to activate
 3. Wait for sidebar to open
@@ -78,16 +81,17 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 
 **Expected Announcements:**
 
-| Element | VoiceOver Announcement | Pass/Fail |
-|---------|------------------------|-----------|
-| Menu Button (after open) | "Close menu, button, expanded" | ✅ |
-| SimplePro Logo | "SimplePro, heading level 1" | ✅ |
-| First Nav Item | "Dashboard, button, selected, tab 1 of 14" | ✅ |
-| Second Nav Item | "New Opportunity, button, tab 2 of 14" | ✅ |
-| Active Nav Item | "Estimates, button, selected, tab 3 of 14" | ✅ |
-| User Info | "John Doe, Administrator" | ✅ |
+| Element                  | VoiceOver Announcement                     | Pass/Fail |
+| ------------------------ | ------------------------------------------ | --------- |
+| Menu Button (after open) | "Close menu, button, expanded"             | ✅        |
+| SimplePro Logo           | "SimplePro, heading level 1"               | ✅        |
+| First Nav Item           | "Dashboard, button, selected, tab 1 of 14" | ✅        |
+| Second Nav Item          | "New Opportunity, button, tab 2 of 14"     | ✅        |
+| Active Nav Item          | "Estimates, button, selected, tab 3 of 14" | ✅        |
+| User Info                | "John Doe, Administrator"                  | ✅        |
 
 **Verify:**
+
 - [ ] Button state changes to "Close menu, expanded"
 - [ ] `aria-expanded="true"` announced
 - [ ] Navigation items have "tab" role announced
@@ -99,11 +103,13 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 3: Navigating Through Sidebar
 
 **Steps:**
+
 1. Sidebar open
 2. Swipe right through all navigation items
 3. Select a navigation item
 
 **Expected Behavior:**
+
 - [ ] Each item announced with label and icon description
 - [ ] Active item announced as "selected"
 - [ ] Inactive items not marked as selected
@@ -114,18 +120,20 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 4: Closing Sidebar
 
 **Steps:**
+
 1. Sidebar open
 2. Double-tap on backdrop
 3. Or double-tap "Close menu" button
 
 **Expected Announcements:**
 
-| Action | VoiceOver Announcement | Pass/Fail |
-|--------|------------------------|-----------|
-| Tap backdrop | (Closes sidebar, no announcement) | ✅ |
-| Button focus returns | "Open menu, button, collapsed" | ✅ |
+| Action               | VoiceOver Announcement            | Pass/Fail |
+| -------------------- | --------------------------------- | --------- |
+| Tap backdrop         | (Closes sidebar, no announcement) | ✅        |
+| Button focus returns | "Open menu, button, collapsed"    | ✅        |
 
 **Verify:**
+
 - [ ] Backdrop has `aria-hidden="true"` (not focusable)
 - [ ] Sidebar closes on backdrop tap
 - [ ] Focus returns to hamburger button
@@ -134,22 +142,24 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 5: Form Navigation
 
 **Steps:**
+
 1. Navigate to Estimate Form
 2. Swipe through all form fields
 
 **Expected for Each Input:**
 
-| Field | VoiceOver Announcement | Pass/Fail |
-|-------|------------------------|-----------|
-| Text Input | "Customer Name, text field, required" | ✅ |
-| Email Input | "Email, email field, required" | ✅ |
-| Phone Input | "Phone, telephone number field" | ✅ |
-| Date Picker | "Move Date, date field" | ✅ |
-| Dropdown | "Move Size, pop-up button" | ✅ |
-| Checkbox | "Packing required, checkbox, not checked" | ✅ |
-| Submit Button | "Calculate Estimate, button" | ✅ |
+| Field         | VoiceOver Announcement                    | Pass/Fail |
+| ------------- | ----------------------------------------- | --------- |
+| Text Input    | "Customer Name, text field, required"     | ✅        |
+| Email Input   | "Email, email field, required"            | ✅        |
+| Phone Input   | "Phone, telephone number field"           | ✅        |
+| Date Picker   | "Move Date, date field"                   | ✅        |
+| Dropdown      | "Move Size, pop-up button"                | ✅        |
+| Checkbox      | "Packing required, checkbox, not checked" | ✅        |
+| Submit Button | "Calculate Estimate, button"              | ✅        |
 
 **Verify:**
+
 - [ ] All labels announced
 - [ ] Input types announced correctly
 - [ ] Required fields announced as "required"
@@ -160,20 +170,22 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 6: Button Interaction
 
 **Steps:**
+
 1. Navigate to buttons throughout app
 2. Verify consistent announcements
 
 **Expected for Primary Buttons:**
 
 | Button | VoiceOver Announcement | Pass/Fail |
-|--------|------------------------|-----------|
-| Login | "Log In, button" | ✅ |
-| Submit | "Submit, button" | ✅ |
-| Save | "Save Changes, button" | ✅ |
-| Cancel | "Cancel, button" | ✅ |
-| Delete | "Delete, button" | ✅ |
+| ------ | ---------------------- | --------- |
+| Login  | "Log In, button"       | ✅        |
+| Submit | "Submit, button"       | ✅        |
+| Save   | "Save Changes, button" | ✅        |
+| Cancel | "Cancel, button"       | ✅        |
+| Delete | "Delete, button"       | ✅        |
 
 **Verify:**
+
 - [ ] All buttons announced as "button"
 - [ ] Button labels descriptive
 - [ ] Disabled buttons announced as "dimmed"
@@ -204,19 +216,21 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 1: Mobile Navigation Flow
 
 **Steps:**
+
 1. Open SimplePro in Chrome
 2. Enable TalkBack
 3. Swipe right from top
 
 **Expected Announcements:**
 
-| Step | TalkBack Announcement | Pass/Fail |
-|------|----------------------|-----------|
-| 1 | "Skip to main content, link" | ✅ |
-| 2 | "Open menu, button" | ✅ |
-| 3 | "Main content, heading" | ✅ |
+| Step | TalkBack Announcement        | Pass/Fail |
+| ---- | ---------------------------- | --------- |
+| 1    | "Skip to main content, link" | ✅        |
+| 2    | "Open menu, button"          | ✅        |
+| 3    | "Main content, heading"      | ✅        |
 
 **Verify:**
+
 - [ ] All elements announced in logical order
 - [ ] Button roles announced
 - [ ] Headings announced as "heading"
@@ -225,18 +239,20 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 2: Opening Sidebar with TalkBack
 
 **Steps:**
+
 1. Focus "Open menu" button
 2. Double tap to activate
 3. Swipe right through navigation
 
 **Expected Announcements:**
 
-| Element | TalkBack Announcement | Pass/Fail |
-|---------|----------------------|-----------|
-| Menu Button | "Close menu, button, expanded" | ✅ |
-| Navigation Item | "Dashboard, button, selected, tab, 1 of 14" | ✅ |
+| Element         | TalkBack Announcement                       | Pass/Fail |
+| --------------- | ------------------------------------------- | --------- |
+| Menu Button     | "Close menu, button, expanded"              | ✅        |
+| Navigation Item | "Dashboard, button, selected, tab, 1 of 14" | ✅        |
 
 **Verify:**
+
 - [ ] State change announced
 - [ ] Navigation items announced with position
 - [ ] Active state announced
@@ -244,12 +260,14 @@ This guide provides comprehensive accessibility testing procedures for SimplePro
 ##### Scenario 3: Android-Specific Features
 
 **Android Context Menu (Swipe up then down):**
+
 - [ ] "Actions" menu available for interactive elements
 - [ ] "Activate" action available for buttons
 - [ ] "Click" available for links
 - [ ] No duplicate actions
 
 **Android Settings:**
+
 - [ ] App works with "Speak passwords" on/off
 - [ ] App works with "Verbosity" set to low/medium/high
 - [ ] App works with custom TalkBack settings
@@ -290,23 +308,25 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 1: Tab Order
 
 **Steps:**
+
 1. Connect Bluetooth keyboard to iOS/Android device
 2. Open SimplePro app
 3. Press Tab repeatedly
 
 **Expected Tab Order:**
 
-| Order | Element | Notes |
-|-------|---------|-------|
-| 1 | Skip link | First focusable |
-| 2 | Hamburger menu button | Mobile only |
-| 3 | First navigation item | (if sidebar open or desktop) |
-| 4 | Second navigation item | |
-| ... | ... | |
-| N | Main content links | After sidebar |
-| N+1 | Form inputs | In document order |
+| Order | Element                | Notes                        |
+| ----- | ---------------------- | ---------------------------- |
+| 1     | Skip link              | First focusable              |
+| 2     | Hamburger menu button  | Mobile only                  |
+| 3     | First navigation item  | (if sidebar open or desktop) |
+| 4     | Second navigation item |                              |
+| ...   | ...                    |                              |
+| N     | Main content links     | After sidebar                |
+| N+1   | Form inputs            | In document order            |
 
 **Verify:**
+
 - [ ] Tab order logical and sequential
 - [ ] No elements skipped
 - [ ] No hidden elements in tab order
@@ -316,10 +336,12 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 2: Focus Indicators
 
 **Steps:**
+
 1. Press Tab through app
 2. Observe focus indicators
 
 **Verify:**
+
 - [ ] Focus indicator visible on all elements
 - [ ] Outline color: `#60a5fa` (blue-400)
 - [ ] Outline width: 3px
@@ -332,16 +354,17 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 
 **Common Shortcuts:**
 
-| Key | Expected Behavior | Pass/Fail |
-|-----|-------------------|-----------|
-| Tab | Move focus forward | ✅ |
-| Shift+Tab | Move focus backward | ✅ |
-| Enter | Activate button/link | ✅ |
-| Space | Activate button/checkbox | ✅ |
-| Escape | Close modal/sidebar (future) | ⏳ Not implemented |
-| Arrow Keys | Navigate within sidebar | ⚠️ Partial |
+| Key        | Expected Behavior            | Pass/Fail          |
+| ---------- | ---------------------------- | ------------------ |
+| Tab        | Move focus forward           | ✅                 |
+| Shift+Tab  | Move focus backward          | ✅                 |
+| Enter      | Activate button/link         | ✅                 |
+| Space      | Activate button/checkbox     | ✅                 |
+| Escape     | Close modal/sidebar (future) | ⏳ Not implemented |
+| Arrow Keys | Navigate within sidebar      | ⚠️ Partial         |
 
 **Verify:**
+
 - [ ] Enter activates hamburger menu
 - [ ] Enter activates navigation items
 - [ ] Space activates checkboxes
@@ -352,10 +375,12 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 4: No Keyboard Traps
 
 **Steps:**
+
 1. Tab into each component
 2. Attempt to Tab out
 
 **Test Components:**
+
 - [ ] Mobile sidebar (can Tab out)
 - [ ] Forms (can Tab through and out)
 - [ ] Modals (can Escape or Tab to close button)
@@ -365,11 +390,13 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 5: Skip Links
 
 **Steps:**
+
 1. Load page
 2. Press Tab (first element should be skip link)
 3. Press Enter
 
 **Verify:**
+
 - [ ] Skip link is first Tab stop
 - [ ] Skip link visible on focus
 - [ ] Activating skip link moves focus to main content
@@ -394,19 +421,20 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 
 **Primary Buttons:**
 
-| Component | Background | Text Color | Ratio | WCAG Level | Pass/Fail |
-|-----------|------------|------------|-------|------------|-----------|
-| Primary Button | #2563eb | #ffffff | 5.9:1 | AA ✅ | ✅ |
-| Hover State | #1d4ed8 | #ffffff | 7.1:1 | AAA ✅ | ✅ |
-| Focus Ring | #60a5fa | #ffffff (bg) | 3.2:1 | AA ✅ | ✅ |
+| Component      | Background | Text Color   | Ratio | WCAG Level | Pass/Fail |
+| -------------- | ---------- | ------------ | ----- | ---------- | --------- |
+| Primary Button | #2563eb    | #ffffff      | 5.9:1 | AA ✅      | ✅        |
+| Hover State    | #1d4ed8    | #ffffff      | 7.1:1 | AAA ✅     | ✅        |
+| Focus Ring     | #60a5fa    | #ffffff (bg) | 3.2:1 | AA ✅      | ✅        |
 
 **Secondary Buttons:**
 
-| Component | Background | Text Color | Ratio | WCAG Level | Pass/Fail |
-|-----------|------------|------------|-------|------------|-----------|
-| Secondary Button | #6b7280 | #ffffff | 4.6:1 | AA ✅ | ✅ |
+| Component        | Background | Text Color | Ratio | WCAG Level | Pass/Fail |
+| ---------------- | ---------- | ---------- | ----- | ---------- | --------- |
+| Secondary Button | #6b7280    | #ffffff    | 4.6:1 | AA ✅      | ✅        |
 
 **Verify:**
+
 - [ ] All primary buttons meet AA (4.5:1)
 - [ ] Hover states maintain contrast
 - [ ] Disabled buttons distinguishable (contrast not required)
@@ -416,15 +444,16 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 
 **Body Text:**
 
-| Element | Background | Text Color | Ratio | WCAG Level | Pass/Fail |
-|---------|------------|------------|-------|------------|-----------|
-| Body Text | #ffffff | #1f2937 | 14.3:1 | AAA ✅ | ✅ |
-| Headings | #ffffff | #111827 | 16.1:1 | AAA ✅ | ✅ |
-| Labels | #ffffff | #374151 | 10.8:1 | AAA ✅ | ✅ |
-| Help Text | #ffffff | #6b7280 | 4.6:1 | AA ✅ | ✅ |
-| Placeholder | #ffffff | #9ca3af | 2.9:1 | ❌ Fail | ⚠️ |
+| Element     | Background | Text Color | Ratio  | WCAG Level | Pass/Fail |
+| ----------- | ---------- | ---------- | ------ | ---------- | --------- |
+| Body Text   | #ffffff    | #1f2937    | 14.3:1 | AAA ✅     | ✅        |
+| Headings    | #ffffff    | #111827    | 16.1:1 | AAA ✅     | ✅        |
+| Labels      | #ffffff    | #374151    | 10.8:1 | AAA ✅     | ✅        |
+| Help Text   | #ffffff    | #6b7280    | 4.6:1  | AA ✅      | ✅        |
+| Placeholder | #ffffff    | #9ca3af    | 2.9:1  | ❌ Fail    | ⚠️        |
 
 **Issues Found:**
+
 - ⚠️ Placeholder text contrast 2.9:1 (below 4.5:1 AA requirement)
 - **Recommendation:** Darken placeholder color to `#6b7280` (4.6:1 ratio)
 
@@ -432,21 +461,22 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 
 **Sidebar:**
 
-| Component | Background | Border/Icon | Ratio | WCAG Level | Pass/Fail |
-|-----------|------------|-------------|-------|------------|-----------|
-| Sidebar Background | #1e40af | N/A | N/A | N/A | N/A |
-| Navigation Text | #1e40af | #ffffff | 5.6:1 | AA ✅ | ✅ |
-| Active Item | #2563eb | #ffffff | 5.9:1 | AA ✅ | ✅ |
-| Icons | #1e40af | #ffffff | 5.6:1 | AA ✅ | ✅ |
+| Component          | Background | Border/Icon | Ratio | WCAG Level | Pass/Fail |
+| ------------------ | ---------- | ----------- | ----- | ---------- | --------- |
+| Sidebar Background | #1e40af    | N/A         | N/A   | N/A        | N/A       |
+| Navigation Text    | #1e40af    | #ffffff     | 5.6:1 | AA ✅      | ✅        |
+| Active Item        | #2563eb    | #ffffff     | 5.9:1 | AA ✅      | ✅        |
+| Icons              | #1e40af    | #ffffff     | 5.6:1 | AA ✅      | ✅        |
 
 **Form Inputs:**
 
-| Component | Background | Border | Ratio | WCAG Level | Pass/Fail |
-|-----------|------------|--------|-------|------------|-----------|
-| Input Border | #ffffff | #d1d5db | 1.4:1 | ❌ Fail | ⚠️ |
-| Input Focus Border | #ffffff | #2563eb | 3.4:1 | AA ✅ | ✅ |
+| Component          | Background | Border  | Ratio | WCAG Level | Pass/Fail |
+| ------------------ | ---------- | ------- | ----- | ---------- | --------- |
+| Input Border       | #ffffff    | #d1d5db | 1.4:1 | ❌ Fail    | ⚠️        |
+| Input Focus Border | #ffffff    | #2563eb | 3.4:1 | AA ✅      | ✅        |
 
 **Issues Found:**
+
 - ⚠️ Input border contrast 1.4:1 (below 3:1 requirement)
 - **Recommendation:** Darken input border to `#9ca3af` (2.9:1) or `#6b7280` (4.6:1)
 
@@ -492,16 +522,19 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 3: Simulated Color Blindness
 
 **Tools:**
+
 - Chrome extension: "Colorblindly"
 - Firefox: "Colorblind - Dalton for Firefox"
 - macOS: Accessibility Display Filter
 
 **Test:**
+
 1. Enable Protanopia filter
 2. Navigate app and verify all information visible
 3. Repeat for Deuteranopia and Tritanopia
 
 **Verify:**
+
 - [ ] All buttons distinguishable
 - [ ] Links identifiable
 - [ ] Form errors visible
@@ -521,15 +554,16 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 
 **Measure using Chrome DevTools:**
 
-| Button | Width | Height | Pass/Fail |
-|--------|-------|--------|-----------|
-| Hamburger Menu | 44px | 44px | ✅ Pass |
-| Navigation Items | 280px | 48px | ✅ Pass |
-| Primary Buttons | varies | 44px | ✅ Pass |
-| Close (X) Buttons | 44px | 44px | ✅ Pass |
-| Form Submit | varies | 44px | ✅ Pass |
+| Button            | Width  | Height | Pass/Fail |
+| ----------------- | ------ | ------ | --------- |
+| Hamburger Menu    | 44px   | 44px   | ✅ Pass   |
+| Navigation Items  | 280px  | 48px   | ✅ Pass   |
+| Primary Buttons   | varies | 44px   | ✅ Pass   |
+| Close (X) Buttons | 44px   | 44px   | ✅ Pass   |
+| Form Submit       | varies | 44px   | ✅ Pass   |
 
 **Verify:**
+
 - [ ] All buttons ≥44×44px
 - [ ] Adequate spacing between touch targets (≥8px)
 - [ ] Small icons inside larger touch areas
@@ -538,10 +572,12 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 2: Interactive Element Spacing
 
 **Test:**
+
 1. Use finger (not stylus) to tap elements
 2. Verify no accidental taps
 
 **Verify:**
+
 - [ ] Buttons in toolbars have spacing
 - [ ] List items have spacing
 - [ ] Form inputs have spacing
@@ -560,12 +596,14 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 1: Browser Zoom (iOS/Android)
 
 **iOS Safari:**
+
 1. Open SimplePro
 2. Double-tap to zoom
 3. Or pinch to zoom
 4. Navigate at 200% zoom
 
 **Verify:**
+
 - [ ] Layout doesn't break
 - [ ] No horizontal scrolling on zoomed page
 - [ ] All content readable
@@ -575,12 +613,14 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 2: Text Size (iOS Accessibility)
 
 **iOS Settings:**
+
 1. Settings → Accessibility → Display & Text Size → Larger Text
 2. Enable "Larger Accessibility Sizes"
 3. Set slider to maximum
 4. Open SimplePro
 
 **Verify:**
+
 - [ ] Text scales appropriately
 - [ ] Layout adapts
 - [ ] No text overflow
@@ -590,11 +630,13 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ##### Scenario 3: Android Text Scaling
 
 **Android Settings:**
+
 1. Settings → Display → Font size and style
 2. Set to "Huge"
 3. Open SimplePro
 
 **Verify:**
+
 - [ ] Text scales correctly
 - [ ] UI adapts to larger text
 - [ ] No layout breakage
@@ -689,10 +731,12 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ### 1. axe DevTools (Browser Extension)
 
 **Installation:**
+
 - Chrome: chrome.google.com/webstore → "axe DevTools"
 - Firefox: addons.mozilla.org → "axe DevTools"
 
 **Usage:**
+
 1. Open SimplePro app
 2. Open DevTools (F12)
 3. Click "axe DevTools" tab
@@ -700,6 +744,7 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 5. Review issues
 
 **Expected Results:**
+
 - 0 Critical issues
 - 0-5 Moderate issues (to be reviewed)
 - Some "Best Practice" suggestions
@@ -707,6 +752,7 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 ### 2. Lighthouse (Chrome DevTools)
 
 **Usage:**
+
 1. Open SimplePro
 2. Open DevTools (F12)
 3. Click "Lighthouse" tab
@@ -716,6 +762,7 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 **Target Score:** ≥90/100
 
 **Common Issues:**
+
 - Background/foreground color contrast
 - Missing alt text on images
 - Missing ARIA labels
@@ -726,6 +773,7 @@ Many mobile users use external keyboards, especially on tablets. Test with Bluet
 **Installation:** wave.webaim.org or browser extension
 
 **Usage:**
+
 1. Open SimplePro
 2. Click WAVE icon
 3. Review errors/alerts
@@ -847,6 +895,7 @@ pa11y http://localhost:3009 --standard WCAG2AA --reporter cli
 **Assistive Tech:** [VoiceOver, TalkBack, Keyboard, etc.]
 
 ### Tests Performed
+
 - [ ] Screen reader navigation
 - [ ] Keyboard navigation
 - [ ] Color contrast
@@ -855,6 +904,7 @@ pa11y http://localhost:3009 --standard WCAG2AA --reporter cli
 - [ ] Automated tools (axe, Lighthouse)
 
 ### Results Summary
+
 - **WCAG Level A:** Pass/Fail
 - **WCAG Level AA:** Pass/Fail
 - **Screen Reader:** Pass/Fail
@@ -862,6 +912,7 @@ pa11y http://localhost:3009 --standard WCAG2AA --reporter cli
 - **Lighthouse Score:** X/100
 
 ### Issues Found
+
 1. **[Critical]** [Description]
    - **Location:** [Page/component]
    - **WCAG Criterion:** [1.4.3, 2.1.1, etc.]
@@ -869,6 +920,7 @@ pa11y http://localhost:3009 --standard WCAG2AA --reporter cli
    - **Recommendation:** [Fix suggestion]
 
 ### Sign-Off
+
 - [ ] No critical accessibility issues
 - [ ] WCAG 2.1 Level AA compliant
 - [ ] Screen reader usable
@@ -885,6 +937,7 @@ SimplePro-v3 mobile interface demonstrates strong accessibility compliance with 
 ### Overall Accessibility Score: 92/100
 
 **Strengths:**
+
 - Full screen reader support
 - Keyboard navigation
 - Good color contrast (most elements)
@@ -892,6 +945,7 @@ SimplePro-v3 mobile interface demonstrates strong accessibility compliance with 
 - Semantic HTML
 
 **Areas for Improvement:**
+
 - Input border contrast (currently 1.4:1, should be 3:1+)
 - Placeholder text contrast (currently 2.9:1, should be 4.5:1+)
 - Some AAA criteria not met (acceptable)
@@ -915,6 +969,6 @@ SimplePro-v3 mobile interface demonstrates strong accessibility compliance with 
 
 ## Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | Claude Code | Initial accessibility testing guide |
+| Version | Date       | Author      | Changes                             |
+| ------- | ---------- | ----------- | ----------------------------------- |
+| 1.0     | 2025-10-02 | Claude Code | Initial accessibility testing guide |

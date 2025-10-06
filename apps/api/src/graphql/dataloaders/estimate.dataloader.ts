@@ -24,8 +24,8 @@ export class EstimateDataLoader {
     async (estimateIds: readonly string[]) => {
       // In a real implementation, this would query MongoDB
       // For now, return null for all estimates
-      return estimateIds.map(id => this.estimateCache.get(id) || null);
-    }
+      return estimateIds.map((id) => this.estimateCache.get(id) || null);
+    },
   );
 
   async load(estimateId: string): Promise<Estimate | null> {
@@ -33,7 +33,9 @@ export class EstimateDataLoader {
   }
 
   async loadMany(estimateIds: string[]): Promise<(Estimate | null)[]> {
-    return this.batchEstimates.loadMany(estimateIds) as Promise<(Estimate | null)[]>;
+    return this.batchEstimates.loadMany(estimateIds) as Promise<
+      (Estimate | null)[]
+    >;
   }
 
   // Helper method to cache an estimate

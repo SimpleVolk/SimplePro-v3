@@ -32,7 +32,11 @@ export default function AutoPricingEngine() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [editingCell, setEditingCell] = useState<{ table: string; index: number; field: string } | null>(null);
+  const [editingCell, setEditingCell] = useState<{
+    table: string;
+    index: number;
+    field: string;
+  } | null>(null);
   const [tempValue, setTempValue] = useState('');
 
   useEffect(() => {
@@ -47,9 +51,9 @@ export default function AutoPricingEngine() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('tariff-settings/active'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -67,7 +71,12 @@ export default function AutoPricingEngine() {
     }
   };
 
-  const handleCellEdit = (table: string, index: number, field: string, currentValue: number) => {
+  const handleCellEdit = (
+    table: string,
+    index: number,
+    field: string,
+    currentValue: number,
+  ) => {
     setEditingCell({ table, index, field });
     setTempValue(currentValue.toString());
   };
@@ -101,11 +110,11 @@ export default function AutoPricingEngine() {
         {
           method: 'PATCH',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(updatedAutoPricing)
-        }
+          body: JSON.stringify(updatedAutoPricing),
+        },
       );
 
       if (!response.ok) {
@@ -177,13 +186,13 @@ export default function AutoPricingEngine() {
       <div className={styles.header}>
         <div>
           <h3>Auto-Pricing Engine</h3>
-          <p>Configure automated crew and truck assignments based on move volume</p>
+          <p>
+            Configure automated crew and truck assignments based on move volume
+          </p>
           {successMessage && (
             <p className={styles.successMessage}>✅ {successMessage}</p>
           )}
-          {error && (
-            <p className={styles.errorMessage}>❌ {error}</p>
-          )}
+          {error && <p className={styles.errorMessage}>❌ {error}</p>}
         </div>
         <div className={styles.headerActions}>
           <button
@@ -216,9 +225,10 @@ export default function AutoPricingEngine() {
               <tr>
                 <td className={styles.labelCell}>Max Cuft</td>
                 {autoPricing.crewAbility.map((entry, idx) => {
-                  const isEditing = editingCell?.table === 'crewAbility' &&
-                                    editingCell?.index === idx &&
-                                    editingCell?.field === 'maxCubicFeet';
+                  const isEditing =
+                    editingCell?.table === 'crewAbility' &&
+                    editingCell?.index === idx &&
+                    editingCell?.field === 'maxCubicFeet';
 
                   return (
                     <td key={idx} className={styles.valueCell}>
@@ -236,7 +246,14 @@ export default function AutoPricingEngine() {
                       ) : (
                         <button
                           className={styles.cellButton}
-                          onClick={() => handleCellEdit('crewAbility', idx, 'maxCubicFeet', entry.maxCubicFeet)}
+                          onClick={() =>
+                            handleCellEdit(
+                              'crewAbility',
+                              idx,
+                              'maxCubicFeet',
+                              entry.maxCubicFeet,
+                            )
+                          }
                           disabled={saving}
                           title="Click to edit"
                         >
@@ -268,12 +285,14 @@ export default function AutoPricingEngine() {
             </thead>
             <tbody>
               {autoPricing.crewRequired.map((entry, idx) => {
-                const isEditingMinCuft = editingCell?.table === 'crewRequired' &&
-                                          editingCell?.index === idx &&
-                                          editingCell?.field === 'minCubicFeet';
-                const isEditingCrewSize = editingCell?.table === 'crewRequired' &&
-                                           editingCell?.index === idx &&
-                                           editingCell?.field === 'crewSize';
+                const isEditingMinCuft =
+                  editingCell?.table === 'crewRequired' &&
+                  editingCell?.index === idx &&
+                  editingCell?.field === 'minCubicFeet';
+                const isEditingCrewSize =
+                  editingCell?.table === 'crewRequired' &&
+                  editingCell?.index === idx &&
+                  editingCell?.field === 'crewSize';
 
                 return (
                   <tr key={idx}>
@@ -292,7 +311,14 @@ export default function AutoPricingEngine() {
                       ) : (
                         <button
                           className={styles.cellButton}
-                          onClick={() => handleCellEdit('crewRequired', idx, 'minCubicFeet', entry.minCubicFeet)}
+                          onClick={() =>
+                            handleCellEdit(
+                              'crewRequired',
+                              idx,
+                              'minCubicFeet',
+                              entry.minCubicFeet,
+                            )
+                          }
                           disabled={saving}
                           title="Click to edit"
                         >
@@ -315,7 +341,14 @@ export default function AutoPricingEngine() {
                       ) : (
                         <button
                           className={styles.cellButton}
-                          onClick={() => handleCellEdit('crewRequired', idx, 'crewSize', entry.crewSize)}
+                          onClick={() =>
+                            handleCellEdit(
+                              'crewRequired',
+                              idx,
+                              'crewSize',
+                              entry.crewSize,
+                            )
+                          }
                           disabled={saving}
                           title="Click to edit"
                         >
@@ -347,12 +380,14 @@ export default function AutoPricingEngine() {
             </thead>
             <tbody>
               {autoPricing.trucksRequired.map((entry, idx) => {
-                const isEditingMinCuft = editingCell?.table === 'trucksRequired' &&
-                                          editingCell?.index === idx &&
-                                          editingCell?.field === 'minCubicFeet';
-                const isEditingTruckCount = editingCell?.table === 'trucksRequired' &&
-                                             editingCell?.index === idx &&
-                                             editingCell?.field === 'truckCount';
+                const isEditingMinCuft =
+                  editingCell?.table === 'trucksRequired' &&
+                  editingCell?.index === idx &&
+                  editingCell?.field === 'minCubicFeet';
+                const isEditingTruckCount =
+                  editingCell?.table === 'trucksRequired' &&
+                  editingCell?.index === idx &&
+                  editingCell?.field === 'truckCount';
 
                 return (
                   <tr key={idx}>
@@ -371,7 +406,14 @@ export default function AutoPricingEngine() {
                       ) : (
                         <button
                           className={styles.cellButton}
-                          onClick={() => handleCellEdit('trucksRequired', idx, 'minCubicFeet', entry.minCubicFeet)}
+                          onClick={() =>
+                            handleCellEdit(
+                              'trucksRequired',
+                              idx,
+                              'minCubicFeet',
+                              entry.minCubicFeet,
+                            )
+                          }
                           disabled={saving}
                           title="Click to edit"
                         >
@@ -394,7 +436,14 @@ export default function AutoPricingEngine() {
                       ) : (
                         <button
                           className={styles.cellButton}
-                          onClick={() => handleCellEdit('trucksRequired', idx, 'truckCount', entry.truckCount)}
+                          onClick={() =>
+                            handleCellEdit(
+                              'trucksRequired',
+                              idx,
+                              'truckCount',
+                              entry.truckCount,
+                            )
+                          }
                           disabled={saving}
                           title="Click to edit"
                         >
@@ -415,11 +464,26 @@ export default function AutoPricingEngine() {
         <h4>How Auto-Pricing Works</h4>
         <div className={styles.tips}>
           <ul>
-            <li><strong>Crew Ability:</strong> Defines the maximum volume each crew size can handle efficiently</li>
-            <li><strong>Crew Required:</strong> Automatically assigns the appropriate crew size based on total move volume</li>
-            <li><strong>Trucks Required:</strong> Calculates the number of trucks needed based on total cubic feet</li>
-            <li><strong>Tip:</strong> Click any value to edit it. Press Enter to save or Escape to cancel</li>
-            <li><strong>Note:</strong> Changes are applied immediately to all new estimates</li>
+            <li>
+              <strong>Crew Ability:</strong> Defines the maximum volume each
+              crew size can handle efficiently
+            </li>
+            <li>
+              <strong>Crew Required:</strong> Automatically assigns the
+              appropriate crew size based on total move volume
+            </li>
+            <li>
+              <strong>Trucks Required:</strong> Calculates the number of trucks
+              needed based on total cubic feet
+            </li>
+            <li>
+              <strong>Tip:</strong> Click any value to edit it. Press Enter to
+              save or Escape to cancel
+            </li>
+            <li>
+              <strong>Note:</strong> Changes are applied immediately to all new
+              estimates
+            </li>
           </ul>
         </div>
 

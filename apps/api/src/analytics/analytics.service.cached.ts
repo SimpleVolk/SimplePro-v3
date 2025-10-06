@@ -47,21 +47,36 @@ export async function getDashboardMetricsCached(this: any) {
   ] = await Promise.all([
     this.jobModel.countDocuments().exec(),
     this.jobModel.countDocuments({ createdAt: { $gte: thisMonth } }).exec(),
-    this.jobModel.countDocuments({ createdAt: { $gte: lastMonth, $lt: thisMonth } }).exec(),
-    this.jobModel.aggregate([
-      { $match: { status: 'completed' } },
-      { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      { $match: { status: 'completed', createdAt: { $gte: thisMonth } } },
-      { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      { $match: { status: 'completed', createdAt: { $gte: lastMonth, $lt: thisMonth } } },
-      { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } }
-    ]).exec(),
+    this.jobModel
+      .countDocuments({ createdAt: { $gte: lastMonth, $lt: thisMonth } })
+      .exec(),
+    this.jobModel
+      .aggregate([
+        { $match: { status: 'completed' } },
+        { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        { $match: { status: 'completed', createdAt: { $gte: thisMonth } } },
+        { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        {
+          $match: {
+            status: 'completed',
+            createdAt: { $gte: lastMonth, $lt: thisMonth },
+          },
+        },
+        { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } },
+      ])
+      .exec(),
     this.customerModel.countDocuments().exec(),
-    this.customerModel.countDocuments({ createdAt: { $gte: thisMonth } }).exec(),
+    this.customerModel
+      .countDocuments({ createdAt: { $gte: thisMonth } })
+      .exec(),
     this.jobModel.countDocuments({ status: 'in_progress' }).exec(),
   ]);
 
@@ -70,15 +85,21 @@ export async function getDashboardMetricsCached(this: any) {
       total: totalJobs,
       thisMonth: jobsThisMonth,
       lastMonth: jobsLastMonth,
-      growth: jobsLastMonth > 0 ? ((jobsThisMonth - jobsLastMonth) / jobsLastMonth) * 100 : 0,
+      growth:
+        jobsLastMonth > 0
+          ? ((jobsThisMonth - jobsLastMonth) / jobsLastMonth) * 100
+          : 0,
     },
     revenue: {
       total: totalRevenue[0]?.total || 0,
       thisMonth: revenueThisMonth[0]?.total || 0,
       lastMonth: revenueLastMonth[0]?.total || 0,
-      growth: revenueLastMonth[0]?.total > 0
-        ? ((revenueThisMonth[0]?.total - revenueLastMonth[0]?.total) / revenueLastMonth[0]?.total) * 100
-        : 0,
+      growth:
+        revenueLastMonth[0]?.total > 0
+          ? ((revenueThisMonth[0]?.total - revenueLastMonth[0]?.total) /
+              revenueLastMonth[0]?.total) *
+            100
+          : 0,
     },
     customers: {
       total: totalCustomers,
@@ -103,7 +124,7 @@ export async function getDashboardMetricsCached(this: any) {
 export async function getRevenueAnalysisCached(
   this: any,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ) {
   const cacheService: CacheService = this.cacheService;
 
@@ -115,37 +136,63 @@ export async function getRevenueAnalysisCached(
   }
 
   // Aggregate revenue by various dimensions
-  const [
-    byType,
-    byStatus,
-    byMonth,
-    topCustomers,
-  ] = await Promise.all([
-    this.jobModel.aggregate([
-      { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
-      { $group: { _id: '$type', revenue: { $sum: '$pricing.finalPrice' }, count: { $sum: 1 } } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
-      { $group: { _id: '$status', revenue: { $sum: '$pricing.finalPrice' }, count: { $sum: 1 } } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
-          revenue: { $sum: '$pricing.finalPrice' },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      { $match: { createdAt: { $gte: startDate, $lte: endDate }, status: 'completed' } },
-      { $group: { _id: '$customerId', revenue: { $sum: '$pricing.finalPrice' }, count: { $sum: 1 } } },
-      { $sort: { revenue: -1 } },
-      { $limit: 10 }
-    ]).exec(),
+  const [byType, byStatus, byMonth, topCustomers] = await Promise.all([
+    this.jobModel
+      .aggregate([
+        { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: '$type',
+            revenue: { $sum: '$pricing.finalPrice' },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: '$status',
+            revenue: { $sum: '$pricing.finalPrice' },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+            revenue: { $sum: '$pricing.finalPrice' },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startDate, $lte: endDate },
+            status: 'completed',
+          },
+        },
+        {
+          $group: {
+            _id: '$customerId',
+            revenue: { $sum: '$pricing.finalPrice' },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { revenue: -1 } },
+        { $limit: 10 },
+      ])
+      .exec(),
   ]);
 
   const analysis = {
@@ -153,7 +200,10 @@ export async function getRevenueAnalysisCached(
     byStatus,
     byMonth,
     topCustomers,
-    totalRevenue: byStatus.reduce((sum: number, item: any) => sum + item.revenue, 0),
+    totalRevenue: byStatus.reduce(
+      (sum: number, item: any) => sum + item.revenue,
+      0,
+    ),
     totalJobs: byStatus.reduce((sum: number, item: any) => sum + item.count, 0),
   };
 
@@ -171,7 +221,7 @@ export async function getRevenueAnalysisCached(
 export async function getConversionFunnelCached(
   this: any,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ) {
   const cacheService: CacheService = this.cacheService;
 
@@ -190,38 +240,71 @@ export async function getConversionFunnelCached(
     scheduledJobs,
     completedJobs,
   ] = await Promise.all([
-    this.customerModel.countDocuments({
-      status: 'lead',
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).exec(),
-    this.customerModel.countDocuments({
-      status: 'prospect',
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).exec(),
-    this.opportunityModel.countDocuments({
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).exec(),
-    this.estimateModel.countDocuments({
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).exec(),
-    this.jobModel.countDocuments({
-      status: 'scheduled',
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).exec(),
-    this.jobModel.countDocuments({
-      status: 'completed',
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).exec(),
+    this.customerModel
+      .countDocuments({
+        status: 'lead',
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .exec(),
+    this.customerModel
+      .countDocuments({
+        status: 'prospect',
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .exec(),
+    this.opportunityModel
+      .countDocuments({
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .exec(),
+    this.estimateModel
+      .countDocuments({
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .exec(),
+    this.jobModel
+      .countDocuments({
+        status: 'scheduled',
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .exec(),
+    this.jobModel
+      .countDocuments({
+        status: 'completed',
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .exec(),
   ]);
 
   const funnel = {
     stages: [
       { name: 'Leads', count: leads, conversion: 100 },
-      { name: 'Prospects', count: prospects, conversion: leads > 0 ? (prospects / leads) * 100 : 0 },
-      { name: 'Opportunities', count: opportunities, conversion: prospects > 0 ? (opportunities / prospects) * 100 : 0 },
-      { name: 'Quotes', count: quotes, conversion: opportunities > 0 ? (quotes / opportunities) * 100 : 0 },
-      { name: 'Scheduled', count: scheduledJobs, conversion: quotes > 0 ? (scheduledJobs / quotes) * 100 : 0 },
-      { name: 'Completed', count: completedJobs, conversion: scheduledJobs > 0 ? (completedJobs / scheduledJobs) * 100 : 0 },
+      {
+        name: 'Prospects',
+        count: prospects,
+        conversion: leads > 0 ? (prospects / leads) * 100 : 0,
+      },
+      {
+        name: 'Opportunities',
+        count: opportunities,
+        conversion: prospects > 0 ? (opportunities / prospects) * 100 : 0,
+      },
+      {
+        name: 'Quotes',
+        count: quotes,
+        conversion: opportunities > 0 ? (quotes / opportunities) * 100 : 0,
+      },
+      {
+        name: 'Scheduled',
+        count: scheduledJobs,
+        conversion: quotes > 0 ? (scheduledJobs / quotes) * 100 : 0,
+      },
+      {
+        name: 'Completed',
+        count: completedJobs,
+        conversion:
+          scheduledJobs > 0 ? (completedJobs / scheduledJobs) * 100 : 0,
+      },
     ],
     overallConversion: leads > 0 ? (completedJobs / leads) * 100 : 0,
   };
@@ -256,53 +339,65 @@ export async function getPerformanceMetricsCached(this: any) {
     customerSatisfaction,
     onTimeCompletion,
   ] = await Promise.all([
-    this.jobModel.aggregate([
-      { $match: { status: 'completed', completedAt: { $gte: thirtyDaysAgo } } },
-      {
-        $project: {
-          duration: {
-            $divide: [
-              { $subtract: ['$completedAt', '$scheduledDate'] },
-              1000 * 60 * 60 // Convert to hours
-            ]
-          }
-        }
-      },
-      { $group: { _id: null, avg: { $avg: '$duration' } } }
-    ]).exec(),
-    this.analyticsEventModel.aggregate([
-      {
-        $match: {
-          eventType: 'lead_response',
-          timestamp: { $gte: thirtyDaysAgo }
-        }
-      },
-      { $group: { _id: null, avg: { $avg: '$duration' } } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      { $match: { status: 'completed', completedAt: { $gte: thirtyDaysAgo } } },
-      { $group: { _id: null, avg: { $avg: '$customerRating' } } }
-    ]).exec(),
-    this.jobModel.aggregate([
-      {
-        $match: {
-          status: 'completed',
-          completedAt: { $gte: thirtyDaysAgo }
-        }
-      },
-      {
-        $project: {
-          onTime: {
-            $cond: [
-              { $lte: ['$completedAt', '$estimatedCompletionDate'] },
-              1,
-              0
-            ]
-          }
-        }
-      },
-      { $group: { _id: null, rate: { $avg: '$onTime' } } }
-    ]).exec(),
+    this.jobModel
+      .aggregate([
+        {
+          $match: { status: 'completed', completedAt: { $gte: thirtyDaysAgo } },
+        },
+        {
+          $project: {
+            duration: {
+              $divide: [
+                { $subtract: ['$completedAt', '$scheduledDate'] },
+                1000 * 60 * 60, // Convert to hours
+              ],
+            },
+          },
+        },
+        { $group: { _id: null, avg: { $avg: '$duration' } } },
+      ])
+      .exec(),
+    this.analyticsEventModel
+      .aggregate([
+        {
+          $match: {
+            eventType: 'lead_response',
+            timestamp: { $gte: thirtyDaysAgo },
+          },
+        },
+        { $group: { _id: null, avg: { $avg: '$duration' } } },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        {
+          $match: { status: 'completed', completedAt: { $gte: thirtyDaysAgo } },
+        },
+        { $group: { _id: null, avg: { $avg: '$customerRating' } } },
+      ])
+      .exec(),
+    this.jobModel
+      .aggregate([
+        {
+          $match: {
+            status: 'completed',
+            completedAt: { $gte: thirtyDaysAgo },
+          },
+        },
+        {
+          $project: {
+            onTime: {
+              $cond: [
+                { $lte: ['$completedAt', '$estimatedCompletionDate'] },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+        { $group: { _id: null, rate: { $avg: '$onTime' } } },
+      ])
+      .exec(),
   ]);
 
   const metrics = {

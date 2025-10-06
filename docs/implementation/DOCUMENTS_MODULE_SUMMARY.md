@@ -52,6 +52,7 @@ October 2, 2025
 ## Features Implemented
 
 ### 1. File Upload & Storage
+
 - Secure multipart file upload with validation
 - MinIO S3-compatible object storage
 - File type whitelist (images, documents, archives)
@@ -60,6 +61,7 @@ October 2, 2025
 - UUID-based storage keys
 
 ### 2. Document Management
+
 - CRUD operations with MongoDB persistence
 - Soft delete (documents retained in storage)
 - Metadata management (tags, description, custom fields)
@@ -67,6 +69,7 @@ October 2, 2025
 - Document type categorization (contract, invoice, receipt, photo, insurance, license, other)
 
 ### 3. File Sharing
+
 - Secure share link generation with UUID tokens
 - Optional password protection (bcrypt hashed)
 - Configurable expiration dates
@@ -74,6 +77,7 @@ October 2, 2025
 - Public endpoints for shared access
 
 ### 4. Search & Filtering
+
 - Full-text search across filename, description, tags
 - Filter by entity type, document type, uploader
 - Date range filtering
@@ -81,12 +85,14 @@ October 2, 2025
 - Pagination support
 
 ### 5. Access Control
+
 - JWT authentication for protected endpoints
 - Role-based access control (admin-only deletion)
 - User isolation (users see only their documents or all if admin)
 - Public share endpoints (no auth required)
 
 ### 6. Storage Management
+
 - Storage statistics by type and entity
 - User-specific or system-wide stats
 - File size tracking
@@ -94,25 +100,26 @@ October 2, 2025
 
 ## API Endpoints (11 Routes)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/documents/upload` | Upload document | Required |
-| GET | `/api/documents` | List documents with filters | Required |
-| GET | `/api/documents/:id` | Get document by ID | Required |
-| GET | `/api/documents/entity/:type/:id` | Get documents by entity | Required |
-| GET | `/api/documents/:id/download` | Download document | Required |
-| DELETE | `/api/documents/:id` | Delete document | Admin only |
-| POST | `/api/documents/:id/share` | Create share link | Required |
-| GET | `/api/documents/shared/:token` | Access shared document | Public |
-| GET | `/api/documents/shared/:token/download` | Download shared document | Public |
-| PATCH | `/api/documents/:id` | Update metadata | Required |
-| GET | `/api/documents/statistics/storage` | Storage statistics | Required |
+| Method | Endpoint                                | Description                 | Auth       |
+| ------ | --------------------------------------- | --------------------------- | ---------- |
+| POST   | `/api/documents/upload`                 | Upload document             | Required   |
+| GET    | `/api/documents`                        | List documents with filters | Required   |
+| GET    | `/api/documents/:id`                    | Get document by ID          | Required   |
+| GET    | `/api/documents/entity/:type/:id`       | Get documents by entity     | Required   |
+| GET    | `/api/documents/:id/download`           | Download document           | Required   |
+| DELETE | `/api/documents/:id`                    | Delete document             | Admin only |
+| POST   | `/api/documents/:id/share`              | Create share link           | Required   |
+| GET    | `/api/documents/shared/:token`          | Access shared document      | Public     |
+| GET    | `/api/documents/shared/:token/download` | Download shared document    | Public     |
+| PATCH  | `/api/documents/:id`                    | Update metadata             | Required   |
+| GET    | `/api/documents/statistics/storage`     | Storage statistics          | Required   |
 
 ## Database Schema
 
 ### Collection: `documents`
 
 **Fields:**
+
 - `filename` - Current filename
 - `originalName` - Original uploaded filename
 - `mimeType` - MIME type
@@ -138,6 +145,7 @@ October 2, 2025
 - `updatedAt` - Auto-generated timestamp
 
 **Indexes:**
+
 - Compound: `{ entityType, entityId, isDeleted }`
 - Compound: `{ uploadedBy, createdAt }`
 - Single: `{ shareToken }` (unique, sparse)
@@ -159,10 +167,12 @@ Installed with: `npm install minio @types/minio --save --legacy-peer-deps`
 ## Configuration Changes
 
 ### 1. app.module.ts
+
 - Added `DocumentsModule` import
 - Added to imports array
 
 ### 2. docker-compose.dev.yml
+
 - Exposed MinIO API port 9000 for host access
 - MinIO console remains on localhost:9001
 
@@ -212,6 +222,7 @@ simplepro-documents/
 ```
 
 **Example:**
+
 - Original: `signed_contract.pdf`
 - Storage key: `2025/10/a1b2c3d4-1696348800000.pdf`
 
@@ -249,20 +260,23 @@ npm run test -- documents.service.spec.ts
 ## Integration Points
 
 ### 1. Customer Module
+
 ```typescript
 const documents = await documentsService.findByEntity('customer', customerId);
 ```
 
 ### 2. Job Module
+
 ```typescript
 await documentsService.uploadDocument(
   completionPhoto,
   { documentType: 'photo', entityType: 'job', entityId: jobId },
-  userId
+  userId,
 );
 ```
 
 ### 3. Estimate Module
+
 ```typescript
 const contracts = await documentsService.findAll({
   entityType: 'estimate',

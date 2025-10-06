@@ -4,7 +4,9 @@ const fs = require('fs').promises;
 const path = require('path');
 
 // Configuration
-const MONGODB_URI = process.env.DATABASE_URL || 'mongodb://admin:simplepro_dev_2024@localhost:27017/simplepro_dev?authSource=admin';
+const MONGODB_URI =
+  process.env.DATABASE_URL ||
+  'mongodb://admin:simplepro_dev_2024@localhost:27017/simplepro_dev?authSource=admin';
 const DB_NAME = 'simplepro_dev';
 
 // Load seed data
@@ -13,13 +15,13 @@ async function loadSeedData() {
     const [usersData, customersData, jobsData] = await Promise.all([
       fs.readFile(path.join(__dirname, 'seed-data', 'users.json'), 'utf8'),
       fs.readFile(path.join(__dirname, 'seed-data', 'customers.json'), 'utf8'),
-      fs.readFile(path.join(__dirname, 'seed-data', 'jobs.json'), 'utf8')
+      fs.readFile(path.join(__dirname, 'seed-data', 'jobs.json'), 'utf8'),
     ]);
 
     return {
       users: JSON.parse(usersData),
       customers: JSON.parse(customersData),
-      jobs: JSON.parse(jobsData)
+      jobs: JSON.parse(jobsData),
     };
   } catch (error) {
     console.error('Error loading seed data:', error);
@@ -51,7 +53,7 @@ async function hashPasswords(users) {
       lastModifiedBy: user.lastModifiedBy,
       createdAt: new Date(),
       updatedAt: new Date(),
-      lastLoginAt: null
+      lastLoginAt: null,
     });
   }
 
@@ -60,19 +62,23 @@ async function hashPasswords(users) {
 
 // Add timestamps and IDs to data
 function prepareCustomers(customers) {
-  return customers.map(customer => ({
+  return customers.map((customer) => ({
     ...customer,
     createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // Random date within last 30 days
     updatedAt: new Date(),
-    lastContactDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000), // Random date within last 7 days
+    lastContactDate: new Date(
+      Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
+    ), // Random date within last 7 days
     estimates: [],
-    jobs: []
+    jobs: [],
   }));
 }
 
 function prepareJobs(jobs) {
-  return jobs.map(job => {
-    const createdAt = new Date(Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000); // Random date within last 15 days
+  return jobs.map((job) => {
+    const createdAt = new Date(
+      Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000,
+    ); // Random date within last 15 days
     const jobNumber = `JOB-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')}`;
 
     return {
@@ -89,7 +95,7 @@ function prepareJobs(jobs) {
       inventory: [],
       services: [],
       equipment: [],
-      additionalCharges: []
+      additionalCharges: [],
     };
   });
 }
@@ -116,7 +122,7 @@ async function seedDatabase() {
       db.collection('users').deleteMany({}),
       db.collection('customers').deleteMany({}),
       db.collection('jobs').deleteMany({}),
-      db.collection('user-sessions').deleteMany({})
+      db.collection('user-sessions').deleteMany({}),
     ]);
 
     // Prepare and insert users
@@ -164,7 +170,9 @@ async function seedDatabase() {
       db.collection('jobs').createIndex({ 'assignedCrew.crewMemberId': 1 }),
 
       // Session indexes (TTL for automatic cleanup)
-      db.collection('user-sessions').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+      db
+        .collection('user-sessions')
+        .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     ]);
     console.log('✅ Created database indexes');
 
@@ -185,7 +193,6 @@ async function seedDatabase() {
     console.log('   1. Start the API: npm run dev:api');
     console.log('   2. Start the Web App: npm run dev:web');
     console.log('   3. Visit: http://localhost:3000');
-
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     process.exit(1);

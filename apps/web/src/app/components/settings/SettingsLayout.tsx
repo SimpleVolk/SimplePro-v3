@@ -21,7 +21,11 @@ export interface SettingsLayoutProps {
   onNavigate: (path: string) => void;
 }
 
-export function SettingsLayout({ children, currentPath, onNavigate }: SettingsLayoutProps) {
+export function SettingsLayout({
+  children,
+  currentPath,
+  onNavigate,
+}: SettingsLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -30,7 +34,9 @@ export function SettingsLayout({ children, currentPath, onNavigate }: SettingsLa
       <div className={styles.settingsHeader}>
         <div className={styles.headerContent}>
           <h2>System Settings</h2>
-          <p>Configure your business operations, pricing, and system preferences</p>
+          <p>
+            Configure your business operations, pricing, and system preferences
+          </p>
         </div>
 
         <div className={styles.headerActions}>
@@ -64,9 +70,7 @@ export function SettingsLayout({ children, currentPath, onNavigate }: SettingsLa
             onNavigate={onNavigate}
           />
 
-          <div className={styles.settingsPanel}>
-            {children}
-          </div>
+          <div className={styles.settingsPanel}>{children}</div>
         </main>
       </div>
     </div>

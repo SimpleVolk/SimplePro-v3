@@ -25,8 +25,10 @@ export default function AuditLogs() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
+    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
   });
   const [filterAction, setFilterAction] = useState<string>('all');
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
@@ -35,11 +37,23 @@ export default function AuditLogs() {
   const logsPerPage = 20;
 
   const actionTypes = [
-    'USER_LOGIN', 'USER_LOGOUT', 'USER_CREATED', 'USER_MODIFIED', 'USER_DELETED',
-    'JOB_CREATED', 'JOB_MODIFIED', 'JOB_STATUS_CHANGED', 'JOB_COMPLETED',
-    'CUSTOMER_CREATED', 'CUSTOMER_MODIFIED', 'CUSTOMER_DELETED',
-    'ESTIMATE_CREATED', 'ESTIMATE_MODIFIED', 'ESTIMATE_APPROVED',
-    'PRICING_RULE_MODIFIED', 'SYSTEM_SETTINGS_CHANGED'
+    'USER_LOGIN',
+    'USER_LOGOUT',
+    'USER_CREATED',
+    'USER_MODIFIED',
+    'USER_DELETED',
+    'JOB_CREATED',
+    'JOB_MODIFIED',
+    'JOB_STATUS_CHANGED',
+    'JOB_COMPLETED',
+    'CUSTOMER_CREATED',
+    'CUSTOMER_MODIFIED',
+    'CUSTOMER_DELETED',
+    'ESTIMATE_CREATED',
+    'ESTIMATE_MODIFIED',
+    'ESTIMATE_APPROVED',
+    'PRICING_RULE_MODIFIED',
+    'SYSTEM_SETTINGS_CHANGED',
   ];
 
   // Fetch audit logs from API
@@ -52,7 +66,7 @@ export default function AuditLogs() {
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
         limit: '50',
-        skip: '0'
+        skip: '0',
       });
 
       if (filterAction !== 'all') params.append('action', filterAction);
@@ -62,9 +76,9 @@ export default function AuditLogs() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(`${getApiUrl('audit-logs')}?${params}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -81,7 +95,9 @@ export default function AuditLogs() {
       setFilteredLogs(fetchedLogs);
     } catch (err) {
       console.error('Error fetching audit logs:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load audit logs');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load audit logs',
+      );
       setLogs([]);
       setFilteredLogs([]);
     } finally {
@@ -101,7 +117,7 @@ export default function AuditLogs() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     });
   };
 
@@ -114,7 +130,7 @@ export default function AuditLogs() {
       // Legacy mappings for backward compatibility
       low: styles.severityLow,
       medium: styles.severityMedium,
-      high: styles.severityHigh
+      high: styles.severityHigh,
     };
     return classes[severity as keyof typeof classes] || styles.severityLow;
   };
@@ -137,7 +153,7 @@ export default function AuditLogs() {
       ESTIMATE_MODIFIED: '📋',
       ESTIMATE_APPROVED: '✅',
       PRICING_RULE_MODIFIED: '💰',
-      SYSTEM_SETTINGS_CHANGED: '⚙️'
+      SYSTEM_SETTINGS_CHANGED: '⚙️',
     };
     return icons[action] || '📝';
   };
@@ -153,7 +169,7 @@ export default function AuditLogs() {
       const params = new URLSearchParams({
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
-        format: 'csv'
+        format: 'csv',
       });
 
       if (filterAction !== 'all') params.append('action', filterAction);
@@ -161,11 +177,14 @@ export default function AuditLogs() {
       if (searchQuery) params.append('search', searchQuery);
 
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`${getApiUrl('audit-logs/export/csv')}?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch(
+        `${getApiUrl('audit-logs/export/csv')}?${params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       if (!response.ok) {
         throw new Error('Failed to export logs');
@@ -193,7 +212,11 @@ export default function AuditLogs() {
           <h3>Audit Logs</h3>
           <p>View system activity and security events</p>
         </div>
-        <button onClick={exportLogs} className={styles.exportButton} disabled={loading}>
+        <button
+          onClick={exportLogs}
+          className={styles.exportButton}
+          disabled={loading}
+        >
           📥 Export Logs
         </button>
       </div>
@@ -201,14 +224,14 @@ export default function AuditLogs() {
       {error && (
         <div className={styles.errorMessage}>
           <span>⚠️ {error}</span>
-          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+          <button onClick={() => setError(null)} className={styles.closeError}>
+            ×
+          </button>
         </div>
       )}
 
       {loading && (
-        <div className={styles.loadingMessage}>
-          Loading audit logs...
-        </div>
+        <div className={styles.loadingMessage}>Loading audit logs...</div>
       )}
 
       <div className={styles.filters}>
@@ -216,14 +239,18 @@ export default function AuditLogs() {
           <input
             type="date"
             value={dateRange.startDate}
-            onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+            onChange={(e) =>
+              setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
+            }
             className={styles.dateInput}
           />
           <span>to</span>
           <input
             type="date"
             value={dateRange.endDate}
-            onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+            onChange={(e) =>
+              setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
+            }
             className={styles.dateInput}
           />
         </div>
@@ -234,7 +261,7 @@ export default function AuditLogs() {
           className={styles.filterSelect}
         >
           <option value="all">All Actions</option>
-          {actionTypes.map(action => (
+          {actionTypes.map((action) => (
             <option key={action} value={action}>
               {action.replace(/_/g, ' ')}
             </option>
@@ -266,18 +293,27 @@ export default function AuditLogs() {
       </div>
 
       <div className={styles.resultsInfo}>
-        <span>Showing {startIndex + 1}-{Math.min(endIndex, filteredLogs.length)} of {filteredLogs.length} logs</span>
+        <span>
+          Showing {startIndex + 1}-{Math.min(endIndex, filteredLogs.length)} of{' '}
+          {filteredLogs.length} logs
+        </span>
       </div>
 
       <div className={styles.logsContainer}>
         <div className={styles.logsList}>
-          {currentLogs.map(log => (
+          {currentLogs.map((log) => (
             <div key={log.id} className={styles.logEntry}>
               <div className={styles.logHeader}>
                 <div className={styles.logAction}>
-                  <span className={styles.actionIcon}>{getActionIcon(log.action)}</span>
-                  <span className={styles.actionText}>{log.action.replace(/_/g, ' ')}</span>
-                  <span className={`${styles.severity} ${getSeverityClass(log.severity)}`}>
+                  <span className={styles.actionIcon}>
+                    {getActionIcon(log.action)}
+                  </span>
+                  <span className={styles.actionText}>
+                    {log.action.replace(/_/g, ' ')}
+                  </span>
+                  <span
+                    className={`${styles.severity} ${getSeverityClass(log.severity)}`}
+                  >
                     {log.severity.toUpperCase()}
                   </span>
                 </div>
@@ -295,9 +331,7 @@ export default function AuditLogs() {
                     </span>
                   )}
                 </div>
-                <div className={styles.logDescription}>
-                  {log.details}
-                </div>
+                <div className={styles.logDescription}>{log.details}</div>
                 <div className={styles.logMeta}>
                   <span>IP: {log.ipAddress}</span>
                   <span>•</span>
@@ -318,7 +352,7 @@ export default function AuditLogs() {
         {totalPages > 1 && (
           <div className={styles.pagination}>
             <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className={styles.pageButton}
             >
@@ -330,7 +364,9 @@ export default function AuditLogs() {
             </span>
 
             <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
               disabled={currentPage === totalPages}
               className={styles.pageButton}
             >

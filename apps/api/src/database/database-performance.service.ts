@@ -41,22 +41,28 @@ export class DatabasePerformanceService {
 
   private setupQueryLogging(): void {
     // Enable MongoDB query logging for performance monitoring
-    this.connection.set('debug', (collection: string, method: string, query: any, _doc?: any) => {
-      const startTime = Date.now();
+    this.connection.set(
+      'debug',
+      (collection: string, method: string, query: any, _doc?: any) => {
+        const startTime = Date.now();
 
-      // Log slow queries (> 100ms)
-      setTimeout(() => {
-        const duration = Date.now() - startTime;
-        if (duration > 100) {
-          this.logger.warn(`Slow query detected: ${collection}.${method} took ${duration}ms`, {
-            collection,
-            method,
-            query: JSON.stringify(query),
-            duration
-          });
-        }
-      }, 0);
-    });
+        // Log slow queries (> 100ms)
+        setTimeout(() => {
+          const duration = Date.now() - startTime;
+          if (duration > 100) {
+            this.logger.warn(
+              `Slow query detected: ${collection}.${method} took ${duration}ms`,
+              {
+                collection,
+                method,
+                query: JSON.stringify(query),
+                duration,
+              },
+            );
+          }
+        }, 0);
+      },
+    );
   }
 
   async logQueryMetrics(metrics: QueryMetrics): Promise<void> {
@@ -69,7 +75,9 @@ export class DatabasePerformanceService {
 
     // Log slow queries
     if (metrics.duration > 100) {
-      this.logger.warn(`Slow query: ${metrics.operation} on ${metrics.collection} took ${metrics.duration}ms`);
+      this.logger.warn(
+        `Slow query: ${metrics.operation} on ${metrics.collection} took ${metrics.duration}ms`,
+      );
     }
   }
 
@@ -82,7 +90,7 @@ export class DatabasePerformanceService {
   }
 
   getSlowQueries(threshold = 100): QueryMetrics[] {
-    return this.queryMetrics.filter(metric => metric.duration > threshold);
+    return this.queryMetrics.filter((metric) => metric.duration > threshold);
   }
 
   async analyzeIndexUsage(collection: string): Promise<any> {
@@ -91,13 +99,17 @@ export class DatabasePerformanceService {
       if (!db) {
         throw new Error('Database connection not available');
       }
-      const stats = await db.collection(collection).aggregate([
-        { $indexStats: {} }
-      ]).toArray();
+      const stats = await db
+        .collection(collection)
+        .aggregate([{ $indexStats: {} }])
+        .toArray();
 
       return stats;
     } catch (error) {
-      this.logger.error(`Failed to analyze index usage for ${collection}:`, error);
+      this.logger.error(
+        `Failed to analyze index usage for ${collection}:`,
+        error,
+      );
       return [];
     }
   }
@@ -108,7 +120,10 @@ export class DatabasePerformanceService {
       if (!db) {
         throw new Error('Database connection not available');
       }
-      const explanation = await db.collection(collection).find(query).explain('executionStats');
+      const explanation = await db
+        .collection(collection)
+        .find(query)
+        .explain('executionStats');
       return explanation;
     } catch (error) {
       this.logger.error(`Failed to explain query for ${collection}:`, error);
@@ -125,27 +140,22 @@ export class DatabasePerformanceService {
       { $sort: sort },
       {
         $facet: {
-          data: [
-            { $skip: skip },
-            { $limit: limit }
-          ],
-          count: [
-            { $count: 'total' }
-          ]
-        }
+          data: [{ $skip: skip }, { $limit: limit }],
+          count: [{ $count: 'total' }],
+        },
       },
       {
         $project: {
           data: 1,
-          total: { $arrayElemAt: ['$count.total', 0] }
-        }
-      }
+          total: { $arrayElemAt: ['$count.total', 0] },
+        },
+      },
     ];
   }
 
   static formatPaginatedResult<T>(
     result: any[],
-    options: PaginationOptions
+    options: PaginationOptions,
   ): PaginatedResult<T> {
     const { page, limit } = options;
     const data = result[0]?.data || [];
@@ -160,8 +170,8 @@ export class DatabasePerformanceService {
         total,
         pages,
         hasNext: page < pages,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -186,7 +196,7 @@ export class DatabasePerformanceService {
         connections: serverStatus?.connections?.current || 0,
         uptime: serverStatus?.uptime || 0,
         host: serverStatus?.host || 'unknown',
-        version: serverStatus?.version || 'unknown'
+        version: serverStatus?.version || 'unknown',
       };
     } catch (error) {
       this.logger.error('Failed to get connection health:', error);
@@ -195,7 +205,7 @@ export class DatabasePerformanceService {
         connections: 0,
         uptime: 0,
         host: 'unknown',
-        version: 'unknown'
+        version: 'unknown',
       };
     }
   }
@@ -209,9 +219,11 @@ export class DatabasePerformanceService {
   }> {
     const totalQueries = this.queryMetrics.length;
     const slowQueries = this.getSlowQueries();
-    const averageQueryTime = totalQueries > 0
-      ? this.queryMetrics.reduce((sum, metric) => sum + metric.duration, 0) / totalQueries
-      : 0;
+    const averageQueryTime =
+      totalQueries > 0
+        ? this.queryMetrics.reduce((sum, metric) => sum + metric.duration, 0) /
+          totalQueries
+        : 0;
 
     const topSlowQueries = slowQueries
       .sort((a, b) => b.duration - a.duration)
@@ -221,7 +233,7 @@ export class DatabasePerformanceService {
       averageQueryTime,
       slowQueryCount: slowQueries.length,
       totalQueries,
-      topSlowQueries
+      topSlowQueries,
     };
   }
 }

@@ -24,7 +24,9 @@ interface UpcomingFollowUpsProps {
   onActivityUpdate: () => void;
 }
 
-export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) {
+export function UpcomingFollowUps({
+  onActivityUpdate,
+}: UpcomingFollowUpsProps) {
   const [activities, setActivities] = useState<UpcomingActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,12 +43,15 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
       setError(null);
 
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/lead-activities/upcoming`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${getApiUrl()}/api/lead-activities/upcoming`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch upcoming activities');
@@ -64,28 +69,33 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
   const handleCompleteActivity = async (activityId: string) => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/lead-activities/${activityId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${getApiUrl()}/api/lead-activities/${activityId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: 'completed',
+            outcome: 'successful',
+            completedDate: new Date().toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          status: 'completed',
-          outcome: 'successful',
-          completedDate: new Date().toISOString(),
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to complete activity');
       }
 
       // Optimistic update
-      setActivities(prev => prev.filter(a => a.id !== activityId));
+      setActivities((prev) => prev.filter((a) => a.id !== activityId));
       onActivityUpdate();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to complete activity');
+      setError(
+        err instanceof Error ? err.message : 'Failed to complete activity',
+      );
       await fetchUpcomingActivities();
     }
   };
@@ -96,16 +106,19 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
       newDueDate.setHours(newDueDate.getHours() + hours);
 
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/lead-activities/${activityId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${getApiUrl()}/api/lead-activities/${activityId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dueDate: newDueDate.toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          dueDate: newDueDate.toISOString(),
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to snooze activity');
@@ -114,18 +127,26 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
       await fetchUpcomingActivities();
       onActivityUpdate();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to snooze activity');
+      setError(
+        err instanceof Error ? err.message : 'Failed to snooze activity',
+      );
     }
   };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'call': return '📞';
-      case 'email': return '✉️';
-      case 'meeting': return '🤝';
-      case 'quote_sent': return '📋';
-      case 'follow_up': return '🔔';
-      default: return '📌';
+      case 'call':
+        return '📞';
+      case 'email':
+        return '✉️';
+      case 'meeting':
+        return '🤝';
+      case 'quote_sent':
+        return '📋';
+      case 'follow_up':
+        return '🔔';
+      default:
+        return '📌';
     }
   };
 
@@ -144,7 +165,8 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
 
     if (diffMins < 0) return 'Overdue';
     if (diffMins < 60) return `In ${diffMins} min${diffMins !== 1 ? 's' : ''}`;
-    if (diffHours < 24) return `In ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+    if (diffHours < 24)
+      return `In ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
     return `In ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
   };
 
@@ -218,23 +240,32 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
                   className={`${styles.activityItem} ${getPriorityClass(activity.status)}`}
                 >
                   <div className={styles.activityIconWrapper}>
-                    <span className={styles.activityIcon}>{getActivityIcon(activity.type)}</span>
+                    <span className={styles.activityIcon}>
+                      {getActivityIcon(activity.type)}
+                    </span>
                   </div>
 
                   <div className={styles.activityInfo}>
-                    <div className={styles.activitySubject}>{activity.subject}</div>
+                    <div className={styles.activitySubject}>
+                      {activity.subject}
+                    </div>
                     {activity.customerName && (
-                      <div className={styles.activityCustomer}>{activity.customerName}</div>
+                      <div className={styles.activityCustomer}>
+                        {activity.customerName}
+                      </div>
                     )}
                     <div className={styles.activityTime}>
-                      {activity.dueDate ? getRelativeTime(activity.dueDate) : 'No due date'}
+                      {activity.dueDate
+                        ? getRelativeTime(activity.dueDate)
+                        : 'No due date'}
                       {' • '}
-                      {activity.dueDate && new Date(activity.dueDate).toLocaleString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit'
-                      })}
+                      {activity.dueDate &&
+                        new Date(activity.dueDate).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
                     </div>
                   </div>
 
@@ -251,16 +282,24 @@ export function UpcomingFollowUps({ onActivityUpdate }: UpcomingFollowUpsProps) 
                         ⏰
                       </button>
                       <div className={styles.snoozeMenu}>
-                        <button onClick={() => handleSnoozeActivity(activity.id, 1)}>
+                        <button
+                          onClick={() => handleSnoozeActivity(activity.id, 1)}
+                        >
                           1 hour
                         </button>
-                        <button onClick={() => handleSnoozeActivity(activity.id, 4)}>
+                        <button
+                          onClick={() => handleSnoozeActivity(activity.id, 4)}
+                        >
                           4 hours
                         </button>
-                        <button onClick={() => handleSnoozeActivity(activity.id, 24)}>
+                        <button
+                          onClick={() => handleSnoozeActivity(activity.id, 24)}
+                        >
                           1 day
                         </button>
-                        <button onClick={() => handleSnoozeActivity(activity.id, 72)}>
+                        <button
+                          onClick={() => handleSnoozeActivity(activity.id, 72)}
+                        >
                           3 days
                         </button>
                       </div>

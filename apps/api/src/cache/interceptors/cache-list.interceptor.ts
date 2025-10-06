@@ -90,14 +90,18 @@ export class CacheListInterceptor implements NestInterceptor {
     // Sort query parameters for consistent cache keys
     const sortedParams = Object.keys(queryParams)
       .sort()
-      .reduce((acc, key) => {
-        acc[key] = queryParams[key];
-        return acc;
-      }, {} as Record<string, any>);
+      .reduce(
+        (acc, key) => {
+          acc[key] = queryParams[key];
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
 
-    const queryString = Object.keys(sortedParams).length > 0
-      ? ':' + JSON.stringify(sortedParams)
-      : '';
+    const queryString =
+      Object.keys(sortedParams).length > 0
+        ? ':' + JSON.stringify(sortedParams)
+        : '';
 
     return `cache:${baseUrl}${queryString}`;
   }
@@ -132,7 +136,10 @@ export class CacheListInterceptor implements NestInterceptor {
     }
 
     // Compress analytics responses
-    if (response && (response.metrics || response.stats || response.analytics)) {
+    if (
+      response &&
+      (response.metrics || response.stats || response.analytics)
+    ) {
       return true;
     }
 

@@ -14,7 +14,11 @@ describe('DistanceRates Component', () => {
       render(<DistanceRates />);
 
       expect(screen.getByText('Distance Rates')).toBeInTheDocument();
-      expect(screen.getByText('Configure distance-based pricing rates for long-distance moves')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'Configure distance-based pricing rates for long-distance moves',
+        ),
+      ).toBeInTheDocument();
     });
 
     it('should display "New Distance Rate" button', () => {
@@ -34,8 +38,16 @@ describe('DistanceRates Component', () => {
       render(<DistanceRates />);
 
       expect(screen.getByText('Distance Rate Types')).toBeInTheDocument();
-      expect(screen.getByText('Pricing based on total shipment weight and distance traveled. Common for long-distance moves.')).toBeInTheDocument();
-      expect(screen.getByText('Flat rate per mile regardless of weight. Suitable for standardized pricing structures.')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'Pricing based on total shipment weight and distance traveled. Common for long-distance moves.',
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'Flat rate per mile regardless of weight. Suitable for standardized pricing structures.',
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -68,15 +80,15 @@ describe('DistanceRates Component', () => {
 
       // Fill form
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Test Rate' }
+        target: { value: 'Test Rate' },
       });
 
       fireEvent.change(screen.getByLabelText('Type'), {
-        target: { value: 'by_distance' }
+        target: { value: 'by_distance' },
       });
 
       fireEvent.change(screen.getByLabelText('Description (Optional)'), {
-        target: { value: 'Test description' }
+        target: { value: 'Test description' },
       });
 
       // Submit
@@ -123,7 +135,7 @@ describe('DistanceRates Component', () => {
       // Create first rate
       fireEvent.click(screen.getByText('+ New Distance Rate'));
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'First Rate' }
+        target: { value: 'First Rate' },
       });
       fireEvent.click(screen.getByText('Create Rate'));
 
@@ -163,12 +175,12 @@ describe('DistanceRates Component', () => {
 
       // Change name
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Updated Rate Name' }
+        target: { value: 'Updated Rate Name' },
       });
 
       // Change type
       fireEvent.change(screen.getByLabelText('Type'), {
-        target: { value: 'flat_rate' }
+        target: { value: 'flat_rate' },
       });
 
       // Submit
@@ -201,7 +213,7 @@ describe('DistanceRates Component', () => {
 
       // Change name
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Changed Name' }
+        target: { value: 'Changed Name' },
       });
 
       // Cancel
@@ -223,7 +235,9 @@ describe('DistanceRates Component', () => {
 
       fireEvent.click(screen.getByText('Delete'));
 
-      expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Distance Rates"?');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to delete "Distance Rates"?',
+      );
     });
 
     it('should delete rate when confirmed', async () => {
@@ -240,7 +254,9 @@ describe('DistanceRates Component', () => {
 
       // Verify deletion - should show empty state
       await waitFor(() => {
-        expect(screen.getByText('No distance rates configured yet.')).toBeInTheDocument();
+        expect(
+          screen.getByText('No distance rates configured yet.'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -266,8 +282,12 @@ describe('DistanceRates Component', () => {
       fireEvent.click(screen.getByText('Delete'));
 
       await waitFor(() => {
-        expect(screen.getByText('No distance rates configured yet.')).toBeInTheDocument();
-        expect(screen.getByText('+ Create Your First Distance Rate')).toBeInTheDocument();
+        expect(
+          screen.getByText('No distance rates configured yet.'),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('+ Create Your First Distance Rate'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -279,7 +299,9 @@ describe('DistanceRates Component', () => {
       fireEvent.click(screen.getByText('Delete'));
 
       await waitFor(() => {
-        expect(screen.getByText('+ Create Your First Distance Rate')).toBeInTheDocument();
+        expect(
+          screen.getByText('+ Create Your First Distance Rate'),
+        ).toBeInTheDocument();
       });
 
       // Click empty state button
@@ -334,10 +356,10 @@ describe('DistanceRates Component', () => {
       // Add rate with description
       fireEvent.click(screen.getByText('+ New Distance Rate'));
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Test Rate' }
+        target: { value: 'Test Rate' },
       });
       fireEvent.change(screen.getByLabelText('Description (Optional)'), {
-        target: { value: 'Test Description' }
+        target: { value: 'Test Description' },
       });
       fireEvent.click(screen.getByText('Create Rate'));
 
@@ -381,7 +403,7 @@ describe('DistanceRates Component', () => {
       // Add first rate
       fireEvent.click(screen.getByText('+ New Distance Rate'));
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Rate 1' }
+        target: { value: 'Rate 1' },
       });
       fireEvent.click(screen.getByText('Create Rate'));
 
@@ -392,10 +414,10 @@ describe('DistanceRates Component', () => {
       // Add second rate
       fireEvent.click(screen.getByText('+ New Distance Rate'));
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Rate 2' }
+        target: { value: 'Rate 2' },
       });
       fireEvent.change(screen.getByLabelText('Type'), {
-        target: { value: 'by_distance' }
+        target: { value: 'by_distance' },
       });
       fireEvent.click(screen.getByText('Create Rate'));
 
@@ -414,7 +436,7 @@ describe('DistanceRates Component', () => {
       // Add multiple rates
       fireEvent.click(screen.getByText('+ New Distance Rate'));
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Rate A' }
+        target: { value: 'Rate A' },
       });
       fireEvent.click(screen.getByText('Create Rate'));
 
@@ -424,7 +446,7 @@ describe('DistanceRates Component', () => {
 
       fireEvent.click(screen.getByText('+ New Distance Rate'));
       fireEvent.change(screen.getByLabelText('Name'), {
-        target: { value: 'Rate B' }
+        target: { value: 'Rate B' },
       });
       fireEvent.click(screen.getByText('Create Rate'));
 

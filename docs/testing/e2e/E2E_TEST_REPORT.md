@@ -12,6 +12,7 @@
 **CRITICAL BLOCKING ISSUE:** The SimplePro-v3 API server cannot start due to TypeScript compilation errors, preventing all end-to-end testing from being executed. The system is currently **NOT production-ready** and requires immediate attention to resolve build-time errors before any functional testing can proceed.
 
 ### Test Status Overview
+
 - **Total Planned Test Scenarios:** 8
 - **Executed:** 0
 - **Passed:** 0
@@ -23,12 +24,15 @@
 ## Environment Status
 
 ### Infrastructure Services
+
 ✅ **Docker Development Stack:** Running
+
 - MongoDB (simplepro-mongodb): ✅ Running
 - Redis (simplepro-redis): ✅ Running
 - MinIO (simplepro-minio): ✅ Running
 
 ### Application Services
+
 ❌ **API Server (Port 3001):** **FAILED TO START**
 ❌ **Web Application:** Not tested (blocked by API failure)
 
@@ -54,7 +58,7 @@ The API server crashes immediately on startup due to multiple TypeScript compila
 2. **Message Notification Service Type Issues**
    - File: `apps/api/src/messages/message-notification.service.ts:22`
    - Error: `Property '_id' does not exist on type 'Message'`
-   - Issue: Service code tries to access `message._id` on a Message type that doesn't expose _id
+   - Issue: Service code tries to access `message._id` on a Message type that doesn't expose \_id
 
 3. **Follow-up Scheduler Timestamp Issues** (NEW - discovered during testing)
    - File: `apps/api/src/follow-up-scheduler/follow-up-scheduler.service.ts`
@@ -64,6 +68,7 @@ The API server crashes immediately on startup due to multiple TypeScript compila
 #### Technical Details
 
 **Error Output:**
+
 ```
 TSError: ⨯ Unable to compile TypeScript:
 apps/api/src/messages/schemas/message.schema.ts(81,9): error TS2339:
@@ -71,6 +76,7 @@ Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: numb
 ```
 
 **Attempted Fixes:**
+
 1. ✅ Added `ret: any` type annotation to transform functions in:
    - `user.schema.ts`
    - `document.schema.ts`
@@ -88,7 +94,9 @@ Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: numb
 #### Recommended Solution
 
 **Immediate Action Required:**
+
 1. **Stop using ts-node for development** - switch to compiled JavaScript
+
    ```bash
    # Build the API first
    nx build api
@@ -97,6 +105,7 @@ Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: numb
    ```
 
 2. **Or clear all caches and restart:**
+
    ```bash
    # Kill all node processes
    taskkill /F /IM node.exe  # Windows
@@ -132,6 +141,7 @@ Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: numb
    - **Fix Applied:** Added all missing fields to DTO with proper validation
 
 **Files Modified:**
+
 - `apps/api/src/customers/customers.controller.ts` - Fixed type casting
 - `apps/api/src/common/dto/query-filters.dto.ts` - Added missing fields and enum validation
 - `apps/api/src/jobs/jobs.controller.ts` - No changes needed after DTO fixes
@@ -141,8 +151,10 @@ Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: numb
 ## Planned Test Scenarios (All Blocked)
 
 ### ❌ 1. Authentication Flow Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. POST /api/auth/login with credentials `admin/Admin123!`
 2. Verify JWT access token and refresh token returned
 3. Test token refresh with POST /api/auth/refresh
@@ -150,6 +162,7 @@ Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: numb
 5. POST /api/auth/logout and verify session termination
 
 **Expected curl command:**
+
 ```bash
 curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
@@ -157,8 +170,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 ```
 
 ### ❌ 2. Customer Management CRUD Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. Create customer via POST /api/customers
 2. List customers via GET /api/customers
 3. Get specific customer via GET /api/customers/:id
@@ -166,6 +181,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 5. Verify MongoDB persistence (restart API and check data)
 
 **Test Data:**
+
 ```json
 {
   "firstName": "John",
@@ -185,8 +201,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 ```
 
 ### ❌ 3. Job Lifecycle Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. Create job via POST /api/jobs (requires customer ID from test #2)
 2. Assign crew via POST /api/jobs/:id/crew
 3. Update status: scheduled → in_progress via PATCH /api/jobs/:id/status
@@ -194,8 +212,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 5. Verify job appears in weekly calendar GET /api/jobs/calendar/week/:startDate
 
 ### ❌ 4. Estimate Calculation Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. POST to /api/estimates/calculate with comprehensive move details
 2. Verify deterministic hash generation (same input = same hash)
 3. Verify pricing rules are applied correctly
@@ -203,6 +223,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 5. Validate price breakdown includes all cost categories
 
 **Test Payload:**
+
 ```json
 {
   "serviceType": "local",
@@ -228,8 +249,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 ```
 
 ### ❌ 5. Document Upload (MinIO) Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. Verify MinIO container is accessible (http://localhost:9000)
 2. POST multipart/form-data to /api/documents/upload
 3. Verify file stored in MinIO with correct bucket
@@ -237,8 +260,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 5. Verify document metadata stored in MongoDB
 
 ### ❌ 6. Notifications Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. Create in-app notification via POST /api/notifications
 2. Verify notification stored in database
 3. Test WebSocket connection for real-time delivery (if gateway running)
@@ -246,8 +271,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 5. Mark notification as read PATCH /api/notifications/:id/read
 
 ### ❌ 7. Weekly Calendar/Dispatch Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. Create multiple jobs with different dates
 2. GET /api/jobs/calendar/week/2025-10-07 (start of week)
 3. Verify jobs grouped by date correctly
@@ -255,8 +282,10 @@ curl -X POST http://localhost:3001/api/auth/login \
 5. Validate job status indicators in response
 
 ### ❌ 8. Analytics Dashboard Data Testing
+
 **Status:** BLOCKED - API not running
 **Planned Steps:**
+
 1. GET /api/analytics/overview - verify KPI calculations
 2. GET /api/analytics/revenue - check revenue metrics
 3. GET /api/analytics/jobs - verify job statistics
@@ -268,20 +297,26 @@ curl -X POST http://localhost:3001/api/auth/login \
 ## Infrastructure Verification
 
 ### ✅ MongoDB Connection
+
 **Status:** Running and accessible
+
 - Container: simplepro-mongodb-dev
 - Port: 27017 (internal), exposed as needed
 - Credentials: Set in docker-compose.dev.yml
 - Database: simplepro_dev (configured in .env.local)
 
 ### ✅ Redis Connection
+
 **Status:** Running
+
 - Container: simplepro-redis
 - Port: 6379
 - Used for: Session storage, caching, rate limiting
 
 ### ✅ MinIO Object Storage
+
 **Status:** Running
+
 - Container: simplepro-minio
 - Console Port: 9001
 - API Port: 9000
@@ -293,6 +328,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ## Known Issues Identified During Testing
 
 ### 🟠 ISSUE #1: Data Persistence Risk (Pre-existing)
+
 **Severity:** MEDIUM (mentioned in CLAUDE.md)
 **Location:** `customers.service.ts`, `jobs.service.ts`
 **Problem:** Services use in-memory `Map` storage instead of MongoDB models
@@ -301,12 +337,14 @@ curl -X POST http://localhost:3001/api/auth/login \
 **Recommendation:** Migrate to use `@InjectModel()` pattern with Mongoose
 
 ### 🟠 ISSUE #2: Port Configuration
+
 **Severity:** LOW
 **Observation:** API configured for ports 3001 (primary), but web app runs on 3009/3010
 **CORS:** Already configured for these ports
 **Status:** No issues expected once API starts
 
 ### 🟠 ISSUE #3: Environment Variables
+
 **Severity:** LOW
 **Observation:** dotenvx shows "injecting env (0)" - suggests .env file might be empty or missing
 **Impact:** API may not have MongoDB connection string, JWT secrets, etc.
@@ -317,6 +355,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ## Test Data & Artifacts
 
 ### Default Credentials (from CLAUDE.md)
+
 - **Username:** admin
 - **Email:** admin@simplepro.com (can also be used as username)
 - **Password:** Admin123! (case-sensitive, includes exclamation mark)
@@ -324,11 +363,13 @@ curl -X POST http://localhost:3001/api/auth/login \
 ### Test Curl Commands (Ready to Execute Once API Starts)
 
 #### 1. Health Check
+
 ```bash
 curl http://localhost:3001/api/health
 ```
 
 #### 2. Login
+
 ```bash
 curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
@@ -336,6 +377,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ```
 
 #### 3. Create Customer (replace TOKEN)
+
 ```bash
 curl -X POST http://localhost:3001/api/customers \
   -H "Content-Type: application/json" \
@@ -353,6 +395,7 @@ curl -X POST http://localhost:3001/api/customers \
 ```
 
 #### 4. Calculate Estimate (replace TOKEN)
+
 ```bash
 curl -X POST http://localhost:3001/api/estimates/calculate \
   -H "Content-Type: application/json" \
@@ -421,6 +464,7 @@ curl -X POST http://localhost:3001/api/estimates/calculate \
 ### Current Status: ❌ **NOT PRODUCTION READY**
 
 **Critical Blockers:**
+
 - ❌ API server cannot start (compilation errors)
 - ❌ No functional testing completed
 - ❌ Data persistence not verified
@@ -428,6 +472,7 @@ curl -X POST http://localhost:3001/api/estimates/calculate \
 - ❌ Core business workflows not validated
 
 **Pre-Production Checklist:**
+
 - [ ] All TypeScript compilation errors resolved
 - [ ] API starts successfully and responds to health checks
 - [ ] Authentication flow tested and working
@@ -463,6 +508,7 @@ Based on the issues found, route tasks to:
 ## Appendix: Error Logs
 
 ### Full TypeScript Compilation Error Output
+
 ```
 TSError: ⨯ Unable to compile TypeScript:
 apps/api/src/messages/schemas/message.schema.ts(81,9): error TS2339: Property 'id' does not exist on type 'Message & { _id: ObjectId; } & { __v: number; }'.
@@ -477,6 +523,7 @@ apps/api/src/follow-up-scheduler/follow-up-scheduler.service.ts(95,73): error TS
 ```
 
 ### Attempted Fix Summary
+
 1. ✅ Modified 5 schema files to add `ret: any` type annotation
 2. ✅ Fixed message-notification.service.ts type casting
 3. ✅ Fixed customer/job controller DTO mismatches

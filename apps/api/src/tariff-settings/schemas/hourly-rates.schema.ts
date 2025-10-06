@@ -40,7 +40,8 @@ export class CrewAbilityEntry {
   maxWeightLbs!: number;
 }
 
-export const CrewAbilityEntrySchema = SchemaFactory.createForClass(CrewAbilityEntry);
+export const CrewAbilityEntrySchema =
+  SchemaFactory.createForClass(CrewAbilityEntry);
 
 /**
  * Minimum Hours Configuration Schema
@@ -68,7 +69,11 @@ export class HourlyRates {
   @Prop({ required: true, default: true })
   enabled!: boolean;
 
-  @Prop({ type: MinimumHoursSchema, required: true, default: () => ({ weekday: 2, weekend: 3, holiday: 3 }) })
+  @Prop({
+    type: MinimumHoursSchema,
+    required: true,
+    default: () => ({ weekday: 2, weekend: 3, holiday: 3 }),
+  })
   minimumHours!: MinimumHours;
 
   @Prop({ type: [HourlyRateSchema], default: [] })

@@ -9,7 +9,12 @@ interface FollowUpRule {
   id: string;
   name: string;
   description?: string;
-  trigger: 'quote_sent' | 'no_response' | 'initial_contact' | 'meeting_scheduled' | 'callback_requested';
+  trigger:
+    | 'quote_sent'
+    | 'no_response'
+    | 'initial_contact'
+    | 'meeting_scheduled'
+    | 'callback_requested';
   delayHours: number;
   action: 'create_task' | 'send_email' | 'schedule_call' | 'send_sms';
   emailTemplate?: string;
@@ -35,7 +40,12 @@ interface FollowUpRule {
 interface CreateRuleDto {
   name: string;
   description?: string;
-  trigger: 'quote_sent' | 'no_response' | 'initial_contact' | 'meeting_scheduled' | 'callback_requested';
+  trigger:
+    | 'quote_sent'
+    | 'no_response'
+    | 'initial_contact'
+    | 'meeting_scheduled'
+    | 'callback_requested';
   delayHours: number;
   action: 'create_task' | 'send_email' | 'schedule_call' | 'send_sms';
   emailTemplate?: string;
@@ -72,7 +82,9 @@ export function FollowUpRules() {
     assignToSalesRep: true,
   });
 
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     fetchRules();
@@ -86,7 +98,7 @@ export function FollowUpRules() {
       const token = localStorage.getItem('accessToken');
       const response = await fetch(`${getApiUrl()}/api/follow-up-rules`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -107,22 +119,27 @@ export function FollowUpRules() {
   const handleToggleRule = async (ruleId: string, currentState: boolean) => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/follow-up-rules/${ruleId}/toggle`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${getApiUrl()}/api/follow-up-rules/${ruleId}/toggle`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to toggle rule');
       }
 
       // Optimistic update
-      setRules(prev => prev.map(rule =>
-        rule.id === ruleId ? { ...rule, isActive: !currentState } : rule
-      ));
+      setRules((prev) =>
+        prev.map((rule) =>
+          rule.id === ruleId ? { ...rule, isActive: !currentState } : rule,
+        ),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to toggle rule');
       await fetchRules();
@@ -136,12 +153,15 @@ export function FollowUpRules() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/follow-up-rules/${ruleId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        `${getApiUrl()}/api/follow-up-rules/${ruleId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to delete rule');
@@ -223,7 +243,7 @@ export function FollowUpRules() {
       const response = await fetch(`${getApiUrl()}/api/follow-up-rules`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
@@ -245,22 +265,33 @@ export function FollowUpRules() {
 
   const getTriggerLabel = (trigger: string) => {
     switch (trigger) {
-      case 'quote_sent': return 'Quote Sent';
-      case 'no_response': return 'No Response';
-      case 'initial_contact': return 'Initial Contact';
-      case 'meeting_scheduled': return 'Meeting Scheduled';
-      case 'callback_requested': return 'Callback Requested';
-      default: return trigger;
+      case 'quote_sent':
+        return 'Quote Sent';
+      case 'no_response':
+        return 'No Response';
+      case 'initial_contact':
+        return 'Initial Contact';
+      case 'meeting_scheduled':
+        return 'Meeting Scheduled';
+      case 'callback_requested':
+        return 'Callback Requested';
+      default:
+        return trigger;
     }
   };
 
   const getActionLabel = (action: string) => {
     switch (action) {
-      case 'create_task': return 'Create Task';
-      case 'send_email': return 'Send Email';
-      case 'schedule_call': return 'Schedule Call';
-      case 'send_sms': return 'Send SMS';
-      default: return action;
+      case 'create_task':
+        return 'Create Task';
+      case 'send_email':
+        return 'Send Email';
+      case 'schedule_call':
+        return 'Schedule Call';
+      case 'send_sms':
+        return 'Send SMS';
+      default:
+        return action;
     }
   };
 
@@ -314,22 +345,33 @@ export function FollowUpRules() {
           <div className={styles.statCard}>
             <div className={styles.statLabel}>Active Rules</div>
             <div className={styles.statValue}>
-              {rules.filter(r => r.isActive).length}
+              {rules.filter((r) => r.isActive).length}
             </div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statLabel}>Total Triggered</div>
             <div className={styles.statValue}>
-              {rules.reduce((sum, r) => sum + (r.executionStats?.totalTriggered || 0), 0)}
+              {rules.reduce(
+                (sum, r) => sum + (r.executionStats?.totalTriggered || 0),
+                0,
+              )}
             </div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statLabel}>Success Rate</div>
             <div className={styles.statValue}>
               {(() => {
-                const total = rules.reduce((sum, r) => sum + (r.executionStats?.totalTriggered || 0), 0);
-                const successful = rules.reduce((sum, r) => sum + (r.executionStats?.totalSuccessful || 0), 0);
-                return total > 0 ? `${Math.round((successful / total) * 100)}%` : 'N/A';
+                const total = rules.reduce(
+                  (sum, r) => sum + (r.executionStats?.totalTriggered || 0),
+                  0,
+                );
+                const successful = rules.reduce(
+                  (sum, r) => sum + (r.executionStats?.totalSuccessful || 0),
+                  0,
+                );
+                return total > 0
+                  ? `${Math.round((successful / total) * 100)}%`
+                  : 'N/A';
               })()}
             </div>
           </div>
@@ -347,11 +389,16 @@ export function FollowUpRules() {
           </div>
         ) : (
           rules.map((rule) => (
-            <div key={rule.id} className={`${styles.ruleCard} ${!rule.isActive ? styles.ruleInactive : ''}`}>
+            <div
+              key={rule.id}
+              className={`${styles.ruleCard} ${!rule.isActive ? styles.ruleInactive : ''}`}
+            >
               <div className={styles.ruleHeader}>
                 <div className={styles.ruleTitle}>
                   <h3>{rule.name}</h3>
-                  {!rule.isActive && <span className={styles.inactiveBadge}>Inactive</span>}
+                  {!rule.isActive && (
+                    <span className={styles.inactiveBadge}>Inactive</span>
+                  )}
                 </div>
                 <div className={styles.ruleToggle}>
                   <label className={styles.switch}>
@@ -401,27 +448,35 @@ export function FollowUpRules() {
                 </div>
               )}
 
-              {rule.executionStats && rule.executionStats.totalTriggered > 0 && (
-                <div className={styles.ruleStats}>
-                  <span>
-                    Triggered: {rule.executionStats.totalTriggered} times
-                  </span>
-                  <span>
-                    Success: {rule.executionStats.totalSuccessful}
-                  </span>
-                  {rule.executionStats.lastTriggered && (
+              {rule.executionStats &&
+                rule.executionStats.totalTriggered > 0 && (
+                  <div className={styles.ruleStats}>
                     <span>
-                      Last: {new Date(rule.executionStats.lastTriggered).toLocaleDateString()}
+                      Triggered: {rule.executionStats.totalTriggered} times
                     </span>
-                  )}
-                </div>
-              )}
+                    <span>Success: {rule.executionStats.totalSuccessful}</span>
+                    {rule.executionStats.lastTriggered && (
+                      <span>
+                        Last:{' '}
+                        {new Date(
+                          rule.executionStats.lastTriggered,
+                        ).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                )}
 
               <div className={styles.ruleActions}>
-                <button onClick={() => handleEditRule(rule)} className={styles.editButton}>
+                <button
+                  onClick={() => handleEditRule(rule)}
+                  className={styles.editButton}
+                >
                   Edit
                 </button>
-                <button onClick={() => handleDeleteRule(rule.id)} className={styles.deleteButton}>
+                <button
+                  onClick={() => handleDeleteRule(rule.id)}
+                  className={styles.deleteButton}
+                >
                   Delete
                 </button>
               </div>
@@ -433,7 +488,10 @@ export function FollowUpRules() {
       {/* Create/Edit Rule Modal */}
       {showCreateForm && (
         <div className={styles.modal} onClick={() => setShowCreateForm(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h3>{editingRule ? 'Edit Rule' : 'Create Automation Rule'}</h3>
               <button onClick={() => setShowCreateForm(false)}>×</button>
@@ -448,13 +506,17 @@ export function FollowUpRules() {
                       type="text"
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       className={validationErrors.name ? styles.inputError : ''}
                       placeholder="e.g., Follow-up 24 hours after quote"
                       required
                     />
                     {validationErrors.name && (
-                      <span className={styles.errorText}>{validationErrors.name}</span>
+                      <span className={styles.errorText}>
+                        {validationErrors.name}
+                      </span>
                     )}
                   </div>
 
@@ -463,7 +525,12 @@ export function FollowUpRules() {
                     <textarea
                       id="description"
                       value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          description: e.target.value,
+                        })
+                      }
                       placeholder="Optional description of what this rule does"
                       rows={2}
                     />
@@ -474,14 +541,23 @@ export function FollowUpRules() {
                     <select
                       id="trigger"
                       value={formData.trigger}
-                      onChange={(e) => setFormData({ ...formData, trigger: e.target.value as any })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          trigger: e.target.value as any,
+                        })
+                      }
                       required
                     >
                       <option value="quote_sent">Quote Sent</option>
                       <option value="no_response">No Response</option>
                       <option value="initial_contact">Initial Contact</option>
-                      <option value="meeting_scheduled">Meeting Scheduled</option>
-                      <option value="callback_requested">Callback Requested</option>
+                      <option value="meeting_scheduled">
+                        Meeting Scheduled
+                      </option>
+                      <option value="callback_requested">
+                        Callback Requested
+                      </option>
                     </select>
                   </div>
 
@@ -491,13 +567,22 @@ export function FollowUpRules() {
                       type="number"
                       id="delayHours"
                       value={formData.delayHours}
-                      onChange={(e) => setFormData({ ...formData, delayHours: parseInt(e.target.value) || 0 })}
-                      className={validationErrors.delayHours ? styles.inputError : ''}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          delayHours: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className={
+                        validationErrors.delayHours ? styles.inputError : ''
+                      }
                       min="0"
                       required
                     />
                     {validationErrors.delayHours && (
-                      <span className={styles.errorText}>{validationErrors.delayHours}</span>
+                      <span className={styles.errorText}>
+                        {validationErrors.delayHours}
+                      </span>
                     )}
                   </div>
 
@@ -506,7 +591,12 @@ export function FollowUpRules() {
                     <select
                       id="action"
                       value={formData.action}
-                      onChange={(e) => setFormData({ ...formData, action: e.target.value as any })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          action: e.target.value as any,
+                        })
+                      }
                       required
                     >
                       <option value="create_task">Create Task</option>
@@ -521,7 +611,12 @@ export function FollowUpRules() {
                     <select
                       id="priority"
                       value={formData.priority}
-                      onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          priority: parseInt(e.target.value),
+                        })
+                      }
                       required
                     >
                       <option value="1">Low</option>
@@ -537,10 +632,15 @@ export function FollowUpRules() {
                         <select
                           id="taskType"
                           value={formData.taskTemplate?.type || 'follow_up'}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            taskTemplate: { ...formData.taskTemplate!, type: e.target.value as any }
-                          })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              taskTemplate: {
+                                ...formData.taskTemplate!,
+                                type: e.target.value as any,
+                              },
+                            })
+                          }
                           required
                         >
                           <option value="call">Call</option>
@@ -556,28 +656,46 @@ export function FollowUpRules() {
                           type="text"
                           id="taskSubject"
                           value={formData.taskTemplate?.subject || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            taskTemplate: { ...formData.taskTemplate!, subject: e.target.value }
-                          })}
-                          className={validationErrors.taskSubject ? styles.inputError : ''}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              taskTemplate: {
+                                ...formData.taskTemplate!,
+                                subject: e.target.value,
+                              },
+                            })
+                          }
+                          className={
+                            validationErrors.taskSubject
+                              ? styles.inputError
+                              : ''
+                          }
                           placeholder="e.g., Follow-up on quote"
                           required
                         />
                         {validationErrors.taskSubject && (
-                          <span className={styles.errorText}>{validationErrors.taskSubject}</span>
+                          <span className={styles.errorText}>
+                            {validationErrors.taskSubject}
+                          </span>
                         )}
                       </div>
 
                       <div className={styles.formGroupFull}>
-                        <label htmlFor="taskDescription">Task Description</label>
+                        <label htmlFor="taskDescription">
+                          Task Description
+                        </label>
                         <textarea
                           id="taskDescription"
                           value={formData.taskTemplate?.description || ''}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            taskTemplate: { ...formData.taskTemplate!, description: e.target.value }
-                          })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              taskTemplate: {
+                                ...formData.taskTemplate!,
+                                description: e.target.value,
+                              },
+                            })
+                          }
                           placeholder="Task description"
                           rows={2}
                         />
@@ -591,7 +709,12 @@ export function FollowUpRules() {
                       <select
                         id="emailTemplate"
                         value={formData.emailTemplate || ''}
-                        onChange={(e) => setFormData({ ...formData, emailTemplate: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            emailTemplate: e.target.value,
+                          })
+                        }
                       >
                         <option value="">-- Select template --</option>
                         <option value="follow_up">Follow-up Email</option>
@@ -606,7 +729,12 @@ export function FollowUpRules() {
                       <input
                         type="checkbox"
                         checked={formData.assignToSalesRep}
-                        onChange={(e) => setFormData({ ...formData, assignToSalesRep: e.target.checked })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            assignToSalesRep: e.target.checked,
+                          })
+                        }
                       />
                       Assign to assigned sales rep
                     </label>
@@ -622,8 +750,16 @@ export function FollowUpRules() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className={styles.primaryButton} disabled={loading}>
-                  {loading ? 'Creating...' : editingRule ? 'Update Rule' : 'Create Rule'}
+                <button
+                  type="submit"
+                  className={styles.primaryButton}
+                  disabled={loading}
+                >
+                  {loading
+                    ? 'Creating...'
+                    : editingRule
+                      ? 'Update Rule'
+                      : 'Create Rule'}
                 </button>
               </div>
             </form>

@@ -29,8 +29,8 @@ module.exports = {
       branches: 80,
       functions: 80,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
   // setupFilesAfterEnv should be configured in individual project jest configs
   testTimeout: 10000,

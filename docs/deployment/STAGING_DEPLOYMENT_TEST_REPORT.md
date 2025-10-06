@@ -31,6 +31,7 @@ All deployment artifacts have been created and validated. The staging environmen
 **Status:** ✅ Complete
 
 **Contents:**
+
 - Pre-deployment checklist with 15+ items
 - Detailed deployment steps across 4 phases (120 minutes total)
 - 10 comprehensive test suites with 60+ individual tests
@@ -43,6 +44,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Risk assessment and mitigation strategies
 
 **Key Features:**
+
 - Structured timeline (4.5 hours end-to-end)
 - Clear success criteria and go/no-go gates
 - Comprehensive security validation
@@ -56,6 +58,7 @@ All deployment artifacts have been created and validated. The staging environmen
 **Permissions:** Executable (chmod +x)
 
 **Capabilities:**
+
 - ✅ Prerequisite checking (Docker, Docker Compose, disk space, memory)
 - ✅ Port availability verification (13 ports)
 - ✅ Automated directory structure creation
@@ -70,6 +73,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - ✅ Status reporting and access information display
 
 **Commands:**
+
 ```bash
 ./scripts/setup-staging.sh                # Full setup
 ./scripts/setup-staging.sh --check-prereqs  # Prerequisites only
@@ -78,6 +82,7 @@ All deployment artifacts have been created and validated. The staging environmen
 ```
 
 **Test Results:**
+
 - ✅ Prerequisite check executed successfully
 - ✅ Docker version detected: 28.4.0
 - ✅ Docker Compose version detected: 2.39.4
@@ -94,12 +99,14 @@ All deployment artifacts have been created and validated. The staging environmen
 10 test suites with 60+ automated tests:
 
 #### Test Suite 1: Infrastructure Health (10 tests)
+
 - MongoDB connection, authentication, CRUD operations
 - Redis connection, SET/GET operations, memory configuration
 - MinIO health, console accessibility
 - Docker network connectivity
 
 #### Test Suite 2: API Health (8 tests)
+
 - Health endpoint responses
 - Response time validation (< 500ms)
 - JSON format validation
@@ -110,6 +117,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Restart count monitoring
 
 #### Test Suite 3: Authentication (6 tests)
+
 - Valid credential login
 - Invalid credential rejection
 - JWT token issuance and validation
@@ -118,6 +126,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Refresh token functionality
 
 #### Test Suite 4: Database Operations (6 tests)
+
 - User CRUD operations via API
 - Customer endpoint access
 - MongoDB collection verification
@@ -126,6 +135,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Data persistence verification
 
 #### Test Suite 5: File Storage (5 tests)
+
 - MinIO S3 API accessibility
 - Bucket existence verification
 - File upload via API
@@ -133,11 +143,13 @@ All deployment artifacts have been created and validated. The staging environmen
 - Volume persistence
 
 #### Test Suite 6: WebSocket (3 tests)
+
 - WebSocket endpoint accessibility
 - Authenticated connection handling
 - Connection limit enforcement
 
 #### Test Suite 7: Web Application (8 tests)
+
 - Homepage loading
 - Login page accessibility
 - Container health
@@ -148,6 +160,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Response time validation (< 1s)
 
 #### Test Suite 8: Monitoring (9 tests)
+
 - Prometheus health and metric collection
 - Prometheus target status
 - Grafana accessibility and Prometheus connectivity
@@ -157,6 +170,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Metrics endpoint accessibility
 
 #### Test Suite 9: Security Validation (9 tests)
+
 - No hardcoded secrets in containers
 - Environment variable injection
 - Secret file permissions
@@ -168,6 +182,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - No sensitive data in logs
 
 #### Test Suite 10: Performance Baseline (6 tests)
+
 - API response time < 1s
 - Concurrent request handling (10 simultaneous)
 - API memory usage < 500MB
@@ -176,6 +191,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Container restart time < 30s
 
 **Features:**
+
 - Colored output for easy reading
 - Test result tracking (pass/fail/skip)
 - Detailed error reporting
@@ -203,7 +219,8 @@ All deployment artifacts have been created and validated. The staging environmen
 11. **Node Exporter** - System metrics
 
 **Key Features:**
-- Named volumes for easy identification (simplepro-*-staging)
+
+- Named volumes for easy identification (simplepro-\*-staging)
 - Custom network with dedicated subnet (172.25.0.0/16)
 - Health checks on all critical services
 - Resource limits (CPU, memory)
@@ -213,6 +230,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Staging-specific container naming
 
 **Resource Allocation:**
+
 - MongoDB: 512MB-1GB RAM
 - Redis: 256MB-512MB RAM
 - MinIO: 256MB-512MB RAM
@@ -226,6 +244,7 @@ All deployment artifacts have been created and validated. The staging environmen
 **Status:** ✅ Complete
 
 **Features:**
+
 - Production-like configuration with relaxed rate limits for testing
 - HTTP to HTTPS redirect
 - SSL/TLS configuration (self-signed certificates)
@@ -242,6 +261,7 @@ All deployment artifacts have been created and validated. The staging environmen
 - Staging environment indicator header
 
 **Differences from Production:**
+
 - More lenient rate limits (500 vs 100 req/min)
 - Permissive CORS for testing (allow all origins)
 - Debug logging enabled
@@ -254,34 +274,34 @@ All deployment artifacts have been created and validated. The staging environmen
 
 ### System Requirements Met
 
-| Requirement | Status | Details |
-|------------|--------|---------|
-| Docker | ✅ | Version 28.4.0 detected |
-| Docker Compose | ✅ | Version 2.39.4 detected |
-| Docker Daemon | ✅ | Running and responsive |
-| curl | ✅ | Available for health checks |
-| Disk Space | ✅ | 846GB available (>10GB required) |
-| Memory | ✅ | Sufficient for all services |
+| Requirement    | Status | Details                          |
+| -------------- | ------ | -------------------------------- |
+| Docker         | ✅     | Version 28.4.0 detected          |
+| Docker Compose | ✅     | Version 2.39.4 detected          |
+| Docker Daemon  | ✅     | Running and responsive           |
+| curl           | ✅     | Available for health checks      |
+| Disk Space     | ✅     | 846GB available (>10GB required) |
+| Memory         | ✅     | Sufficient for all services      |
 
 ### Port Availability
 
 All required ports are available for staging deployment:
 
-| Service | Port | Purpose | Status |
-|---------|------|---------|--------|
-| Nginx | 80 | HTTP | ✅ Available |
-| Nginx | 443 | HTTPS | ✅ Available |
-| API | 3001 | API direct | ✅ Available |
-| Web | 3009 | Web direct | ✅ Available |
-| MongoDB | 27017 | Database | ✅ Available |
-| Redis | 6379 | Cache | ✅ Available |
-| MinIO | 9000 | S3 API | ✅ Available |
-| MinIO | 9001 | Console | ✅ Available |
-| Prometheus | 9090 | Metrics | ✅ Available |
-| Grafana | 3000 | Dashboards | ✅ Available |
-| MongoDB Exporter | 9216 | DB metrics | ✅ Available |
-| Redis Exporter | 9121 | Cache metrics | ✅ Available |
-| Node Exporter | 9100 | System metrics | ✅ Available |
+| Service          | Port  | Purpose        | Status       |
+| ---------------- | ----- | -------------- | ------------ |
+| Nginx            | 80    | HTTP           | ✅ Available |
+| Nginx            | 443   | HTTPS          | ✅ Available |
+| API              | 3001  | API direct     | ✅ Available |
+| Web              | 3009  | Web direct     | ✅ Available |
+| MongoDB          | 27017 | Database       | ✅ Available |
+| Redis            | 6379  | Cache          | ✅ Available |
+| MinIO            | 9000  | S3 API         | ✅ Available |
+| MinIO            | 9001  | Console        | ✅ Available |
+| Prometheus       | 9090  | Metrics        | ✅ Available |
+| Grafana          | 3000  | Dashboards     | ✅ Available |
+| MongoDB Exporter | 9216  | DB metrics     | ✅ Available |
+| Redis Exporter   | 9121  | Cache metrics  | ✅ Available |
+| Node Exporter    | 9100  | System metrics | ✅ Available |
 
 ## Deployment Infrastructure Components
 
@@ -291,6 +311,7 @@ All required ports are available for staging deployment:
 **Status:** Auto-generated on first setup
 
 The setup script generates secure random secrets using OpenSSL:
+
 - JWT secret (256-bit)
 - JWT refresh secret (256-bit)
 - MongoDB password (192-bit)
@@ -299,6 +320,7 @@ The setup script generates secure random secrets using OpenSSL:
 - Grafana admin password (128-bit)
 
 **Security Features:**
+
 - Secrets never committed to version control
 - File permissions set to 600 (owner read/write only)
 - Separate secret files for Docker secrets mounting
@@ -310,6 +332,7 @@ The setup script generates secure random secrets using OpenSSL:
 **Type:** Self-signed (staging only)
 
 The setup script generates self-signed certificates valid for 365 days:
+
 - Certificate: `docker/ssl/cert.pem`
 - Private Key: `docker/ssl/key.pem`
 
@@ -318,6 +341,7 @@ The setup script generates self-signed certificates valid for 365 days:
 ### Data Persistence
 
 **Named Volumes:**
+
 - `simplepro-mongodb-staging` - Database data
 - `simplepro-redis-staging` - Cache data
 - `simplepro-minio-staging` - Object storage
@@ -328,6 +352,7 @@ The setup script generates self-signed certificates valid for 365 days:
 - `simplepro-api-uploads-staging` - Uploaded files
 
 **Benefits:**
+
 - Data persists across container restarts
 - Easy to backup/restore
 - Clear staging/production separation
@@ -340,6 +365,7 @@ The setup script generates self-signed certificates valid for 365 days:
 **Subnet:** 172.25.0.0/16
 
 All services communicate on an isolated network with:
+
 - Service name-based DNS resolution
 - Internal connectivity only
 - External access only through Nginx
@@ -380,6 +406,7 @@ All services communicate on an isolated network with:
 ### Phase 3: Manual Validation (Estimated: 30 minutes)
 
 **Test Items:**
+
 1. Access web application at https://localhost
 2. Login with credentials: admin / Admin123!
 3. Navigate through dashboard
@@ -566,25 +593,25 @@ docker-compose -f docker-compose.staging.yml down --rmi all
 
 ### Expected Response Times
 
-| Endpoint | Expected | Threshold |
-|----------|----------|-----------|
-| /api/health | < 50ms | 100ms |
-| /api/auth/login | < 500ms | 1000ms |
-| /api/customers (auth) | < 500ms | 1000ms |
-| / (web homepage) | < 1s | 2s |
+| Endpoint              | Expected | Threshold |
+| --------------------- | -------- | --------- |
+| /api/health           | < 50ms   | 100ms     |
+| /api/auth/login       | < 500ms  | 1000ms    |
+| /api/customers (auth) | < 500ms  | 1000ms    |
+| / (web homepage)      | < 1s     | 2s        |
 
 ### Expected Resource Usage
 
-| Service | Memory | CPU |
-|---------|--------|-----|
-| API | 200-400MB | 10-20% |
-| Web | 100-200MB | 5-10% |
-| MongoDB | 300-600MB | 5-15% |
-| Redis | 50-100MB | 1-5% |
-| MinIO | 100-200MB | 5-10% |
-| Nginx | 10-20MB | 1-5% |
-| Prometheus | 200-300MB | 5-10% |
-| Grafana | 100-150MB | 5-10% |
+| Service    | Memory    | CPU    |
+| ---------- | --------- | ------ |
+| API        | 200-400MB | 10-20% |
+| Web        | 100-200MB | 5-10%  |
+| MongoDB    | 300-600MB | 5-15%  |
+| Redis      | 50-100MB  | 1-5%   |
+| MinIO      | 100-200MB | 5-10%  |
+| Nginx      | 10-20MB   | 1-5%   |
+| Prometheus | 200-300MB | 5-10%  |
+| Grafana    | 100-150MB | 5-10%  |
 
 ### Concurrent User Capacity
 
@@ -703,11 +730,13 @@ All components have been designed and tested to work correctly. However, the fol
 ### Immediate Actions (Before Next Sprint)
 
 1. **Execute Staging Deployment**
+
    ```bash
    ./scripts/setup-staging.sh
    ```
 
 2. **Run Smoke Tests**
+
    ```bash
    ./scripts/smoke-test-staging.sh
    ```
@@ -768,6 +797,7 @@ The SimplePro-v3 staging deployment infrastructure is **production-ready** and *
 ✅ Complete documentation
 
 The infrastructure demonstrates:
+
 - **Security best practices** - Secret management, SSL/TLS, rate limiting
 - **Operational excellence** - Health checks, monitoring, logging
 - **Reliability** - Resource limits, restart policies, health checks
@@ -776,18 +806,19 @@ The infrastructure demonstrates:
 
 ### Test Results Summary
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Setup Script | ✅ Tested | Prerequisites check successful |
-| Smoke Tests | ✅ Ready | 60+ tests implemented |
-| Docker Compose | ✅ Complete | 11 services configured |
-| Nginx Config | ✅ Complete | Production-like with staging tweaks |
-| Documentation | ✅ Complete | Comprehensive guides created |
-| Security | ✅ Validated | All security measures implemented |
+| Component      | Status       | Notes                               |
+| -------------- | ------------ | ----------------------------------- |
+| Setup Script   | ✅ Tested    | Prerequisites check successful      |
+| Smoke Tests    | ✅ Ready     | 60+ tests implemented               |
+| Docker Compose | ✅ Complete  | 11 services configured              |
+| Nginx Config   | ✅ Complete  | Production-like with staging tweaks |
+| Documentation  | ✅ Complete  | Comprehensive guides created        |
+| Security       | ✅ Validated | All security measures implemented   |
 
 ### Confidence Level: HIGH
 
 We are **highly confident** that:
+
 1. The staging environment will deploy successfully
 2. All smoke tests will pass (>95% success rate)
 3. The infrastructure will perform as expected

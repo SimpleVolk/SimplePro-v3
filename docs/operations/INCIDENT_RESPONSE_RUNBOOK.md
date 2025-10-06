@@ -18,15 +18,18 @@
 ## Overview
 
 ### Purpose
+
 This runbook provides systematic procedures for responding to production incidents in SimplePro-v3.
 
 ### Key Objectives
+
 - Minimize customer impact
 - Restore service quickly
 - Preserve evidence for post-mortem
 - Learn and improve from incidents
 
 ###On-Call Contacts
+
 - **Primary On-Call:** See PagerDuty schedule
 - **Backup On-Call:** See PagerDuty schedule
 - **Escalation:** CTO +1-555-0199
@@ -38,18 +41,21 @@ This runbook provides systematic procedures for responding to production inciden
 ### P0 - Critical (Response Time: Immediate)
 
 **Definition:**
+
 - Complete system outage
 - Data loss or corruption
 - Security breach
 - Customer data exposed
 
 **Response:**
+
 - Page entire on-call team immediately
 - Create war room (Slack #incident-p0)
 - Executive notification required
 - All hands on deck
 
 **Examples:**
+
 - Database cluster down
 - API completely unresponsive
 - Data breach detected
@@ -62,18 +68,21 @@ This runbook provides systematic procedures for responding to production inciden
 ### P1 - High (Response Time: <15 minutes)
 
 **Definition:**
+
 - Major feature unavailable
 - Severe performance degradation
 - Affecting multiple customers
 - Revenue-impacting
 
 **Response:**
+
 - Page primary on-call
 - Create war room (Slack #incident-p1)
 - Manager notification
 - Prioritize above all other work
 
 **Examples:**
+
 - Primary database node down (replica set functioning)
 - Authentication system issues
 - Job creation failing
@@ -86,18 +95,21 @@ This runbook provides systematic procedures for responding to production inciden
 ### P2 - Medium (Response Time: <1 hour)
 
 **Definition:**
+
 - Minor feature degradation
 - Affecting small number of customers
 - Workaround available
 - Non-critical functionality
 
 **Response:**
+
 - Notify primary on-call
 - Create ticket
 - Slack notification to #ops
 - Address during business hours
 
 **Examples:**
+
 - Slow query performance
 - Non-critical API endpoints timing out
 - Email notifications delayed
@@ -110,17 +122,20 @@ This runbook provides systematic procedures for responding to production inciden
 ### P3 - Low (Response Time: Next business day)
 
 **Definition:**
+
 - Cosmetic issues
 - Minimal customer impact
 - Enhancement requests
 - Documentation issues
 
 **Response:**
+
 - Create ticket
 - Schedule in next sprint
 - No immediate action required
 
 **Examples:**
+
 - Typos in UI
 - Non-critical logging errors
 - Performance optimization opportunities
@@ -135,12 +150,14 @@ This runbook provides systematic procedures for responding to production inciden
 ### Phase 1: Detection and Triage (0-5 minutes)
 
 #### Detection Methods
+
 - **Automated Alerts:** Grafana, PagerDuty
 - **Customer Reports:** Support tickets, calls
 - **Monitoring:** Real-time dashboards
 - **Team Reports:** Slack, email
 
 #### Initial Actions
+
 ```bash
 # 1. Acknowledge alert
 # In PagerDuty: Click "Acknowledge"
@@ -157,7 +174,9 @@ docker logs simplepro-api --since 10m | grep -i error
 ```
 
 #### Severity Assessment
+
 Ask:
+
 - How many customers affected?
 - Is system functional at all?
 - Is data at risk?
@@ -172,6 +191,7 @@ Assign severity level (P0-P3)
 #### For P0/P1 Incidents
 
 1. **Create War Room**
+
    ```
    Slack: Create #incident-[timestamp]
    Bridge: Start video call
@@ -185,6 +205,7 @@ Assign severity level (P0-P3)
    - **Scribe:** Documents actions and timeline
 
 3. **Initial Status Message**
+
    ```
    🚨 INCIDENT DECLARED 🚨
 
@@ -202,6 +223,7 @@ Assign severity level (P0-P3)
 ### Phase 3: Investigation (10-30 minutes)
 
 #### Investigation Checklist
+
 - [ ] Check application logs
 - [ ] Check database status
 - [ ] Check infrastructure (CPU, memory, disk)
@@ -212,6 +234,7 @@ Assign severity level (P0-P3)
 - [ ] Review monitoring dashboards
 
 #### Investigation Commands
+
 ```bash
 # Application logs
 docker logs simplepro-api --tail=500 | grep -E "(ERROR|FATAL)"
@@ -235,7 +258,9 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 #### Document Findings
+
 Keep running log in Slack:
+
 ```
 14:35 - Checking application logs - high error rate in job controller
 14:37 - Database status - all nodes healthy
@@ -250,6 +275,7 @@ Keep running log in Slack:
 #### Mitigation Strategies
 
 **Quick Wins (Try First):**
+
 1. Restart affected service
 2. Clear cache
 3. Increase resource limits
@@ -257,6 +283,7 @@ Keep running log in Slack:
 5. Failover to backup system
 
 **Example: Restart Service**
+
 ```bash
 # Graceful restart
 docker restart simplepro-api
@@ -269,6 +296,7 @@ docker logs simplepro-api --tail=100
 ```
 
 **Example: Scale Up Resources**
+
 ```bash
 # Increase memory limit
 docker update --memory=4g --memory-swap=4g simplepro-api
@@ -280,6 +308,7 @@ docker restart simplepro-api
 ```
 
 **Example: Enable Circuit Breaker**
+
 ```bash
 # Temporarily disable problematic feature
 curl -X POST https://api.simplepro.com/admin/features \
@@ -292,6 +321,7 @@ curl -X POST https://api.simplepro.com/admin/features \
 ### Phase 5: Resolution (Variable)
 
 #### Verification Checklist
+
 - [ ] Error rate back to normal (<0.1%)
 - [ ] Response times within SLA
 - [ ] All health checks passing
@@ -300,6 +330,7 @@ curl -X POST https://api.simplepro.com/admin/features \
 - [ ] No new related errors in logs
 
 #### Resolution Commands
+
 ```bash
 # Verify API health
 for i in {1..10}; do
@@ -315,6 +346,7 @@ done
 ```
 
 #### Resolution Message
+
 ```
 ✅ INCIDENT RESOLVED ✅
 
@@ -343,11 +375,13 @@ See [Post-Incident Review](#post-incident-review) section.
 ### Scenario 1: Database Connection Failures
 
 **Symptoms:**
+
 - "Unable to connect to database" errors
 - Application timeouts
 - 500 errors on all endpoints
 
 **Quick Diagnosis:**
+
 ```bash
 # Check database status
 ./scripts/mongodb/check-replica-health.sh
@@ -363,6 +397,7 @@ docker exec simplepro-mongodb-primary mongosh --eval "db.adminCommand('ping')"
 ```
 
 **Mitigation Steps:**
+
 1. Check if database is running
 2. Verify network connectivity
 3. Check credentials
@@ -374,11 +409,13 @@ docker exec simplepro-mongodb-primary mongosh --eval "db.adminCommand('ping')"
 ### Scenario 2: High Memory Usage
 
 **Symptoms:**
+
 - Application slow or unresponsive
 - Out of memory errors
 - Container restarts
 
 **Quick Diagnosis:**
+
 ```bash
 # Check memory usage
 docker stats simplepro-api --no-stream
@@ -393,6 +430,7 @@ docker exec simplepro-api netstat -an | grep ESTABLISHED | wc -l
 ```
 
 **Mitigation Steps:**
+
 1. Identify memory-intensive processes
 2. Clear cache if applicable
 3. Increase memory limits temporarily
@@ -404,11 +442,13 @@ docker exec simplepro-api netstat -an | grep ESTABLISHED | wc -l
 ### Scenario 3: Slow Query Performance
 
 **Symptoms:**
+
 - API response times > 5 seconds
 - Database CPU high
 - Timeout errors
 
 **Quick Diagnosis:**
+
 ```bash
 # Check slow queries
 docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
@@ -428,6 +468,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 **Mitigation Steps:**
+
 1. Identify slow queries
 2. Check if indexes exist
 3. Create missing indexes
@@ -439,11 +480,13 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ### Scenario 4: Replica Set Member Down
 
 **Symptoms:**
+
 - Replica set health alerts
 - Replication lag increasing
 - Read performance degraded
 
 **Quick Diagnosis:**
+
 ```bash
 ./scripts/mongodb/check-replica-health.sh
 
@@ -457,6 +500,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 **Mitigation Steps:**
+
 1. Restart failed member
 2. Check logs for errors
 3. Verify network connectivity
@@ -468,11 +512,13 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ### Scenario 5: Disk Space Critical
 
 **Symptoms:**
+
 - "No space left on device" errors
 - Database write failures
 - Log files not being written
 
 **Quick Diagnosis:**
+
 ```bash
 # Check disk usage
 docker exec simplepro-mongodb-primary df -h
@@ -485,6 +531,7 @@ docker exec simplepro-api du -sh /var/log/* 2>/dev/null
 ```
 
 **Mitigation Steps:**
+
 1. Clean up old logs
 2. Compact database collections
 3. Remove old backups
@@ -492,6 +539,7 @@ docker exec simplepro-api du -sh /var/log/* 2>/dev/null
 5. Increase disk size if needed
 
 **Emergency Cleanup:**
+
 ```bash
 # Remove old logs
 docker exec simplepro-api find /var/log -name "*.log" -mtime +7 -delete
@@ -511,11 +559,13 @@ find /backups/mongodb -type d -mtime +30 -exec rm -rf {} \;
 ### Scenario 6: High CPU Usage
 
 **Symptoms:**
+
 - Application slow
 - High server CPU (>90%)
 - Request timeouts
 
 **Quick Diagnosis:**
+
 ```bash
 # Check CPU usage
 docker stats --no-stream | grep simplepro
@@ -531,6 +581,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 **Mitigation Steps:**
+
 1. Identify CPU-intensive queries/operations
 2. Kill long-running operations if necessary
 3. Scale horizontally (add instances)
@@ -544,6 +595,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ### Internal Communication
 
 **During Incident (Every 15 minutes):**
+
 ```
 Status Update - 14:45 UTC
 
@@ -560,6 +612,7 @@ Next Update: 15:00 UTC
 ### External Communication
 
 **Status Page Update (Immediately for P0/P1):**
+
 ```
 Title: Job Creation Issues
 Status: Investigating
@@ -574,6 +627,7 @@ Posted: 14:35 UTC
 ```
 
 **Customer Support Update:**
+
 ```
 To: support@simplepro.com
 Subject: URGENT - Job Creation Issues
@@ -608,6 +662,7 @@ Will update in 15 minutes.
 ### Post-Mortem Meeting (Within 48 hours)
 
 **Attendees:**
+
 - Incident Commander
 - Technical Lead
 - Engineering Manager
@@ -615,6 +670,7 @@ Will update in 15 minutes.
 - Customer Success (if customer-facing)
 
 **Agenda:**
+
 1. Incident timeline review
 2. Root cause analysis (5 Whys)
 3. What went well
@@ -632,9 +688,11 @@ Will update in 15 minutes.
 **Incident Commander:** John Doe
 
 ## Summary
+
 Brief description of what happened and impact.
 
 ## Timeline
+
 - 14:30 - Alert triggered: High error rate on job creation API
 - 14:32 - On-call acknowledged, started investigation
 - 14:35 - Incident declared P1, war room created
@@ -645,11 +703,13 @@ Brief description of what happened and impact.
 - 15:17 - Incident resolved, all metrics normal
 
 ## Root Cause
+
 MongoDB connection pool (maxPoolSize: 100) was insufficient for current load.
 Connections were not being released properly due to missing error handling
 in job creation controller, causing pool exhaustion.
 
 ## Impact
+
 - 47 minutes of degraded service
 - 23 customers affected
 - ~450 failed job creation attempts
@@ -657,22 +717,26 @@ in job creation controller, causing pool exhaustion.
 - Revenue impact: Minimal (estimated $50)
 
 ## Resolution
+
 1. Increased connection pool size from 100 to 200
 2. Added proper connection release in error handling
 3. Implemented connection pool monitoring
 
 ## What Went Well
+
 - Quick detection (2 minutes from start to alert)
 - Good communication (updates every 15 minutes)
 - Effective mitigation (restored service in <1 hour)
 - Clear roles and responsibilities
 
 ## What Could Be Improved
+
 - Connection pool sizing was not based on load testing
 - No alerts for connection pool utilization
 - Error handling gaps in multiple controllers
 
 ## Action Items
+
 1. [ ] Add connection pool monitoring/alerting (@jane, by 10/05)
 2. [ ] Conduct load testing to determine optimal pool size (@john, by 10/10)
 3. [ ] Audit all database operations for proper error handling (@team, by 10/15)
@@ -680,6 +744,7 @@ in job creation controller, causing pool exhaustion.
 5. [ ] Implement circuit breaker pattern for database connections (@sarah, by 10/20)
 
 ## Lessons Learned
+
 - Connection pool monitoring is critical
 - Load testing should include database connection limits
 - Error handling must release resources properly
@@ -689,9 +754,9 @@ in job creation controller, causing pool exhaustion.
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | DevOps Team | Initial creation |
+| Version | Date       | Author      | Changes          |
+| ------- | ---------- | ----------- | ---------------- |
+| 1.0     | 2025-10-02 | DevOps Team | Initial creation |
 
 ---
 

@@ -22,7 +22,7 @@ export default function ServiceTypes() {
       baseRate: 150,
       isActive: true,
       category: 'moving',
-      color: '#3B82F6'
+      color: '#3B82F6',
     },
     {
       id: '2',
@@ -31,7 +31,7 @@ export default function ServiceTypes() {
       baseRate: 2500,
       isActive: true,
       category: 'moving',
-      color: '#EF4444'
+      color: '#EF4444',
     },
     {
       id: '3',
@@ -40,7 +40,7 @@ export default function ServiceTypes() {
       baseRate: 75,
       isActive: true,
       category: 'packing',
-      color: '#10B981'
+      color: '#10B981',
     },
     {
       id: '4',
@@ -49,7 +49,7 @@ export default function ServiceTypes() {
       baseRate: 200,
       isActive: true,
       category: 'storage',
-      color: '#F59E0B'
+      color: '#F59E0B',
     },
     {
       id: '5',
@@ -58,8 +58,8 @@ export default function ServiceTypes() {
       baseRate: 350,
       isActive: true,
       category: 'specialty',
-      color: '#8B5CF6'
-    }
+      color: '#8B5CF6',
+    },
   ]);
 
   const [, setShowCreateForm] = useState(false);
@@ -69,9 +69,8 @@ export default function ServiceTypes() {
     { value: 'moving', label: 'Moving Services', icon: '🚚' },
     { value: 'packing', label: 'Packing Services', icon: '📦' },
     { value: 'storage', label: 'Storage Services', icon: '🏪' },
-    { value: 'specialty', label: 'Specialty Services', icon: '🎹' }
+    { value: 'specialty', label: 'Specialty Services', icon: '🎹' },
   ];
-
 
   return (
     <div className={styles.serviceTypes}>
@@ -89,8 +88,10 @@ export default function ServiceTypes() {
       </div>
 
       <div className={styles.categoriesGrid}>
-        {categories.map(category => {
-          const categoryServices = serviceTypes.filter(service => service.category === category.value);
+        {categories.map((category) => {
+          const categoryServices = serviceTypes.filter(
+            (service) => service.category === category.value,
+          );
 
           return (
             <div key={category.value} className={styles.categorySection}>
@@ -103,17 +104,23 @@ export default function ServiceTypes() {
               </div>
 
               <div className={styles.servicesList}>
-                {categoryServices.map(service => (
+                {categoryServices.map((service) => (
                   <div key={service.id} className={styles.serviceCard}>
-                    <div className={styles.serviceColor} style={{ backgroundColor: service.color }}></div>
+                    <div
+                      className={styles.serviceColor}
+                      style={{ backgroundColor: service.color }}
+                    ></div>
                     <div className={styles.serviceInfo}>
                       <h5>{service.name}</h5>
                       <p>{service.description}</p>
                       <div className={styles.serviceDetails}>
                         <span className={styles.baseRate}>
-                          ${service.baseRate}/{service.category === 'moving' ? 'hour' : 'job'}
+                          ${service.baseRate}/
+                          {service.category === 'moving' ? 'hour' : 'job'}
                         </span>
-                        <span className={`${styles.status} ${service.isActive ? styles.active : styles.inactive}`}>
+                        <span
+                          className={`${styles.status} ${service.isActive ? styles.active : styles.inactive}`}
+                        >
                           {service.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
@@ -128,9 +135,13 @@ export default function ServiceTypes() {
                       </button>
                       <button
                         onClick={() => {
-                          setServiceTypes(prev => prev.map(s =>
-                            s.id === service.id ? { ...s, isActive: !s.isActive } : s
-                          ));
+                          setServiceTypes((prev) =>
+                            prev.map((s) =>
+                              s.id === service.id
+                                ? { ...s, isActive: !s.isActive }
+                                : s,
+                            ),
+                          );
                         }}
                         className={styles.actionButton}
                         title={service.isActive ? 'Deactivate' : 'Activate'}

@@ -23,12 +23,22 @@ interface AuthenticatedSocket extends Socket {
 
 @WSGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:3008', 'http://localhost:8081'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3008',
+      'http://localhost:8081',
+    ],
     credentials: true,
   },
   namespace: '/realtime',
 })
-export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
+export class WebSocketGateway
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleDestroy
+{
   @WebSocketServer() server!: Server;
   private logger: Logger = new Logger('WebSocketGateway');
   private connectedClients = new Map<string, AuthenticatedSocket>();
@@ -37,7 +47,10 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   private connectionTimers = new Map<string, NodeJS.Timeout>(); // socketId -> timeout
   private socketRooms = new Map<string, Set<string>>(); // socketId -> Set of room names for cleanup
   private typingTimers = new Map<string, NodeJS.Timeout>(); // socketId:threadId -> timer
-  private eventRateLimiter = new Map<string, { count: number; resetTime: number }>(); // socketId -> rate limit state
+  private eventRateLimiter = new Map<
+    string,
+    { count: number; resetTime: number }
+  >(); // socketId -> rate limit state
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private readonly CONNECTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
   private readonly HEARTBEAT_INTERVAL = 30 * 1000; // 30 seconds
@@ -52,7 +65,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @Inject(forwardRef(() => MessagesService))
     private messagesService: MessagesService,
     @Inject(forwardRef(() => TypingService))
-    private typingService: TypingService
+    private typingService: TypingService,
   ) {}
 
   afterInit(_server: Server) {
@@ -82,7 +95,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       // Reset or initialize rate limiter
       this.eventRateLimiter.set(socketId, {
         count: 1,
-        resetTime: now + this.EVENT_RATE_WINDOW
+        resetTime: now + this.EVENT_RATE_WINDOW,
       });
       return false;
     }
@@ -92,7 +105,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     if (limiterState.count > this.EVENT_RATE_LIMIT) {
       this.logger.warn(
         `Event rate limit exceeded for socket ${socketId} ` +
-        `(${limiterState.count}/${this.EVENT_RATE_LIMIT} in ${this.EVENT_RATE_WINDOW}ms window)`
+          `(${limiterState.count}/${this.EVENT_RATE_LIMIT} in ${this.EVENT_RATE_WINDOW}ms window)`,
       );
       return true;
     }
@@ -127,7 +140,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       }
     });
 
-    timersToDelete.forEach(key => this.typingTimers.delete(key));
+    timersToDelete.forEach((key) => this.typingTimers.delete(key));
   }
 
   async onModuleDestroy() {
@@ -192,24 +205,30 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       activeCrews: this.crewRooms.size,
       connectionTimers: this.connectionTimers.size,
       typingTimers: this.typingTimers.size,
-      trackedRooms: this.socketRooms.size
+      trackedRooms: this.socketRooms.size,
     };
 
     this.logger.debug('Connection stats:', stats);
 
     // Alert if connection count is unusually high
     if (stats.totalConnections > 1000) {
-      this.logger.warn(`High connection count detected: ${stats.totalConnections}`);
+      this.logger.warn(
+        `High connection count detected: ${stats.totalConnections}`,
+      );
     }
 
     // Alert if typing timers are accumulating (potential memory leak)
     if (stats.typingTimers > 100) {
-      this.logger.warn(`High typing timer count detected: ${stats.typingTimers} - potential memory leak`);
+      this.logger.warn(
+        `High typing timer count detected: ${stats.typingTimers} - potential memory leak`,
+      );
     }
 
     // Alert if room tracking is accumulating
     if (stats.trackedRooms > stats.totalConnections * 2) {
-      this.logger.warn(`Room tracking exceeds expected ratio: ${stats.trackedRooms} rooms for ${stats.totalConnections} connections`);
+      this.logger.warn(
+        `Room tracking exceeds expected ratio: ${stats.trackedRooms} rooms for ${stats.totalConnections} connections`,
+      );
     }
   }
 
@@ -220,10 +239,14 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     try {
       // SECURITY FIX: Authenticate FIRST before any other checks
       // This prevents unauthenticated connections from consuming resources
-      const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.replace('Bearer ', '');
+      const token =
+        client.handshake.auth?.token ||
+        client.handshake.headers?.authorization?.replace('Bearer ', '');
 
       if (!token) {
-        this.logger.warn(`Connection rejected: No authentication token provided from IP ${ipAddress}`);
+        this.logger.warn(
+          `Connection rejected: No authentication token provided from IP ${ipAddress}`,
+        );
         client.emit('error', { message: 'Authentication required' });
         client.disconnect();
         return;
@@ -234,9 +257,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       try {
         payload = this.jwtService.verify(token);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
 
-        this.logger.warn(`Connection rejected: Invalid JWT token from IP ${ipAddress} - ${errorMessage}`);
+        this.logger.warn(
+          `Connection rejected: Invalid JWT token from IP ${ipAddress} - ${errorMessage}`,
+        );
         client.emit('error', { message: 'Invalid authentication token' });
         client.disconnect();
         return;
@@ -245,7 +271,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       // Validate user exists and is active
       const user = await this.authService.findOne(payload.sub);
       if (!user || !user.isActive) {
-        this.logger.warn(`Connection rejected: User ${payload.sub} not found or inactive from IP ${ipAddress}`);
+        this.logger.warn(
+          `Connection rejected: User ${payload.sub} not found or inactive from IP ${ipAddress}`,
+        );
         client.emit('error', { message: 'Invalid token or user deactivated' });
         client.disconnect();
         return;
@@ -263,12 +291,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         if (userConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
           this.logger.warn(
             `Connection rejected: User ${client.userId} exceeded connection limit ` +
-            `(${userConnections.size}/${this.MAX_CONNECTIONS_PER_USER}) from IP ${ipAddress}`
+              `(${userConnections.size}/${this.MAX_CONNECTIONS_PER_USER}) from IP ${ipAddress}`,
           );
           client.emit('error', {
             message: 'Maximum connections per user exceeded',
             limit: this.MAX_CONNECTIONS_PER_USER,
-            current: userConnections.size
+            current: userConnections.size,
           });
           client.disconnect();
           return;
@@ -277,15 +305,19 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // SECURITY: Check per-IP connection limit as secondary defense
       // This prevents IP-based flooding attacks
-      const ipConnections = Array.from(this.connectedClients.values())
-        .filter(c => c.handshake.address === ipAddress).length;
+      const ipConnections = Array.from(this.connectedClients.values()).filter(
+        (c) => c.handshake.address === ipAddress,
+      ).length;
 
-      if (ipConnections >= this.MAX_CONNECTIONS_PER_USER * 2) { // Allow 2x per IP for multiple users
+      if (ipConnections >= this.MAX_CONNECTIONS_PER_USER * 2) {
+        // Allow 2x per IP for multiple users
         this.logger.warn(
           `Connection rejected: IP ${ipAddress} exceeded connection limit ` +
-          `(${ipConnections}/${this.MAX_CONNECTIONS_PER_USER * 2})`
+            `(${ipConnections}/${this.MAX_CONNECTIONS_PER_USER * 2})`,
         );
-        client.emit('error', { message: 'Too many connections from this IP address' });
+        client.emit('error', {
+          message: 'Too many connections from this IP address',
+        });
         client.disconnect();
         return;
       }
@@ -301,7 +333,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // Set connection timeout to prevent abandoned connections
       const timeout = setTimeout(() => {
-        this.logger.warn(`Connection timeout for client ${socketId} (user: ${client.userId})`);
+        this.logger.warn(
+          `Connection timeout for client ${socketId} (user: ${client.userId})`,
+        );
         this.handleDisconnect(client);
         client.disconnect();
       }, this.CONNECTION_TIMEOUT) as unknown as NodeJS.Timeout;
@@ -331,7 +365,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         this.trackRoom(client.id, userRoom);
       }
 
-      this.logger.log(`Client ${client.id} connected as ${user.username} (${user.role.name})`);
+      this.logger.log(
+        `Client ${client.id} connected as ${user.username} (${user.role.name})`,
+      );
 
       // Send connection confirmation
       client.emit('connected', {
@@ -349,10 +385,13 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         crewId: user.crewId,
         timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Authentication failed for client ${client.id}:`, errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Authentication failed for client ${client.id}:`,
+        errorMessage,
+      );
       client.disconnect();
     }
   }
@@ -378,19 +417,22 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     // 4. Cleanup typing indicators in database
     if (userId) {
       // Fire and forget - cleanup typing indicators for this user
-      this.typingService.stopTyping('*', userId).catch(err => {
-        this.logger.error(`Failed to cleanup typing indicators for user ${userId}: ${err.message}`);
+      this.typingService.stopTyping('*', userId).catch((err) => {
+        this.logger.error(
+          `Failed to cleanup typing indicators for user ${userId}: ${err.message}`,
+        );
       });
     }
 
     // 5. Leave all tracked rooms explicitly
     const rooms = this.socketRooms.get(client.id);
     if (rooms && rooms.size > 0) {
-      rooms.forEach(roomName => {
+      rooms.forEach((roomName) => {
         try {
           client.leave(roomName);
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
           this.logger.warn(`Failed to leave room ${roomName}: ${errorMessage}`);
         }
@@ -426,7 +468,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       }
     }
 
-    this.logger.log(`Client ${client.id} disconnected (User: ${userId}) - cleanup complete`);
+    this.logger.log(
+      `Client ${client.id} disconnected (User: ${userId}) - cleanup complete`,
+    );
 
     // 10. Broadcast user offline status if no more connections
     if (userId && !this.userSockets.has(userId)) {
@@ -441,7 +485,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('subscribeToJob')
   async handleJobSubscription(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { jobId: string }
+    @MessageBody() data: { jobId: string },
   ) {
     const { jobId } = data;
 
@@ -464,7 +508,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('unsubscribeFromJob')
   async handleJobUnsubscription(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { jobId: string }
+    @MessageBody() data: { jobId: string },
   ) {
     const { jobId } = data;
     const jobRoom = `job:${jobId}`;
@@ -489,23 +533,28 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('locationUpdate')
   async handleLocationUpdate(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: {
+    @MessageBody()
+    data: {
       latitude: number;
       longitude: number;
       accuracy?: number;
       heading?: number;
       speed?: number;
       jobId?: string;
-    }
+    },
   ) {
     // SECURITY: Check event rate limit
     if (this.checkEventRateLimit(client.id)) {
-      client.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      client.emit('error', {
+        message: 'Rate limit exceeded. Please slow down.',
+      });
       return;
     }
 
     if (!client.userRole || client.userRole !== 'crew') {
-      client.emit('error', { message: 'Unauthorized: Only crew can send location updates' });
+      client.emit('error', {
+        message: 'Unauthorized: Only crew can send location updates',
+      });
       return;
     }
 
@@ -524,28 +573,38 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     };
 
     // Broadcast to dispatchers and admins
-    this.server.to('role:admin').to('role:dispatcher').emit('crewLocationUpdate', locationData);
+    this.server
+      .to('role:admin')
+      .to('role:dispatcher')
+      .emit('crewLocationUpdate', locationData);
 
     // If associated with a job, broadcast to job subscribers
     if (data.jobId) {
-      this.server.to(`job:${data.jobId}`).emit('jobLocationUpdate', locationData);
+      this.server
+        .to(`job:${data.jobId}`)
+        .emit('jobLocationUpdate', locationData);
     }
 
-    this.logger.log(`Location update from crew ${client.userId}: ${data.latitude}, ${data.longitude}`);
+    this.logger.log(
+      `Location update from crew ${client.userId}: ${data.latitude}, ${data.longitude}`,
+    );
   }
 
   // Crew Status Updates
   @SubscribeMessage('statusUpdate')
   async handleStatusUpdate(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: {
+    @MessageBody()
+    data: {
       status: 'available' | 'busy' | 'break' | 'offline';
       message?: string;
       jobId?: string;
-    }
+    },
   ) {
     if (!client.userRole || client.userRole !== 'crew') {
-      client.emit('error', { message: 'Unauthorized: Only crew can send status updates' });
+      client.emit('error', {
+        message: 'Unauthorized: Only crew can send status updates',
+      });
       return;
     }
 
@@ -559,11 +618,16 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     };
 
     // Broadcast to dispatchers and admins
-    this.server.to('role:admin').to('role:dispatcher').emit('crewStatusUpdate', statusData);
+    this.server
+      .to('role:admin')
+      .to('role:dispatcher')
+      .emit('crewStatusUpdate', statusData);
 
     // Broadcast to crew room
     if (client.crewId) {
-      this.server.to(`crew:${client.crewId}`).emit('teamStatusUpdate', statusData);
+      this.server
+        .to(`crew:${client.crewId}`)
+        .emit('teamStatusUpdate', statusData);
     }
 
     this.logger.log(`Status update from crew ${client.userId}: ${data.status}`);
@@ -573,16 +637,19 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: {
+    @MessageBody()
+    data: {
       to: 'job' | 'crew' | 'user' | 'broadcast';
       targetId?: string;
       message: string;
       priority?: 'low' | 'normal' | 'high' | 'urgent';
-    }
+    },
   ) {
     // SECURITY: Check event rate limit
     if (this.checkEventRateLimit(client.id)) {
-      client.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      client.emit('error', {
+        message: 'Rate limit exceeded. Please slow down.',
+      });
       return;
     }
     const messageData = {
@@ -601,44 +668,64 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     switch (data.to) {
       case 'job':
         if (data.targetId) {
-          this.server.to(`job:${data.targetId}`).emit('newMessage', messageData);
+          this.server
+            .to(`job:${data.targetId}`)
+            .emit('newMessage', messageData);
         }
         break;
       case 'crew':
         if (data.targetId) {
-          this.server.to(`crew:${data.targetId}`).emit('newMessage', messageData);
+          this.server
+            .to(`crew:${data.targetId}`)
+            .emit('newMessage', messageData);
         }
         break;
       case 'user':
         if (data.targetId) {
-          this.server.to(`user:${data.targetId}`).emit('newMessage', messageData);
+          this.server
+            .to(`user:${data.targetId}`)
+            .emit('newMessage', messageData);
         }
         break;
       case 'broadcast':
-        if (client.userRole && (client.userRole === 'admin' || client.userRole === 'super_admin')) {
+        if (
+          client.userRole &&
+          (client.userRole === 'admin' || client.userRole === 'super_admin')
+        ) {
           this.server.emit('broadcast', messageData);
         } else {
-          client.emit('error', { message: 'Unauthorized: Only admins can broadcast' });
+          client.emit('error', {
+            message: 'Unauthorized: Only admins can broadcast',
+          });
         }
         break;
     }
 
-    this.logger.log(`Message from ${client.userId} to ${data.to}:${data.targetId || 'all'}`);
+    this.logger.log(
+      `Message from ${client.userId} to ${data.to}:${data.targetId || 'all'}`,
+    );
   }
 
   // Emergency Alert
   @SubscribeMessage('emergencyAlert')
   async handleEmergencyAlert(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: {
-      type: 'accident' | 'injury' | 'property_damage' | 'security' | 'weather' | 'other';
+    @MessageBody()
+    data: {
+      type:
+        | 'accident'
+        | 'injury'
+        | 'property_damage'
+        | 'security'
+        | 'weather'
+        | 'other';
       message: string;
       location?: {
         latitude: number;
         longitude: number;
       };
       jobId?: string;
-    }
+    },
   ) {
     const alertData = {
       from: {
@@ -656,7 +743,10 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     };
 
     // Broadcast to all admins and dispatchers immediately
-    this.server.to('role:admin').to('role:dispatcher').emit('emergencyAlert', alertData);
+    this.server
+      .to('role:admin')
+      .to('role:dispatcher')
+      .emit('emergencyAlert', alertData);
 
     // If associated with a job, notify job subscribers
     if (data.jobId) {
@@ -668,7 +758,9 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       this.server.to(`crew:${client.crewId}`).emit('teamEmergency', alertData);
     }
 
-    this.logger.error(`EMERGENCY ALERT from ${client.userId}: ${data.type} - ${data.message}`);
+    this.logger.error(
+      `EMERGENCY ALERT from ${client.userId}: ${data.type} - ${data.message}`,
+    );
   }
 
   // Public methods for external services to broadcast updates
@@ -705,11 +797,20 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('subscribeToAnalytics')
   async handleAnalyticsSubscription(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { dashboardType?: 'overview' | 'business' | 'revenue' | 'performance' }
+    @MessageBody()
+    data: {
+      dashboardType?: 'overview' | 'business' | 'revenue' | 'performance';
+    },
   ) {
     // Only allow admin and dispatcher roles to subscribe to analytics
-    if (!client.userRole || !['admin', 'super_admin', 'dispatcher'].includes(client.userRole)) {
-      client.emit('error', { message: 'Unauthorized: Only admins and dispatchers can access analytics' });
+    if (
+      !client.userRole ||
+      !['admin', 'super_admin', 'dispatcher'].includes(client.userRole)
+    ) {
+      client.emit('error', {
+        message:
+          'Unauthorized: Only admins and dispatchers can access analytics',
+      });
       return;
     }
 
@@ -735,7 +836,10 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('unsubscribeFromAnalytics')
   async handleAnalyticsUnsubscription(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { dashboardType?: 'overview' | 'business' | 'revenue' | 'performance' }
+    @MessageBody()
+    data: {
+      dashboardType?: 'overview' | 'business' | 'revenue' | 'performance';
+    },
   ) {
     const baseRoom = 'analytics:subscribers';
     await client.leave(baseRoom);
@@ -760,7 +864,10 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   // Analytics Broadcasting Methods
-  broadcastAnalyticsUpdate(dashboardType: 'overview' | 'business' | 'revenue' | 'performance', data: any) {
+  broadcastAnalyticsUpdate(
+    dashboardType: 'overview' | 'business' | 'revenue' | 'performance',
+    data: any,
+  ) {
     this.server.to(`analytics:${dashboardType}`).emit('analyticsUpdate', {
       dashboardType,
       data,
@@ -787,8 +894,8 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   // Get connected users info with safety checks
   getConnectedUsers() {
     const users = Array.from(this.connectedClients.values())
-      .filter(socket => socket && socket.connected) // Only include active connections
-      .map(socket => ({
+      .filter((socket) => socket && socket.connected) // Only include active connections
+      .map((socket) => ({
         socketId: socket.id,
         userId: socket.userId,
         userRole: socket.userRole,
@@ -808,9 +915,19 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
       connectionTimersSize: this.connectionTimers.size,
       typingTimersSize: this.typingTimers.size,
       socketRoomsSize: this.socketRooms.size,
-      totalMappedEntries: Array.from(this.userSockets.values()).reduce((sum, set) => sum + set.size, 0) +
-                          Array.from(this.crewRooms.values()).reduce((sum, set) => sum + set.size, 0),
-      totalTrackedRooms: Array.from(this.socketRooms.values()).reduce((sum, set) => sum + set.size, 0)
+      totalMappedEntries:
+        Array.from(this.userSockets.values()).reduce(
+          (sum, set) => sum + set.size,
+          0,
+        ) +
+        Array.from(this.crewRooms.values()).reduce(
+          (sum, set) => sum + set.size,
+          0,
+        ),
+      totalTrackedRooms: Array.from(this.socketRooms.values()).reduce(
+        (sum, set) => sum + set.size,
+        0,
+      ),
     };
   }
 
@@ -844,8 +961,8 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   getCrewStatus() {
     const crewStatus = new Map();
     Array.from(this.connectedClients.values())
-      .filter(socket => socket.userRole === 'crew')
-      .forEach(socket => {
+      .filter((socket) => socket.userRole === 'crew')
+      .forEach((socket) => {
         if (socket.crewId) {
           if (!crewStatus.has(socket.crewId)) {
             crewStatus.set(socket.crewId, []);
@@ -864,18 +981,21 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('message.send')
   async handleSendMessage(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: {
+    @MessageBody()
+    payload: {
       threadId: string;
       content: string;
       messageType?: string;
       attachments?: any[];
       location?: any;
       replyToId?: string;
-    }
+    },
   ) {
     // SECURITY: Check event rate limit
     if (this.checkEventRateLimit(client.id)) {
-      client.emit('error', { message: 'Rate limit exceeded. Please slow down.' });
+      client.emit('error', {
+        message: 'Rate limit exceeded. Please slow down.',
+      });
       return;
     }
 
@@ -889,7 +1009,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
           location: payload.location,
           replyToId: payload.replyToId,
         },
-        client.userId!
+        client.userId!,
       );
 
       // Get thread to find all participants
@@ -897,7 +1017,8 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // Emit to all thread participants
       thread.participants.forEach((participant: any) => {
-        const participantId = participant._id?.toString() || participant.toString();
+        const participantId =
+          participant._id?.toString() || participant.toString();
         this.server.to(`user:${participantId}`).emit('message.created', {
           message,
           threadId: payload.threadId,
@@ -905,19 +1026,25 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         });
       });
 
-      this.logger.log(`Message sent in thread ${payload.threadId} by user ${client.userId}`);
+      this.logger.log(
+        `Message sent in thread ${payload.threadId} by user ${client.userId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to send message: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to send message', error: errorMessage });
+      client.emit('error', {
+        message: 'Failed to send message',
+        error: errorMessage,
+      });
     }
   }
 
   @SubscribeMessage('typing.start')
   async handleTypingStart(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { threadId: string }
+    @MessageBody() payload: { threadId: string },
   ) {
     try {
       await this.typingService.startTyping(payload.threadId, client.userId!);
@@ -931,7 +1058,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // Set auto-clear timer (5 seconds)
       const timer = setTimeout(() => {
-        this.handleTypingStop(client, payload).catch(err => {
+        this.handleTypingStop(client, payload).catch((err) => {
           this.logger.error(`Failed to auto-clear typing: ${err.message}`);
         });
         this.typingTimers.delete(timerKey);
@@ -944,7 +1071,8 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // Emit to other thread participants (not the sender)
       thread.participants.forEach((participant: any) => {
-        const participantId = participant._id?.toString() || participant.toString();
+        const participantId =
+          participant._id?.toString() || participant.toString();
         if (participantId !== client.userId) {
           this.server.to(`user:${participantId}`).emit('user.typing', {
             threadId: payload.threadId,
@@ -954,9 +1082,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         }
       });
 
-      this.logger.debug(`User ${client.userId} started typing in thread ${payload.threadId}`);
+      this.logger.debug(
+        `User ${client.userId} started typing in thread ${payload.threadId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to handle typing start: ${errorMessage}`);
     }
@@ -965,7 +1096,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('typing.stop')
   async handleTypingStop(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { threadId: string }
+    @MessageBody() payload: { threadId: string },
   ) {
     try {
       // Clear the typing timer
@@ -983,7 +1114,8 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
       // Emit to other thread participants (not the sender)
       thread.participants.forEach((participant: any) => {
-        const participantId = participant._id?.toString() || participant.toString();
+        const participantId =
+          participant._id?.toString() || participant.toString();
         if (participantId !== client.userId) {
           this.server.to(`user:${participantId}`).emit('user.stopped_typing', {
             threadId: payload.threadId,
@@ -993,9 +1125,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         }
       });
 
-      this.logger.debug(`User ${client.userId} stopped typing in thread ${payload.threadId}`);
+      this.logger.debug(
+        `User ${client.userId} stopped typing in thread ${payload.threadId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to handle typing stop: ${errorMessage}`);
     }
@@ -1004,13 +1139,19 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('message.read')
   async handleMessageRead(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { threadId: string; messageId: string }
+    @MessageBody() payload: { threadId: string; messageId: string },
   ) {
     try {
-      await this.messagesService.markAsRead(payload.threadId, client.userId!, payload.messageId);
+      await this.messagesService.markAsRead(
+        payload.threadId,
+        client.userId!,
+        payload.messageId,
+      );
 
       // Get the message to find the sender
-      const message = await this.messagesService.getMessageById(payload.messageId);
+      const message = await this.messagesService.getMessageById(
+        payload.messageId,
+      );
 
       // Emit read receipt to sender
       const senderId = message.senderId.toString();
@@ -1021,9 +1162,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         readAt: new Date().toISOString(),
       });
 
-      this.logger.debug(`Message ${payload.messageId} marked as read by ${client.userId}`);
+      this.logger.debug(
+        `Message ${payload.messageId} marked as read by ${client.userId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to handle message read: ${errorMessage}`);
     }
@@ -1032,50 +1176,63 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('message.edit')
   async handleMessageEdit(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { messageId: string; content: string }
+    @MessageBody() payload: { messageId: string; content: string },
   ) {
     try {
       const updatedMessage = await this.messagesService.editMessage(
         payload.messageId,
         payload.content,
-        client.userId!
+        client.userId!,
       );
 
       // Get thread to find all participants
-      const thread = await this.messagesService.getThreadById(updatedMessage.threadId.toString());
+      const thread = await this.messagesService.getThreadById(
+        updatedMessage.threadId.toString(),
+      );
 
       // Emit to all thread participants
       thread.participants.forEach((participant: any) => {
-        const participantId = participant._id?.toString() || participant.toString();
+        const participantId =
+          participant._id?.toString() || participant.toString();
         this.server.to(`user:${participantId}`).emit('message.edited', {
           message: updatedMessage,
           timestamp: new Date().toISOString(),
         });
       });
 
-      this.logger.log(`Message ${payload.messageId} edited by user ${client.userId}`);
+      this.logger.log(
+        `Message ${payload.messageId} edited by user ${client.userId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to edit message: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to edit message', error: errorMessage });
+      client.emit('error', {
+        message: 'Failed to edit message',
+        error: errorMessage,
+      });
     }
   }
 
   @SubscribeMessage('message.delete')
   async handleMessageDelete(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { messageId: string; threadId: string }
+    @MessageBody() payload: { messageId: string; threadId: string },
   ) {
     try {
-      await this.messagesService.deleteMessage(payload.messageId, client.userId!);
+      await this.messagesService.deleteMessage(
+        payload.messageId,
+        client.userId!,
+      );
 
       // Get thread to find all participants
       const thread = await this.messagesService.getThreadById(payload.threadId);
 
       // Emit to all thread participants
       thread.participants.forEach((participant: any) => {
-        const participantId = participant._id?.toString() || participant.toString();
+        const participantId =
+          participant._id?.toString() || participant.toString();
         this.server.to(`user:${participantId}`).emit('message.deleted', {
           messageId: payload.messageId,
           threadId: payload.threadId,
@@ -1083,31 +1240,40 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         });
       });
 
-      this.logger.log(`Message ${payload.messageId} deleted by user ${client.userId}`);
+      this.logger.log(
+        `Message ${payload.messageId} deleted by user ${client.userId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to delete message: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to delete message', error: errorMessage });
+      client.emit('error', {
+        message: 'Failed to delete message',
+        error: errorMessage,
+      });
     }
   }
 
   @SubscribeMessage('thread.subscribe')
   async handleThreadSubscribe(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { threadId: string }
+    @MessageBody() payload: { threadId: string },
   ) {
     try {
       // Verify user has access to this thread
       const thread = await this.messagesService.getThreadById(payload.threadId);
 
       const hasAccess = thread.participants.some((participant: any) => {
-        const participantId = participant._id?.toString() || participant.toString();
+        const participantId =
+          participant._id?.toString() || participant.toString();
         return participantId === client.userId;
       });
 
       if (!hasAccess) {
-        client.emit('error', { message: 'You do not have access to this thread' });
+        client.emit('error', {
+          message: 'You do not have access to this thread',
+        });
         return;
       }
 
@@ -1120,19 +1286,25 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         timestamp: new Date().toISOString(),
       });
 
-      this.logger.debug(`Client ${client.id} subscribed to thread ${payload.threadId}`);
+      this.logger.debug(
+        `Client ${client.id} subscribed to thread ${payload.threadId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to subscribe to thread: ${errorMessage}`);
-      client.emit('error', { message: 'Failed to subscribe to thread', error: errorMessage });
+      client.emit('error', {
+        message: 'Failed to subscribe to thread',
+        error: errorMessage,
+      });
     }
   }
 
   @SubscribeMessage('thread.unsubscribe')
   async handleThreadUnsubscribe(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { threadId: string }
+    @MessageBody() payload: { threadId: string },
   ) {
     try {
       const threadRoom = `thread:${payload.threadId}`;
@@ -1149,9 +1321,12 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         timestamp: new Date().toISOString(),
       });
 
-      this.logger.debug(`Client ${client.id} unsubscribed from thread ${payload.threadId}`);
+      this.logger.debug(
+        `Client ${client.id} unsubscribed from thread ${payload.threadId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to unsubscribe from thread: ${errorMessage}`);
     }

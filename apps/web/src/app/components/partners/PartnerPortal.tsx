@@ -15,10 +15,14 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'submit' | 'referrals' | 'commissions'>('submit');
+  const [activeTab, setActiveTab] = useState<
+    'submit' | 'referrals' | 'commissions'
+  >('submit');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  const [newReferral, setNewReferral] = useState<Omit<CreateReferralDto, 'partnerId'>>({
+  const [newReferral, setNewReferral] = useState<
+    Omit<CreateReferralDto, 'partnerId'>
+  >({
     customerName: '',
     customerEmail: '',
     customerPhone: '',
@@ -40,7 +44,7 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
       // Fetch partner details
       const partnerResponse = await fetch(getApiUrl(`/partners/${partnerId}`), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -53,12 +57,15 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
       setPartner(partnerData);
 
       // Fetch partner's referrals
-      const referralsResponse = await fetch(getApiUrl(`/referrals/partner/${partnerId}`), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const referralsResponse = await fetch(
+        getApiUrl(`/referrals/partner/${partnerId}`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (referralsResponse.ok) {
         const referralsData = await referralsResponse.json();
@@ -70,19 +77,23 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
         getApiUrl(`/partner-commissions?partnerId=${partnerId}`),
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (commissionsResponse.ok) {
         const commissionsData = await commissionsResponse.json();
-        setCommissions(commissionsData.filter((c: Commission) => c.partnerId === partnerId));
+        setCommissions(
+          commissionsData.filter((c: Commission) => c.partnerId === partnerId),
+        );
       }
     } catch (err) {
       console.error('Error fetching partner data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load partner data');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load partner data',
+      );
     } finally {
       setLoading(false);
     }
@@ -107,7 +118,7 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
       const response = await fetch(getApiUrl('/referrals'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -137,7 +148,9 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
       setActiveTab('referrals');
     } catch (err) {
       console.error('Error submitting referral:', err);
-      setError(err instanceof Error ? err.message : 'Failed to submit referral');
+      setError(
+        err instanceof Error ? err.message : 'Failed to submit referral',
+      );
     } finally {
       setLoading(false);
     }
@@ -146,19 +159,28 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
   // Calculate commission summary
   const commissionSummary = {
     total: commissions.reduce((sum, c) => sum + c.commissionAmount, 0),
-    pending: commissions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.commissionAmount, 0),
-    calculated: commissions.filter(c => c.status === 'calculated').reduce((sum, c) => sum + c.commissionAmount, 0),
-    paid: commissions.filter(c => c.status === 'paid').reduce((sum, c) => sum + c.commissionAmount, 0),
+    pending: commissions
+      .filter((c) => c.status === 'pending')
+      .reduce((sum, c) => sum + c.commissionAmount, 0),
+    calculated: commissions
+      .filter((c) => c.status === 'calculated')
+      .reduce((sum, c) => sum + c.commissionAmount, 0),
+    paid: commissions
+      .filter((c) => c.status === 'paid')
+      .reduce((sum, c) => sum + c.commissionAmount, 0),
   };
 
   // Calculate referral statistics
   const referralStats = {
     total: referrals.length,
-    new: referrals.filter(r => r.status === 'new').length,
-    converted: referrals.filter(r => r.status === 'converted').length,
-    conversionRate: referrals.length > 0
-      ? (referrals.filter(r => r.status === 'converted').length / referrals.length) * 100
-      : 0,
+    new: referrals.filter((r) => r.status === 'new').length,
+    converted: referrals.filter((r) => r.status === 'converted').length,
+    conversionRate:
+      referrals.length > 0
+        ? (referrals.filter((r) => r.status === 'converted').length /
+            referrals.length) *
+          100
+        : 0,
   };
 
   if (loading && !partner) {
@@ -202,7 +224,9 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
         <div className={styles.statCard}>
           <div className={styles.statIcon}>📈</div>
           <div className={styles.statContent}>
-            <div className={styles.statValue}>{referralStats.conversionRate.toFixed(1)}%</div>
+            <div className={styles.statValue}>
+              {referralStats.conversionRate.toFixed(1)}%
+            </div>
             <div className={styles.statLabel}>Conversion Rate</div>
           </div>
         </div>
@@ -210,7 +234,9 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
         <div className={styles.statCard}>
           <div className={styles.statIcon}>💰</div>
           <div className={styles.statContent}>
-            <div className={styles.statValue}>${commissionSummary.total.toLocaleString()}</div>
+            <div className={styles.statValue}>
+              ${commissionSummary.total.toLocaleString()}
+            </div>
             <div className={styles.statLabel}>Total Commissions</div>
           </div>
         </div>
@@ -245,12 +271,13 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
           <div className={styles.submitSection}>
             <h2 className={styles.sectionTitle}>Submit New Referral</h2>
             <p className={styles.sectionDescription}>
-              Fill out the form below to submit a new customer referral. We&apos;ll contact them within 24 hours.
+              Fill out the form below to submit a new customer referral. We'll
+              contact them within 24 hours.
             </p>
 
             {showSuccessMessage && (
               <div className={styles.successMessage}>
-                ✅ Referral submitted successfully! We&apos;ll be in touch soon.
+                ✅ Referral submitted successfully! We'll be in touch soon.
               </div>
             )}
 
@@ -263,7 +290,12 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
                   type="text"
                   className={styles.input}
                   value={newReferral.customerName}
-                  onChange={(e) => setNewReferral({ ...newReferral, customerName: e.target.value })}
+                  onChange={(e) =>
+                    setNewReferral({
+                      ...newReferral,
+                      customerName: e.target.value,
+                    })
+                  }
                   required
                   placeholder="John Doe"
                 />
@@ -275,7 +307,12 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
                   type="email"
                   className={styles.input}
                   value={newReferral.customerEmail}
-                  onChange={(e) => setNewReferral({ ...newReferral, customerEmail: e.target.value })}
+                  onChange={(e) =>
+                    setNewReferral({
+                      ...newReferral,
+                      customerEmail: e.target.value,
+                    })
+                  }
                   required
                   placeholder="john@example.com"
                 />
@@ -287,22 +324,33 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
                   type="tel"
                   className={styles.input}
                   value={newReferral.customerPhone}
-                  onChange={(e) => setNewReferral({ ...newReferral, customerPhone: e.target.value })}
+                  onChange={(e) =>
+                    setNewReferral({
+                      ...newReferral,
+                      customerPhone: e.target.value,
+                    })
+                  }
                   required
                   placeholder="(555) 123-4567"
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Estimated Move Value (Optional)</label>
+                <label className={styles.label}>
+                  Estimated Move Value (Optional)
+                </label>
                 <input
                   type="number"
                   className={styles.input}
                   value={newReferral.estimatedValue || ''}
-                  onChange={(e) => setNewReferral({
-                    ...newReferral,
-                    estimatedValue: e.target.value ? parseFloat(e.target.value) : undefined
-                  })}
+                  onChange={(e) =>
+                    setNewReferral({
+                      ...newReferral,
+                      estimatedValue: e.target.value
+                        ? parseFloat(e.target.value)
+                        : undefined,
+                    })
+                  }
                   min="0"
                   step="100"
                   placeholder="5000"
@@ -314,13 +362,19 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
                 <textarea
                   className={styles.textarea}
                   value={newReferral.notes}
-                  onChange={(e) => setNewReferral({ ...newReferral, notes: e.target.value })}
+                  onChange={(e) =>
+                    setNewReferral({ ...newReferral, notes: e.target.value })
+                  }
                   rows={4}
                   placeholder="Any special requirements or details about the customer..."
                 />
               </div>
 
-              <button type="submit" className={styles.submitButton} disabled={loading}>
+              <button
+                type="submit"
+                className={styles.submitButton}
+                disabled={loading}
+              >
                 {loading ? 'Submitting...' : 'Submit Referral'}
               </button>
             </form>
@@ -334,18 +388,25 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
 
             {referrals.length === 0 ? (
               <div className={styles.emptyState}>
-                <p>You haven&apos;t submitted any referrals yet.</p>
-                <button className={styles.emptyStateButton} onClick={() => setActiveTab('submit')}>
+                <p>You haven't submitted any referrals yet.</p>
+                <button
+                  className={styles.emptyStateButton}
+                  onClick={() => setActiveTab('submit')}
+                >
                   Submit Your First Referral
                 </button>
               </div>
             ) : (
               <div className={styles.referralsList}>
-                {referrals.map(referral => (
+                {referrals.map((referral) => (
                   <div key={referral.id} className={styles.referralCard}>
                     <div className={styles.cardHeader}>
-                      <h3 className={styles.cardTitle}>{referral.customerName}</h3>
-                      <span className={`${styles.statusBadge} ${styles[referral.status]}`}>
+                      <h3 className={styles.cardTitle}>
+                        {referral.customerName}
+                      </h3>
+                      <span
+                        className={`${styles.statusBadge} ${styles[referral.status]}`}
+                      >
                         {referral.status}
                       </span>
                     </div>
@@ -353,11 +414,15 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
                     <div className={styles.cardBody}>
                       <div className={styles.infoRow}>
                         <span className={styles.infoLabel}>Email:</span>
-                        <span className={styles.infoValue}>{referral.customerEmail}</span>
+                        <span className={styles.infoValue}>
+                          {referral.customerEmail}
+                        </span>
                       </div>
                       <div className={styles.infoRow}>
                         <span className={styles.infoLabel}>Phone:</span>
-                        <span className={styles.infoValue}>{referral.customerPhone}</span>
+                        <span className={styles.infoValue}>
+                          {referral.customerPhone}
+                        </span>
                       </div>
                       {referral.estimatedValue && (
                         <div className={styles.infoRow}>
@@ -394,19 +459,27 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
             <div className={styles.commissionSummary}>
               <div className={styles.summaryItem}>
                 <div className={styles.summaryLabel}>Total Earned</div>
-                <div className={styles.summaryValue}>${commissionSummary.total.toLocaleString()}</div>
+                <div className={styles.summaryValue}>
+                  ${commissionSummary.total.toLocaleString()}
+                </div>
               </div>
               <div className={styles.summaryItem}>
                 <div className={styles.summaryLabel}>Pending</div>
-                <div className={styles.summaryValue}>${commissionSummary.pending.toLocaleString()}</div>
+                <div className={styles.summaryValue}>
+                  ${commissionSummary.pending.toLocaleString()}
+                </div>
               </div>
               <div className={styles.summaryItem}>
                 <div className={styles.summaryLabel}>Ready to Pay</div>
-                <div className={styles.summaryValue}>${commissionSummary.calculated.toLocaleString()}</div>
+                <div className={styles.summaryValue}>
+                  ${commissionSummary.calculated.toLocaleString()}
+                </div>
               </div>
               <div className={styles.summaryItem}>
                 <div className={styles.summaryLabel}>Paid</div>
-                <div className={styles.summaryValue}>${commissionSummary.paid.toLocaleString()}</div>
+                <div className={styles.summaryValue}>
+                  ${commissionSummary.paid.toLocaleString()}
+                </div>
               </div>
             </div>
 
@@ -427,15 +500,19 @@ export function PartnerPortal({ partnerId }: PartnerPortalProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {commissions.map(commission => (
+                    {commissions.map((commission) => (
                       <tr key={commission.id}>
-                        <td>{new Date(commission.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          {new Date(commission.createdAt).toLocaleDateString()}
+                        </td>
                         <td>${commission.jobValue.toLocaleString()}</td>
                         <td className={styles.commissionAmount}>
                           ${commission.commissionAmount.toLocaleString()}
                         </td>
                         <td>
-                          <span className={`${styles.statusBadge} ${styles[commission.status]}`}>
+                          <span
+                            className={`${styles.statusBadge} ${styles[commission.status]}`}
+                          >
                             {commission.status}
                           </span>
                         </td>

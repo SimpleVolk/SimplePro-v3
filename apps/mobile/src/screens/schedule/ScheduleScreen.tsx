@@ -19,7 +19,9 @@ import { fetchShifts } from '../../store/slices/shiftsSlice';
 
 export const ScheduleScreen = ({ navigation }: any) => {
   const dispatch = useAppDispatch();
-  const { shifts, loading, selectedDate } = useAppSelector((state) => state.shifts);
+  const { shifts, loading, selectedDate } = useAppSelector(
+    (state) => state.shifts,
+  );
   const { isOnline } = useAppSelector((state) => state.offline);
   const [refreshing, setRefreshing] = useState(false);
 

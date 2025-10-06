@@ -45,7 +45,6 @@ interface RuleAction {
 //   actionTypes: { value: string; label: string }[];
 // }
 
-
 export function PricingRulesAdmin() {
   const [rules, setRules] = useState<PricingRule[]>([]);
   const [loading, setLoading] = useState(false);
@@ -77,7 +76,7 @@ export function PricingRulesAdmin() {
     actions: [],
     isActive: true,
     applicableServices: [],
-    notes: ''
+    notes: '',
   });
 
   // Test state
@@ -86,7 +85,7 @@ export function PricingRulesAdmin() {
     weight: 5000,
     distance: 50,
     isWeekend: false,
-    hasStairs: false
+    hasStairs: false,
   });
   const [testResult, setTestResult] = useState<any>(null);
 
@@ -103,13 +102,14 @@ export function PricingRulesAdmin() {
       const params = new URLSearchParams();
       if (searchTerm) params.append('search', searchTerm);
       if (filterCategory) params.append('category', filterCategory);
-      if (filterStatus) params.append('isActive', filterStatus === 'active' ? 'true' : 'false');
+      if (filterStatus)
+        params.append('isActive', filterStatus === 'active' ? 'true' : 'false');
 
       const response = await fetch(`/api/pricing-rules?${params}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -129,14 +129,14 @@ export function PricingRulesAdmin() {
     try {
       const token = localStorage.getItem('access_token');
       const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       };
 
       const [categoriesRes, operatorsRes, actionTypesRes] = await Promise.all([
         fetch('/api/pricing-rules/metadata/categories', { headers }),
         fetch('/api/pricing-rules/metadata/operators', { headers }),
-        fetch('/api/pricing-rules/metadata/action-types', { headers })
+        fetch('/api/pricing-rules/metadata/action-types', { headers }),
       ]);
 
       setCategories(await categoriesRes.json());
@@ -157,7 +157,7 @@ export function PricingRulesAdmin() {
       actions: [],
       isActive: true,
       applicableServices: [],
-      notes: ''
+      notes: '',
     });
   };
 
@@ -168,11 +168,18 @@ export function PricingRulesAdmin() {
       errors.push('Rule name is required');
     }
 
-    if (formData.priority === undefined || formData.priority < 0 || formData.priority > 100) {
+    if (
+      formData.priority === undefined ||
+      formData.priority < 0 ||
+      formData.priority > 100
+    ) {
       errors.push('Priority must be between 0 and 100');
     }
 
-    if (!formData.applicableServices || formData.applicableServices.length === 0) {
+    if (
+      !formData.applicableServices ||
+      formData.applicableServices.length === 0
+    ) {
       errors.push('At least one service type must be selected');
     }
 
@@ -207,7 +214,7 @@ export function PricingRulesAdmin() {
       actions: rule.actions,
       isActive: rule.isActive,
       applicableServices: rule.applicableServices,
-      notes: rule.notes
+      notes: rule.notes,
     });
     setSelectedRule(rule);
     setShowEditModal(true);
@@ -222,10 +229,10 @@ export function PricingRulesAdmin() {
       const response = await fetch('/api/pricing-rules', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -240,7 +247,10 @@ export function PricingRulesAdmin() {
       alert('Pricing rule created successfully');
     } catch (err) {
       console.error('Error creating rule:', err);
-      alert('Failed to create pricing rule: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      alert(
+        'Failed to create pricing rule: ' +
+          (err instanceof Error ? err.message : 'Unknown error'),
+      );
     } finally {
       setIsSaving(false);
     }
@@ -255,10 +265,10 @@ export function PricingRulesAdmin() {
       const response = await fetch(`/api/pricing-rules/${selectedRule.id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -267,14 +277,17 @@ export function PricingRulesAdmin() {
       }
 
       const data = await response.json();
-      setRules(rules.map(r => r.id === data.data.id ? data.data : r));
+      setRules(rules.map((r) => (r.id === data.data.id ? data.data : r)));
       setShowEditModal(false);
       setSelectedRule(null);
       resetForm();
       alert('Pricing rule updated successfully');
     } catch (err) {
       console.error('Error updating rule:', err);
-      alert('Failed to update pricing rule: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      alert(
+        'Failed to update pricing rule: ' +
+          (err instanceof Error ? err.message : 'Unknown error'),
+      );
     } finally {
       setIsSaving(false);
     }
@@ -288,9 +301,9 @@ export function PricingRulesAdmin() {
       const response = await fetch(`/api/pricing-rules/${ruleId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -309,10 +322,10 @@ export function PricingRulesAdmin() {
       const response = await fetch(`/api/pricing-rules/${ruleId}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ isActive: !isActive })
+        body: JSON.stringify({ isActive: !isActive }),
       });
 
       if (!response.ok) {
@@ -340,13 +353,13 @@ export function PricingRulesAdmin() {
       const response = await fetch('/api/pricing-rules/test', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ruleId: selectedRule.id,
-          testData: testInput
-        })
+          testData: testInput,
+        }),
       });
 
       if (!response.ok) {
@@ -363,22 +376,23 @@ export function PricingRulesAdmin() {
     }
   };
 
-
   const exportRules = async () => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch('/api/pricing-rules/export/json', {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
       if (!response.ok) {
         throw new Error('Failed to export rules');
       }
 
       const data = await response.json();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -396,15 +410,15 @@ export function PricingRulesAdmin() {
       ...formData,
       conditions: [
         ...(formData.conditions || []),
-        { field: '', operator: 'equals', value: '' }
-      ]
+        { field: '', operator: 'equals', value: '' },
+      ],
     });
   };
 
   const removeCondition = (index: number) => {
     setFormData({
       ...formData,
-      conditions: formData.conditions?.filter((_, i) => i !== index) || []
+      conditions: formData.conditions?.filter((_, i) => i !== index) || [],
     });
   };
 
@@ -419,15 +433,15 @@ export function PricingRulesAdmin() {
       ...formData,
       actions: [
         ...(formData.actions || []),
-        { type: 'add_fixed', amount: 0, description: '', targetField: 'price' }
-      ]
+        { type: 'add_fixed', amount: 0, description: '', targetField: 'price' },
+      ],
     });
   };
 
   const removeAction = (index: number) => {
     setFormData({
       ...formData,
-      actions: formData.actions?.filter((_, i) => i !== index) || []
+      actions: formData.actions?.filter((_, i) => i !== index) || [],
     });
   };
 
@@ -440,13 +454,16 @@ export function PricingRulesAdmin() {
   const toggleService = (service: string) => {
     const currentServices = formData.applicableServices || [];
     const updated = currentServices.includes(service)
-      ? currentServices.filter(s => s !== service)
+      ? currentServices.filter((s) => s !== service)
       : [...currentServices, service];
     setFormData({ ...formData, applicableServices: updated });
   };
 
   const getStatusBadge = (rule: PricingRule) => {
-    const statusClass = styles[`status${rule.status.charAt(0).toUpperCase()}${rule.status.slice(1)}`];
+    const statusClass =
+      styles[
+        `status${rule.status.charAt(0).toUpperCase()}${rule.status.slice(1)}`
+      ];
     return (
       <span className={`${styles.statusBadge} ${statusClass}`}>
         {rule.status}
@@ -454,14 +471,16 @@ export function PricingRulesAdmin() {
     );
   };
 
-  const filteredRules = rules.filter(rule => {
-    const matchesSearch = rule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         rule.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         rule.id.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredRules = rules.filter((rule) => {
+    const matchesSearch =
+      rule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rule.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rule.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !filterCategory || rule.category === filterCategory;
-    const matchesStatus = !filterStatus ||
-                         (filterStatus === 'active' && rule.isActive) ||
-                         (filterStatus === 'inactive' && !rule.isActive);
+    const matchesStatus =
+      !filterStatus ||
+      (filterStatus === 'active' && rule.isActive) ||
+      (filterStatus === 'inactive' && !rule.isActive);
 
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -499,8 +518,10 @@ export function PricingRulesAdmin() {
             className={styles.filterSelect}
           >
             <option value="">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat.value} value={cat.value}>{cat.label}</option>
+            {categories.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
+              </option>
             ))}
           </select>
         </div>
@@ -526,7 +547,9 @@ export function PricingRulesAdmin() {
       {error && (
         <div className={styles.errorAlert}>
           <strong>⚠️ Error:</strong> {error}
-          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+          <button onClick={() => setError(null)} className={styles.closeError}>
+            ×
+          </button>
         </div>
       )}
 
@@ -553,12 +576,17 @@ export function PricingRulesAdmin() {
             </tr>
           </thead>
           <tbody>
-            {filteredRules.map(rule => (
-              <tr key={rule.id} className={!rule.isActive ? styles.inactiveRow : ''}>
+            {filteredRules.map((rule) => (
+              <tr
+                key={rule.id}
+                className={!rule.isActive ? styles.inactiveRow : ''}
+              >
                 <td className={styles.ruleId}>{rule.id}</td>
                 <td>
                   <div className={styles.ruleName}>{rule.name}</div>
-                  <div className={styles.ruleDescription}>{rule.description}</div>
+                  <div className={styles.ruleDescription}>
+                    {rule.description}
+                  </div>
                 </td>
                 <td>
                   <span className={styles.categoryBadge}>
@@ -569,7 +597,7 @@ export function PricingRulesAdmin() {
                 <td>{getStatusBadge(rule)}</td>
                 <td>
                   <div className={styles.services}>
-                    {rule.applicableServices.map(service => (
+                    {rule.applicableServices.map((service) => (
                       <span key={service} className={styles.serviceBadge}>
                         {service.replace('_', ' ')}
                       </span>
@@ -594,7 +622,11 @@ export function PricingRulesAdmin() {
                     </button>
                     <button
                       onClick={() => handleToggleRule(rule.id, rule.isActive)}
-                      className={rule.isActive ? styles.deactivateButton : styles.activateButton}
+                      className={
+                        rule.isActive
+                          ? styles.deactivateButton
+                          : styles.activateButton
+                      }
                       title={rule.isActive ? 'Deactivate' : 'Activate'}
                     >
                       {rule.isActive ? '⏸️' : '▶️'}
@@ -631,7 +663,9 @@ export function PricingRulesAdmin() {
         </div>
         <div className={styles.statCard}>
           <h3>Active Rules</h3>
-          <span className={styles.statNumber}>{rules.filter(r => r.isActive).length}</span>
+          <span className={styles.statNumber}>
+            {rules.filter((r) => r.isActive).length}
+          </span>
         </div>
         <div className={styles.statCard}>
           <h3>Categories</h3>
@@ -641,15 +675,22 @@ export function PricingRulesAdmin() {
 
       {/* Create/Edit Modal */}
       {(showCreateModal || showEditModal) && (
-        <div className={styles.modalOverlay} onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setShowCreateModal(false);
-            setShowEditModal(false);
-          }
-        }}>
+        <div
+          className={styles.modalOverlay}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowCreateModal(false);
+              setShowEditModal(false);
+            }
+          }}
+        >
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <h2>{showCreateModal ? 'Create New Pricing Rule' : 'Edit Pricing Rule'}</h2>
+              <h2>
+                {showCreateModal
+                  ? 'Create New Pricing Rule'
+                  : 'Edit Pricing Rule'}
+              </h2>
               <button
                 className={styles.modalClose}
                 onClick={() => {
@@ -669,7 +710,9 @@ export function PricingRulesAdmin() {
                   type="text"
                   className={styles.formInput}
                   value={formData.name || ''}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="e.g., Weekend Surcharge"
                 />
               </div>
@@ -679,7 +722,9 @@ export function PricingRulesAdmin() {
                 <textarea
                   className={styles.formTextarea}
                   value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Describe what this rule does..."
                 />
               </div>
@@ -689,11 +734,15 @@ export function PricingRulesAdmin() {
                 <select
                   className={styles.formSelect}
                   value={formData.category || ''}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
                 >
                   <option value="">Select Category</option>
-                  {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -704,28 +753,40 @@ export function PricingRulesAdmin() {
                   type="number"
                   className={styles.formInput}
                   value={formData.priority || 50}
-                  onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      priority: parseInt(e.target.value),
+                    })
+                  }
                   min="0"
                   max="100"
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Applicable Services *</label>
+                <label className={styles.formLabel}>
+                  Applicable Services *
+                </label>
                 <div className={styles.formCheckboxGroup}>
-                  {['local', 'long_distance', 'storage', 'packing_only'].map(service => (
-                    <div key={service} className={styles.formCheckbox}>
-                      <input
-                        type="checkbox"
-                        id={`service-${service}`}
-                        checked={formData.applicableServices?.includes(service) || false}
-                        onChange={() => toggleService(service)}
-                      />
-                      <label htmlFor={`service-${service}`}>
-                        {service.replace('_', ' ')}
-                      </label>
-                    </div>
-                  ))}
+                  {['local', 'long_distance', 'storage', 'packing_only'].map(
+                    (service) => (
+                      <div key={service} className={styles.formCheckbox}>
+                        <input
+                          type="checkbox"
+                          id={`service-${service}`}
+                          checked={
+                            formData.applicableServices?.includes(service) ||
+                            false
+                          }
+                          onChange={() => toggleService(service)}
+                        />
+                        <label htmlFor={`service-${service}`}>
+                          {service.replace('_', ' ')}
+                        </label>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 
@@ -747,17 +808,23 @@ export function PricingRulesAdmin() {
                             className={styles.formInput}
                             placeholder="Field (e.g., weight)"
                             value={condition.field}
-                            onChange={(e) => updateCondition(index, 'field', e.target.value)}
+                            onChange={(e) =>
+                              updateCondition(index, 'field', e.target.value)
+                            }
                           />
                         </div>
                         <div>
                           <select
                             className={styles.formSelect}
                             value={condition.operator}
-                            onChange={(e) => updateCondition(index, 'operator', e.target.value)}
+                            onChange={(e) =>
+                              updateCondition(index, 'operator', e.target.value)
+                            }
                           >
-                            {operators.map(op => (
-                              <option key={op.value} value={op.value}>{op.label}</option>
+                            {operators.map((op) => (
+                              <option key={op.value} value={op.value}>
+                                {op.label}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -767,7 +834,9 @@ export function PricingRulesAdmin() {
                             className={styles.formInput}
                             placeholder="Value"
                             value={condition.value || ''}
-                            onChange={(e) => updateCondition(index, 'value', e.target.value)}
+                            onChange={(e) =>
+                              updateCondition(index, 'value', e.target.value)
+                            }
                           />
                         </div>
                       </div>
@@ -795,10 +864,14 @@ export function PricingRulesAdmin() {
                           <select
                             className={styles.formSelect}
                             value={action.type}
-                            onChange={(e) => updateAction(index, 'type', e.target.value)}
+                            onChange={(e) =>
+                              updateAction(index, 'type', e.target.value)
+                            }
                           >
-                            {actionTypes.map(at => (
-                              <option key={at.value} value={at.value}>{at.label}</option>
+                            {actionTypes.map((at) => (
+                              <option key={at.value} value={at.value}>
+                                {at.label}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -808,7 +881,13 @@ export function PricingRulesAdmin() {
                             className={styles.formInput}
                             placeholder="Amount"
                             value={action.amount}
-                            onChange={(e) => updateAction(index, 'amount', parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              updateAction(
+                                index,
+                                'amount',
+                                parseFloat(e.target.value),
+                              )
+                            }
                           />
                         </div>
                         <div>
@@ -817,7 +896,9 @@ export function PricingRulesAdmin() {
                             className={styles.formInput}
                             placeholder="Description"
                             value={action.description}
-                            onChange={(e) => updateAction(index, 'description', e.target.value)}
+                            onChange={(e) =>
+                              updateAction(index, 'description', e.target.value)
+                            }
                           />
                         </div>
                       </div>
@@ -834,7 +915,9 @@ export function PricingRulesAdmin() {
                 <textarea
                   className={styles.formTextarea}
                   value={formData.notes || ''}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
                   placeholder="Additional notes about this rule..."
                 />
               </div>
@@ -845,7 +928,9 @@ export function PricingRulesAdmin() {
                     type="checkbox"
                     id="isActive"
                     checked={formData.isActive !== false}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isActive: e.target.checked })
+                    }
                   />
                   <label htmlFor="isActive">Active Rule</label>
                 </div>
@@ -869,7 +954,11 @@ export function PricingRulesAdmin() {
                 onClick={showCreateModal ? handleCreate : handleEdit}
                 disabled={isSaving}
               >
-                {isSaving ? 'Saving...' : showCreateModal ? 'Create Rule' : 'Update Rule'}
+                {isSaving
+                  ? 'Saving...'
+                  : showCreateModal
+                    ? 'Create Rule'
+                    : 'Update Rule'}
               </button>
             </div>
           </div>
@@ -878,12 +967,15 @@ export function PricingRulesAdmin() {
 
       {/* Test Modal */}
       {showTestModal && selectedRule && (
-        <div className={styles.modalOverlay} onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setShowTestModal(false);
-            setTestResult(null);
-          }
-        }}>
+        <div
+          className={styles.modalOverlay}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowTestModal(false);
+              setTestResult(null);
+            }
+          }}
+        >
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <h2>Test Rule: {selectedRule.name}</h2>
@@ -900,7 +992,8 @@ export function PricingRulesAdmin() {
 
             <div className={styles.modalBody}>
               <p style={{ color: '#9ca3af', marginBottom: '1rem' }}>
-                Test this rule with sample data to see if it applies and what its impact would be.
+                Test this rule with sample data to see if it applies and what
+                its impact would be.
               </p>
 
               <div className={styles.testInputs}>
@@ -909,7 +1002,12 @@ export function PricingRulesAdmin() {
                   <select
                     className={styles.formSelect}
                     value={testInput.serviceType}
-                    onChange={(e) => setTestInput({ ...testInput, serviceType: e.target.value })}
+                    onChange={(e) =>
+                      setTestInput({
+                        ...testInput,
+                        serviceType: e.target.value,
+                      })
+                    }
                   >
                     <option value="local">Local</option>
                     <option value="long_distance">Long Distance</option>
@@ -924,7 +1022,12 @@ export function PricingRulesAdmin() {
                     type="number"
                     className={styles.formInput}
                     value={testInput.weight}
-                    onChange={(e) => setTestInput({ ...testInput, weight: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setTestInput({
+                        ...testInput,
+                        weight: parseInt(e.target.value),
+                      })
+                    }
                   />
                 </div>
 
@@ -934,7 +1037,12 @@ export function PricingRulesAdmin() {
                     type="number"
                     className={styles.formInput}
                     value={testInput.distance}
-                    onChange={(e) => setTestInput({ ...testInput, distance: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setTestInput({
+                        ...testInput,
+                        distance: parseInt(e.target.value),
+                      })
+                    }
                   />
                 </div>
 
@@ -944,7 +1052,12 @@ export function PricingRulesAdmin() {
                       type="checkbox"
                       id="isWeekend"
                       checked={testInput.isWeekend}
-                      onChange={(e) => setTestInput({ ...testInput, isWeekend: e.target.checked })}
+                      onChange={(e) =>
+                        setTestInput({
+                          ...testInput,
+                          isWeekend: e.target.checked,
+                        })
+                      }
                     />
                     <label htmlFor="isWeekend">Weekend Move</label>
                   </div>
@@ -956,7 +1069,12 @@ export function PricingRulesAdmin() {
                       type="checkbox"
                       id="hasStairs"
                       checked={testInput.hasStairs}
-                      onChange={(e) => setTestInput({ ...testInput, hasStairs: e.target.checked })}
+                      onChange={(e) =>
+                        setTestInput({
+                          ...testInput,
+                          hasStairs: e.target.checked,
+                        })
+                      }
                     />
                     <label htmlFor="hasStairs">Has Stairs</label>
                   </div>
@@ -973,7 +1091,9 @@ export function PricingRulesAdmin() {
               </button>
 
               {testResult && (
-                <div className={`${styles.testResult} ${testResult.success ? styles.testResultSuccess : styles.testResultError}`}>
+                <div
+                  className={`${styles.testResult} ${testResult.success ? styles.testResultSuccess : styles.testResultError}`}
+                >
                   <div className={styles.testResultTitle}>
                     {testResult.success ? '✓ Test Completed' : '✗ Test Failed'}
                   </div>

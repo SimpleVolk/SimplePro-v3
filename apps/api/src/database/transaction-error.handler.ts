@@ -120,9 +120,7 @@ export class TransactionErrorHandler {
 
       case 'timeout':
         // Timeouts may indicate performance issues
-        this.logger.error(
-          `Transaction timeout${contextStr}: ${errorMessage}`,
-        );
+        this.logger.error(`Transaction timeout${contextStr}: ${errorMessage}`);
         break;
 
       case 'validation':
@@ -134,10 +132,7 @@ export class TransactionErrorHandler {
 
       default:
         // Unknown errors should be investigated
-        this.logger.error(
-          `Unexpected transaction error${contextStr}:`,
-          error,
-        );
+        this.logger.error(`Unexpected transaction error${contextStr}:`, error);
     }
   }
 
@@ -174,7 +169,9 @@ export class TransactionErrorHandler {
         return 'The operation took too long to complete. Please try again or contact support.';
 
       case 'validation':
-        return error.message || 'Invalid data provided. Please check your input.';
+        return (
+          error.message || 'Invalid data provided. Please check your input.'
+        );
 
       default:
         return 'An unexpected error occurred. Please try again or contact support.';

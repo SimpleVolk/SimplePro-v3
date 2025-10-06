@@ -51,7 +51,6 @@ interface CalendarDay {
   isCurrentMonth: boolean;
 }
 
-
 export function CalendarDispatch() {
   const { user: _user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -108,14 +107,27 @@ export function CalendarDispatch() {
     const calendarDays: CalendarDay[] = [];
 
     if (viewMode === 'month') {
-      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const firstDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1,
+      );
+      const lastDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0,
+      );
       const startDate = getWeekStart(firstDayOfMonth);
       const endDate = getWeekEnd(lastDayOfMonth);
 
-      for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-        const dayJobs = jobs.filter(job =>
-          new Date(job.scheduledDate).toDateString() === date.toDateString()
+      for (
+        let date = new Date(startDate);
+        date <= endDate;
+        date.setDate(date.getDate() + 1)
+      ) {
+        const dayJobs = jobs.filter(
+          (job) =>
+            new Date(job.scheduledDate).toDateString() === date.toDateString(),
         );
 
         calendarDays.push({
@@ -132,8 +144,9 @@ export function CalendarDispatch() {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
 
-        const dayJobs = jobs.filter(job =>
-          new Date(job.scheduledDate).toDateString() === date.toDateString()
+        const dayJobs = jobs.filter(
+          (job) =>
+            new Date(job.scheduledDate).toDateString() === date.toDateString(),
         );
 
         calendarDays.push({
@@ -145,8 +158,10 @@ export function CalendarDispatch() {
       }
     } else {
       // Day view
-      const dayJobs = jobs.filter(job =>
-        new Date(job.scheduledDate).toDateString() === currentDate.toDateString()
+      const dayJobs = jobs.filter(
+        (job) =>
+          new Date(job.scheduledDate).toDateString() ===
+          currentDate.toDateString(),
       );
 
       calendarDays.push({
@@ -181,28 +196,39 @@ export function CalendarDispatch() {
   const formatTime = (time: string) => {
     return new Date(`2000-01-01T${time}`).toLocaleTimeString([], {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'scheduled': return '#3b82f6';
-      case 'in_progress': return '#f59e0b';
-      case 'completed': return '#10b981';
-      case 'cancelled': return '#ef4444';
-      case 'on_hold': return '#6b7280';
-      default: return '#6b7280';
+      case 'scheduled':
+        return '#3b82f6';
+      case 'in_progress':
+        return '#f59e0b';
+      case 'completed':
+        return '#10b981';
+      case 'cancelled':
+        return '#ef4444';
+      case 'on_hold':
+        return '#6b7280';
+      default:
+        return '#6b7280';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return '#10b981';
-      case 'normal': return '#3b82f6';
-      case 'high': return '#f59e0b';
-      case 'urgent': return '#ef4444';
-      default: return '#6b7280';
+      case 'low':
+        return '#10b981';
+      case 'normal':
+        return '#3b82f6';
+      case 'high':
+        return '#f59e0b';
+      case 'urgent':
+        return '#ef4444';
+      default:
+        return '#6b7280';
     }
   };
 
@@ -210,7 +236,9 @@ export function CalendarDispatch() {
     const newDate = new Date(currentDate);
 
     if (viewMode === 'month') {
-      newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1));
+      newDate.setMonth(
+        currentDate.getMonth() + (direction === 'next' ? 1 : -1),
+      );
     } else if (viewMode === 'week') {
       newDate.setDate(currentDate.getDate() + (direction === 'next' ? 7 : -7));
     } else {
@@ -226,13 +254,21 @@ export function CalendarDispatch() {
 
   const getCalendarTitle = () => {
     if (viewMode === 'month') {
-      return currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      return currentDate.toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric',
+      });
     } else if (viewMode === 'week') {
       const start = getWeekStart(currentDate);
       const end = getWeekEnd(currentDate);
       return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     } else {
-      return currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      return currentDate.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
     }
   };
 
@@ -273,11 +309,17 @@ export function CalendarDispatch() {
         </div>
 
         <div className={styles.headerCenter}>
-          <button onClick={() => navigateDate('prev')} className={styles.navButton}>
+          <button
+            onClick={() => navigateDate('prev')}
+            className={styles.navButton}
+          >
             ◀
           </button>
           <h3 className={styles.calendarTitle}>{getCalendarTitle()}</h3>
-          <button onClick={() => navigateDate('next')} className={styles.navButton}>
+          <button
+            onClick={() => navigateDate('next')}
+            className={styles.navButton}
+          >
             ▶
           </button>
         </div>
@@ -300,8 +342,10 @@ export function CalendarDispatch() {
         {viewMode === 'month' && (
           <div className={styles.monthView}>
             <div className={styles.weekHeader}>
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className={styles.dayHeader}>{day}</div>
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <div key={day} className={styles.dayHeader}>
+                  {day}
+                </div>
               ))}
             </div>
             <div className={styles.monthGrid}>
@@ -313,7 +357,7 @@ export function CalendarDispatch() {
                 >
                   <div className={styles.dayNumber}>{day.date.getDate()}</div>
                   <div className={styles.dayJobs}>
-                    {day.jobs.slice(0, 3).map(job => (
+                    {day.jobs.slice(0, 3).map((job) => (
                       <div
                         key={job.id}
                         className={styles.jobItem}
@@ -323,12 +367,16 @@ export function CalendarDispatch() {
                           setSelectedJob(job);
                         }}
                       >
-                        <span className={styles.jobTime}>{formatTime(job.scheduledStartTime)}</span>
+                        <span className={styles.jobTime}>
+                          {formatTime(job.scheduledStartTime)}
+                        </span>
                         <span className={styles.jobTitle}>{job.title}</span>
                       </div>
                     ))}
                     {day.jobs.length > 3 && (
-                      <div className={styles.moreJobs}>+{day.jobs.length - 3} more</div>
+                      <div className={styles.moreJobs}>
+                        +{day.jobs.length - 3} more
+                      </div>
                     )}
                   </div>
                 </div>
@@ -354,17 +402,26 @@ export function CalendarDispatch() {
                 <div key={index} className={styles.dayColumn}>
                   <div className={styles.dayHeader}>
                     <div className={styles.dayName}>
-                      {day.date.toLocaleDateString('en-US', { weekday: 'short' })}
+                      {day.date.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                      })}
                     </div>
-                    <div className={`${styles.dayNumber} ${day.isToday ? styles.today : ''}`}>
+                    <div
+                      className={`${styles.dayNumber} ${day.isToday ? styles.today : ''}`}
+                    >
                       {day.date.getDate()}
                     </div>
                   </div>
                   <div className={styles.dayContent}>
-                    {day.jobs.map(job => {
-                      const startHour = parseInt(job.scheduledStartTime.split(':')[0]);
-                      const startMinute = parseInt(job.scheduledStartTime.split(':')[1]);
-                      const top = ((startHour - 6) * 60 + startMinute) * (60 / 60); // 60px per hour
+                    {day.jobs.map((job) => {
+                      const startHour = parseInt(
+                        job.scheduledStartTime.split(':')[0],
+                      );
+                      const startMinute = parseInt(
+                        job.scheduledStartTime.split(':')[1],
+                      );
+                      const top =
+                        ((startHour - 6) * 60 + startMinute) * (60 / 60); // 60px per hour
                       const height = job.estimatedDuration * 60; // 60px per hour
 
                       return (
@@ -379,10 +436,13 @@ export function CalendarDispatch() {
                           onClick={() => setSelectedJob(job)}
                         >
                           <div className={styles.jobInfo}>
-                            <div className={styles.jobNumber}>{job.jobNumber}</div>
+                            <div className={styles.jobNumber}>
+                              {job.jobNumber}
+                            </div>
                             <div className={styles.jobTitle}>{job.title}</div>
                             <div className={styles.jobTime}>
-                              {formatTime(job.scheduledStartTime)} - {formatTime(job.scheduledEndTime)}
+                              {formatTime(job.scheduledStartTime)} -{' '}
+                              {formatTime(job.scheduledEndTime)}
                             </div>
                             {job.assignedCrew.length > 0 && (
                               <div className={styles.crewCount}>
@@ -403,10 +463,16 @@ export function CalendarDispatch() {
         {viewMode === 'day' && (
           <div className={styles.dayView}>
             <div className={styles.dayHeader}>
-              <h3>{currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
+              <h3>
+                {currentDate.toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </h3>
             </div>
             <div className={styles.dayJobs}>
-              {calendarData[0]?.jobs.map(job => (
+              {calendarData[0]?.jobs.map((job) => (
                 <div
                   key={job.id}
                   className={styles.dayJobCard}
@@ -426,19 +492,36 @@ export function CalendarDispatch() {
                       </span>
                       <span
                         className={styles.priorityBadge}
-                        style={{ backgroundColor: getPriorityColor(job.priority) }}
+                        style={{
+                          backgroundColor: getPriorityColor(job.priority),
+                        }}
                       >
                         {job.priority}
                       </span>
                     </div>
                   </div>
                   <div className={styles.jobDetails}>
-                    <p><strong>Time:</strong> {formatTime(job.scheduledStartTime)} - {formatTime(job.scheduledEndTime)}</p>
-                    <p><strong>Duration:</strong> {job.estimatedDuration} hours</p>
-                    <p><strong>Pickup:</strong> {job.pickupAddress.street}, {job.pickupAddress.city}</p>
-                    <p><strong>Delivery:</strong> {job.deliveryAddress.street}, {job.deliveryAddress.city}</p>
+                    <p>
+                      <strong>Time:</strong>{' '}
+                      {formatTime(job.scheduledStartTime)} -{' '}
+                      {formatTime(job.scheduledEndTime)}
+                    </p>
+                    <p>
+                      <strong>Duration:</strong> {job.estimatedDuration} hours
+                    </p>
+                    <p>
+                      <strong>Pickup:</strong> {job.pickupAddress.street},{' '}
+                      {job.pickupAddress.city}
+                    </p>
+                    <p>
+                      <strong>Delivery:</strong> {job.deliveryAddress.street},{' '}
+                      {job.deliveryAddress.city}
+                    </p>
                     {job.assignedCrew.length > 0 && (
-                      <p><strong>Crew:</strong> {job.assignedCrew.length} members assigned</p>
+                      <p>
+                        <strong>Crew:</strong> {job.assignedCrew.length} members
+                        assigned
+                      </p>
                     )}
                   </div>
                 </div>
@@ -463,19 +546,50 @@ export function CalendarDispatch() {
             <div className={styles.modalBody}>
               <div className={styles.jobDetailSection}>
                 <h4>Basic Information</h4>
-                <p><strong>Title:</strong> {selectedJob.title}</p>
-                <p><strong>Type:</strong> {selectedJob.type.replace('_', ' ')}</p>
-                <p><strong>Status:</strong> <span style={{ color: getStatusColor(selectedJob.status) }}>{selectedJob.status}</span></p>
-                <p><strong>Priority:</strong> <span style={{ color: getPriorityColor(selectedJob.priority) }}>{selectedJob.priority}</span></p>
-                <p><strong>Customer ID:</strong> {selectedJob.customerId}</p>
-                <p><strong>Estimated Cost:</strong> ${selectedJob.estimatedCost.toLocaleString()}</p>
+                <p>
+                  <strong>Title:</strong> {selectedJob.title}
+                </p>
+                <p>
+                  <strong>Type:</strong> {selectedJob.type.replace('_', ' ')}
+                </p>
+                <p>
+                  <strong>Status:</strong>{' '}
+                  <span style={{ color: getStatusColor(selectedJob.status) }}>
+                    {selectedJob.status}
+                  </span>
+                </p>
+                <p>
+                  <strong>Priority:</strong>{' '}
+                  <span
+                    style={{ color: getPriorityColor(selectedJob.priority) }}
+                  >
+                    {selectedJob.priority}
+                  </span>
+                </p>
+                <p>
+                  <strong>Customer ID:</strong> {selectedJob.customerId}
+                </p>
+                <p>
+                  <strong>Estimated Cost:</strong> $
+                  {selectedJob.estimatedCost.toLocaleString()}
+                </p>
               </div>
 
               <div className={styles.jobDetailSection}>
                 <h4>Schedule</h4>
-                <p><strong>Date:</strong> {new Date(selectedJob.scheduledDate).toLocaleDateString()}</p>
-                <p><strong>Time:</strong> {formatTime(selectedJob.scheduledStartTime)} - {formatTime(selectedJob.scheduledEndTime)}</p>
-                <p><strong>Duration:</strong> {selectedJob.estimatedDuration} hours</p>
+                <p>
+                  <strong>Date:</strong>{' '}
+                  {new Date(selectedJob.scheduledDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Time:</strong>{' '}
+                  {formatTime(selectedJob.scheduledStartTime)} -{' '}
+                  {formatTime(selectedJob.scheduledEndTime)}
+                </p>
+                <p>
+                  <strong>Duration:</strong> {selectedJob.estimatedDuration}{' '}
+                  hours
+                </p>
               </div>
 
               <div className={styles.jobDetailSection}>
@@ -484,17 +598,33 @@ export function CalendarDispatch() {
                   <div>
                     <h5>Pickup Address</h5>
                     <p>{selectedJob.pickupAddress.street}</p>
-                    <p>{selectedJob.pickupAddress.city}, {selectedJob.pickupAddress.state} {selectedJob.pickupAddress.zipCode}</p>
+                    <p>
+                      {selectedJob.pickupAddress.city},{' '}
+                      {selectedJob.pickupAddress.state}{' '}
+                      {selectedJob.pickupAddress.zipCode}
+                    </p>
                     {selectedJob.pickupAddress.contactPerson && (
-                      <p><strong>Contact:</strong> {selectedJob.pickupAddress.contactPerson} - {selectedJob.pickupAddress.contactPhone}</p>
+                      <p>
+                        <strong>Contact:</strong>{' '}
+                        {selectedJob.pickupAddress.contactPerson} -{' '}
+                        {selectedJob.pickupAddress.contactPhone}
+                      </p>
                     )}
                   </div>
                   <div>
                     <h5>Delivery Address</h5>
                     <p>{selectedJob.deliveryAddress.street}</p>
-                    <p>{selectedJob.deliveryAddress.city}, {selectedJob.deliveryAddress.state} {selectedJob.deliveryAddress.zipCode}</p>
+                    <p>
+                      {selectedJob.deliveryAddress.city},{' '}
+                      {selectedJob.deliveryAddress.state}{' '}
+                      {selectedJob.deliveryAddress.zipCode}
+                    </p>
                     {selectedJob.deliveryAddress.contactPerson && (
-                      <p><strong>Contact:</strong> {selectedJob.deliveryAddress.contactPerson} - {selectedJob.deliveryAddress.contactPhone}</p>
+                      <p>
+                        <strong>Contact:</strong>{' '}
+                        {selectedJob.deliveryAddress.contactPerson} -{' '}
+                        {selectedJob.deliveryAddress.contactPhone}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -507,10 +637,17 @@ export function CalendarDispatch() {
                     {selectedJob.assignedCrew.map((crew, index) => (
                       <div key={index} className={styles.crewMember}>
                         <span className={styles.crewRole}>{crew.role}</span>
-                        <span className={styles.crewStatus} style={{
-                          color: crew.status === 'confirmed' ? '#10b981' :
-                                crew.status === 'checked_in' ? '#3b82f6' : '#6b7280'
-                        }}>
+                        <span
+                          className={styles.crewStatus}
+                          style={{
+                            color:
+                              crew.status === 'confirmed'
+                                ? '#10b981'
+                                : crew.status === 'checked_in'
+                                  ? '#3b82f6'
+                                  : '#6b7280',
+                          }}
+                        >
                           {crew.status}
                         </span>
                       </div>

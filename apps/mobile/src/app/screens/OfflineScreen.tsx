@@ -227,7 +227,12 @@ const OfflineScreen = () => {
 
         <View style={styles.statusContainer}>
           <View style={styles.statusIndicator}>
-            <View style={[styles.statusDot, { backgroundColor: getConnectionStatusColor() }]} />
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: getConnectionStatusColor() },
+              ]}
+            />
             <Text style={styles.statusText}>{getConnectionStatusText()}</Text>
           </View>
 
@@ -242,19 +247,23 @@ const OfflineScreen = () => {
             <Text style={styles.syncInfo}>
               {lastSyncAttempt
                 ? `Last synced: ${lastSyncAttempt.toLocaleTimeString()}`
-                : 'Ready to sync'
-              }
+                : 'Ready to sync'}
             </Text>
           )}
         </View>
 
         <View style={styles.actionsContainer}>
           <TouchableOpacity
-            style={[styles.syncButton, (!isOnline || isSyncing) && styles.syncButtonDisabled]}
+            style={[
+              styles.syncButton,
+              (!isOnline || isSyncing) && styles.syncButtonDisabled,
+            ]}
             onPress={handleManualSync}
             disabled={!isOnline || isSyncing}
           >
-            {isSyncing && <ActivityIndicator size="small" color={colors.textPrimary} />}
+            {isSyncing && (
+              <ActivityIndicator size="small" color={colors.textPrimary} />
+            )}
             <Text style={styles.syncButtonText}>
               {isSyncing ? 'Syncing...' : 'Sync Now'}
             </Text>
@@ -272,23 +281,25 @@ const OfflineScreen = () => {
 
       <Text style={styles.title}>You're Offline</Text>
       <Text style={styles.subtitle}>
-        No internet connection detected. You can still view and update job information.
-        Changes will be synced when you're back online.
+        No internet connection detected. You can still view and update job
+        information. Changes will be synced when you're back online.
       </Text>
 
       <View style={styles.statusContainer}>
         <View style={styles.statusIndicator}>
-          <View style={[styles.statusDot, { backgroundColor: getConnectionStatusColor() }]} />
+          <View
+            style={[
+              styles.statusDot,
+              { backgroundColor: getConnectionStatusColor() },
+            ]}
+          />
           <Text style={styles.statusText}>{getConnectionStatusText()}</Text>
         </View>
-        <Text style={styles.connectionType}>
-          Offline mode active
-        </Text>
+        <Text style={styles.connectionType}>Offline mode active</Text>
         <Text style={styles.syncInfo}>
           {lastSyncAttempt
             ? `Last synced: ${lastSyncAttempt.toLocaleTimeString()}`
-            : 'Waiting for connection'
-          }
+            : 'Waiting for connection'}
         </Text>
       </View>
 

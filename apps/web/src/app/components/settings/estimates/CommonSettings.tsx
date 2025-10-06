@@ -48,9 +48,9 @@ export default function CommonSettings() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/estimate-common'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -78,13 +78,19 @@ export default function CommonSettings() {
     setSuccess(null);
 
     // Validation
-    if (formData.estimateExpirationDays < 1 || formData.estimateExpirationDays > 365) {
+    if (
+      formData.estimateExpirationDays < 1 ||
+      formData.estimateExpirationDays > 365
+    ) {
       setError('Estimate expiration days must be between 1 and 365');
       setSaving(false);
       return;
     }
 
-    if (formData.requireDeposit && (formData.depositPercentage < 0 || formData.depositPercentage > 100)) {
+    if (
+      formData.requireDeposit &&
+      (formData.depositPercentage < 0 || formData.depositPercentage > 100)
+    ) {
       setError('Deposit percentage must be between 0 and 100');
       setSaving(false);
       return;
@@ -96,7 +102,7 @@ export default function CommonSettings() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -113,14 +119,16 @@ export default function CommonSettings() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving estimate settings:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const updateFormData = (path: string[], value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = { ...prev };
       let current = updated as any;
 
@@ -144,32 +152,54 @@ export default function CommonSettings() {
       {error && (
         <div className={styles.errorMessage}>
           <span>{error}</span>
-          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+          <button onClick={() => setError(null)} className={styles.closeError}>
+            ×
+          </button>
         </div>
       )}
 
       {success && (
         <div className={styles.successMessage}>
           <span>{success}</span>
-          <button onClick={() => setSuccess(null)} className={styles.closeSuccess}>×</button>
+          <button
+            onClick={() => setSuccess(null)}
+            className={styles.closeSuccess}
+          >
+            ×
+          </button>
         </div>
       )}
 
       {loading ? (
-        <div className={styles.loadingMessage}>Loading estimate settings...</div>
+        <div className={styles.loadingMessage}>
+          Loading estimate settings...
+        </div>
       ) : (
-        <form className={styles.formSection} onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+        <form
+          className={styles.formSection}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
           <h4>Estimate Configuration</h4>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
-              <label htmlFor="estimateExpirationDays">Estimate Expiration (days)</label>
+              <label htmlFor="estimateExpirationDays">
+                Estimate Expiration (days)
+              </label>
               <input
                 id="estimateExpirationDays"
                 type="number"
                 min="1"
                 max="365"
                 value={formData.estimateExpirationDays}
-                onChange={(e) => updateFormData(['estimateExpirationDays'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(
+                    ['estimateExpirationDays'],
+                    parseInt(e.target.value),
+                  )
+                }
                 className={styles.input}
               />
             </div>
@@ -179,7 +209,9 @@ export default function CommonSettings() {
               <select
                 id="defaultServiceType"
                 value={formData.defaultServiceType}
-                onChange={(e) => updateFormData(['defaultServiceType'], e.target.value)}
+                onChange={(e) =>
+                  updateFormData(['defaultServiceType'], e.target.value)
+                }
                 className={styles.select}
               >
                 <option value="local">Local Move</option>
@@ -196,7 +228,9 @@ export default function CommonSettings() {
                 min="1"
                 max="10"
                 value={formData.defaultCrewSize}
-                onChange={(e) => updateFormData(['defaultCrewSize'], parseInt(e.target.value))}
+                onChange={(e) =>
+                  updateFormData(['defaultCrewSize'], parseInt(e.target.value))
+                }
                 className={styles.input}
               />
             </div>
@@ -207,23 +241,34 @@ export default function CommonSettings() {
                 id="estimatePrefix"
                 type="text"
                 value={formData.estimatePrefix}
-                onChange={(e) => updateFormData(['estimatePrefix'], e.target.value)}
+                onChange={(e) =>
+                  updateFormData(['estimatePrefix'], e.target.value)
+                }
                 className={styles.input}
                 placeholder="EST"
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="estimateNumberFormat">Estimate Number Format</label>
+              <label htmlFor="estimateNumberFormat">
+                Estimate Number Format
+              </label>
               <input
                 id="estimateNumberFormat"
                 type="text"
                 value={formData.estimateNumberFormat}
-                onChange={(e) => updateFormData(['estimateNumberFormat'], e.target.value)}
+                onChange={(e) =>
+                  updateFormData(['estimateNumberFormat'], e.target.value)
+                }
                 className={styles.input}
                 placeholder="EST-{YEAR}-{NUMBER}"
               />
-              <small style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem' }}>
+              <small
+                style={{
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.8rem',
+                }}
+              >
                 Use {'{YEAR}'}, {'{MONTH}'}, {'{NUMBER}'} as placeholders
               </small>
             </div>
@@ -236,7 +281,9 @@ export default function CommonSettings() {
                 <input
                   type="checkbox"
                   checked={formData.requireDeposit}
-                  onChange={(e) => updateFormData(['requireDeposit'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['requireDeposit'], e.target.checked)
+                  }
                 />
                 Require Deposit
               </label>
@@ -244,14 +291,21 @@ export default function CommonSettings() {
 
             {formData.requireDeposit && (
               <div className={styles.formGroup}>
-                <label htmlFor="depositPercentage">Deposit Percentage (%)</label>
+                <label htmlFor="depositPercentage">
+                  Deposit Percentage (%)
+                </label>
                 <input
                   id="depositPercentage"
                   type="number"
                   min="0"
                   max="100"
                   value={formData.depositPercentage}
-                  onChange={(e) => updateFormData(['depositPercentage'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['depositPercentage'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                 />
               </div>
@@ -262,14 +316,18 @@ export default function CommonSettings() {
               <select
                 id="defaultPaymentTerms"
                 value={formData.defaultPaymentTerms}
-                onChange={(e) => updateFormData(['defaultPaymentTerms'], e.target.value)}
+                onChange={(e) =>
+                  updateFormData(['defaultPaymentTerms'], e.target.value)
+                }
                 className={styles.select}
               >
                 <option value="Due on completion">Due on Completion</option>
                 <option value="Net 15">Net 15</option>
                 <option value="Net 30">Net 30</option>
                 <option value="Net 60">Net 60</option>
-                <option value="50% upfront, 50% on completion">50% Upfront, 50% on Completion</option>
+                <option value="50% upfront, 50% on completion">
+                  50% Upfront, 50% on Completion
+                </option>
               </select>
             </div>
           </div>
@@ -281,7 +339,9 @@ export default function CommonSettings() {
                 <input
                   type="checkbox"
                   checked={formData.includeInsurance}
-                  onChange={(e) => updateFormData(['includeInsurance'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['includeInsurance'], e.target.checked)
+                  }
                 />
                 Include Insurance in Estimate
               </label>
@@ -292,7 +352,9 @@ export default function CommonSettings() {
                 <input
                   type="checkbox"
                   checked={formData.autoEmailEstimate}
-                  onChange={(e) => updateFormData(['autoEmailEstimate'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['autoEmailEstimate'], e.target.checked)
+                  }
                 />
                 Auto-Email Estimate to Customer
               </label>

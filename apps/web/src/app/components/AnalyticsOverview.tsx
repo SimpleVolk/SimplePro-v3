@@ -18,7 +18,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 import { getApiUrl } from '../../lib/config';
 import styles from './AnalyticsOverview.module.css';
@@ -61,17 +61,27 @@ interface BusinessMetrics {
   costPerJob: number;
 }
 
-
 export const AnalyticsOverview = memo(function AnalyticsOverview() {
   const { user } = useAuth();
-  const { isConnected, subscribeToAnalytics, unsubscribeFromAnalytics, lastUpdate } = useWebSocket();
-  const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null);
-  const [businessMetrics, setBusinessMetrics] = useState<BusinessMetrics | null>(null);
+  const {
+    isConnected,
+    subscribeToAnalytics,
+    unsubscribeFromAnalytics,
+    lastUpdate,
+  } = useWebSocket();
+  const [dashboardMetrics, setDashboardMetrics] =
+    useState<DashboardMetrics | null>(null);
+  const [businessMetrics, setBusinessMetrics] =
+    useState<BusinessMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'business' | 'revenue' | 'performance'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'business' | 'revenue' | 'performance'
+  >('overview');
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
+  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(
+    null,
+  );
 
   useEffect(() => {
     if (user) {
@@ -98,8 +108,13 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
   useEffect(() => {
     if (isConnected && user) {
       // Unsubscribe from previous tab
-      const previousTabs = ['overview', 'business', 'revenue', 'performance'].filter(tab => tab !== activeTab);
-      previousTabs.forEach(tab => unsubscribeFromAnalytics(tab));
+      const previousTabs = [
+        'overview',
+        'business',
+        'revenue',
+        'performance',
+      ].filter((tab) => tab !== activeTab);
+      previousTabs.forEach((tab) => unsubscribeFromAnalytics(tab));
 
       // Subscribe to new active tab
       subscribeToAnalytics(activeTab);
@@ -149,12 +164,24 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
     };
 
     // Add event listeners for WebSocket events
-    window.addEventListener('analyticsUpdate', handleAnalyticsUpdate as EventListener);
-    window.addEventListener('metricsUpdate', handleMetricsUpdate as EventListener);
+    window.addEventListener(
+      'analyticsUpdate',
+      handleAnalyticsUpdate as EventListener,
+    );
+    window.addEventListener(
+      'metricsUpdate',
+      handleMetricsUpdate as EventListener,
+    );
 
     return () => {
-      window.removeEventListener('analyticsUpdate', handleAnalyticsUpdate as EventListener);
-      window.removeEventListener('metricsUpdate', handleMetricsUpdate as EventListener);
+      window.removeEventListener(
+        'analyticsUpdate',
+        handleAnalyticsUpdate as EventListener,
+      );
+      window.removeEventListener(
+        'metricsUpdate',
+        handleMetricsUpdate as EventListener,
+      );
     };
   }, [activeTab]);
 
@@ -173,7 +200,9 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
       };
 
       // Fetch dashboard metrics
-      const dashboardResponse = await fetch(getApiUrl('analytics/dashboard'), { headers });
+      const dashboardResponse = await fetch(getApiUrl('analytics/dashboard'), {
+        headers,
+      });
       if (!dashboardResponse.ok) {
         throw new Error('Failed to fetch dashboard metrics');
       }
@@ -181,16 +210,20 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
       setDashboardMetrics(dashboardData);
 
       // Fetch business metrics
-      const businessResponse = await fetch(getApiUrl('analytics/business-metrics'), { headers });
+      const businessResponse = await fetch(
+        getApiUrl('analytics/business-metrics'),
+        { headers },
+      );
       if (!businessResponse.ok) {
         throw new Error('Failed to fetch business metrics');
       }
       const businessData = await businessResponse.json();
       setBusinessMetrics(businessData);
-
     } catch (err) {
       console.error('Analytics fetch error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load analytics data');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load analytics data',
+      );
     } finally {
       setLoading(false);
     }
@@ -209,14 +242,24 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
   }, []);
 
   // Memoized chart colors
-  const chartColors = useMemo(() => ({
-    primary: '#4caf50',
-    secondary: '#2196f3',
-    accent: '#ff9800',
-    warning: '#f44336',
-    pie: ['#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0', '#00bcd4', '#ffeb3b']
-  }), []);
-
+  const chartColors = useMemo(
+    () => ({
+      primary: '#4caf50',
+      secondary: '#2196f3',
+      accent: '#ff9800',
+      warning: '#f44336',
+      pie: [
+        '#4caf50',
+        '#2196f3',
+        '#ff9800',
+        '#f44336',
+        '#9c27b0',
+        '#00bcd4',
+        '#ffeb3b',
+      ],
+    }),
+    [],
+  );
 
   if (loading) {
     return (
@@ -275,37 +318,51 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
           <div className={styles.metricsGrid}>
             <div className={styles.metricCard}>
               <h3>Total Jobs</h3>
-              <div className={styles.metricValue}>{dashboardMetrics.totalJobs}</div>
+              <div className={styles.metricValue}>
+                {dashboardMetrics.totalJobs}
+              </div>
               <div className={styles.metricSubtext}>All time</div>
             </div>
 
             <div className={styles.metricCard}>
               <h3>Active Jobs</h3>
-              <div className={styles.metricValue}>{dashboardMetrics.activeJobs}</div>
+              <div className={styles.metricValue}>
+                {dashboardMetrics.activeJobs}
+              </div>
               <div className={styles.metricSubtext}>Currently in progress</div>
             </div>
 
             <div className={styles.metricCard}>
               <h3>Completed Today</h3>
-              <div className={styles.metricValue}>{dashboardMetrics.completedJobsToday}</div>
+              <div className={styles.metricValue}>
+                {dashboardMetrics.completedJobsToday}
+              </div>
               <div className={styles.metricSubtext}>Jobs finished today</div>
             </div>
 
             <div className={styles.metricCard}>
               <h3>Total Revenue</h3>
-              <div className={styles.metricValue}>{formatCurrency(dashboardMetrics.totalRevenue)}</div>
+              <div className={styles.metricValue}>
+                {formatCurrency(dashboardMetrics.totalRevenue)}
+              </div>
               <div className={styles.metricSubtext}>All time</div>
             </div>
 
             <div className={styles.metricCard}>
               <h3>Today&apos;s Revenue</h3>
-              <div className={styles.metricValue}>{formatCurrency(dashboardMetrics.revenueToday)}</div>
-              <div className={styles.metricSubtext}>Revenue generated today</div>
+              <div className={styles.metricValue}>
+                {formatCurrency(dashboardMetrics.revenueToday)}
+              </div>
+              <div className={styles.metricSubtext}>
+                Revenue generated today
+              </div>
             </div>
 
             <div className={styles.metricCard}>
               <h3>Average Job Value</h3>
-              <div className={styles.metricValue}>{formatCurrency(dashboardMetrics.averageJobValue)}</div>
+              <div className={styles.metricValue}>
+                {formatCurrency(dashboardMetrics.averageJobValue)}
+              </div>
               <div className={styles.metricSubtext}>Per job</div>
             </div>
           </div>
@@ -330,10 +387,15 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                       dataKey="revenue"
                     >
                       {dashboardMetrics.topServices.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={chartColors.pie[index % chartColors.pie.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={chartColors.pie[index % chartColors.pie.length]}
+                        />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                    <Tooltip
+                      formatter={(value) => formatCurrency(Number(value))}
+                    />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -346,10 +408,23 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
                     data={[
-                      { name: 'Crew Utilization', value: dashboardMetrics.crewUtilization },
-                      { name: 'Customer Satisfaction', value: dashboardMetrics.customerSatisfaction * 20 },
-                      { name: 'On-Time Performance', value: dashboardMetrics.onTimePerformance },
-                      { name: 'Job Completion', value: dashboardMetrics.performanceMetrics.jobCompletionRate }
+                      {
+                        name: 'Crew Utilization',
+                        value: dashboardMetrics.crewUtilization,
+                      },
+                      {
+                        name: 'Customer Satisfaction',
+                        value: dashboardMetrics.customerSatisfaction * 20,
+                      },
+                      {
+                        name: 'On-Time Performance',
+                        value: dashboardMetrics.onTimePerformance,
+                      },
+                      {
+                        name: 'Job Completion',
+                        value:
+                          dashboardMetrics.performanceMetrics.jobCompletionRate,
+                      },
                     ]}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
@@ -359,11 +434,17 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                     <Tooltip
                       formatter={(value, name) => {
                         if (name === 'Customer Satisfaction') {
-                          return [(Number(value) / 20).toFixed(1) + '/5.0', name];
+                          return [
+                            (Number(value) / 20).toFixed(1) + '/5.0',
+                            name,
+                          ];
                         }
                         return [formatPercentage(Number(value)), name];
                       }}
-                      contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #444' }}
+                      contentStyle={{
+                        backgroundColor: '#2d2d2d',
+                        border: '1px solid #444',
+                      }}
                     />
                     <Bar dataKey="value" fill="#0070f3" />
                   </BarChart>
@@ -387,7 +468,9 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                 </div>
                 <div className={styles.metricRow}>
                   <span>Monthly Recurring Revenue</span>
-                  <span>{formatCurrency(businessMetrics.monthlyRecurringRevenue)}</span>
+                  <span>
+                    {formatCurrency(businessMetrics.monthlyRecurringRevenue)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Average Job Value</span>
@@ -395,7 +478,9 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                 </div>
                 <div className={styles.metricRow}>
                   <span>Revenue Growth Rate</span>
-                  <span>{formatPercentage(businessMetrics.revenueGrowthRate)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.revenueGrowthRate)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -405,19 +490,27 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
               <div className={styles.metricsList}>
                 <div className={styles.metricRow}>
                   <span>Job Completion Rate</span>
-                  <span>{formatPercentage(businessMetrics.jobCompletionRate)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.jobCompletionRate)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Average Job Duration</span>
-                  <span>{businessMetrics.averageJobDuration.toFixed(1)} hours</span>
+                  <span>
+                    {businessMetrics.averageJobDuration.toFixed(1)} hours
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Crew Utilization</span>
-                  <span>{formatPercentage(businessMetrics.crewUtilization)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.crewUtilization)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>On-Time Delivery Rate</span>
-                  <span>{formatPercentage(businessMetrics.onTimeDeliveryRate)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.onTimeDeliveryRate)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -427,15 +520,23 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
               <div className={styles.metricsList}>
                 <div className={styles.metricRow}>
                   <span>Customer Satisfaction Score</span>
-                  <span>{businessMetrics.customerSatisfactionScore.toFixed(1)}/5.0</span>
+                  <span>
+                    {businessMetrics.customerSatisfactionScore.toFixed(1)}/5.0
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Customer Retention Rate</span>
-                  <span>{formatPercentage(businessMetrics.customerRetentionRate)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.customerRetentionRate)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>New Customer Acquisition Rate</span>
-                  <span>{formatPercentage(businessMetrics.newCustomerAcquisitionRate)}</span>
+                  <span>
+                    {formatPercentage(
+                      businessMetrics.newCustomerAcquisitionRate,
+                    )}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Churn Rate</span>
@@ -449,15 +550,21 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
               <div className={styles.metricsList}>
                 <div className={styles.metricRow}>
                   <span>Estimate Accuracy</span>
-                  <span>{formatPercentage(businessMetrics.estimateAccuracy)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.estimateAccuracy)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Crew Productivity</span>
-                  <span>{formatPercentage(businessMetrics.crewProductivity)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.crewProductivity)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Equipment Utilization</span>
-                  <span>{formatPercentage(businessMetrics.equipmentUtilization)}</span>
+                  <span>
+                    {formatPercentage(businessMetrics.equipmentUtilization)}
+                  </span>
                 </div>
                 <div className={styles.metricRow}>
                   <span>Cost Per Job</span>
@@ -483,14 +590,21 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     <XAxis dataKey="month" stroke="#888" />
-                    <YAxis stroke="#888" tickFormatter={(value) => formatCurrency(value)} />
+                    <YAxis
+                      stroke="#888"
+                      tickFormatter={(value) => formatCurrency(value)}
+                    />
                     <Tooltip
                       formatter={(value, name) => {
-                        if (name === 'revenue') return [formatCurrency(Number(value)), 'Revenue'];
+                        if (name === 'revenue')
+                          return [formatCurrency(Number(value)), 'Revenue'];
                         if (name === 'jobs') return [value + ' jobs', 'Jobs'];
                         return [value, name];
                       }}
-                      contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #444' }}
+                      contentStyle={{
+                        backgroundColor: '#2d2d2d',
+                        border: '1px solid #444',
+                      }}
                     />
                     <Area
                       type="monotone"
@@ -515,15 +629,24 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     <XAxis dataKey="month" stroke="#888" />
-                    <YAxis yAxisId="left" stroke="#888" tickFormatter={(value) => formatCurrency(value)} />
+                    <YAxis
+                      yAxisId="left"
+                      stroke="#888"
+                      tickFormatter={(value) => formatCurrency(value)}
+                    />
                     <YAxis yAxisId="right" orientation="right" stroke="#888" />
                     <Tooltip
                       formatter={(value, name) => {
-                        if (name === 'revenue') return [formatCurrency(Number(value)), 'Revenue'];
-                        if (name === 'jobs') return [value + ' jobs', 'Jobs Completed'];
+                        if (name === 'revenue')
+                          return [formatCurrency(Number(value)), 'Revenue'];
+                        if (name === 'jobs')
+                          return [value + ' jobs', 'Jobs Completed'];
                         return [value, name];
                       }}
-                      contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #444' }}
+                      contentStyle={{
+                        backgroundColor: '#2d2d2d',
+                        border: '1px solid #444',
+                      }}
                     />
                     <Legend />
                     <Line
@@ -562,16 +685,25 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                     data={[
                       {
                         name: 'Job Performance',
-                        'Completion Rate': dashboardMetrics.performanceMetrics.jobCompletionRate,
-                        'On-Time Performance': dashboardMetrics.onTimePerformance,
-                        'Average Duration': (dashboardMetrics.performanceMetrics.averageJobDuration / 8) * 100
+                        'Completion Rate':
+                          dashboardMetrics.performanceMetrics.jobCompletionRate,
+                        'On-Time Performance':
+                          dashboardMetrics.onTimePerformance,
+                        'Average Duration':
+                          (dashboardMetrics.performanceMetrics
+                            .averageJobDuration /
+                            8) *
+                          100,
                       },
                       {
                         name: 'Crew Performance',
-                        'Crew Efficiency': dashboardMetrics.performanceMetrics.averageCrewEfficiency,
+                        'Crew Efficiency':
+                          dashboardMetrics.performanceMetrics
+                            .averageCrewEfficiency,
                         'Utilization Rate': dashboardMetrics.crewUtilization,
-                        'Customer Satisfaction': dashboardMetrics.customerSatisfaction * 20
-                      }
+                        'Customer Satisfaction':
+                          dashboardMetrics.customerSatisfaction * 20,
+                      },
                     ]}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
@@ -581,14 +713,23 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                     <Tooltip
                       formatter={(value, name) => {
                         if (name === 'Customer Satisfaction') {
-                          return [(Number(value) / 20).toFixed(1) + '/5.0', name];
+                          return [
+                            (Number(value) / 20).toFixed(1) + '/5.0',
+                            name,
+                          ];
                         }
                         if (name === 'Average Duration') {
-                          return [(Number(value) / 100 * 8).toFixed(1) + ' hrs', name];
+                          return [
+                            ((Number(value) / 100) * 8).toFixed(1) + ' hrs',
+                            name,
+                          ];
                         }
                         return [formatPercentage(Number(value)), name];
                       }}
-                      contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #444' }}
+                      contentStyle={{
+                        backgroundColor: '#2d2d2d',
+                        border: '1px solid #444',
+                      }}
                     />
                     <Legend />
                     <Bar dataKey="Completion Rate" fill="#0070f3" />
@@ -607,10 +748,32 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                 <ResponsiveContainer width="100%" height={350}>
                   <LineChart
                     data={[
-                      { period: 'Week 1', performance: 85, satisfaction: 4.2, efficiency: 78 },
-                      { period: 'Week 2', performance: 88, satisfaction: 4.3, efficiency: 82 },
-                      { period: 'Week 3', performance: 92, satisfaction: 4.5, efficiency: 85 },
-                      { period: 'Week 4', performance: dashboardMetrics.onTimePerformance, satisfaction: dashboardMetrics.customerSatisfaction, efficiency: dashboardMetrics.performanceMetrics.averageCrewEfficiency }
+                      {
+                        period: 'Week 1',
+                        performance: 85,
+                        satisfaction: 4.2,
+                        efficiency: 78,
+                      },
+                      {
+                        period: 'Week 2',
+                        performance: 88,
+                        satisfaction: 4.3,
+                        efficiency: 82,
+                      },
+                      {
+                        period: 'Week 3',
+                        performance: 92,
+                        satisfaction: 4.5,
+                        efficiency: 85,
+                      },
+                      {
+                        period: 'Week 4',
+                        performance: dashboardMetrics.onTimePerformance,
+                        satisfaction: dashboardMetrics.customerSatisfaction,
+                        efficiency:
+                          dashboardMetrics.performanceMetrics
+                            .averageCrewEfficiency,
+                      },
                     ]}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
@@ -619,15 +782,40 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
                     <YAxis stroke="#888" />
                     <Tooltip
                       formatter={(value, name) => {
-                        if (name === 'satisfaction') return [Number(value).toFixed(1) + '/5.0', 'Customer Satisfaction'];
+                        if (name === 'satisfaction')
+                          return [
+                            Number(value).toFixed(1) + '/5.0',
+                            'Customer Satisfaction',
+                          ];
                         return [formatPercentage(Number(value)), name];
                       }}
-                      contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #444' }}
+                      contentStyle={{
+                        backgroundColor: '#2d2d2d',
+                        border: '1px solid #444',
+                      }}
                     />
                     <Legend />
-                    <Line type="monotone" dataKey="performance" stroke="#0070f3" strokeWidth={2} name="On-Time Performance" />
-                    <Line type="monotone" dataKey="efficiency" stroke="#00d9ff" strokeWidth={2} name="Crew Efficiency" />
-                    <Line type="monotone" dataKey="satisfaction" stroke="#ff6b6b" strokeWidth={2} name="Customer Satisfaction" />
+                    <Line
+                      type="monotone"
+                      dataKey="performance"
+                      stroke="#0070f3"
+                      strokeWidth={2}
+                      name="On-Time Performance"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="efficiency"
+                      stroke="#00d9ff"
+                      strokeWidth={2}
+                      name="Crew Efficiency"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="satisfaction"
+                      stroke="#ff6b6b"
+                      strokeWidth={2}
+                      name="Customer Satisfaction"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -640,7 +828,9 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
       <div className={styles.refreshSection}>
         <div className={styles.refreshControls}>
           <div className={styles.connectionStatus}>
-            <div className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`}></div>
+            <div
+              className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`}
+            ></div>
             <span className={styles.statusText}>
               {isConnected ? 'Live' : 'Offline'}
             </span>

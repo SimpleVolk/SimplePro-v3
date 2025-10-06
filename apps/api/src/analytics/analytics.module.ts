@@ -4,7 +4,10 @@ import { AnalyticsController } from './analytics.controller';
 import { AnalyticsService } from './analytics.service';
 import { ReportsService } from './reports.service';
 import { MetricsService } from './metrics.service';
-import { AnalyticsEvent, AnalyticsEventSchema } from './schemas/analytics-event.schema';
+import {
+  AnalyticsEvent,
+  AnalyticsEventSchema,
+} from './schemas/analytics-event.schema';
 import { Report, ReportSchema } from './schemas/report.schema';
 import { Customer, CustomerSchema } from '../customers/schemas/customer.schema';
 import { Job, JobSchema } from '../jobs/schemas/job.schema';

@@ -29,7 +29,7 @@ export class CustomThrottlerGuard extends ThrottlerGuard {
     // Skip for certain user agents (monitoring tools)
     const userAgent = request.get('User-Agent')?.toLowerCase() || '';
     const monitoringAgents = ['healthcheck', 'monitor', 'probe'];
-    if (monitoringAgents.some(agent => userAgent.includes(agent))) {
+    if (monitoringAgents.some((agent) => userAgent.includes(agent))) {
       return true;
     }
 
@@ -40,7 +40,7 @@ export class CustomThrottlerGuard extends ThrottlerGuard {
     // Check for trusted proxy headers in order of preference
     const forwarded = request.get('X-Forwarded-For');
     if (forwarded) {
-      const ips = forwarded.split(',').map(ip => ip.trim());
+      const ips = forwarded.split(',').map((ip) => ip.trim());
       return ips[0]; // First IP is the original client
     }
 

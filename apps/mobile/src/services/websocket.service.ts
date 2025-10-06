@@ -19,7 +19,9 @@ class WebSocketService {
    * Connect to WebSocket server
    */
   connect(token: string) {
-    const WS_URL = __DEV__ ? 'http://localhost:3001' : 'https://api.simplepro.com';
+    const WS_URL = __DEV__
+      ? 'http://localhost:3001'
+      : 'https://api.simplepro.com';
 
     this.socket = io(WS_URL, {
       auth: { token },
@@ -82,7 +84,7 @@ class WebSocketService {
           timestamp: new Date().toISOString(),
           read: false,
           data,
-        })
+        }),
       );
 
       this.showLocalNotification({
@@ -104,7 +106,7 @@ class WebSocketService {
           timestamp: new Date().toISOString(),
           read: false,
           data,
-        })
+        }),
       );
     });
 
@@ -121,7 +123,7 @@ class WebSocketService {
           timestamp: new Date().toISOString(),
           read: false,
           data: notification.data,
-        })
+        }),
       );
 
       this.showLocalNotification({
@@ -144,7 +146,13 @@ class WebSocketService {
   /**
    * Show local push notification
    */
-  private showLocalNotification({ title, message }: { title: string; message: string }) {
+  private showLocalNotification({
+    title,
+    message,
+  }: {
+    title: string;
+    message: string;
+  }) {
     PushNotification.localNotification({
       channelId: 'job-updates',
       title,

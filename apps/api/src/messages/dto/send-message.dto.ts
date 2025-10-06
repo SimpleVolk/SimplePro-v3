@@ -1,4 +1,15 @@
-import { IsArray, IsEnum, IsMongoId, IsOptional, IsString, MinLength, MaxLength, IsObject, ValidateNested, IsNumber } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsObject,
+  ValidateNested,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class AttachmentDto {
@@ -36,7 +47,9 @@ export class SendMessageDto {
   @MaxLength(5000, { message: 'Message content cannot exceed 5000 characters' })
   content!: string;
 
-  @IsEnum(['text', 'image', 'file', 'location', 'quick_reply'], { message: 'Invalid message type' })
+  @IsEnum(['text', 'image', 'file', 'location', 'quick_reply'], {
+    message: 'Invalid message type',
+  })
   @IsOptional()
   messageType?: string;
 

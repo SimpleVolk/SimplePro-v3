@@ -24,7 +24,10 @@ export class FollowUpRulesController {
 
   @Post()
   @Roles('super_admin', 'admin')
-  async createRule(@Body() createDto: CreateRuleDto, @Request() req: AuthenticatedRequest) {
+  async createRule(
+    @Body() createDto: CreateRuleDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     const rule = await this.rulesService.createRule(createDto, req.user.userId);
 
     return {
@@ -74,12 +77,12 @@ export class FollowUpRulesController {
   async updateRule(
     @Param('ruleId') ruleId: string,
     @Body() updateDto: UpdateRuleDto,
-    @Request() req: AuthenticatedRequest
+    @Request() req: AuthenticatedRequest,
   ) {
     const rule = await this.rulesService.updateRule(
       ruleId,
       updateDto,
-      req.user.userId
+      req.user.userId,
     );
 
     return {

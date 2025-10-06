@@ -1,11 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
-import { EventType, ActionType } from '../../follow-up-rules/schemas/follow-up-rule.schema';
+import {
+  EventType,
+  ActionType,
+} from '../../follow-up-rules/schemas/follow-up-rule.schema';
 
 export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'New Website Lead Follow-up',
-    description: 'Automatically create a follow-up call activity within 1 hour for new website leads',
+    description:
+      'Automatically create a follow-up call activity within 1 hour for new website leads',
     trigger: {
       eventType: EventType.OPPORTUNITY_CREATED,
       conditions: [
@@ -22,7 +26,8 @@ export const defaultFollowUpRules = [
         delay: 1, // 1 hour
         activityType: 'call',
         subject: 'Call new website lead',
-        description: 'Follow up with customer who submitted inquiry through website',
+        description:
+          'Follow up with customer who submitted inquiry through website',
         assignTo: 'lead_owner',
       },
     ],
@@ -44,7 +49,8 @@ export const defaultFollowUpRules = [
         delay: 48, // 2 days
         activityType: 'call',
         subject: 'Follow up on quote',
-        description: 'Check if customer received quote and answer any questions',
+        description:
+          'Check if customer received quote and answer any questions',
         assignTo: 'lead_owner',
       },
     ],
@@ -55,7 +61,8 @@ export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'Callback Requested Auto Follow-up',
-    description: 'Automatically create next-day follow-up when customer requests callback',
+    description:
+      'Automatically create next-day follow-up when customer requests callback',
     trigger: {
       eventType: EventType.ACTIVITY_COMPLETED,
       conditions: [
@@ -83,7 +90,8 @@ export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'Won Opportunity - Create Job',
-    description: 'Automatically create job and schedule kickoff call when opportunity is won',
+    description:
+      'Automatically create job and schedule kickoff call when opportunity is won',
     trigger: {
       eventType: EventType.STATUS_CHANGED,
       conditions: [
@@ -100,7 +108,8 @@ export const defaultFollowUpRules = [
         delay: 0, // Immediate
         activityType: 'meeting',
         subject: 'Job kickoff call',
-        description: 'Schedule kickoff call to confirm details and finalize moving plans',
+        description:
+          'Schedule kickoff call to confirm details and finalize moving plans',
         assignTo: 'lead_owner',
       },
       {
@@ -117,7 +126,8 @@ export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'Lost Opportunity Re-engagement',
-    description: 'Create follow-up activity 30 days after opportunity is lost for potential re-engagement',
+    description:
+      'Create follow-up activity 30 days after opportunity is lost for potential re-engagement',
     trigger: {
       eventType: EventType.STATUS_CHANGED,
       conditions: [
@@ -134,7 +144,8 @@ export const defaultFollowUpRules = [
         delay: 720, // 30 days
         activityType: 'email',
         subject: 'Re-engagement opportunity',
-        description: 'Reach out to previously lost lead to check if circumstances have changed',
+        description:
+          'Reach out to previously lost lead to check if circumstances have changed',
         assignTo: 'lead_owner',
       },
     ],
@@ -145,7 +156,8 @@ export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'Urgent Priority Immediate Follow-up',
-    description: 'Immediately create follow-up for urgent priority opportunities',
+    description:
+      'Immediately create follow-up for urgent priority opportunities',
     trigger: {
       eventType: EventType.OPPORTUNITY_CREATED,
       conditions: [
@@ -179,7 +191,8 @@ export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'Referral Lead Special Handling',
-    description: 'Create personalized follow-up for referral leads within 2 hours',
+    description:
+      'Create personalized follow-up for referral leads within 2 hours',
     trigger: {
       eventType: EventType.OPPORTUNITY_CREATED,
       conditions: [
@@ -207,7 +220,8 @@ export const defaultFollowUpRules = [
   {
     ruleId: uuidv4(),
     name: 'Negotiating Status Weekly Follow-up',
-    description: 'Create weekly follow-up for opportunities in negotiating status',
+    description:
+      'Create weekly follow-up for opportunities in negotiating status',
     trigger: {
       eventType: EventType.STATUS_CHANGED,
       conditions: [
@@ -224,7 +238,8 @@ export const defaultFollowUpRules = [
         delay: 168, // 7 days
         activityType: 'call',
         subject: 'Check negotiation progress',
-        description: 'Follow up on ongoing negotiations and address any concerns',
+        description:
+          'Follow up on ongoing negotiations and address any concerns',
         assignTo: 'lead_owner',
       },
     ],

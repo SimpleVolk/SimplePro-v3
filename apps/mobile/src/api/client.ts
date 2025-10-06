@@ -4,13 +4,19 @@
  * Axios instance with interceptors for authentication and error handling
  */
 
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from 'axios';
+import axios, {
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+  AxiosError,
+} from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { store } from '../store/store';
 import { logout, setTokens } from '../store/slices/authSlice';
 
 // API base URL - adjust based on environment
-const API_BASE_URL = __DEV__ ? 'http://localhost:3001/api' : 'https://api.simplepro.com/api';
+const API_BASE_URL = __DEV__
+  ? 'http://localhost:3001/api'
+  : 'https://api.simplepro.com/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -34,7 +40,7 @@ apiClient.interceptors.request.use(
   },
   (error: AxiosError) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor - handle token refresh and errors
@@ -43,7 +49,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // If 401 and not already retried, try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -73,7 +81,7 @@ apiClient.interceptors.response.use(
           setTokens({
             accessToken,
             refreshToken: newRefreshToken || refreshToken,
-          })
+          }),
         );
 
         // Retry original request with new token
@@ -87,7 +95,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

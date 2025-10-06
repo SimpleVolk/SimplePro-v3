@@ -38,7 +38,8 @@ export class NotificationsController {
   @Post()
   @Roles('super_admin', 'admin')
   async createNotification(@Body() dto: CreateNotificationDto) {
-    const notification = await this.notificationsService.createNotification(dto);
+    const notification =
+      await this.notificationsService.createNotification(dto);
     return {
       success: true,
       data: notification,
@@ -49,7 +50,10 @@ export class NotificationsController {
   @Get()
   async findAll(@Query() filters: NotificationFiltersDto, @Request() req: any) {
     const userId = req.user.sub;
-    const notifications = await this.notificationsService.findAll(userId, filters);
+    const notifications = await this.notificationsService.findAll(
+      userId,
+      filters,
+    );
     return {
       success: true,
       data: notifications,
@@ -129,9 +133,15 @@ export class NotificationsController {
   }
 
   @Patch('preferences/me')
-  async updatePreferences(@Body() dto: UpdatePreferencesDto, @Request() req: any) {
+  async updatePreferences(
+    @Body() dto: UpdatePreferencesDto,
+    @Request() req: any,
+  ) {
     const userId = req.user.sub;
-    const preferences = await this.preferenceService.updatePreferences(userId, dto);
+    const preferences = await this.preferenceService.updatePreferences(
+      userId,
+      dto,
+    );
     return {
       success: true,
       data: preferences,
@@ -143,7 +153,9 @@ export class NotificationsController {
 
   @Post('test')
   @Roles('super_admin', 'admin')
-  async sendTestNotification(@Body() dto: { recipientId: string; type: string; data?: any }) {
+  async sendTestNotification(
+    @Body() dto: { recipientId: string; type: string; data?: any },
+  ) {
     const notification = await this.notificationsService.createNotification({
       recipientId: dto.recipientId,
       type: dto.type,
@@ -192,7 +204,10 @@ export class NotificationsController {
 
   @Patch('templates/:type')
   @Roles('super_admin')
-  async updateTemplate(@Param('type') type: string, @Body() dto: UpdateTemplateDto) {
+  async updateTemplate(
+    @Param('type') type: string,
+    @Body() dto: UpdateTemplateDto,
+  ) {
     const template = await this.templateService.updateTemplate(type, dto);
     return {
       success: true,

@@ -17,7 +17,9 @@ This document details the critical security vulnerabilities identified during th
 **CWE:** CWE-798 (Use of Hard-coded Credentials)
 
 #### Description
+
 Default passwords and secrets were hardcoded in `docker-compose.dev.yml` and committed to version control. This exposed sensitive credentials including:
+
 - MongoDB password: `simplepro_dev_2024`
 - Redis password: `simplepro_redis_2024`
 - MinIO password: `simplepro_minio_2024`
@@ -25,6 +27,7 @@ Default passwords and secrets were hardcoded in `docker-compose.dev.yml` and com
 These hardcoded secrets could be used by attackers to gain unauthorized access to databases and storage systems.
 
 #### Impact
+
 - Unauthorized database access
 - Data breach potential
 - Service compromise
@@ -33,6 +36,7 @@ These hardcoded secrets could be used by attackers to gain unauthorized access t
 #### Fix Implementation
 
 **Files Modified:**
+
 - `docker-compose.dev.yml` (lines 13-15, 35, 56-57)
 - `.env.example` (lines 10-19, 27-32)
 - `.env.docker.example` (NEW FILE - created)
@@ -40,6 +44,7 @@ These hardcoded secrets could be used by attackers to gain unauthorized access t
 **Changes Made:**
 
 1. **docker-compose.dev.yml** - Removed all hardcoded defaults:
+
    ```yaml
    # BEFORE (VULNERABLE):
    MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-simplepro_dev_2024}
@@ -57,6 +62,7 @@ These hardcoded secrets could be used by attackers to gain unauthorized access t
 3. **Updated `.env.example`** - Removed hardcoded values, added placeholders
 
 **Verification Steps:**
+
 ```bash
 # 1. Verify docker-compose.dev.yml has no hardcoded secrets
 grep -E "(simplepro_dev|simplepro_redis|simplepro_minio)" docker-compose.dev.yml
@@ -71,11 +77,13 @@ npm run docker:dev
 ```
 
 **Breaking Changes:**
+
 - Developers must now create `.env.docker` file with custom credentials
 - No automatic fallback to default passwords
 - System will fail to start without proper configuration
 
 **Migration Guide:**
+
 ```bash
 # Copy template
 cp .env.docker.example .env.docker
@@ -99,12 +107,15 @@ npm run docker:dev
 **CWE:** CWE-798 (Use of Hard-coded Credentials), CWE-321 (Use of Hard-coded Cryptographic Key)
 
 #### Description
+
 The Partner Portal JWT strategy (`apps/api/src/auth/strategies/partner-jwt.strategy.ts`) used a weak fallback secret `'default-secret-key'` when the environment variable was not set. This allowed attackers to:
+
 - Generate valid JWT tokens without knowing the actual secret
 - Bypass authentication completely
 - Impersonate any partner user
 
 #### Impact
+
 - Complete authentication bypass for Partner Portal
 - Unauthorized access to partner data
 - Potential privilege escalation
@@ -113,14 +124,16 @@ The Partner Portal JWT strategy (`apps/api/src/auth/strategies/partner-jwt.strat
 #### Fix Implementation
 
 **Files Modified:**
+
 - `apps/api/src/auth/strategies/partner-jwt.strategy.ts` (lines 1-45)
 
 **Changes Made:**
 
 1. **Removed weak fallback** - No default secret allowed:
+
    ```typescript
    // BEFORE (VULNERABLE):
-   secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret-key'
+   secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret-key';
 
    // AFTER (SECURE):
    secretOrKey: (() => {
@@ -132,7 +145,7 @@ The Partner Portal JWT strategy (`apps/api/src/auth/strategies/partner-jwt.strat
        throw new Error('JWT_SECRET must be at least 32 characters long...');
      }
      return envSecret;
-   })()
+   })();
    ```
 
 2. **Added validation** - Enforces minimum 32-character secret length
@@ -142,6 +155,7 @@ The Partner Portal JWT strategy (`apps/api/src/auth/strategies/partner-jwt.strat
 4. **Added secrets.config fallback** - Uses production secrets management system when available
 
 **Verification Steps:**
+
 ```bash
 # 1. Test startup fails without JWT_SECRET
 unset JWT_SECRET
@@ -160,6 +174,7 @@ npm run dev:api
 ```
 
 **Security Testing Performed:**
+
 - Attempted to generate tokens with default secret (failed as expected)
 - Verified existing tokens remain valid after fix
 - Confirmed error messages don't leak sensitive information
@@ -173,12 +188,15 @@ npm run dev:api
 **CWE:** CWE-598 (Use of GET Request Method With Sensitive Query Strings), CWE-307 (Improper Restriction of Excessive Authentication Attempts)
 
 #### Description
+
 Document sharing endpoints accepted passwords via URL query parameters:
+
 ```
 GET /api/documents/shared/:token/download?password=secretpass123
 ```
 
 This exposed passwords in:
+
 - Browser history
 - Server access logs
 - Proxy/CDN logs
@@ -188,6 +206,7 @@ This exposed passwords in:
 Additionally, there was no rate limiting, allowing unlimited brute force attempts.
 
 #### Impact
+
 - Password exposure in logs and browser history
 - Brute force attacks on shared documents
 - Unauthorized document access
@@ -196,6 +215,7 @@ Additionally, there was no rate limiting, allowing unlimited brute force attempt
 #### Fix Implementation
 
 **Files Modified:**
+
 - `apps/api/src/documents/documents.controller.ts` (lines 1-32, 176-235)
 - `apps/api/src/documents/documents.service.ts` (lines 337-420)
 - `apps/api/src/documents/dto/access-shared-document.dto.ts` (NEW FILE)
@@ -204,6 +224,7 @@ Additionally, there was no rate limiting, allowing unlimited brute force attempt
 **Changes Made:**
 
 1. **Changed HTTP method** - GET to POST for security:
+
    ```typescript
    // BEFORE (VULNERABLE):
    @Get('shared/:token/download')
@@ -234,6 +255,7 @@ Additionally, there was no rate limiting, allowing unlimited brute force attempt
    - Successful access with metadata
 
 **Verification Steps:**
+
 ```bash
 # 1. Test password in POST body works
 curl -X POST http://localhost:3001/api/documents/shared/TOKEN123/access \
@@ -253,12 +275,14 @@ tail -f apps/api/logs/app.log | grep "Document share access"
 ```
 
 **Security Testing Performed:**
+
 - Verified passwords no longer appear in server logs
 - Confirmed rate limiting blocks brute force attempts
 - Tested audit logging captures all access attempts
 - Validated error messages don't leak information
 
 **Breaking Changes:**
+
 - Frontend must use POST instead of GET
 - Password must be in request body, not URL
 - Update any API clients calling these endpoints
@@ -272,7 +296,9 @@ tail -f apps/api/logs/app.log | grep "Document share access"
 **CWE:** CWE-770 (Allocation of Resources Without Limits), CWE-400 (Uncontrolled Resource Consumption)
 
 #### Description
+
 WebSocket gateway had multiple security issues:
+
 1. Authentication happened AFTER resource allocation
 2. Connection limits could be bypassed by reconnecting
 3. No rate limiting on WebSocket events
@@ -280,6 +306,7 @@ WebSocket gateway had multiple security issues:
 5. Event flooding not prevented
 
 #### Impact
+
 - Denial of Service (DoS) attacks
 - Server resource exhaustion
 - Memory leaks from abandoned connections
@@ -289,11 +316,13 @@ WebSocket gateway had multiple security issues:
 #### Fix Implementation
 
 **Files Modified:**
+
 - `apps/api/src/websocket/websocket.gateway.ts` (lines 37-108, 176-266, 365-430, 483-583, 859-876)
 
 **Changes Made:**
 
 1. **Authentication first** - Moved JWT verification before ANY resource allocation:
+
    ```typescript
    // BEFORE (VULNERABLE):
    // 1. Count connections from IP
@@ -314,10 +343,12 @@ WebSocket gateway had multiple security issues:
    - Clear error messages with current/max values
 
 3. **Added event rate limiting**:
+
    ```typescript
    private readonly EVENT_RATE_LIMIT = 100; // Max events per window
    private readonly EVENT_RATE_WINDOW = 60 * 1000; // 1 minute
    ```
+
    - Applied to critical events: `locationUpdate`, `sendMessage`, `message.send`
    - Sliding window algorithm
    - Auto-cleanup on disconnect
@@ -337,6 +368,7 @@ WebSocket gateway had multiple security issues:
    - Helpful for incident response
 
 **Verification Steps:**
+
 ```bash
 # 1. Test authentication required
 # Connect without token - should fail immediately
@@ -364,6 +396,7 @@ curl http://localhost:3001/api/websocket/stats
 ```
 
 **Security Testing Performed:**
+
 - Load tested with 1000+ concurrent connections (rejected properly)
 - Verified event flooding is blocked
 - Confirmed memory cleanup on disconnect (no leaks)
@@ -371,6 +404,7 @@ curl http://localhost:3001/api/websocket/stats
 - Validated IP-based limits work correctly
 
 **Performance Impact:**
+
 - Negligible - authentication check adds ~5ms per connection
 - Event rate limiter adds ~0.1ms per event
 - Memory usage reduced by proper cleanup
@@ -381,10 +415,12 @@ curl http://localhost:3001/api/websocket/stats
 ## Summary of Changes
 
 ### Files Created
+
 1. `.env.docker.example` - Template for Docker service credentials
 2. `apps/api/src/documents/dto/access-shared-document.dto.ts` - DTO for secure password handling
 
 ### Files Modified
+
 1. `docker-compose.dev.yml` - Removed hardcoded secrets
 2. `.env.example` - Replaced hardcoded values with placeholders
 3. `apps/api/src/auth/strategies/partner-jwt.strategy.ts` - Removed weak JWT fallback
@@ -396,6 +432,7 @@ curl http://localhost:3001/api/websocket/stats
 ## Testing Results
 
 ### Automated Testing
+
 ```bash
 # All existing tests pass
 npm test
@@ -433,6 +470,7 @@ npm run docker:dev
    - Confirmed memory cleanup on disconnect
 
 ### Security Scan Results
+
 ```bash
 # No critical vulnerabilities remaining
 npm audit
@@ -448,12 +486,14 @@ npm run lint:security
 ### For Development
 
 1. **Create `.env.docker` file:**
+
    ```bash
    cp .env.docker.example .env.docker
    # Edit with secure passwords
    ```
 
 2. **Generate secure secrets:**
+
    ```bash
    # Linux/Mac
    export MONGODB_PASSWORD=$(openssl rand -base64 32)
@@ -530,6 +570,7 @@ alerts:
 ## Compliance Impact
 
 ### Standards Addressed
+
 - **OWASP API Security Top 10:**
   - API2:2023 - Broken Authentication (Fixed)
   - API4:2023 - Unrestricted Resource Consumption (Fixed)
@@ -577,6 +618,7 @@ alerts:
 ## Conclusion
 
 All 4 critical security vulnerabilities have been successfully remediated with comprehensive fixes that:
+
 - Eliminate hardcoded secrets
 - Enforce strong authentication
 - Prevent brute force attacks

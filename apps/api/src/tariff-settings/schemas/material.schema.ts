@@ -20,7 +20,7 @@ export class Material {
     required: true,
     type: String,
     enum: Object.values(MaterialCategory),
-    index: true
+    index: true,
   })
   category!: MaterialCategory;
 

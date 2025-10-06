@@ -38,6 +38,7 @@ This guide provides standardized procedures for security testing of SimplePro-v3
 ### 1.3 Testing Philosophy
 
 **Shift-Left Security:** Test early, test often
+
 - Security tests run on every commit
 - Automated tests in CI/CD pipeline
 - Manual tests before major releases
@@ -94,6 +95,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ### 3.1 Running the Test Suite
 
 **Full Test Suite:**
+
 ```bash
 # Run all security tests
 node scripts/security-pentest.js
@@ -107,6 +109,7 @@ node scripts/security-pentest.js
 ```
 
 **Category-Specific Tests:**
+
 ```bash
 # Test only JWT security
 node scripts/security-pentest.js --category=jwt
@@ -125,6 +128,7 @@ node scripts/security-pentest.js --category=input
 ```
 
 **Verbose Mode:**
+
 ```bash
 # Get detailed output
 node scripts/security-pentest.js --verbose
@@ -139,6 +143,7 @@ node scripts/security-pentest.js --verbose
 ### 3.2 Understanding Test Results
 
 **Test Output Format:**
+
 ```
 ╔════════════════════════════════════════════════════════════╗
 ║   SimplePro-v3 Security Penetration Testing Suite         ║
@@ -172,6 +177,7 @@ Results by Category:
 ```
 
 **Test Result File:**
+
 ```bash
 # Detailed results saved to
 cat security-pentest-results.json
@@ -188,16 +194,19 @@ cat security-pentest-results.json
 **When Tests Fail:**
 
 1. **Review the error message:**
+
    ```bash
    node scripts/security-pentest.js --verbose
    ```
 
 2. **Check the detailed results:**
+
    ```bash
    cat security-pentest-results.json | jq '.tests[] | select(.passed == false)'
    ```
 
 3. **Verify environment:**
+
    ```bash
    # Is API running?
    curl http://localhost:3001/api/health
@@ -207,6 +216,7 @@ cat security-pentest-results.json
    ```
 
 4. **Check logs:**
+
    ```bash
    tail -f apps/api/logs/app.log
    ```
@@ -258,6 +268,7 @@ docs/security/MANUAL_PENTEST_CHECKLIST.md
 **Schedule:** Before major releases (monthly)
 
 **Procedure:**
+
 1. Review OWASP API Security Top 10 checklist
 2. Test each category systematically
 3. Document findings
@@ -265,6 +276,7 @@ docs/security/MANUAL_PENTEST_CHECKLIST.md
 5. Retest after fixes
 
 **Checklist Location:**
+
 ```
 docs/security/MANUAL_PENTEST_CHECKLIST.md
 Section 3: OWASP API Security Top 10
@@ -275,6 +287,7 @@ Section 3: OWASP API Security Top 10
 **Schedule:** Quarterly or before major releases
 
 **Procedure:**
+
 1. Review penetration testing plan
 2. Execute automated tests
 3. Perform manual testing
@@ -284,6 +297,7 @@ Section 3: OWASP API Security Top 10
 7. Retest
 
 **Documentation:**
+
 - Plan: `docs/security/PENETRATION_TESTING_PLAN.md`
 - Checklist: `docs/security/MANUAL_PENTEST_CHECKLIST.md`
 - Report Template: `docs/security/PENETRATION_TEST_REPORT.md`
@@ -440,6 +454,7 @@ JWT_REFRESH_SECRET_TEST=<64-character-random-string>
 ```
 
 **Generate Secrets:**
+
 ```bash
 # Generate test secrets
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -452,11 +467,13 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ### 6.1 Continuous Testing (Every Commit)
 
 **Automated Tests:**
+
 - ✅ Run on every pull request
 - ✅ Run on merge to main
 - ✅ Block merge if tests fail
 
 **What's Tested:**
+
 - Hardcoded secret scanning
 - JWT security validation
 - Input validation
@@ -473,6 +490,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Scope:** Full security test suite
 
 **Tests Run:**
+
 - All automated security tests
 - Rate limiting verification
 - WebSocket security tests
@@ -481,6 +499,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Duration:** ~10-15 minutes
 
 **Notifications:**
+
 - Email on failure
 - Slack alert on failure
 - GitHub issue created for failures
@@ -494,6 +513,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Scope:** Comprehensive security review
 
 **Checklist:**
+
 1. Run full automated test suite
 2. Review security logs for anomalies
 3. Check rate limit metrics
@@ -513,6 +533,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Scope:** OWASP API Top 10 + Custom tests
 
 **Procedure:**
+
 1. Execute automated test suite
 2. Perform manual OWASP API Top 10 testing
 3. Test new features for security issues
@@ -524,6 +545,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Owner:** Security Team
 
 **Deliverables:**
+
 - Monthly security report
 - Updated risk assessment
 - Remediation tickets
@@ -538,6 +560,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Scope:** Comprehensive security audit
 
 **Procedure:**
+
 1. Full penetration testing engagement
 2. Third-party security assessment (optional)
 3. Comprehensive OWASP compliance check
@@ -549,6 +572,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Owner:** CISO / Security Director
 
 **Deliverables:**
+
 - Comprehensive penetration test report
 - Executive summary for management
 - Updated security roadmap
@@ -562,6 +586,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Scope:** Release-specific security validation
 
 **Checklist:**
+
 1. ✅ All automated tests passing
 2. ✅ Manual OWASP Top 10 testing complete
 3. ✅ No critical or high vulnerabilities
@@ -582,6 +607,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **When Automated Tests Fail:**
 
 1. **Immediate Actions** (within 1 hour):
+
    ```bash
    # 1. Check test results
    cat security-pentest-results.json | jq '.tests[] | select(.passed == false)'
@@ -642,14 +668,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ### 8.1 Testing Tools
 
-| Tool | Purpose | Installation |
-|------|---------|--------------|
-| **curl** | API testing | Pre-installed on most systems |
-| **wscat** | WebSocket testing | `npm install -g wscat` |
-| **jq** | JSON processing | `apt-get install jq` (Linux) |
-| **Postman** | API testing UI | Download from postman.com |
-| **Burp Suite** | Proxy/Scanner | Download Community Edition |
-| **OWASP ZAP** | Vulnerability scanning | Download from zaproxy.org |
+| Tool           | Purpose                | Installation                  |
+| -------------- | ---------------------- | ----------------------------- |
+| **curl**       | API testing            | Pre-installed on most systems |
+| **wscat**      | WebSocket testing      | `npm install -g wscat`        |
+| **jq**         | JSON processing        | `apt-get install jq` (Linux)  |
+| **Postman**    | API testing UI         | Download from postman.com     |
+| **Burp Suite** | Proxy/Scanner          | Download Community Edition    |
+| **OWASP ZAP**  | Vulnerability scanning | Download from zaproxy.org     |
 
 ### 8.2 npm Scripts
 
@@ -672,28 +698,31 @@ npm run scan:secrets           # Scan for hardcoded secrets
 
 ### 8.3 Documentation
 
-| Document | Purpose | Location |
-|----------|---------|----------|
-| Penetration Testing Plan | Detailed test plan | `docs/security/PENETRATION_TESTING_PLAN.md` |
-| Manual Test Checklist | Manual testing guide | `docs/security/MANUAL_PENTEST_CHECKLIST.md` |
-| Test Report Template | Report format | `docs/security/PENETRATION_TEST_REPORT.md` |
-| Security Fixes Week 1 | Recent fixes | `docs/security/SECURITY_FIXES_WEEK1.md` |
-| Incident Response | Incident handling | `docs/security/INCIDENT_RESPONSE_PLAYBOOK.md` |
-| Security Metrics | Dashboard spec | `docs/security/SECURITY_METRICS_DASHBOARD.md` |
+| Document                 | Purpose              | Location                                      |
+| ------------------------ | -------------------- | --------------------------------------------- |
+| Penetration Testing Plan | Detailed test plan   | `docs/security/PENETRATION_TESTING_PLAN.md`   |
+| Manual Test Checklist    | Manual testing guide | `docs/security/MANUAL_PENTEST_CHECKLIST.md`   |
+| Test Report Template     | Report format        | `docs/security/PENETRATION_TEST_REPORT.md`    |
+| Security Fixes Week 1    | Recent fixes         | `docs/security/SECURITY_FIXES_WEEK1.md`       |
+| Incident Response        | Incident handling    | `docs/security/INCIDENT_RESPONSE_PLAYBOOK.md` |
+| Security Metrics         | Dashboard spec       | `docs/security/SECURITY_METRICS_DASHBOARD.md` |
 
 ### 8.4 External Resources
 
 **OWASP Resources:**
+
 - [OWASP API Security Top 10](https://owasp.org/www-project-api-security/)
 - [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
 - [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
 
 **Security Testing:**
+
 - [PortSwigger Web Security Academy](https://portswigger.net/web-security)
 - [HackerOne Security Testing](https://www.hackerone.com/)
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
 
 **Compliance:**
+
 - [PCI DSS Requirements](https://www.pcisecuritystandards.org/)
 - [GDPR Security](https://gdpr.eu/security/)
 - [ISO 27001](https://www.iso.org/isoiec-27001-information-security.html)
@@ -729,6 +758,7 @@ npm run scan:secrets           # Scan for hardcoded secrets
 ### 9.2 Common Pitfalls to Avoid
 
 ❌ **Don't:**
+
 - Skip security tests to meet deadlines
 - Test only in production
 - Ignore test failures
@@ -737,6 +767,7 @@ npm run scan:secrets           # Scan for hardcoded secrets
 - Test production systems without permission
 
 ✅ **Do:**
+
 - Run tests in isolated environment
 - Use strong test credentials
 - Document all findings
@@ -747,6 +778,7 @@ npm run scan:secrets           # Scan for hardcoded secrets
 ### 9.3 Security Testing Checklist
 
 **Before Testing:**
+
 - [ ] Environment is isolated
 - [ ] Test data is prepared
 - [ ] Backups are current
@@ -754,6 +786,7 @@ npm run scan:secrets           # Scan for hardcoded secrets
 - [ ] Tools are configured
 
 **During Testing:**
+
 - [ ] Document all actions
 - [ ] Take screenshots
 - [ ] Save logs
@@ -761,6 +794,7 @@ npm run scan:secrets           # Scan for hardcoded secrets
 - [ ] Record findings
 
 **After Testing:**
+
 - [ ] Generate report
 - [ ] Create remediation tickets
 - [ ] Notify stakeholders
@@ -774,6 +808,7 @@ npm run scan:secrets           # Scan for hardcoded secrets
 ### 10.1 Common Issues
 
 **Issue: Tests fail with "API not available"**
+
 ```bash
 # Solution: Start API
 npm run docker:dev
@@ -784,6 +819,7 @@ curl http://localhost:3001/api/health
 ```
 
 **Issue: WebSocket tests timeout**
+
 ```bash
 # Solution: Check WebSocket is accessible
 wscat -c ws://localhost:3001/realtime
@@ -793,6 +829,7 @@ tail -f apps/api/logs/app.log
 ```
 
 **Issue: Rate limiting tests fail**
+
 ```bash
 # Solution: Wait for rate limit window to reset
 # Document sharing: 1 hour
@@ -802,6 +839,7 @@ tail -f apps/api/logs/app.log
 ```
 
 **Issue: Authentication tests fail**
+
 ```bash
 # Solution: Verify test user exists
 # If using seeded data:
@@ -813,11 +851,13 @@ npm run seed:dev
 ### 10.2 Getting Help
 
 **Internal Resources:**
+
 - Security Team Slack: #security-team
 - Development Team: #dev-team
 - Documentation: `/docs/security/`
 
 **External Resources:**
+
 - GitHub Issues: Create issue with `security` label
 - Stack Overflow: Tag with `simplepro-security`
 

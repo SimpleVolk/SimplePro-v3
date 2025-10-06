@@ -96,7 +96,7 @@ export function AutoAssignment() {
         const result = await response.json();
         // Filter jobs with no or incomplete crew assignments
         const unassigned = (result.jobs || []).filter(
-          (job: Job) => !job || job.crewSizeNeeded > 0
+          (job: Job) => !job || job.crewSizeNeeded > 0,
         );
         setJobs(unassigned);
       } else {
@@ -127,13 +127,16 @@ export function AutoAssignment() {
       setLoading(true);
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(getApiUrl(`crew-schedule/auto-assign/${jobId}`), {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`crew-schedule/auto-assign/${jobId}`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const result: AutoAssignmentResult = await response.json();
@@ -228,13 +231,16 @@ export function AutoAssignment() {
       const token = localStorage.getItem('access_token');
 
       // Use auto-suggested crew
-      const response = await fetch(getApiUrl(`crew-schedule/auto-assign/${selectedJob.id}`), {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`crew-schedule/auto-assign/${selectedJob.id}`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const result: AutoAssignmentResult = await response.json();
@@ -266,7 +272,7 @@ export function AutoAssignment() {
 
       // Assign selected crew members
       for (const crewId of selectedCrew) {
-        const crew = suggestions.find(s => s.crewMemberId === crewId);
+        const crew = suggestions.find((s) => s.crewMemberId === crewId);
 
         await fetch(getApiUrl(`jobs/${selectedJob.id}/crew`), {
           method: 'POST',
@@ -282,7 +288,9 @@ export function AutoAssignment() {
         });
       }
 
-      setSuccessMessage(`Successfully assigned ${selectedCrew.size} crew member(s)!`);
+      setSuccessMessage(
+        `Successfully assigned ${selectedCrew.size} crew member(s)!`,
+      );
       setSelectedCrew(new Set());
       setSelectedJob(null);
       setSuggestions([]);
@@ -327,7 +335,9 @@ export function AutoAssignment() {
       <div className={styles.header}>
         <div>
           <h2>Auto-Assignment</h2>
-          <p className={styles.subtitle}>AI-powered crew assignment with scoring algorithm</p>
+          <p className={styles.subtitle}>
+            AI-powered crew assignment with scoring algorithm
+          </p>
         </div>
       </div>
 
@@ -352,7 +362,9 @@ export function AutoAssignment() {
           {jobs.length === 0 ? (
             <div className={styles.emptyState}>
               <p>No unassigned jobs</p>
-              <p className={styles.emptyHint}>All jobs have been assigned crew members</p>
+              <p className={styles.emptyHint}>
+                All jobs have been assigned crew members
+              </p>
             </div>
           ) : (
             <div className={styles.jobList}>
@@ -412,14 +424,17 @@ export function AutoAssignment() {
                     <strong>Crew Size:</strong> {jobRequirements.crewSize}
                   </div>
                   <div className={styles.requirement}>
-                    <strong>Date/Time:</strong> {selectedJob.scheduledDate} at {selectedJob.scheduledStartTime}
+                    <strong>Date/Time:</strong> {selectedJob.scheduledDate} at{' '}
+                    {selectedJob.scheduledStartTime}
                   </div>
                   {jobRequirements.skills.length > 0 && (
                     <div className={styles.requirement}>
                       <strong>Skills:</strong>
                       <div className={styles.skillsList}>
                         {jobRequirements.skills.map((skill, idx) => (
-                          <span key={idx} className={styles.skillBadge}>{skill}</span>
+                          <span key={idx} className={styles.skillBadge}>
+                            {skill}
+                          </span>
                         ))}
                       </div>
                     </div>
@@ -430,7 +445,8 @@ export function AutoAssignment() {
               <div className={styles.suggestionsHeader}>
                 <h4>Top Crew Suggestions</h4>
                 <p className={styles.suggestionsHint}>
-                  Click crew members to select, then assign manually or use auto-assign
+                  Click crew members to select, then assign manually or use
+                  auto-assign
                 </p>
               </div>
 
@@ -449,9 +465,13 @@ export function AutoAssignment() {
                     <div
                       key={suggestion.crewMemberId}
                       className={`${styles.suggestionCard} ${
-                        selectedCrew.has(suggestion.crewMemberId) ? styles.selectedCrew : ''
+                        selectedCrew.has(suggestion.crewMemberId)
+                          ? styles.selectedCrew
+                          : ''
                       }`}
-                      onClick={() => toggleCrewSelection(suggestion.crewMemberId)}
+                      onClick={() =>
+                        toggleCrewSelection(suggestion.crewMemberId)
+                      }
                     >
                       <div className={styles.suggestionHeader}>
                         <div className={styles.rank}>#{index + 1}</div>
@@ -465,7 +485,9 @@ export function AutoAssignment() {
                         </div>
                         <div
                           className={styles.totalScore}
-                          style={{ color: getScoreColor(suggestion.totalScore) }}
+                          style={{
+                            color: getScoreColor(suggestion.totalScore),
+                          }}
                         >
                           {suggestion.totalScore}
                         </div>
@@ -477,21 +499,31 @@ export function AutoAssignment() {
                           <div className={styles.scoreBar}>
                             <div
                               className={styles.scoreProgress}
-                              style={{ width: `${(suggestion.scoreBreakdown.skillMatch / 30) * 100}%` }}
+                              style={{
+                                width: `${(suggestion.scoreBreakdown.skillMatch / 30) * 100}%`,
+                              }}
                             ></div>
                           </div>
-                          <span className={styles.scoreValue}>{suggestion.scoreBreakdown.skillMatch}/30</span>
+                          <span className={styles.scoreValue}>
+                            {suggestion.scoreBreakdown.skillMatch}/30
+                          </span>
                         </div>
 
                         <div className={styles.scoreItem}>
-                          <span className={styles.scoreLabel}>Availability</span>
+                          <span className={styles.scoreLabel}>
+                            Availability
+                          </span>
                           <div className={styles.scoreBar}>
                             <div
                               className={styles.scoreProgress}
-                              style={{ width: `${(suggestion.scoreBreakdown.availability / 20) * 100}%` }}
+                              style={{
+                                width: `${(suggestion.scoreBreakdown.availability / 20) * 100}%`,
+                              }}
                             ></div>
                           </div>
-                          <span className={styles.scoreValue}>{suggestion.scoreBreakdown.availability}/20</span>
+                          <span className={styles.scoreValue}>
+                            {suggestion.scoreBreakdown.availability}/20
+                          </span>
                         </div>
 
                         <div className={styles.scoreItem}>
@@ -499,10 +531,14 @@ export function AutoAssignment() {
                           <div className={styles.scoreBar}>
                             <div
                               className={styles.scoreProgress}
-                              style={{ width: `${(suggestion.scoreBreakdown.proximity / 20) * 100}%` }}
+                              style={{
+                                width: `${(suggestion.scoreBreakdown.proximity / 20) * 100}%`,
+                              }}
                             ></div>
                           </div>
-                          <span className={styles.scoreValue}>{suggestion.scoreBreakdown.proximity}/20</span>
+                          <span className={styles.scoreValue}>
+                            {suggestion.scoreBreakdown.proximity}/20
+                          </span>
                         </div>
 
                         <div className={styles.scoreItem}>
@@ -510,10 +546,14 @@ export function AutoAssignment() {
                           <div className={styles.scoreBar}>
                             <div
                               className={styles.scoreProgress}
-                              style={{ width: `${(suggestion.scoreBreakdown.rating / 15) * 100}%` }}
+                              style={{
+                                width: `${(suggestion.scoreBreakdown.rating / 15) * 100}%`,
+                              }}
                             ></div>
                           </div>
-                          <span className={styles.scoreValue}>{suggestion.scoreBreakdown.rating}/15</span>
+                          <span className={styles.scoreValue}>
+                            {suggestion.scoreBreakdown.rating}/15
+                          </span>
                         </div>
 
                         <div className={styles.scoreItem}>
@@ -521,10 +561,14 @@ export function AutoAssignment() {
                           <div className={styles.scoreBar}>
                             <div
                               className={styles.scoreProgress}
-                              style={{ width: `${(suggestion.scoreBreakdown.workload / 10) * 100}%` }}
+                              style={{
+                                width: `${(suggestion.scoreBreakdown.workload / 10) * 100}%`,
+                              }}
                             ></div>
                           </div>
-                          <span className={styles.scoreValue}>{suggestion.scoreBreakdown.workload}/10</span>
+                          <span className={styles.scoreValue}>
+                            {suggestion.scoreBreakdown.workload}/10
+                          </span>
                         </div>
 
                         <div className={styles.scoreItem}>
@@ -532,17 +576,25 @@ export function AutoAssignment() {
                           <div className={styles.scoreBar}>
                             <div
                               className={styles.scoreProgress}
-                              style={{ width: `${(suggestion.scoreBreakdown.preferences / 5) * 100}%` }}
+                              style={{
+                                width: `${(suggestion.scoreBreakdown.preferences / 5) * 100}%`,
+                              }}
                             ></div>
                           </div>
-                          <span className={styles.scoreValue}>{suggestion.scoreBreakdown.preferences}/5</span>
+                          <span className={styles.scoreValue}>
+                            {suggestion.scoreBreakdown.preferences}/5
+                          </span>
                         </div>
                       </div>
 
                       <div className={styles.suggestionFooter}>
                         <span
                           className={styles.availabilityBadge}
-                          style={{ background: getAvailabilityColor(suggestion.availability) }}
+                          style={{
+                            background: getAvailabilityColor(
+                              suggestion.availability,
+                            ),
+                          }}
                         >
                           {suggestion.availability}
                         </span>
@@ -574,14 +626,18 @@ export function AutoAssignment() {
                   disabled={assigning || selectedCrew.size === 0}
                   className={styles.secondaryButton}
                 >
-                  {assigning ? 'Assigning...' : `Assign Selected (${selectedCrew.size})`}
+                  {assigning
+                    ? 'Assigning...'
+                    : `Assign Selected (${selectedCrew.size})`}
                 </button>
               </div>
             </>
           ) : (
             <div className={styles.emptyState}>
               <p>Select a job to view crew suggestions</p>
-              <p className={styles.emptyHint}>AI will analyze and rank the best crew members</p>
+              <p className={styles.emptyHint}>
+                AI will analyze and rank the best crew members
+              </p>
             </div>
           )}
         </div>

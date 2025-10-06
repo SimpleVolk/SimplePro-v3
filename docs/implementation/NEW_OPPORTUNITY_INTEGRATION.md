@@ -12,41 +12,48 @@ The **NewOpportunity** component is a comprehensive, production-ready form for c
 ## Key Features
 
 ### 1. Multi-Step Wizard Interface
+
 - **Step 1**: Customer Information (contact details, preferences, source)
 - **Step 2**: Move Details (pickup/delivery addresses, access difficulty)
 - **Step 3**: Move Size & Inventory (smart presets or manual entry)
 - **Step 4**: Review & Submit (comprehensive summary)
 
 ### 2. Real-Time Pricing Engine Integration
+
 - Automatic estimate calculation as form is filled
 - Debounced calculations (800ms) for performance
 - Live price breakdown display in sidebar
 - Shows applied pricing rules and location handicaps
 
 ### 3. Smart Move Size Selection
+
 - Pre-configured move sizes from settings (Studio, 1BR, 2BR, etc.)
 - Auto-populates weight and volume when selected
 - Option for manual entry for custom scenarios
 - 16 pre-defined move size presets
 
 ### 4. Customer Duplicate Detection
+
 - Automatically checks for existing customers by email/phone
 - Warning message if duplicate found
 - Debounced API calls (500ms) to prevent excessive requests
 
 ### 5. Form Validation
+
 - Step-by-step validation before navigation
 - Real-time field validation with error messages
 - Clear error display with highlighting
 - Business logic validation (max weight, crew size limits)
 
 ### 6. Auto-Save Draft Feature
+
 - Automatically saves progress to localStorage
 - Restores draft on component mount
 - Persists across page refreshes
 - Cleared after successful submission
 
 ### 7. Responsive Design
+
 - Mobile-first dark theme
 - Sticky price summary panel on desktop
 - Collapsible layout on mobile
@@ -106,6 +113,7 @@ Add the menu item to your sidebar navigation:
 ## API Endpoints Used
 
 ### Required Endpoints
+
 1. `POST /api/customers` - Create new customer
    - Expects: `CreateCustomerDto` object
    - Returns: Created customer with ID
@@ -115,6 +123,7 @@ Add the menu item to your sidebar navigation:
    - Returns: Array of matching customers
 
 ### Optional Enhancement
+
 3. `POST /api/estimates` - Save estimate (future enhancement)
    - Expects: Complete estimate data
    - Returns: Saved estimate with ID
@@ -136,6 +145,7 @@ User Input → Form State → Real-time Validation
 ## TypeScript Interfaces
 
 ### CreateCustomerDto
+
 ```typescript
 interface CreateCustomerDto {
   firstName: string;
@@ -150,7 +160,13 @@ interface CreateCustomerDto {
     zipCode: string;
   };
   type: 'residential' | 'commercial';
-  source: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
   companyName?: string;
   preferredContactMethod: 'email' | 'phone' | 'text';
   communicationPreferences?: {
@@ -163,6 +179,7 @@ interface CreateCustomerDto {
 ```
 
 ### EstimateInput (from pricing-engine)
+
 ```typescript
 // Already defined in @simplepro/pricing-engine
 // Includes pickup, delivery, inventory, special items, etc.
@@ -184,6 +201,7 @@ Users can select a preset or choose "Manual Entry" for custom values.
 ## Validation Rules
 
 ### Step 1 - Customer Information
+
 - First Name: Required
 - Last Name: Required
 - Email: Required, valid format
@@ -191,12 +209,14 @@ Users can select a preset or choose "Manual Entry" for custom values.
 - Company Name: Required if type = commercial
 
 ### Step 2 - Move Details
+
 - Pickup Address: Required
 - Delivery Address: Required
 - Move Date: Required
 - Distance: Required, > 0
 
 ### Step 3 - Inventory
+
 - Total Weight: Required, > 0, ≤ 50,000 lbs
 - Total Volume: Required, > 0
 - Estimated Duration: Required, > 0
@@ -205,6 +225,7 @@ Users can select a preset or choose "Manual Entry" for custom values.
 ## Price Summary Features
 
 The sidebar shows:
+
 - **Final Estimated Total** (large, prominent)
 - **Price Breakdown**:
   - Base Labor
@@ -295,20 +316,25 @@ To customize the component:
 ### Common Issues
 
 **Issue**: Estimate not calculating
+
 - **Solution**: Ensure all required fields are filled (addresses, weight, volume)
 
 **Issue**: Duplicate warning persists
+
 - **Solution**: Check API response format, verify customer search endpoint
 
 **Issue**: Form not saving draft
+
 - **Solution**: Check localStorage availability, browser privacy settings
 
 **Issue**: Pricing rules not applied
+
 - **Solution**: Verify pricing engine integration, check defaultRules import
 
 ## Production Checklist
 
 Before deploying:
+
 - [ ] Remove console.log statements
 - [ ] Test with production API
 - [ ] Verify all API endpoints exist

@@ -39,16 +39,19 @@ SESSION_SECRET=<64+ chars>
 ## Secret Generation
 
 ### Generate JWT Secret (64 chars)
+
 ```bash
 openssl rand -base64 64 | tr -d '\n'
 ```
 
 ### Generate Password (32 chars)
+
 ```bash
 openssl rand -base64 32 | tr -d '\n'
 ```
 
 ### Generate All Secrets
+
 ```bash
 npm run generate:secrets:production
 # Output: .secrets/production-secrets.txt
@@ -89,12 +92,14 @@ apps/web/.env.*.example          # Web templates (committed)
 ## Common Variables by Category
 
 ### Database (MongoDB)
+
 ```bash
 MONGODB_URI=mongodb+srv://user:pass@host/db?ssl=true
 MONGODB_POOL_SIZE=50
 ```
 
 ### Cache (Redis)
+
 ```bash
 REDIS_HOST=redis.example.com
 REDIS_PORT=6379
@@ -103,6 +108,7 @@ REDIS_TLS_ENABLED=true
 ```
 
 ### Authentication
+
 ```bash
 JWT_SECRET=<64+ chars>
 JWT_REFRESH_SECRET=<64+ chars, different>
@@ -112,11 +118,13 @@ SESSION_SECRET=<64+ chars>
 ```
 
 ### CORS
+
 ```bash
 ALLOWED_ORIGINS=https://app.example.com,https://www.example.com
 ```
 
 ### Email (Optional)
+
 ```bash
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
@@ -127,6 +135,7 @@ EMAIL_NOTIFICATIONS_ENABLED=true
 ```
 
 ### Storage (S3/MinIO)
+
 ```bash
 STORAGE_PROVIDER=s3
 STORAGE_ENDPOINT=s3.us-east-1.amazonaws.com
@@ -137,6 +146,7 @@ STORAGE_USE_SSL=true
 ```
 
 ### Feature Flags
+
 ```bash
 ENABLE_SWAGGER=false          # false in production
 DEBUG_MODE=false              # false in production
@@ -147,6 +157,7 @@ WEBSOCKET_ENABLED=true
 ## Troubleshooting
 
 ### Validation Fails: JWT Secret Too Short
+
 ```bash
 # Generate new secret (64+ chars)
 openssl rand -base64 64 | tr -d '\n'
@@ -156,6 +167,7 @@ npm run generate:secrets:production
 ```
 
 ### Missing Required Variable
+
 ```bash
 # Check which variables are missing
 npm run validate:env:production
@@ -165,6 +177,7 @@ npm run validate:env:production
 ```
 
 ### MongoDB Connection Failed
+
 ```bash
 # Format: mongodb+srv://USER:PASS@HOST/DB?OPTIONS
 MONGODB_URI=mongodb+srv://prod_user:password@cluster.mongodb.net/simplepro?retryWrites=true&w=majority&ssl=true
@@ -177,6 +190,7 @@ MONGODB_URI=mongodb+srv://prod_user:password@cluster.mongodb.net/simplepro?retry
 ```
 
 ### CORS Error
+
 ```bash
 # Add frontend domain to ALLOWED_ORIGINS
 ALLOWED_ORIGINS=https://app.example.com
@@ -186,6 +200,7 @@ ALLOWED_ORIGINS=https://app.example.com,https://www.example.com
 ```
 
 ### Redis Connection Failed
+
 ```bash
 # Check Redis is accessible
 redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
@@ -196,6 +211,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 ## Environment-Specific Settings
 
 ### Development
+
 ```bash
 NODE_ENV=development
 LOG_LEVEL=debug
@@ -206,6 +222,7 @@ BCRYPT_ROUNDS=10
 ```
 
 ### Staging
+
 ```bash
 NODE_ENV=staging
 LOG_LEVEL=debug
@@ -216,6 +233,7 @@ BCRYPT_ROUNDS=10
 ```
 
 ### Production
+
 ```bash
 NODE_ENV=production
 LOG_LEVEL=warn

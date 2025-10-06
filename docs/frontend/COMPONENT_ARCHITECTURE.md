@@ -309,34 +309,14 @@ RateLimitNotification.module.css
 
 ```css
 /* Color Palette (Dark Theme) */
---background: #1a1a1a
---surface: #2a2a2a
---border: #3a3a3a
---text-primary: #ffffff
---text-secondary: #b0b0b0
---text-muted: #888888
---primary: #ffa500 (orange)
---success: #4caf50 (green)
---error: #ff6b6b (red)
-
-/* Spacing Scale */
---space-xs: 0.25rem
---space-sm: 0.5rem
---space-md: 1rem
---space-lg: 1.5rem
---space-xl: 2rem
-
-/* Border Radius */
---radius-sm: 4px
---radius-md: 8px
---radius-lg: 12px
---radius-full: 50%
-
-/* Typography */
---font-size-sm: 0.875rem
---font-size-base: 1rem
---font-size-lg: 1.125rem
---font-size-xl: 1.75rem
+--background: #1a1a1a --surface: #2a2a2a --border: #3a3a3a
+  --text-primary: #ffffff --text-secondary: #b0b0b0 --text-muted: #888888
+  --primary: #ffa500 (orange) --success: #4caf50 (green) --error: #ff6b6b (red)
+  /* Spacing Scale */ --space-xs: 0.25rem --space-sm: 0.5rem --space-md: 1rem
+  --space-lg: 1.5rem --space-xl: 2rem /* Border Radius */ --radius-sm: 4px
+  --radius-md: 8px --radius-lg: 12px --radius-full: 50% /* Typography */
+  --font-size-sm: 0.875rem --font-size-base: 1rem --font-size-lg: 1.125rem
+  --font-size-xl: 1.75rem;
 ```
 
 ## Accessibility Features
@@ -435,10 +415,13 @@ Not loaded on other routes (dashboard, documents, etc.)
 const [state, setState] = useState<AccessState>('initial');
 
 // Efficient event handlers
-const handleSubmit = useCallback(async (e: FormEvent) => {
-  e.preventDefault();
-  // ...
-}, [token, password]);
+const handleSubmit = useCallback(
+  async (e: FormEvent) => {
+    e.preventDefault();
+    // ...
+  },
+  [token, password],
+);
 
 // Cleanup on unmount
 useEffect(() => {

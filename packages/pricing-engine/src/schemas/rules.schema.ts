@@ -1,12 +1,29 @@
 export interface RuleCondition {
   field: string;
-  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin' | 'between' | 'exists' | 'regex';
+  operator:
+    | 'eq'
+    | 'ne'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte'
+    | 'in'
+    | 'nin'
+    | 'between'
+    | 'exists'
+    | 'regex';
   value: any;
   logicalOperator?: 'and' | 'or';
 }
 
 export interface RuleAction {
-  type: 'add_fixed' | 'add_percentage' | 'multiply' | 'set_minimum' | 'set_maximum' | 'replace';
+  type:
+    | 'add_fixed'
+    | 'add_percentage'
+    | 'multiply'
+    | 'set_minimum'
+    | 'set_maximum'
+    | 'replace';
   amount: number;
   description: string;
   targetField?: string;
@@ -16,8 +33,16 @@ export interface PricingRule {
   id: string;
   name: string;
   description: string;
-  category: 'base_pricing' | 'weight_based' | 'volume_based' | 'distance_based' |
-           'location_handicap' | 'difficulty_based' | 'seasonal' | 'promotional' | 'special_items';
+  category:
+    | 'base_pricing'
+    | 'weight_based'
+    | 'volume_based'
+    | 'distance_based'
+    | 'location_handicap'
+    | 'difficulty_based'
+    | 'seasonal'
+    | 'promotional'
+    | 'special_items';
   priority: number;
   conditions: RuleCondition[];
   actions: RuleAction[];
@@ -200,61 +225,99 @@ export interface PriceBreakdown {
 
 // JSON Schema for validation
 export const PricingRuleJsonSchema = {
-  type: "object",
-  required: ["id", "name", "category", "priority", "conditions", "actions", "isActive", "applicableServices", "version"],
+  type: 'object',
+  required: [
+    'id',
+    'name',
+    'category',
+    'priority',
+    'conditions',
+    'actions',
+    'isActive',
+    'applicableServices',
+    'version',
+  ],
   properties: {
-    id: { type: "string" },
-    name: { type: "string", minLength: 1, maxLength: 100 },
-    description: { type: "string", maxLength: 500 },
+    id: { type: 'string' },
+    name: { type: 'string', minLength: 1, maxLength: 100 },
+    description: { type: 'string', maxLength: 500 },
     category: {
-      type: "string",
-      enum: ["base_pricing", "weight_based", "volume_based", "distance_based",
-             "location_handicap", "difficulty_based", "seasonal", "promotional", "special_items"]
+      type: 'string',
+      enum: [
+        'base_pricing',
+        'weight_based',
+        'volume_based',
+        'distance_based',
+        'location_handicap',
+        'difficulty_based',
+        'seasonal',
+        'promotional',
+        'special_items',
+      ],
     },
-    priority: { type: "number", minimum: 0, maximum: 100 },
+    priority: { type: 'number', minimum: 0, maximum: 100 },
     conditions: {
-      type: "array",
+      type: 'array',
       items: {
-        type: "object",
-        required: ["field", "operator", "value"],
+        type: 'object',
+        required: ['field', 'operator', 'value'],
         properties: {
-          field: { type: "string" },
+          field: { type: 'string' },
           operator: {
-            type: "string",
-            enum: ["eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "between", "exists", "regex"]
+            type: 'string',
+            enum: [
+              'eq',
+              'ne',
+              'gt',
+              'gte',
+              'lt',
+              'lte',
+              'in',
+              'nin',
+              'between',
+              'exists',
+              'regex',
+            ],
           },
           value: {},
-          logicalOperator: { type: "string", enum: ["and", "or"] }
-        }
-      }
+          logicalOperator: { type: 'string', enum: ['and', 'or'] },
+        },
+      },
     },
     actions: {
-      type: "array",
+      type: 'array',
       items: {
-        type: "object",
-        required: ["type", "amount", "description"],
+        type: 'object',
+        required: ['type', 'amount', 'description'],
         properties: {
           type: {
-            type: "string",
-            enum: ["add_fixed", "add_percentage", "multiply", "set_minimum", "set_maximum", "replace"]
+            type: 'string',
+            enum: [
+              'add_fixed',
+              'add_percentage',
+              'multiply',
+              'set_minimum',
+              'set_maximum',
+              'replace',
+            ],
           },
-          amount: { type: "number" },
-          description: { type: "string" },
-          targetField: { type: "string" }
-        }
-      }
+          amount: { type: 'number' },
+          description: { type: 'string' },
+          targetField: { type: 'string' },
+        },
+      },
     },
-    isActive: { type: "boolean" },
-    effectiveFrom: { type: "string", format: "date-time" },
-    effectiveTo: { type: "string", format: "date-time" },
+    isActive: { type: 'boolean' },
+    effectiveFrom: { type: 'string', format: 'date-time' },
+    effectiveTo: { type: 'string', format: 'date-time' },
     applicableServices: {
-      type: "array",
-      items: { type: "string" }
+      type: 'array',
+      items: { type: 'string' },
     },
-    version: { type: "string" },
+    version: { type: 'string' },
     tags: {
-      type: "array",
-      items: { type: "string" }
-    }
-  }
+      type: 'array',
+      items: { type: 'string' },
+    },
+  },
 } as const;

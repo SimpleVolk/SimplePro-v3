@@ -28,8 +28,9 @@ const colors = {
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const envArg = args.find(arg => arg.startsWith('--env='))?.split('=')[1] || 'development';
-const fileArg = args.find(arg => arg.startsWith('--file='))?.split('=')[1];
+const envArg =
+  args.find((arg) => arg.startsWith('--env='))?.split('=')[1] || 'development';
+const fileArg = args.find((arg) => arg.startsWith('--file='))?.split('=')[1];
 
 function print(message, color = 'reset') {
   console.log(`${colors[color]}${message}${colors.reset}`);
@@ -49,7 +50,7 @@ function loadEnvFile(filePath) {
     const content = fs.readFileSync(filePath, 'utf8');
     const env = {};
 
-    content.split('\n').forEach(line => {
+    content.split('\n').forEach((line) => {
       line = line.trim();
 
       // Skip comments and empty lines
@@ -61,8 +62,10 @@ function loadEnvFile(filePath) {
         let value = match[2].trim();
 
         // Remove quotes if present
-        if ((value.startsWith('"') && value.endsWith('"')) ||
-            (value.startsWith("'") && value.endsWith("'"))) {
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
           value = value.slice(1, -1);
         }
 
@@ -118,18 +121,10 @@ const validationRules = {
   ],
 
   // URL values
-  urls: [
-    'API_BASE_URL',
-    'WEB_APP_URL',
-    'STORAGE_PUBLIC_URL',
-  ],
+  urls: ['API_BASE_URL', 'WEB_APP_URL', 'STORAGE_PUBLIC_URL'],
 
   // Email values
-  emails: [
-    'SMTP_FROM_EMAIL',
-    'SMTP_REPLY_TO',
-    'FIREBASE_CLIENT_EMAIL',
-  ],
+  emails: ['SMTP_FROM_EMAIL', 'SMTP_REPLY_TO', 'FIREBASE_CLIENT_EMAIL'],
 };
 
 /**
@@ -147,7 +142,18 @@ function validateSecretStrength(value, minLength, isProduction) {
   }
 
   // Check for unsafe patterns
-  const unsafePatterns = ['dev', 'test', 'development', 'example', 'demo', 'changeme', 'admin', 'password', '123', 'root'];
+  const unsafePatterns = [
+    'dev',
+    'test',
+    'development',
+    'example',
+    'demo',
+    'changeme',
+    'admin',
+    'password',
+    '123',
+    'root',
+  ];
   const lowerValue = value.toLowerCase();
 
   for (const pattern of unsafePatterns) {
@@ -176,7 +182,7 @@ function validateEnvironment(env, environment) {
     requiredVars.push(...validationRules.requiredProduction);
   }
 
-  requiredVars.forEach(key => {
+  requiredVars.forEach((key) => {
     if (!env[key] || env[key].trim() === '') {
       errors.push(`Missing required variable: ${key}`);
       print(`  ❌ ${key}`, 'red');
@@ -189,7 +195,9 @@ function validateEnvironment(env, environment) {
   print('\n🌍 Validating NODE_ENV...', 'cyan');
   const validEnvs = ['development', 'staging', 'production', 'test'];
   if (env.NODE_ENV && !validEnvs.includes(env.NODE_ENV)) {
-    errors.push(`Invalid NODE_ENV: ${env.NODE_ENV}. Must be one of: ${validEnvs.join(', ')}`);
+    errors.push(
+      `Invalid NODE_ENV: ${env.NODE_ENV}. Must be one of: ${validEnvs.join(', ')}`,
+    );
     print(`  ❌ Invalid value: ${env.NODE_ENV}`, 'red');
   } else {
     print(`  ✅ NODE_ENV: ${env.NODE_ENV}`, 'green');
@@ -208,12 +216,19 @@ function validateEnvironment(env, environment) {
   }
 
   if (env.JWT_REFRESH_SECRET) {
-    const jwtRefreshIssues = validateSecretStrength(env.JWT_REFRESH_SECRET, 32, isProduction);
+    const jwtRefreshIssues = validateSecretStrength(
+      env.JWT_REFRESH_SECRET,
+      32,
+      isProduction,
+    );
     if (jwtRefreshIssues.length > 0) {
       errors.push(`JWT_REFRESH_SECRET: ${jwtRefreshIssues.join(', ')}`);
       print(`  ❌ JWT_REFRESH_SECRET: ${jwtRefreshIssues.join(', ')}`, 'red');
     } else {
-      print(`  ✅ JWT_REFRESH_SECRET (${env.JWT_REFRESH_SECRET.length} chars)`, 'green');
+      print(
+        `  ✅ JWT_REFRESH_SECRET (${env.JWT_REFRESH_SECRET.length} chars)`,
+        'green',
+      );
     }
 
     // Check that JWT secrets are different
@@ -225,12 +240,19 @@ function validateEnvironment(env, environment) {
 
   // Validate session secret
   if (env.SESSION_SECRET) {
-    const sessionIssues = validateSecretStrength(env.SESSION_SECRET, 32, isProduction);
+    const sessionIssues = validateSecretStrength(
+      env.SESSION_SECRET,
+      32,
+      isProduction,
+    );
     if (sessionIssues.length > 0) {
       errors.push(`SESSION_SECRET: ${sessionIssues.join(', ')}`);
       print(`  ❌ SESSION_SECRET: ${sessionIssues.join(', ')}`, 'red');
     } else {
-      print(`  ✅ SESSION_SECRET (${env.SESSION_SECRET.length} chars)`, 'green');
+      print(
+        `  ✅ SESSION_SECRET (${env.SESSION_SECRET.length} chars)`,
+        'green',
+      );
     }
   }
 
@@ -239,15 +261,21 @@ function validateEnvironment(env, environment) {
   if (env.REDIS_PASSWORD) {
     if (env.REDIS_PASSWORD.length < 12) {
       errors.push('REDIS_PASSWORD must be at least 12 characters');
-      print(`  ❌ REDIS_PASSWORD too short (${env.REDIS_PASSWORD.length} chars)`, 'red');
+      print(
+        `  ❌ REDIS_PASSWORD too short (${env.REDIS_PASSWORD.length} chars)`,
+        'red',
+      );
     } else {
-      print(`  ✅ REDIS_PASSWORD (${env.REDIS_PASSWORD.length} chars)`, 'green');
+      print(
+        `  ✅ REDIS_PASSWORD (${env.REDIS_PASSWORD.length} chars)`,
+        'green',
+      );
     }
   }
 
   // Validate URLs
   print('\n🌐 Validating URLs...', 'cyan');
-  validationRules.urls.forEach(key => {
+  validationRules.urls.forEach((key) => {
     if (env[key]) {
       try {
         const url = new URL(env[key]);
@@ -276,7 +304,7 @@ function validateEnvironment(env, environment) {
     } else {
       const origins = env.ALLOWED_ORIGINS.split(',');
       print(`  ✅ ALLOWED_ORIGINS: ${origins.length} origin(s)`, 'green');
-      origins.forEach(origin => {
+      origins.forEach((origin) => {
         if (!origin.startsWith('https://') && !origin.includes('localhost')) {
           warnings.push(`CORS origin should use HTTPS: ${origin}`);
         }
@@ -298,8 +326,13 @@ function validateEnvironment(env, environment) {
 
       // Check for unsafe usernames
       const unsafeUsernames = ['admin', 'root', 'test'];
-      if (url.username && unsafeUsernames.includes(url.username.toLowerCase())) {
-        warnings.push(`MongoDB username "${url.username}" is not recommended for production`);
+      if (
+        url.username &&
+        unsafeUsernames.includes(url.username.toLowerCase())
+      ) {
+        warnings.push(
+          `MongoDB username "${url.username}" is not recommended for production`,
+        );
         print(`  ⚠️  Username "${url.username}" not recommended`, 'yellow');
       } else {
         print('  ✅ MongoDB URI configured', 'green');
@@ -324,7 +357,9 @@ function validateEnvironment(env, environment) {
     }
 
     if (env.ENABLE_SWAGGER === 'true') {
-      warnings.push('ENABLE_SWAGGER is enabled in production (consider disabling)');
+      warnings.push(
+        'ENABLE_SWAGGER is enabled in production (consider disabling)',
+      );
       print('  ⚠️  ENABLE_SWAGGER is enabled', 'yellow');
     }
 
@@ -343,8 +378,13 @@ function validateEnvironment(env, environment) {
   // Validate email configuration
   print('\n📧 Validating email configuration...', 'cyan');
   if (env.EMAIL_NOTIFICATIONS_ENABLED === 'true') {
-    const emailRequired = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_FROM_EMAIL'];
-    const missingEmail = emailRequired.filter(key => !env[key]);
+    const emailRequired = [
+      'SMTP_HOST',
+      'SMTP_USER',
+      'SMTP_PASSWORD',
+      'SMTP_FROM_EMAIL',
+    ];
+    const missingEmail = emailRequired.filter((key) => !env[key]);
 
     if (missingEmail.length > 0) {
       warnings.push(`Email enabled but missing: ${missingEmail.join(', ')}`);
@@ -379,7 +419,10 @@ function validateEnvironment(env, environment) {
     });
   }
 
-  print('\nRefer to docs/deployment/ENVIRONMENT_CONFIGURATION_GUIDE.md for help.\n', 'cyan');
+  print(
+    '\nRefer to docs/deployment/ENVIRONMENT_CONFIGURATION_GUIDE.md for help.\n',
+    'cyan',
+  );
 
   return errors.length === 0;
 }
@@ -397,7 +440,8 @@ function main() {
   if (fileArg) {
     envFilePath = path.resolve(fileArg);
   } else {
-    const envFileName = envArg === 'development' ? '.env.local' : `.env.${envArg}`;
+    const envFileName =
+      envArg === 'development' ? '.env.local' : `.env.${envArg}`;
     envFilePath = path.join(projectRoot, 'apps', 'api', envFileName);
   }
 
@@ -418,7 +462,10 @@ function main() {
   let env;
   try {
     env = loadEnvFile(envFilePath);
-    print(`✅ Successfully loaded ${Object.keys(env).length} variables\n`, 'green');
+    print(
+      `✅ Successfully loaded ${Object.keys(env).length} variables\n`,
+      'green',
+    );
   } catch (error) {
     print(`\n❌ Error loading environment file: ${error.message}\n`, 'red');
     process.exit(1);

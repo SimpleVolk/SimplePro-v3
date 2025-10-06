@@ -53,13 +53,17 @@ export const shiftsApi = {
       date: string;
       available: boolean;
       notes?: string;
-    }
+    },
   ) => {
-    const response = await apiClient.post('/shifts/availability', availability, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await apiClient.post(
+      '/shifts/availability',
+      availability,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
     return response.data;
   },
 };

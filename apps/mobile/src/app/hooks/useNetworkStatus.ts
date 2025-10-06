@@ -6,7 +6,7 @@ export const useNetworkStatus = () => {
   const [connectionType, setConnectionType] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
       setIsOnline(state.isConnected ?? false);
       setConnectionType(state.type);
     });

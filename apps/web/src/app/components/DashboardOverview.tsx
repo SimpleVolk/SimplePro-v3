@@ -24,7 +24,8 @@ interface DashboardKPIs {
 
 export const DashboardOverview = memo(function DashboardOverview() {
   const { user } = useAuth();
-  const { isConnected, subscribeToAnalytics, unsubscribeFromAnalytics } = useWebSocket();
+  const { isConnected, subscribeToAnalytics, unsubscribeFromAnalytics } =
+    useWebSocket();
   const [kpiData, setKpiData] = useState<DashboardKPIs>({
     totalMoves: 0,
     totalRevenue: 0,
@@ -33,7 +34,7 @@ export const DashboardOverview = memo(function DashboardOverview() {
     notBookedRevenue: 0,
     averageMoveValue: 0,
     conversionRate: 0,
-    activeJobs: 0
+    activeJobs: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +56,9 @@ export const DashboardOverview = memo(function DashboardOverview() {
       };
 
       // Fetch dashboard KPIs
-      const response = await fetch(getApiUrl('analytics/dashboard'), { headers });
+      const response = await fetch(getApiUrl('analytics/dashboard'), {
+        headers,
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch dashboard data: ${response.status}`);
@@ -68,19 +71,23 @@ export const DashboardOverview = memo(function DashboardOverview() {
         totalMoves: data.totalJobs || 0,
         totalRevenue: data.totalRevenue || 0,
         jobsToday: data.completedJobsToday || 0,
-        movesNotBooked: Math.max(0, (data.activeJobs || 0) - (data.completedJobsToday || 0)),
+        movesNotBooked: Math.max(
+          0,
+          (data.activeJobs || 0) - (data.completedJobsToday || 0),
+        ),
         notBookedRevenue: data.totalRevenue * 0.3 || 0, // Estimate pending revenue
         averageMoveValue: data.averageJobValue || 0,
         conversionRate: data.onTimePerformance || 85,
-        activeJobs: data.activeJobs || 0
+        activeJobs: data.activeJobs || 0,
       };
 
       setKpiData(kpis);
       setLastUpdated(new Date());
-
     } catch (err) {
       console.error('Dashboard fetch error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load dashboard data',
+      );
 
       // Set fallback data for development
       setKpiData({
@@ -91,7 +98,7 @@ export const DashboardOverview = memo(function DashboardOverview() {
         notBookedRevenue: 2368,
         averageMoveValue: 695,
         conversionRate: 82,
-        activeJobs: 2
+        activeJobs: 2,
       });
     } finally {
       setLoading(false);
@@ -114,7 +121,13 @@ export const DashboardOverview = memo(function DashboardOverview() {
         unsubscribeFromAnalytics('dashboard');
       }
     };
-  }, [user, isConnected, fetchDashboardData, subscribeToAnalytics, unsubscribeFromAnalytics]);
+  }, [
+    user,
+    isConnected,
+    fetchDashboardData,
+    subscribeToAnalytics,
+    unsubscribeFromAnalytics,
+  ]);
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
@@ -132,14 +145,20 @@ export const DashboardOverview = memo(function DashboardOverview() {
     const handleDashboardUpdate = (event: CustomEvent) => {
       const { dashboardType, data } = event.detail;
       if (dashboardType === 'dashboard' && data) {
-        setKpiData(prevData => ({ ...prevData, ...data }));
+        setKpiData((prevData) => ({ ...prevData, ...data }));
         setLastUpdated(new Date());
       }
     };
 
-    window.addEventListener('analyticsUpdate', handleDashboardUpdate as EventListener);
+    window.addEventListener(
+      'analyticsUpdate',
+      handleDashboardUpdate as EventListener,
+    );
     return () => {
-      window.removeEventListener('analyticsUpdate', handleDashboardUpdate as EventListener);
+      window.removeEventListener(
+        'analyticsUpdate',
+        handleDashboardUpdate as EventListener,
+      );
     };
   }, []);
 
@@ -173,7 +192,9 @@ export const DashboardOverview = memo(function DashboardOverview() {
 
         <div className={styles.headerActions}>
           <div className={styles.connectionStatus}>
-            <div className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`} />
+            <div
+              className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`}
+            />
             <span>{isConnected ? 'Live' : 'Offline'}</span>
           </div>
 
@@ -205,7 +226,13 @@ export const DashboardOverview = memo(function DashboardOverview() {
           value={kpiData.totalMoves}
           subValue={formatCurrency(kpiData.totalRevenue)}
           change={calculateTrend(kpiData.totalMoves, 4)}
-          trend={kpiData.totalMoves > 4 ? 'up' : kpiData.totalMoves < 4 ? 'down' : 'neutral'}
+          trend={
+            kpiData.totalMoves > 4
+              ? 'up'
+              : kpiData.totalMoves < 4
+                ? 'down'
+                : 'neutral'
+          }
           icon="✅"
           color="success"
           onClick={() => handleKPIClick('moves')}
@@ -239,7 +266,13 @@ export const DashboardOverview = memo(function DashboardOverview() {
           title="Avg. Move Value"
           value={formatCurrency(kpiData.averageMoveValue)}
           change={calculateTrend(kpiData.averageMoveValue, 650)}
-          trend={kpiData.averageMoveValue > 650 ? 'up' : kpiData.averageMoveValue < 650 ? 'down' : 'neutral'}
+          trend={
+            kpiData.averageMoveValue > 650
+              ? 'up'
+              : kpiData.averageMoveValue < 650
+                ? 'down'
+                : 'neutral'
+          }
           icon="📈"
           color="success"
           onClick={() => handleKPIClick('avg-value')}

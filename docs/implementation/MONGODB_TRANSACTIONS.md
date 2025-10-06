@@ -70,7 +70,7 @@ export class MyService {
       await this.model2.updateOne(
         { _id: someId },
         { $set: updates },
-        { session }
+        { session },
       );
 
       // 3. Find operations can use session too
@@ -130,8 +130,10 @@ async manualTransactionControl(): Promise<void> {
 ### JobsService
 
 #### `updateStatus(id, status, updatedBy)`
+
 **Purpose**: Update job status atomically
 **Operations**:
+
 1. Update job status and timestamps
 2. Schedule real-time notifications (after commit)
 
@@ -140,8 +142,10 @@ async manualTransactionControl(): Promise<void> {
 ### CustomersService
 
 #### `remove(id)`
+
 **Purpose**: Delete customer with cascading cleanup
 **Operations**:
+
 1. Delete all customer jobs
 2. Delete all customer opportunities
 3. Archive all customer documents
@@ -152,8 +156,10 @@ async manualTransactionControl(): Promise<void> {
 ### OpportunitiesService
 
 #### `markAsWon(opportunityId, jobId, userId)`
+
 **Purpose**: Convert opportunity to won status
 **Operations**:
+
 1. Update opportunity status to 'won'
 2. Link opportunity to job
 3. Emit conversion event (after commit)
@@ -163,8 +169,10 @@ async manualTransactionControl(): Promise<void> {
 ### NotificationsService
 
 #### `markAllAsRead(userId)`
+
 **Purpose**: Mark all notifications as read for a user
 **Operations**:
+
 1. Find all unread notifications
 2. Update all to read status
 3. Set readAt timestamp
@@ -176,6 +184,7 @@ async manualTransactionControl(): Promise<void> {
 The TransactionService automatically retries transient errors:
 
 ### Retryable Errors
+
 - `TransientTransactionError` - Temporary network or server issues
 - `UnknownTransactionCommitResult` - Commit status uncertain
 - `WriteConflict` (code 112) - Concurrent modification detected
@@ -183,11 +192,13 @@ The TransactionService automatically retries transient errors:
 - `LockTimeout` (code 50) - Lock acquisition timeout
 
 ### Retry Strategy
+
 - **Max Retries**: 3 attempts (configurable)
 - **Backoff**: Exponential (100ms → 200ms → 400ms)
 - **Max Backoff**: 1 second
 
 ### Non-Retryable Errors
+
 - Validation errors
 - Not found errors
 - Business logic errors
@@ -199,6 +210,7 @@ These fail immediately without retry.
 ### Best Practices
 
 1. **Keep Transactions Short** - Aim for < 100ms execution time
+
    ```typescript
    // ✅ Good - Quick operations only
    await this.transactionService.withTransaction(async (session) => {
@@ -214,6 +226,7 @@ These fail immediately without retry.
    ```
 
 2. **Minimize Document Count** - Fewer documents = faster commits
+
    ```typescript
    // ✅ Good - Update specific documents
    await model.updateMany({ userId, isRead: false }, updates, { session });
@@ -223,6 +236,7 @@ These fail immediately without retry.
    ```
 
 3. **Use Proper Indexes** - Ensure queries are indexed
+
    ```typescript
    // ✅ Good - userId is indexed
    await model.find({ userId: id }).session(session);
@@ -232,6 +246,7 @@ These fail immediately without retry.
    ```
 
 4. **Schedule Side Effects After Commit** - Don't include in transaction
+
    ```typescript
    await this.transactionService.withTransaction(async (session) => {
      const result = await this.model.create([data], { session });
@@ -328,9 +343,11 @@ await this.transactionService.withTransaction(async (session) => {
 });
 
 // ✅ Correct - External calls after transaction
-const result = await this.transactionService.withTransaction(async (session) => {
-  return await this.model.create([data], { session });
-});
+const result = await this.transactionService.withTransaction(
+  async (session) => {
+    return await this.model.create([data], { session });
+  },
+);
 await axios.post('https://api.example.com', result); // Call after commit
 ```
 
@@ -338,9 +355,11 @@ await axios.post('https://api.example.com', result); // Call after commit
 
 ```typescript
 // ❌ Wrong - Silent failure
-await this.transactionService.withTransaction(async (session) => {
-  // ... operations
-}).catch(() => {}); // Swallowing errors!
+await this.transactionService
+  .withTransaction(async (session) => {
+    // ... operations
+  })
+  .catch(() => {}); // Swallowing errors!
 
 // ✅ Correct - Proper error handling
 try {

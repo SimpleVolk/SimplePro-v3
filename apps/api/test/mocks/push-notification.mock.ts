@@ -12,9 +12,16 @@ export interface PushNotification {
 
 export class PushNotificationServiceMock {
   private sentNotifications: PushNotification[] = [];
-  private deviceTokens: Map<string, { userId: string; platform: 'ios' | 'android' }> = new Map();
+  private deviceTokens: Map<
+    string,
+    { userId: string; platform: 'ios' | 'android' }
+  > = new Map();
 
-  registerDeviceToken(userId: string, token: string, platform: 'ios' | 'android') {
+  registerDeviceToken(
+    userId: string,
+    token: string,
+    platform: 'ios' | 'android',
+  ) {
     this.deviceTokens.set(token, { userId, platform });
   }
 
@@ -22,7 +29,7 @@ export class PushNotificationServiceMock {
     token: string,
     title: string,
     body: string,
-    data?: Record<string, any>
+    data?: Record<string, any>,
   ): Promise<PushNotification> {
     const messageId = `fcm_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
 
@@ -46,7 +53,9 @@ export class PushNotificationServiceMock {
 
     // Simulate async delivery
     setTimeout(() => {
-      const notif = this.sentNotifications.find((n) => n.messageId === messageId);
+      const notif = this.sentNotifications.find(
+        (n) => n.messageId === messageId,
+      );
       if (notif) {
         notif.status = 'delivered';
       }
@@ -59,7 +68,7 @@ export class PushNotificationServiceMock {
     userId: string,
     title: string,
     body: string,
-    data?: Record<string, any>
+    data?: Record<string, any>,
   ): Promise<PushNotification[]> {
     const userTokens = Array.from(this.deviceTokens.entries())
       .filter(([_, info]) => info.userId === userId)
@@ -69,10 +78,18 @@ export class PushNotificationServiceMock {
 
     for (const token of userTokens) {
       try {
-        const notification = await this.sendPushNotification(token, title, body, data);
+        const notification = await this.sendPushNotification(
+          token,
+          title,
+          body,
+          data,
+        );
         notifications.push(notification);
       } catch (error) {
-        console.error(`Failed to send push notification to token ${token}:`, error);
+        console.error(
+          `Failed to send push notification to token ${token}:`,
+          error,
+        );
       }
     }
 
@@ -80,7 +97,12 @@ export class PushNotificationServiceMock {
   }
 
   async sendBulkPush(
-    recipients: Array<{ token: string; title: string; body: string; data?: Record<string, any> }>
+    recipients: Array<{
+      token: string;
+      title: string;
+      body: string;
+      data?: Record<string, any>;
+    }>,
   ): Promise<{
     successful: PushNotification[];
     failed: Array<{ token: string; error: string }>;
@@ -94,11 +116,12 @@ export class PushNotificationServiceMock {
           recipient.token,
           recipient.title,
           recipient.body,
-          recipient.data
+          recipient.data,
         );
         successful.push(notification);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         failed.push({
           token: recipient.token,
           error: errorMessage || 'Unknown error',
@@ -109,8 +132,12 @@ export class PushNotificationServiceMock {
     return { successful, failed };
   }
 
-  async getNotificationStatus(messageId: string): Promise<PushNotification | null> {
-    return this.sentNotifications.find((n) => n.messageId === messageId) || null;
+  async getNotificationStatus(
+    messageId: string,
+  ): Promise<PushNotification | null> {
+    return (
+      this.sentNotifications.find((n) => n.messageId === messageId) || null
+    );
   }
 
   getSentNotifications() {

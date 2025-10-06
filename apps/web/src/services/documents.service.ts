@@ -4,7 +4,12 @@
  */
 
 import { getApiUrl } from '../lib/config';
-import { AccessSharedDocumentRequest, AccessSharedDocumentResponse, RateLimitError, DocumentAccessError } from '../app/components/documents/types';
+import {
+  AccessSharedDocumentRequest,
+  AccessSharedDocumentResponse,
+  RateLimitError,
+  DocumentAccessError,
+} from '../app/components/documents/types';
 
 /**
  * Access a shared document using a secure token and password
@@ -16,7 +21,7 @@ import { AccessSharedDocumentRequest, AccessSharedDocumentResponse, RateLimitErr
  */
 export async function accessSharedDocument(
   token: string,
-  password: string
+  password: string,
 ): Promise<AccessSharedDocumentResponse> {
   const response = await fetch(getApiUrl(`documents/shared/${token}/access`), {
     method: 'POST',
@@ -56,7 +61,7 @@ export async function accessSharedDocument(
  * @throws DocumentAccessError for other access failures
  */
 export async function accessPublicDocument(
-  token: string
+  token: string,
 ): Promise<AccessSharedDocumentResponse> {
   const response = await fetch(getApiUrl(`documents/shared/${token}/access`), {
     method: 'POST',
@@ -94,7 +99,7 @@ export async function accessPublicDocument(
  */
 export async function downloadDocument(
   documentUrl: string,
-  filename: string
+  filename: string,
 ): Promise<void> {
   const response = await fetch(documentUrl);
 

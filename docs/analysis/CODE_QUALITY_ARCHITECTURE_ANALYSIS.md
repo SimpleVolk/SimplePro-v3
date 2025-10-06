@@ -14,6 +14,7 @@
 SimplePro-v3 is a well-architected NX monorepo implementing a comprehensive business management system for moving companies. The codebase demonstrates strong adherence to enterprise patterns, proper separation of concerns, and production-ready features. However, there are areas requiring improvement in test coverage, code complexity, and consistency.
 
 **Key Strengths:**
+
 - ✅ Excellent module organization with clear separation of concerns
 - ✅ Comprehensive dependency injection and service-oriented architecture
 - ✅ Strong type safety with TypeScript across all projects
@@ -23,6 +24,7 @@ SimplePro-v3 is a well-architected NX monorepo implementing a comprehensive busi
 - ✅ Deterministic calculations with SHA256 hash verification
 
 **Critical Areas for Improvement:**
+
 - ⚠️ **Test Coverage:** Only 58% API coverage (93/159 tests) - needs 80%+ target
 - ⚠️ **Code Complexity:** Some service files exceed 700 lines with cyclomatic complexity >20
 - ⚠️ **Consistency:** Mixed patterns for error handling and validation
@@ -36,6 +38,7 @@ SimplePro-v3 is a well-architected NX monorepo implementing a comprehensive busi
 ### 1.1 NX Monorepo Organization ✅ **Score: 9/10**
 
 **Structure:**
+
 ```
 SimplePro-v3/
 ├── apps/
@@ -48,6 +51,7 @@ SimplePro-v3/
 ```
 
 **Strengths:**
+
 - Clear separation between applications and shared packages
 - Proper dependency graph management (`dependsOn: ["^build"]`)
 - TypeScript path mappings for clean imports (`@simplepro/pricing-engine`)
@@ -55,6 +59,7 @@ SimplePro-v3/
 - Proper workspace-level configurations
 
 **Issues Found:**
+
 1. **MEDIUM:** Some circular dependency risks between modules (e.g., `RealtimeService` ↔ `JobsService`)
    - **File:** `D:\Claude\SimplePro-v3\apps\api\src\jobs\jobs.service.ts:24`
    - **Solution:** Use `forwardRef()` pattern (already implemented but needs documentation)
@@ -64,6 +69,7 @@ SimplePro-v3/
    - **Solution:** Add mobile app to NX target defaults
 
 **Recommendations:**
+
 - Add dependency graph validation in CI/CD pipeline
 - Document cross-package dependency rules
 - Create architecture decision records (ADRs) for major patterns
@@ -74,20 +80,22 @@ SimplePro-v3/
 
 **Backend Module Organization (28 Modules):**
 
-| Category | Modules | Quality |
-|----------|---------|---------|
-| **Core Business** | auth, customers, jobs, estimates, crews | Excellent |
-| **Operations** | analytics, pricing-rules, tariff-settings, conversion-tracking | Good |
-| **Advanced** | documents, crew-schedule, messages, notifications | Very Good |
-| **Supporting** | common, database, websockets, cache, config | Excellent |
+| Category          | Modules                                                        | Quality   |
+| ----------------- | -------------------------------------------------------------- | --------- |
+| **Core Business** | auth, customers, jobs, estimates, crews                        | Excellent |
+| **Operations**    | analytics, pricing-rules, tariff-settings, conversion-tracking | Good      |
+| **Advanced**      | documents, crew-schedule, messages, notifications              | Very Good |
+| **Supporting**    | common, database, websockets, cache, config                    | Excellent |
 
 **Strengths:**
+
 - Clear domain-driven design with bounded contexts
 - Each module has dedicated folder with services, controllers, schemas, DTOs
 - Common module provides shared utilities (guards, filters, decorators, middleware)
 - Proper encapsulation of business logic within services
 
 **Issues Found:**
+
 1. **MEDIUM:** Some modules have tight coupling
    - **Example:** `CustomersService` directly depends on `JobModel`, `OpportunityModel`, `DocumentModel`
    - **File:** `D:\Claude\SimplePro-v3\apps\api\src\customers\customers.service.ts:21-24`
@@ -103,6 +111,7 @@ SimplePro-v3/
    - Some use nested `services/` folder, others have services in root
 
 **Recommendations:**
+
 - Establish and document standard module structure
 - Create module templates for consistency
 - Consider implementing hexagonal architecture for complex domains
@@ -121,11 +130,13 @@ graph TD
 ```
 
 **Issue Details:**
+
 - **Location:** `apps/api/src/jobs/jobs.service.ts` ↔ `apps/api/src/websocket/realtime.service.ts`
 - **Current Solution:** Using `@Inject(forwardRef())` pattern
 - **Risk:** Runtime initialization order issues, difficult debugging
 
 **Recommendations:**
+
 - Introduce event-driven architecture to break circular dependencies
 - Use EventEmitter pattern for cross-module communication
 - Consider CQRS pattern for complex workflows
@@ -138,29 +149,35 @@ graph TD
 
 **Cyclomatic Complexity Hotspots:**
 
-| File | Lines | Complexity | Status |
-|------|-------|------------|--------|
-| `jobs.service.ts` | 689 | ~25 | 🔴 High |
-| `analytics.service.ts` | 749 | ~22 | 🔴 High |
-| `customers.service.ts` | 397 | ~15 | 🟡 Medium |
-| `estimator.ts` | 896 | ~30 | 🔴 Very High |
-| `crew-schedule.service.ts` | ~600 | ~20 | 🔴 High |
+| File                       | Lines | Complexity | Status       |
+| -------------------------- | ----- | ---------- | ------------ |
+| `jobs.service.ts`          | 689   | ~25        | 🔴 High      |
+| `analytics.service.ts`     | 749   | ~22        | 🔴 High      |
+| `customers.service.ts`     | 397   | ~15        | 🟡 Medium    |
+| `estimator.ts`             | 896   | ~30        | 🔴 Very High |
+| `crew-schedule.service.ts` | ~600  | ~20        | 🔴 High      |
 
 **Detailed Analysis: `estimator.ts`**
 
 **File:** `D:\Claude\SimplePro-v3\packages\pricing-engine\src\estimator.ts`
 
 **Issues:**
+
 1. **HIGH:** Single file with 896 lines and ~30 methods
 2. **HIGH:** Method `createDeterministicHash` has platform-specific branching (3 fallbacks)
 3. **MEDIUM:** Method `calculateEstimate` has 9 distinct responsibilities
 4. **MEDIUM:** Deep nesting in condition evaluation (up to 5 levels)
 
 **Code Smell Example:**
+
 ```typescript
 // Lines 202-261: Multiple try-catch blocks for UUID generation
 try {
-  if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+  if (
+    typeof process !== 'undefined' &&
+    process.versions &&
+    process.versions.node
+  ) {
     const crypto = require('crypto');
     if (crypto && typeof crypto.randomUUID === 'function') {
       uuid = crypto.randomUUID();
@@ -182,6 +199,7 @@ try {
 ```
 
 **Solution:** Extract platform detection to separate module:
+
 ```typescript
 // platform-detector.ts
 export class PlatformDetector {
@@ -200,6 +218,7 @@ export class PlatformDetector {
 **Duplicate Code Blocks Found:**
 
 1. **HIGH:** Document conversion pattern repeated across 5 services
+
    ```typescript
    // Pattern appears in: customers.service.ts, jobs.service.ts, opportunities.service.ts
    private convertDocument(doc: Document | any): Entity {
@@ -210,16 +229,19 @@ export class PlatformDetector {
      };
    }
    ```
+
    - **Files:** `customers.service.ts:366`, `jobs.service.ts:643`, etc.
    - **Solution:** Create abstract `BaseMongooseService<T>` with generic conversion
 
 2. **MEDIUM:** Pagination logic duplicated in 8 controllers
+
    ```typescript
    const [total, items] = await Promise.all([
      this.model.countDocuments(query).exec(),
      this.model.find(query).sort().skip(skip).limit(limit).exec(),
    ]);
    ```
+
    - **Solution:** Create `PaginationService` utility
 
 3. **MEDIUM:** Query filter building duplicated across services
@@ -227,6 +249,7 @@ export class PlatformDetector {
    - **Solution:** Extract to `QueryBuilder` utility class
 
 **Recommendations:**
+
 - Implement abstract base classes for common patterns
 - Create utility functions for repeated logic
 - Use TypeScript generics to reduce duplication
@@ -236,12 +259,14 @@ export class PlatformDetector {
 ### 2.3 Naming Conventions ✅ **Score: 8.5/10**
 
 **Strengths:**
+
 - Consistent PascalCase for classes: `CustomersService`, `JobsController`
 - Consistent camelCase for methods: `findAll()`, `updateStatus()`
 - Descriptive variable names: `totalRevenue`, `assignedCrewMembers`
 - Proper DTO naming: `CreateCustomerDto`, `UpdateJobDto`
 
 **Issues Found:**
+
 1. **LOW:** Inconsistent boolean prefixes
    - Mix of `is`, `has`, `should` prefixes
    - Example: `isActive` vs `shouldApplyRule` vs `hasPermission`
@@ -271,11 +296,13 @@ apps/api/src/
 ```
 
 **Strengths:**
+
 - Consistent folder structure across modules
 - Logical grouping of related files
 - Clear separation of concerns (controllers, services, schemas, DTOs)
 
 **Issues Found:**
+
 1. **MEDIUM:** Some modules lack `interfaces/` folder causing type definitions in service files
    - **Example:** `jobs.service.ts` defines `JobStats` interface
    - **Solution:** Create `jobs/interfaces/` folder
@@ -293,6 +320,7 @@ apps/api/src/
 **Module Count:** 28 modules (27 complete, 1 partial - GraphQL)
 
 **Best Practices Implemented:**
+
 - ✅ Feature modules with proper encapsulation
 - ✅ Global modules for cross-cutting concerns (Database, Cache)
 - ✅ Dynamic modules for configuration (ThrottlerModule)
@@ -324,11 +352,13 @@ export class AppModule {}
 ```
 
 **Strengths:**
+
 - Multi-tier rate limiting configuration
 - Global guard registration
 - Event-driven architecture support
 
 **Issues Found:**
+
 1. **LOW:** Module imports not alphabetically ordered
    - **Solution:** Organize imports by category (Infrastructure → Core → Features)
 
@@ -339,15 +369,19 @@ export class AppModule {}
 **DI Quality Assessment:**
 
 **Excellent Patterns:**
+
 ```typescript
 // D:\Claude\SimplePro-v3\apps\api\src\customers\customers.service.ts:20-27
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectModel(CustomerSchema.name) private customerModel: Model<CustomerDocument>,
+    @InjectModel(CustomerSchema.name)
+    private customerModel: Model<CustomerDocument>,
     @InjectModel(Job.name) private jobModel: Model<JobDocument>,
-    @InjectModel(Opportunity.name) private opportunityModel: Model<OpportunityDocument>,
-    @InjectModel(DocumentSchema.name) private documentModel: Model<DocumentDocument>,
+    @InjectModel(Opportunity.name)
+    private opportunityModel: Model<OpportunityDocument>,
+    @InjectModel(DocumentSchema.name)
+    private documentModel: Model<DocumentDocument>,
     private transactionService: TransactionService,
     private cacheService: CacheService,
   ) {}
@@ -355,17 +389,21 @@ export class CustomersService {
 ```
 
 **Strengths:**
+
 - Proper use of `@InjectModel()` decorator for Mongoose models
 - Constructor-based dependency injection
 - Interface-based dependencies (not concrete implementations)
 
 **Issues Found:**
+
 1. **MEDIUM:** Circular dependency workaround using `forwardRef()`
+
    ```typescript
    // D:\Claude\SimplePro-v3\apps\api\src\jobs\jobs.service.ts:24
    @Inject(forwardRef(() => RealtimeService))
    private realtimeService: RealtimeService,
    ```
+
    - **Impact:** Harder to test, potential initialization issues
    - **Solution:** Use event-driven architecture instead
 
@@ -379,11 +417,11 @@ export class CustomersService {
 
 **Service Responsibilities Analysis:**
 
-| Service | Lines | Methods | Responsibilities | Score |
-|---------|-------|---------|------------------|-------|
-| CustomersService | 397 | 14 | CRUD, Stats, Transactions | 8/10 |
-| JobsService | 689 | 20 | CRUD, Status, Crew, Milestones | 7/10 |
-| AnalyticsService | 749 | 15 | Events, Metrics, Aggregations | 6/10 |
+| Service          | Lines | Methods | Responsibilities               | Score |
+| ---------------- | ----- | ------- | ------------------------------ | ----- |
+| CustomersService | 397   | 14      | CRUD, Stats, Transactions      | 8/10  |
+| JobsService      | 689   | 20      | CRUD, Status, Crew, Milestones | 7/10  |
+| AnalyticsService | 749   | 15      | Events, Metrics, Aggregations  | 6/10  |
 
 **Best Practice Example:**
 
@@ -414,11 +452,13 @@ async remove(id: string): Promise<void> {
 ```
 
 **Strengths:**
+
 - Excellent documentation with clear transaction semantics
 - Atomic operations with proper rollback
 - Audit-friendly approach (archive instead of delete)
 
 **Issues Found:**
+
 1. **HIGH:** `AnalyticsService` violates Single Responsibility Principle
    - **File:** `D:\Claude\SimplePro-v3\apps\api\src\analytics\analytics.service.ts`
    - **Responsibilities:** Event tracking, dashboard metrics, revenue analytics, geographic analytics, activity metrics
@@ -462,12 +502,14 @@ export class CustomersController {
 ```
 
 **Strengths:**
+
 - Proper use of guards (authentication + authorization)
 - Swagger documentation with `@ApiOperation()`
 - Input validation with pipes
 - Thin controllers (delegate to services)
 
 **Issues Found:**
+
 1. **MEDIUM:** Inconsistent error handling across controllers
    - Some use try-catch, others rely on global exception filter
    - **Solution:** Standardize on global filter with controller-specific exceptions
@@ -483,18 +525,22 @@ export class CustomersController {
 **DTO Quality (61 DTO files):**
 
 **Best Practices:**
+
 - ✅ Comprehensive use of `class-validator` decorators
 - ✅ Separate DTOs for create/update operations
 - ✅ Proper use of `PartialType()` for update DTOs
 - ✅ Nested validation with `@ValidateNested()`
 
 **Issues Found:**
+
 1. **LOW:** Some DTOs lack detailed validation messages
+
    ```typescript
    @IsString()
    @MinLength(3) // Missing custom error message
    name: string;
    ```
+
    - **Solution:** Add custom messages: `@MinLength(3, { message: 'Name must be at least 3 characters' })`
 
 ---
@@ -506,11 +552,13 @@ export class CustomersController {
 **File:** `D:\Claude\SimplePro-v3\apps\api\src\common\filters\global-exception.filter.ts`
 
 **Strengths:**
+
 - Centralized error handling with proper logging
 - Standardized error response format
 - Environment-aware error details (hide stack trace in production)
 
 **Issues Found:**
+
 1. **MEDIUM:** Inconsistent exception usage across services
    - Some services throw generic `Error`, others use NestJS exceptions
    - **Solution:** Create domain-specific exception classes
@@ -527,6 +575,7 @@ export class CustomersController {
 **Component Count:** 93 TSX components
 
 **Organization:**
+
 ```
 apps/web/src/app/components/
 ├── admin/              # Admin-specific components (1)
@@ -546,11 +595,13 @@ apps/web/src/app/components/
 ```
 
 **Strengths:**
+
 - Logical grouping by feature domain
 - Component co-location with styles (CSS Modules)
 - Clear naming conventions (`*.tsx` for components)
 
 **Issues Found:**
+
 1. **MEDIUM:** Settings components are deeply nested (4 levels)
    - Makes imports cumbersome: `../../settings/estimates/lists/PropertyTypes`
    - **Solution:** Flatten to 2 levels or use barrel exports
@@ -566,10 +617,12 @@ apps/web/src/app/components/
 **Current Approach:** React Context API + local useState
 
 **Contexts Implemented:**
+
 - `AuthContext` - User authentication and session
 - `WebSocketContext` - Real-time connection management
 
 **Issues Found:**
+
 1. **HIGH:** No centralized state management for complex data flows
    - Each component fetches and manages its own data
    - Leads to prop drilling and duplicate requests
@@ -585,6 +638,7 @@ apps/web/src/app/components/
    - **Solution:** Implement React Query or SWR for data fetching
 
 **Recommendations:**
+
 - Implement React Query for server state management
 - Keep React Context for UI state only
 - Add request caching and invalidation strategy
@@ -619,6 +673,7 @@ useEffect(() => {
 ```
 
 **Issues Found:**
+
 1. **HIGH:** Repeated boilerplate for API calls
    - Every component reimplements loading/error state
    - **Solution:** Create custom hooks: `useCustomers()`, `useJobs()`
@@ -633,6 +688,7 @@ useEffect(() => {
    - **Solution:** Use AbortController for request cancellation
 
 **Recommended Pattern:**
+
 ```typescript
 // Custom hook with React Query
 export function useCustomers(filters: CustomerFilters) {
@@ -654,6 +710,7 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 **Implementation:** Next.js App Router with client-side navigation
 
 **Strengths:**
+
 - Clean sidebar navigation with role-based filtering
 - Proper accessibility (ARIA attributes, keyboard navigation)
 - Responsive design with collapsible sidebar
@@ -661,6 +718,7 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 **File:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\Sidebar.tsx`
 
 **Issues Found:**
+
 1. **LOW:** Missing loading states during navigation
    - **Solution:** Add Suspense boundaries and loading.tsx files
 
@@ -672,11 +730,13 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 ### 4.5 CSS Modules Usage ✅ **Score: 8/10**
 
 **Strengths:**
+
 - Consistent use of CSS Modules for component-scoped styling
 - Proper naming convention: `ComponentName.module.css`
 - Dark theme implementation with CSS variables
 
 **Issues Found:**
+
 1. **MEDIUM:** Global styles mixed with component styles
    - `global.css` has component-specific rules
    - **File:** `D:\Claude\SimplePro-v3\apps\web\src\app\global.css`
@@ -747,6 +807,7 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 **Inconsistencies Found:**
 
 1. **Error Handling Patterns:**
+
    ```typescript
    // Pattern A: Try-catch with re-throw (analytics.service.ts)
    try {
@@ -763,6 +824,7 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
      await customer.save(); // No try-catch
    }
    ```
+
    - **Solution:** Standardize on global exception filter with service-level logging
 
 2. **Response Formatting:**
@@ -841,6 +903,7 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 **Assessment:** Generally well-followed due to TypeScript interfaces and proper inheritance.
 
 **Issues:**
+
 1. **LOW:** Some DTOs violate LSP
    - `UpdateCustomerDto` extends `CreateCustomerDto` but makes all fields optional
    - Could break code expecting required fields
@@ -851,11 +914,13 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 ### 6.4 Interface Segregation Principle (ISP) ✅ **Score: 8/10**
 
 **Strengths:**
+
 - Focused interfaces in pricing engine
 - Role-specific DTOs (Create vs Update)
 - Granular guard interfaces
 
 **Issues:**
+
 1. **LOW:** Some interfaces have too many optional fields
    - `JobFilters` interface with 10+ optional properties
    - **Solution:** Create focused filter interfaces
@@ -865,10 +930,12 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 ### 6.5 Dependency Inversion Principle (DIP) ⚠️ **Score: 7/10**
 
 **Strengths:**
+
 - Services depend on abstractions via NestJS DI
 - Mongoose models injected as dependencies
 
 **Issues:**
+
 1. **MEDIUM:** Direct dependency on Mongoose models
    - Services tightly coupled to MongoDB/Mongoose
    - **Example:** `CustomersService` directly uses `Model<CustomerDocument>`
@@ -887,6 +954,7 @@ const { data, isLoading, error } = useCustomers({ status: 'active' });
 **Architecture Quality: Excellent**
 
 **Strengths:**
+
 - SHA256 hash verification for reproducible calculations
 - Cross-platform compatibility (Node.js + Browser)
 - Comprehensive test coverage (38/38 tests passing)
@@ -936,6 +1004,7 @@ private createDeterministicHash(input: EstimateInput): string {
 **Schema Quality Assessment:**
 
 **Best Practices Implemented:**
+
 - ✅ Proper indexing for query performance
 - ✅ Compound indexes for common queries
 - ✅ TTL indexes for session cleanup
@@ -963,13 +1032,15 @@ export class Job {
 
   // Embedded crew assignments
   @Prop({
-    type: [{
-      crewMemberId: String,
-      role: String,
-      assignedAt: Date,
-      status: String,
-    }],
-    default: []
+    type: [
+      {
+        crewMemberId: String,
+        role: String,
+        assignedAt: Date,
+        status: String,
+      },
+    ],
+    default: [],
   })
   assignedCrew: CrewAssignment[];
 }
@@ -992,6 +1063,7 @@ export class Job {
 **Security Quality: Excellent**
 
 **Implementation:**
+
 - Access tokens (1h expiration)
 - Refresh tokens (7d expiration)
 - bcrypt password hashing (12 rounds)
@@ -1000,12 +1072,14 @@ export class Job {
 - Role-based access control with permissions
 
 **Best Practices:**
+
 - ✅ Password never logged to console
 - ✅ Secure password storage in `.secrets/` directory
 - ✅ JWT secrets in environment variables
 - ✅ Rate limiting on auth endpoints (5 attempts/min)
 
 **Issues Found:**
+
 1. **LOW:** JWT secret should be rotated periodically
    - **Solution:** Implement key rotation strategy
 
@@ -1014,17 +1088,20 @@ export class Job {
 ### 7.4 WebSocket Integration ✅ **Score: 8/10**
 
 **Real-time Features:**
+
 - Job status updates
 - Crew notifications
 - Typing indicators
 - Message delivery
 
 **Strengths:**
+
 - Proper authentication on socket connection
 - Room-based messaging
 - Error handling and reconnection
 
 **Issues Found:**
+
 1. **MEDIUM:** No message queue for offline clients
    - Messages lost if client disconnected
    - **Solution:** Implement Redis-backed message queue
@@ -1036,6 +1113,7 @@ export class Job {
 ### 8.1 Database Query Optimization ⚠️ **Score: 7/10**
 
 **Good Practices:**
+
 - ✅ Parallel queries with `Promise.all()`
 - ✅ Lean queries with `.lean()` for read-only data
 - ✅ Proper indexing on frequently queried fields
@@ -1045,14 +1123,16 @@ export class Job {
 
 1. **HIGH: Sales Performance Aggregation**
    - **File:** `D:\Claude\SimplePro-v3\apps\api\src\analytics\analytics.service.ts:610-646`
+
    ```typescript
    const topPerformers = await Promise.all(
      topPerformersData.map(async (performer) => {
        const user = await this.userModel.findById(performer._id).exec(); // N+1!
        // ...
-     })
+     }),
    );
    ```
+
    - **Impact:** 5 additional database queries
    - **Solution:** Use aggregation `$lookup` to join users in single query
 
@@ -1062,6 +1142,7 @@ export class Job {
    - **Solution:** Use aggregation pipeline
 
 **Recommendations:**
+
 - Add query performance monitoring
 - Implement database query logging in development
 - Set up slow query alerts
@@ -1071,15 +1152,18 @@ export class Job {
 ### 8.2 Caching Strategy ✅ **Score: 8/10**
 
 **Implementation:**
+
 - Redis caching service
 - Cache warming service
 - Cache metrics tracking
 
 **Strengths:**
+
 - Centralized cache service
 - Proper cache invalidation
 
 **Issues Found:**
+
 1. **MEDIUM:** No cache strategy for frequently accessed data
    - Customer/job details fetched on every request
    - **Solution:** Implement TTL-based caching for read-heavy endpoints
@@ -1092,12 +1176,12 @@ export class Job {
 
 **Current Coverage:**
 
-| Project | Unit Tests | Integration Tests | Coverage | Status |
-|---------|-----------|-------------------|----------|--------|
-| **Pricing Engine** | 38 | 0 | 100% | ✅ Excellent |
-| **API** | 93 | ~10 | 58% | ⚠️ Needs Improvement |
-| **Web** | ~4 | 0 | <10% | 🔴 Critical |
-| **Overall** | ~135 | ~10 | ~45% | ⚠️ Below Target |
+| Project            | Unit Tests | Integration Tests | Coverage | Status               |
+| ------------------ | ---------- | ----------------- | -------- | -------------------- |
+| **Pricing Engine** | 38         | 0                 | 100%     | ✅ Excellent         |
+| **API**            | 93         | ~10               | 58%      | ⚠️ Needs Improvement |
+| **Web**            | ~4         | 0                 | <10%     | 🔴 Critical          |
+| **Overall**        | ~135       | ~10               | ~45%     | ⚠️ Below Target      |
 
 **Critical Gaps:**
 
@@ -1120,6 +1204,7 @@ export class Job {
    - **Missing:** End-to-end workflow tests
 
 **Recommendations:**
+
 - Implement test-driven development (TDD) for new features
 - Add integration tests for critical workflows
 - Set up code coverage gates in CI/CD (80% minimum)
@@ -1133,12 +1218,14 @@ export class Job {
 **File:** `D:\Claude\SimplePro-v3\packages\pricing-engine\src\estimator.test.ts`
 
 **Strengths:**
+
 - Comprehensive test scenarios (38 tests)
 - Clear test descriptions
 - Test data organization
 - Edge case coverage
 
 **Issues in API Tests:**
+
 1. **MEDIUM:** Incomplete mock setup
    - Some tests use partial mocks
    - **Solution:** Use test fixtures and factories
@@ -1154,6 +1241,7 @@ export class Job {
 ### 10.1 Security Vulnerabilities Fixed ✅
 
 **Recent Security Fixes:**
+
 1. ✅ Next.js upgraded from canary to stable (14.2.33)
 2. ✅ NoSQL injection protection implemented
 3. ✅ Rate limiting hardened (5 login attempts/min)
@@ -1375,6 +1463,7 @@ sequenceDiagram
 **SimplePro-v3** is a **well-architected, production-ready system** with strong foundational patterns and enterprise-grade features. The codebase demonstrates professional development practices, proper security implementations, and thoughtful system design.
 
 **Key Achievements:**
+
 - ✅ **Complete business functionality** - All 28 backend modules operational
 - ✅ **Strong architecture** - NX monorepo with clear boundaries
 - ✅ **Security hardening** - Rate limiting, injection protection, secure authentication
@@ -1382,6 +1471,7 @@ sequenceDiagram
 - ✅ **Production builds** - All compilation errors resolved
 
 **Primary Weaknesses:**
+
 - ⚠️ **Test coverage** - Needs immediate attention (current 58% API, <10% Web)
 - ⚠️ **Code complexity** - Some services exceed 700 lines with high cyclomatic complexity
 - ⚠️ **Performance** - N+1 query patterns need optimization
@@ -1389,22 +1479,23 @@ sequenceDiagram
 
 ### 14.2 Quality Score Breakdown
 
-| Category | Score | Weight | Weighted Score |
-|----------|-------|--------|----------------|
-| Architecture Patterns | 8.5/10 | 20% | 1.70 |
-| Code Quality | 7.0/10 | 15% | 1.05 |
-| SOLID Principles | 7.5/10 | 15% | 1.13 |
-| Backend Design | 8.5/10 | 20% | 1.70 |
-| Frontend Design | 7.0/10 | 10% | 0.70 |
-| Testing | 5.8/10 | 10% | 0.58 |
-| Security | 8.5/10 | 10% | 0.85 |
-| **Total** | **7.8/10** | 100% | **7.71/10** |
+| Category              | Score      | Weight | Weighted Score |
+| --------------------- | ---------- | ------ | -------------- |
+| Architecture Patterns | 8.5/10     | 20%    | 1.70           |
+| Code Quality          | 7.0/10     | 15%    | 1.05           |
+| SOLID Principles      | 7.5/10     | 15%    | 1.13           |
+| Backend Design        | 8.5/10     | 20%    | 1.70           |
+| Frontend Design       | 7.0/10     | 10%    | 0.70           |
+| Testing               | 5.8/10     | 10%    | 0.58           |
+| Security              | 8.5/10     | 10%    | 0.85           |
+| **Total**             | **7.8/10** | 100%   | **7.71/10**    |
 
 ### 14.3 Readiness Assessment
 
 **Production Readiness: 85%** ✅
 
 **Ready for Production:**
+
 - ✅ Core business functionality
 - ✅ Security features
 - ✅ Database persistence
@@ -1412,6 +1503,7 @@ sequenceDiagram
 - ✅ Real-time features
 
 **Needs Work Before Full Production:**
+
 - ⚠️ Test coverage to 80%+
 - ⚠️ Performance optimization (N+1 queries)
 - ⚠️ Frontend state management
@@ -1420,20 +1512,14 @@ sequenceDiagram
 ### 14.4 Next Steps
 
 **Immediate (Week 1-2):**
+
 1. Implement test coverage for critical services
 2. Fix N+1 query patterns in analytics
 3. Create API client for frontend
 
-**Short-term (Month 1):**
-4. Refactor large services (AnalyticsService, JobsService)
-5. Add React Query for frontend data management
-6. Implement repository pattern
+**Short-term (Month 1):** 4. Refactor large services (AnalyticsService, JobsService) 5. Add React Query for frontend data management 6. Implement repository pattern
 
-**Long-term (Quarter 1):**
-7. Achieve 80%+ test coverage
-8. Implement CQRS for complex domains
-9. Add comprehensive monitoring and observability
-10. Complete GraphQL resolver implementation
+**Long-term (Quarter 1):** 7. Achieve 80%+ test coverage 8. Implement CQRS for complex domains 9. Add comprehensive monitoring and observability 10. Complete GraphQL resolver implementation
 
 ---
 
@@ -1441,26 +1527,26 @@ sequenceDiagram
 
 ### A.1 Codebase Size
 
-| Project | TypeScript Files | Lines of Code | Components/Services |
-|---------|-----------------|---------------|---------------------|
-| **API** | ~250 | ~45,000 | 47 services, 28 modules |
-| **Web** | ~95 | ~25,000 | 93 components |
-| **Pricing Engine** | 5 | ~1,200 | 1 main class |
-| **Mobile** | ~15 | ~3,000 | 8 screens |
-| **Total** | ~365 | ~74,200 | - |
+| Project            | TypeScript Files | Lines of Code | Components/Services     |
+| ------------------ | ---------------- | ------------- | ----------------------- |
+| **API**            | ~250             | ~45,000       | 47 services, 28 modules |
+| **Web**            | ~95              | ~25,000       | 93 components           |
+| **Pricing Engine** | 5                | ~1,200        | 1 main class            |
+| **Mobile**         | ~15              | ~3,000        | 8 screens               |
+| **Total**          | ~365             | ~74,200       | -                       |
 
 ### A.2 Complexity Metrics
 
-| Metric | Count | Status |
-|--------|-------|--------|
-| Total Modules | 28 | ✅ Good |
-| Total Services | 47 | ✅ Good |
-| Total Controllers | 20+ | ✅ Good |
-| Total DTOs | 61 | ✅ Good |
-| Total Schemas | 39 | ✅ Good |
-| Files >500 Lines | 8 | ⚠️ Needs Review |
-| Files >700 Lines | 3 | 🔴 Refactor Needed |
-| Circular Dependencies | 2 | ⚠️ Resolve |
+| Metric                | Count | Status             |
+| --------------------- | ----- | ------------------ |
+| Total Modules         | 28    | ✅ Good            |
+| Total Services        | 47    | ✅ Good            |
+| Total Controllers     | 20+   | ✅ Good            |
+| Total DTOs            | 61    | ✅ Good            |
+| Total Schemas         | 39    | ✅ Good            |
+| Files >500 Lines      | 8     | ⚠️ Needs Review    |
+| Files >700 Lines      | 3     | 🔴 Refactor Needed |
+| Circular Dependencies | 2     | ⚠️ Resolve         |
 
 ---
 
@@ -1468,25 +1554,25 @@ sequenceDiagram
 
 ### B.1 High-Priority Debt
 
-| ID | Item | Location | Effort | Impact |
-|----|------|----------|--------|--------|
-| TD-001 | Split AnalyticsService | `analytics.service.ts` | 5d | High |
-| TD-002 | Implement Repository Pattern | All services | 10d | Medium |
-| TD-003 | Add Frontend State Management | Web app | 5d | High |
-| TD-004 | Fix N+1 Queries | `analytics.service.ts` | 3d | Medium |
-| TD-005 | Increase Test Coverage | All projects | 15d | High |
+| ID     | Item                          | Location               | Effort | Impact |
+| ------ | ----------------------------- | ---------------------- | ------ | ------ |
+| TD-001 | Split AnalyticsService        | `analytics.service.ts` | 5d     | High   |
+| TD-002 | Implement Repository Pattern  | All services           | 10d    | Medium |
+| TD-003 | Add Frontend State Management | Web app                | 5d     | High   |
+| TD-004 | Fix N+1 Queries               | `analytics.service.ts` | 3d     | Medium |
+| TD-005 | Increase Test Coverage        | All projects           | 15d    | High   |
 
 ### B.2 Medium-Priority Debt
 
-| ID | Item | Location | Effort | Impact |
-|----|------|----------|--------|--------|
-| TD-006 | Refactor DeterministicEstimator | `estimator.ts` | 5d | Medium |
-| TD-007 | Standardize Error Handling | All controllers | 5d | Low |
-| TD-008 | Extract UUID Generator | `estimator.ts` | 2d | Low |
-| TD-009 | Flatten Settings Components | Web components | 3d | Low |
+| ID     | Item                            | Location        | Effort | Impact |
+| ------ | ------------------------------- | --------------- | ------ | ------ |
+| TD-006 | Refactor DeterministicEstimator | `estimator.ts`  | 5d     | Medium |
+| TD-007 | Standardize Error Handling      | All controllers | 5d     | Low    |
+| TD-008 | Extract UUID Generator          | `estimator.ts`  | 2d     | Low    |
+| TD-009 | Flatten Settings Components     | Web components  | 3d     | Low    |
 
 ---
 
 **End of Analysis Report**
 
-*This analysis was performed using automated code scanning, manual review, and industry best practices. Recommendations are prioritized based on impact and effort. For questions or clarifications, please refer to specific file locations and line numbers provided.*
+_This analysis was performed using automated code scanning, manual review, and industry best practices. Recommendations are prioritized based on impact and effort. For questions or clarifications, please refer to specific file locations and line numbers provided._

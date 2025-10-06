@@ -52,9 +52,9 @@ export default function MaterialsPricing() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('tariff-settings/active'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -112,19 +112,25 @@ export default function MaterialsPricing() {
       const response = await fetch(getApiUrl(endpoint), {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${editingMaterial ? 'update' : 'create'} material`);
+        throw new Error(
+          `Failed to ${editingMaterial ? 'update' : 'create'} material`,
+        );
       }
 
       const data = await response.json();
       setMaterials(data.materials);
-      setSuccessMessage(editingMaterial ? 'Material updated successfully' : 'Material added successfully');
+      setSuccessMessage(
+        editingMaterial
+          ? 'Material updated successfully'
+          : 'Material added successfully',
+      );
       setTimeout(() => setSuccessMessage(null), 3000);
       setShowAddForm(false);
     } catch (err: any) {
@@ -150,10 +156,10 @@ export default function MaterialsPricing() {
         {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
       );
 
       if (!response.ok) {
@@ -176,7 +182,7 @@ export default function MaterialsPricing() {
     if (field === 'cubicFeet') {
       setFormData({
         ...formData,
-        dimensions: { cubicFeet: parseFloat(value) || 0 }
+        dimensions: { cubicFeet: parseFloat(value) || 0 },
       });
     } else {
       setFormData({ ...formData, [field]: value });
@@ -216,9 +222,7 @@ export default function MaterialsPricing() {
           {successMessage && (
             <p className={styles.successMessage}>✅ {successMessage}</p>
           )}
-          {error && (
-            <p className={styles.errorMessage}>❌ {error}</p>
-          )}
+          {error && <p className={styles.errorMessage}>❌ {error}</p>}
         </div>
         <div className={styles.headerActions}>
           <button
@@ -270,7 +274,9 @@ export default function MaterialsPricing() {
                 <input
                   type="text"
                   value={formData.description}
-                  onChange={(e) => handleFormChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleFormChange('description', e.target.value)
+                  }
                   placeholder="e.g., 1.5 Cuft"
                   disabled={saving}
                 />
@@ -283,7 +289,9 @@ export default function MaterialsPricing() {
                     type="number"
                     step="0.1"
                     value={formData.dimensions.cubicFeet}
-                    onChange={(e) => handleFormChange('cubicFeet', e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange('cubicFeet', e.target.value)
+                    }
                     disabled={saving}
                   />
                 </div>
@@ -294,7 +302,9 @@ export default function MaterialsPricing() {
                     type="number"
                     step="0.01"
                     value={formData.cost}
-                    onChange={(e) => handleFormChange('cost', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleFormChange('cost', parseFloat(e.target.value) || 0)
+                    }
                     disabled={saving}
                   />
                 </div>
@@ -306,7 +316,12 @@ export default function MaterialsPricing() {
                   <input
                     type="number"
                     value={formData.packTime}
-                    onChange={(e) => handleFormChange('packTime', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleFormChange(
+                        'packTime',
+                        parseInt(e.target.value) || 0,
+                      )
+                    }
                     disabled={saving}
                   />
                 </div>
@@ -316,7 +331,12 @@ export default function MaterialsPricing() {
                   <input
                     type="number"
                     value={formData.unpackTime}
-                    onChange={(e) => handleFormChange('unpackTime', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleFormChange(
+                        'unpackTime',
+                        parseInt(e.target.value) || 0,
+                      )
+                    }
                     disabled={saving}
                   />
                 </div>
@@ -328,7 +348,9 @@ export default function MaterialsPricing() {
                   <input
                     type="text"
                     value={formData.cpShortCode}
-                    onChange={(e) => handleFormChange('cpShortCode', e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange('cpShortCode', e.target.value)
+                    }
                     placeholder="e.g., 503"
                     disabled={saving}
                   />
@@ -339,7 +361,9 @@ export default function MaterialsPricing() {
                   <input
                     type="text"
                     value={formData.proShortCode}
-                    onChange={(e) => handleFormChange('proShortCode', e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange('proShortCode', e.target.value)
+                    }
                     placeholder="e.g., 504"
                     disabled={saving}
                   />
@@ -351,7 +375,9 @@ export default function MaterialsPricing() {
                   <input
                     type="checkbox"
                     checked={formData.isContainer}
-                    onChange={(e) => handleFormChange('isContainer', e.target.checked)}
+                    onChange={(e) =>
+                      handleFormChange('isContainer', e.target.checked)
+                    }
                     disabled={saving}
                   />
                   <span>Is Container (box, crate, etc.)</span>
@@ -372,7 +398,8 @@ export default function MaterialsPricing() {
                 className={styles.saveButton}
                 disabled={saving}
               >
-                {saving ? 'Saving...' : (editingMaterial ? 'Update' : 'Add')} Material
+                {saving ? 'Saving...' : editingMaterial ? 'Update' : 'Add'}{' '}
+                Material
               </button>
             </div>
           </div>
@@ -401,7 +428,10 @@ export default function MaterialsPricing() {
                 <td colSpan={9} className={styles.emptyState}>
                   <div className={styles.emptyContent}>
                     <p>📦 No materials configured yet</p>
-                    <button onClick={handleAddMaterial} className={styles.addButton}>
+                    <button
+                      onClick={handleAddMaterial}
+                      className={styles.addButton}
+                    >
                       ➕ Add Your First Material
                     </button>
                   </div>
@@ -413,7 +443,9 @@ export default function MaterialsPricing() {
                   <td>
                     <div className={styles.materialName}>
                       <strong>{material.name}</strong>
-                      <span className={styles.materialDesc}>{material.description}</span>
+                      <span className={styles.materialDesc}>
+                        {material.description}
+                      </span>
                     </div>
                   </td>
                   <td>{material.dimensions.cubicFeet} cf</td>
@@ -423,7 +455,13 @@ export default function MaterialsPricing() {
                   <td>{material.cpShortCode}</td>
                   <td>{material.proShortCode}</td>
                   <td>
-                    <span className={material.isContainer ? styles.containerBadge : styles.itemBadge}>
+                    <span
+                      className={
+                        material.isContainer
+                          ? styles.containerBadge
+                          : styles.itemBadge
+                      }
+                    >
                       {material.isContainer ? '📦 Container' : '🧰 Item'}
                     </span>
                   </td>
@@ -438,7 +476,9 @@ export default function MaterialsPricing() {
                         ✏️
                       </button>
                       <button
-                        onClick={() => material._id && handleDeleteMaterial(material._id)}
+                        onClick={() =>
+                          material._id && handleDeleteMaterial(material._id)
+                        }
                         className={styles.deleteButton}
                         disabled={saving}
                         title="Delete material"

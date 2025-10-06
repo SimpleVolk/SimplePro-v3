@@ -7,9 +7,11 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ## System Components Overview
 
 ### 1. Lead Activities Module
+
 **Purpose**: Track all customer interactions and follow-up activities
 
 **Key Features**:
+
 - Activity logging (calls, emails, meetings, quotes)
 - Outcome tracking (successful, callback requested, not interested, etc.)
 - Overdue activity detection
@@ -17,14 +19,17 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 - Performance analytics
 
 **Database Design**:
+
 - MongoDB schema with comprehensive indexing
 - Supports 50,000+ activities with sub-second query performance
 - Automatic TTL cleanup for old records
 
 ### 2. Follow-up Rules Engine
+
 **Purpose**: Automate follow-up workflows based on business events
 
 **Key Features**:
+
 - Condition-based rule evaluation
 - Multi-action rule execution
 - Priority-based rule ordering
@@ -32,6 +37,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 - Test mode for rule validation
 
 **Automation Capabilities**:
+
 - Create activities automatically
 - Send notifications
 - Update opportunity status
@@ -39,9 +45,11 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 - Trigger email/SMS campaigns (placeholders for future integration)
 
 ### 3. Background Scheduler
+
 **Purpose**: Run periodic tasks for follow-up management
 
 **Cron Jobs Implemented**:
+
 - **Hourly**: Overdue activity checks and notifications
 - **Every 6 hours**: Stale opportunity detection
 - **Every 30 minutes**: Upcoming activity reminders
@@ -97,17 +105,18 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 
 ### Event Types
 
-| Event | Trigger | Use Case |
-|-------|---------|----------|
-| `opportunity.created` | New opportunity saved | Immediate follow-up for new leads |
-| `opportunity.status_changed` | Status update | Won/lost workflows, escalation |
-| `estimate.created` | Quote sent | Follow-up reminder after quote |
-| `activity.completed` | Activity marked done | Callback handling, next steps |
-| `opportunity.stale_detected` | No activity in 7 days | Re-engagement campaigns |
+| Event                        | Trigger               | Use Case                          |
+| ---------------------------- | --------------------- | --------------------------------- |
+| `opportunity.created`        | New opportunity saved | Immediate follow-up for new leads |
+| `opportunity.status_changed` | Status update         | Won/lost workflows, escalation    |
+| `estimate.created`           | Quote sent            | Follow-up reminder after quote    |
+| `activity.completed`         | Activity marked done  | Callback handling, next steps     |
+| `opportunity.stale_detected` | No activity in 7 days | Re-engagement campaigns           |
 
 ## Default Automation Rules
 
 ### Rule 1: Website Lead Follow-up
+
 ```typescript
 {
   name: "New Website Lead Follow-up",
@@ -126,6 +135,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ```
 
 ### Rule 2: Quote Follow-up
+
 ```typescript
 {
   name: "Quote Sent Follow-up Reminder",
@@ -140,6 +150,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ```
 
 ### Rule 3: Callback Automation
+
 ```typescript
 {
   name: "Callback Requested Auto Follow-up",
@@ -156,6 +167,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ```
 
 ### Rule 4: Won Opportunity Workflow
+
 ```typescript
 {
   name: "Won Opportunity - Create Job",
@@ -171,6 +183,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ```
 
 ### Additional Rules (8 total)
+
 - Lost Opportunity Re-engagement (30-day follow-up)
 - Urgent Priority Immediate Follow-up
 - Referral Lead Special Handling
@@ -217,6 +230,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ```
 
 **Index Strategy**:
+
 - 7 indexes for optimal query performance
 - Partial index for overdue queries (saves 50% index space)
 - Compound indexes for common filter combinations
@@ -261,48 +275,51 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 
 ### Lead Activities API (11 endpoints)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/lead-activities` | Create activity | JWT + Role |
-| GET | `/api/lead-activities` | List activities (with filters) | JWT + Role |
-| GET | `/api/lead-activities/opportunity/:id` | Activities for opportunity | JWT + Role |
-| GET | `/api/lead-activities/customer/:id` | Activities for customer | JWT + Role |
-| GET | `/api/lead-activities/pending` | Pending follow-ups | JWT + Role |
-| GET | `/api/lead-activities/overdue` | Overdue activities | JWT + Role |
-| GET | `/api/lead-activities/statistics` | Analytics & metrics | JWT + Role |
-| GET | `/api/lead-activities/timeline/:opportunityId` | Chronological timeline | JWT + Role |
-| GET | `/api/lead-activities/:activityId` | Single activity details | JWT + Role |
-| PATCH | `/api/lead-activities/:activityId/complete` | Mark complete | JWT + Role |
-| DELETE | `/api/lead-activities/:activityId` | Delete activity | Admin only |
+| Method | Endpoint                                       | Description                    | Auth       |
+| ------ | ---------------------------------------------- | ------------------------------ | ---------- |
+| POST   | `/api/lead-activities`                         | Create activity                | JWT + Role |
+| GET    | `/api/lead-activities`                         | List activities (with filters) | JWT + Role |
+| GET    | `/api/lead-activities/opportunity/:id`         | Activities for opportunity     | JWT + Role |
+| GET    | `/api/lead-activities/customer/:id`            | Activities for customer        | JWT + Role |
+| GET    | `/api/lead-activities/pending`                 | Pending follow-ups             | JWT + Role |
+| GET    | `/api/lead-activities/overdue`                 | Overdue activities             | JWT + Role |
+| GET    | `/api/lead-activities/statistics`              | Analytics & metrics            | JWT + Role |
+| GET    | `/api/lead-activities/timeline/:opportunityId` | Chronological timeline         | JWT + Role |
+| GET    | `/api/lead-activities/:activityId`             | Single activity details        | JWT + Role |
+| PATCH  | `/api/lead-activities/:activityId/complete`    | Mark complete                  | JWT + Role |
+| DELETE | `/api/lead-activities/:activityId`             | Delete activity                | Admin only |
 
 ### Follow-up Rules API (6 endpoints)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/follow-up-rules` | Create automation rule | Admin only |
-| GET | `/api/follow-up-rules` | List all rules | Admin/Dispatcher |
-| GET | `/api/follow-up-rules/active` | Active rules only | Admin/Dispatcher |
-| GET | `/api/follow-up-rules/:ruleId` | Single rule details | Admin/Dispatcher |
-| PATCH | `/api/follow-up-rules/:ruleId` | Update rule | Admin only |
-| DELETE | `/api/follow-up-rules/:ruleId` | Delete rule | Admin only |
-| POST | `/api/follow-up-rules/:ruleId/test` | Test rule with sample data | Admin only |
+| Method | Endpoint                            | Description                | Auth             |
+| ------ | ----------------------------------- | -------------------------- | ---------------- |
+| POST   | `/api/follow-up-rules`              | Create automation rule     | Admin only       |
+| GET    | `/api/follow-up-rules`              | List all rules             | Admin/Dispatcher |
+| GET    | `/api/follow-up-rules/active`       | Active rules only          | Admin/Dispatcher |
+| GET    | `/api/follow-up-rules/:ruleId`      | Single rule details        | Admin/Dispatcher |
+| PATCH  | `/api/follow-up-rules/:ruleId`      | Update rule                | Admin only       |
+| DELETE | `/api/follow-up-rules/:ruleId`      | Delete rule                | Admin only       |
+| POST   | `/api/follow-up-rules/:ruleId/test` | Test rule with sample data | Admin only       |
 
 ## Security & Access Control
 
 ### Role-Based Access Control (RBAC)
 
 **Super Admin / Admin**:
+
 - Full access to all activities
 - Create/edit/delete automation rules
 - View system-wide statistics
 - Access all user activities
 
 **Dispatcher**:
+
 - View all activities
 - View automation rules (read-only)
 - Cannot create/edit rules
 
 **Sales**:
+
 - View only assigned activities
 - Complete own activities
 - Cannot access other users' activities
@@ -320,12 +337,12 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 
 ### Query Performance
 
-| Operation | Documents | Response Time |
-|-----------|-----------|---------------|
-| Find by opportunityId | 50 activities | < 10ms |
-| Find overdue (indexed) | 1,000 activities | < 20ms |
-| Activity statistics aggregation | 10,000 activities | < 100ms |
-| Rule evaluation (active rules) | 20 rules | < 5ms |
+| Operation                       | Documents         | Response Time |
+| ------------------------------- | ----------------- | ------------- |
+| Find by opportunityId           | 50 activities     | < 10ms        |
+| Find overdue (indexed)          | 1,000 activities  | < 20ms        |
+| Activity statistics aggregation | 10,000 activities | < 100ms       |
+| Rule evaluation (active rules)  | 20 rules          | < 5ms         |
 
 ### Scalability
 
@@ -346,15 +363,18 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ### Existing Modules
 
 **Opportunities Module**:
+
 - Events emitted on create/update
 - Status changes trigger automation
 - Lead source tracking for rules
 
 **Customers Module**:
+
 - Activity tracking per customer
 - Contact history integration
 
 **Authentication Module**:
+
 - User assignment to activities
 - Role-based rule access
 - Audit trail userId tracking
@@ -362,21 +382,25 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ### External Systems (Future)
 
 **Email Service** (SendGrid, AWS SES):
+
 - Template-based emails
 - Open/click tracking
 - Unsubscribe handling
 
 **SMS Service** (Twilio):
+
 - Text reminders
 - Two-way messaging
 - Delivery confirmation
 
 **Calendar Integration** (Google, Outlook):
+
 - Activity sync
 - Meeting scheduling
 - Reminder sync
 
 **CRM Platforms**:
+
 - Webhook events
 - Data synchronization
 - Lead import/export
@@ -386,6 +410,7 @@ Successfully implemented a comprehensive lead tracking and follow-up automation 
 ### Logging
 
 All services use NestJS Logger:
+
 - Rule evaluation results
 - Activity creation/completion
 - Cron job execution
@@ -394,6 +419,7 @@ All services use NestJS Logger:
 ### Event Tracking
 
 Events emitted for notifications:
+
 - `notification.overdue_activities` - Hourly overdue check
 - `notification.upcoming_activities` - 30-min upcoming reminder
 - `notification.daily_summary` - Daily 8 AM report
@@ -402,6 +428,7 @@ Events emitted for notifications:
 ### Metrics (Future)
 
 Prometheus/Grafana integration:
+
 - Activities created per hour
 - Rule match rate
 - Average response time
@@ -474,6 +501,7 @@ Prometheus/Grafana integration:
 **Scenario**: New lead submits inquiry on website
 
 **Flow**:
+
 1. Opportunity created with `leadSource: 'website'`
 2. Event `opportunity.created` emitted
 3. Rule "New Website Lead Follow-up" matches
@@ -487,6 +515,7 @@ Prometheus/Grafana integration:
 **Scenario**: Sales rep sends quote to customer
 
 **Flow**:
+
 1. Estimate created and sent
 2. Event `estimate.created` emitted
 3. Rule "Quote Sent Follow-up Reminder" matches
@@ -501,6 +530,7 @@ Prometheus/Grafana integration:
 **Scenario**: Opportunity marked as lost
 
 **Flow**:
+
 1. Status updated to 'lost'
 2. Event `opportunity.status_changed` emitted
 3. Rule "Lost Opportunity Re-engagement" matches
@@ -568,6 +598,7 @@ Prometheus/Grafana integration:
 The Lead Tracking & Follow-up Automation System provides SimplePro-v3 with enterprise-grade workflow automation capabilities. The event-driven architecture ensures scalability, while the rule engine provides flexibility for business-specific automation needs.
 
 **Key Achievements**:
+
 - ✅ 17 new REST API endpoints
 - ✅ 3 new database collections with optimized indexes
 - ✅ 8 default automation rules covering common scenarios

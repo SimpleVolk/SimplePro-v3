@@ -27,7 +27,10 @@ export const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!employeeId || !password) {
-      Alert.alert('Validation Error', 'Please enter both employee ID and password');
+      Alert.alert(
+        'Validation Error',
+        'Please enter both employee ID and password',
+      );
       return;
     }
 

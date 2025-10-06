@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 import * as zlib from 'zlib';
@@ -45,7 +50,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   // private readonly EXTRA_LONG_TTL = 86400; // 24 hours
 
   // Fallback in-memory cache
-  private memoryCache = new Map<string, { value: any; expires: number; tags?: string[] }>();
+  private memoryCache = new Map<
+    string,
+    { value: any; expires: number; tags?: string[] }
+  >();
 
   constructor(private configService: ConfigService) {}
 
@@ -61,7 +69,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 
   private async connectRedis(): Promise<void> {
     try {
-      const redisHost = this.configService.get<string>('REDIS_HOST', 'localhost');
+      const redisHost = this.configService.get<string>(
+        'REDIS_HOST',
+        'localhost',
+      );
       const redisPort = this.configService.get<number>('REDIS_PORT', 6379);
       const redisPassword = this.configService.get<string>('REDIS_PASSWORD');
 
@@ -73,11 +84,15 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
           port: redisPort,
           reconnectStrategy: (retries) => {
             if (retries > 10) {
-              this.logger.error('Redis reconnection limit reached. Falling back to memory cache.');
+              this.logger.error(
+                'Redis reconnection limit reached. Falling back to memory cache.',
+              );
               return new Error('Redis reconnection limit reached');
             }
             const delay = Math.min(retries * 100, 3000);
-            this.logger.warn(`Redis reconnecting... Attempt ${retries}, delay ${delay}ms`);
+            this.logger.warn(
+              `Redis reconnecting... Attempt ${retries}, delay ${delay}ms`,
+            );
             return delay;
           },
         },
@@ -108,7 +123,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       this.isRedisConnected = true;
       this.logger.log('Successfully connected to Redis');
     } catch (error) {
-      this.logger.error('Failed to connect to Redis. Falling back to in-memory cache:', error);
+      this.logger.error(
+        'Failed to connect to Redis. Falling back to in-memory cache:',
+        error,
+      );
       this.isRedisConnected = false;
       this.redisClient = null;
     }
@@ -132,7 +150,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     try {
       // Try Redis first
       if (this.isRedisConnected && this.redisClient) {
-        const value = await this.redisClient.get(key) as string | null;
+        const value = (await this.redisClient.get(key)) as string | null;
 
         if (value !== null) {
           this.stats.hits++;
@@ -166,7 +184,11 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   /**
    * Set value in cache
    */
-  async set<T>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
+  async set<T>(
+    key: string,
+    value: T,
+    options: CacheOptions = {},
+  ): Promise<void> {
     try {
       const ttl = options.ttl || this.DEFAULT_TTL;
       let serialized = JSON.stringify(value);
@@ -190,7 +212,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         }
 
         this.stats.sets++;
-        this.logger.debug(`Cache set (Redis): ${key} (TTL: ${ttl}s, Size: ${serialized.length})`);
+        this.logger.debug(
+          `Cache set (Redis): ${key} (TTL: ${ttl}s, Size: ${serialized.length})`,
+        );
       } else {
         // Fallback to memory cache
         this.setInMemory(key, value, options);
@@ -233,7 +257,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         const keys = await this.redisClient.keys(pattern);
         if (keys.length > 0) {
           await this.redisClient.del(keys);
-          this.logger.debug(`Deleted ${keys.length} keys matching pattern: ${pattern}`);
+          this.logger.debug(
+            `Deleted ${keys.length} keys matching pattern: ${pattern}`,
+          );
           return keys.length;
         }
         return 0;
@@ -247,11 +273,16 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
             deleted++;
           }
         }
-        this.logger.debug(`Deleted ${deleted} keys from memory matching pattern: ${pattern}`);
+        this.logger.debug(
+          `Deleted ${deleted} keys from memory matching pattern: ${pattern}`,
+        );
         return deleted;
       }
     } catch (error) {
-      this.logger.error(`Cache deletePattern error for pattern ${pattern}:`, error);
+      this.logger.error(
+        `Cache deletePattern error for pattern ${pattern}:`,
+        error,
+      );
       this.stats.errors++;
       return 0;
     }
@@ -305,19 +336,23 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
           if (keys.length > 0) {
             await this.redisClient.del(keys);
             await this.redisClient.del(`tag:${tag}`);
-            this.logger.debug(`Invalidated ${keys.length} cache entries for tag: ${tag}`);
+            this.logger.debug(
+              `Invalidated ${keys.length} cache entries for tag: ${tag}`,
+            );
           }
         }
       } else {
         // Memory cache tag invalidation
         let deleted = 0;
         for (const [key, cached] of this.memoryCache.entries()) {
-          if (cached.tags && cached.tags.some(tag => tags.includes(tag))) {
+          if (cached.tags && cached.tags.some((tag) => tags.includes(tag))) {
             this.memoryCache.delete(key);
             deleted++;
           }
         }
-        this.logger.debug(`Invalidated ${deleted} cache entries by tags: ${tags.join(', ')}`);
+        this.logger.debug(
+          `Invalidated ${deleted} cache entries by tags: ${tags.join(', ')}`,
+        );
       }
     } catch (error) {
       this.logger.error('Cache invalidation error:', error);
@@ -338,7 +373,11 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     return this.get<T>(`analytics:${key}`);
   }
 
-  async setAnalyticsCache<T>(key: string, value: T, ttl?: number): Promise<void> {
+  async setAnalyticsCache<T>(
+    key: string,
+    value: T,
+    ttl?: number,
+  ): Promise<void> {
     return this.set(`analytics:${key}`, value, {
       ttl: ttl || this.MEDIUM_TTL,
       tags: ['analytics'],
@@ -362,7 +401,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   async setCustomerCache<T>(customerId: string, value: T): Promise<void> {
     return this.set(`customer:${customerId}`, value, {
       ttl: this.LONG_TTL,
-      tags: ['customers']
+      tags: ['customers'],
     });
   }
 
@@ -383,7 +422,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   async setJobCache<T>(jobId: string, value: T): Promise<void> {
     return this.set(`job:${jobId}`, value, {
       ttl: this.MEDIUM_TTL,
-      tags: ['jobs']
+      tags: ['jobs'],
     });
   }
 
@@ -446,14 +485,18 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     return null;
   }
 
-  private setInMemory<T>(key: string, value: T, options: CacheOptions = {}): void {
+  private setInMemory<T>(
+    key: string,
+    value: T,
+    options: CacheOptions = {},
+  ): void {
     const ttl = options.ttl || this.DEFAULT_TTL;
-    const expires = Date.now() + (ttl * 1000);
+    const expires = Date.now() + ttl * 1000;
 
     this.memoryCache.set(key, {
       value,
       expires,
-      tags: options.tags
+      tags: options.tags,
     });
 
     this.stats.sets++;

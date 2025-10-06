@@ -21,7 +21,13 @@ interface Customer {
   };
   type: 'residential' | 'commercial';
   status: 'lead' | 'prospect' | 'active' | 'inactive';
-  source: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
   companyName?: string;
   businessLicense?: string;
   preferredContactMethod: 'email' | 'phone' | 'text';
@@ -61,7 +67,13 @@ interface CreateCustomerDto {
     country?: string;
   };
   type: 'residential' | 'commercial';
-  source: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
   companyName?: string;
   businessLicense?: string;
   preferredContactMethod: 'email' | 'phone' | 'text';
@@ -76,14 +88,15 @@ interface CreateCustomerDto {
   assignedSalesRep?: string;
 }
 
-
 export function CustomerManagement() {
   const { user: _user } = useAuth();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [_editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [_editingCustomer, setEditingCustomer] = useState<Customer | null>(
+    null,
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -153,7 +166,7 @@ export function CustomerManagement() {
 
       if (response.ok) {
         const result = await response.json();
-        setCustomers(prev => [...prev, result.customer]);
+        setCustomers((prev) => [...prev, result.customer]);
         resetForm();
         setShowCreateForm(false);
       } else {
@@ -166,24 +179,26 @@ export function CustomerManagement() {
     }
   };
 
-
   const updateLastContact = async (customerId: string) => {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(getApiUrl(`customers/${customerId}/contact`), {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`customers/${customerId}/contact`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const result = await response.json();
-        setCustomers(prev =>
-          prev.map(customer =>
-            customer.id === customerId ? result.customer : customer
-          )
+        setCustomers((prev) =>
+          prev.map((customer) =>
+            customer.id === customerId ? result.customer : customer,
+          ),
         );
       } else {
         setError('Failed to update contact date');
@@ -217,15 +232,18 @@ export function CustomerManagement() {
     });
   };
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = !searchTerm ||
+  const filteredCustomers = customers.filter((customer) => {
+    const matchesSearch =
+      !searchTerm ||
       customer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm) ||
-      (customer.companyName && customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()));
+      (customer.companyName &&
+        customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'all' || customer.status === statusFilter;
     const matchesType = typeFilter === 'all' || customer.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
@@ -233,11 +251,16 @@ export function CustomerManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'lead': return '#f59e0b';
-      case 'prospect': return '#3b82f6';
-      case 'active': return '#10b981';
-      case 'inactive': return '#6b7280';
-      default: return '#6b7280';
+      case 'lead':
+        return '#f59e0b';
+      case 'prospect':
+        return '#3b82f6';
+      case 'active':
+        return '#10b981';
+      case 'inactive':
+        return '#6b7280';
+      default:
+        return '#6b7280';
     }
   };
 
@@ -306,7 +329,9 @@ export function CustomerManagement() {
           <div key={customer.id} className={styles.customerCard}>
             <div className={styles.customerHeader}>
               <div className={styles.customerName}>
-                <h3>{customer.firstName} {customer.lastName}</h3>
+                <h3>
+                  {customer.firstName} {customer.lastName}
+                </h3>
                 {customer.companyName && (
                   <p className={styles.companyName}>{customer.companyName}</p>
                 )}
@@ -324,30 +349,54 @@ export function CustomerManagement() {
 
             <div className={styles.customerInfo}>
               <div className={styles.contactInfo}>
-                <p><strong>Email:</strong> {customer.email}</p>
-                <p><strong>Phone:</strong> {customer.phone}</p>
-                <p><strong>Address:</strong> {customer.address.street}, {customer.address.city}, {customer.address.state} {customer.address.zipCode}</p>
+                <p>
+                  <strong>Email:</strong> {customer.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {customer.phone}
+                </p>
+                <p>
+                  <strong>Address:</strong> {customer.address.street},{' '}
+                  {customer.address.city}, {customer.address.state}{' '}
+                  {customer.address.zipCode}
+                </p>
               </div>
 
               <div className={styles.metaInfo}>
-                <p><strong>Source:</strong> {customer.source}</p>
-                <p><strong>Contact Method:</strong> {customer.preferredContactMethod}</p>
-                {customer.leadScore && <p><strong>Lead Score:</strong> {customer.leadScore}</p>}
+                <p>
+                  <strong>Source:</strong> {customer.source}
+                </p>
+                <p>
+                  <strong>Contact Method:</strong>{' '}
+                  {customer.preferredContactMethod}
+                </p>
+                {customer.leadScore && (
+                  <p>
+                    <strong>Lead Score:</strong> {customer.leadScore}
+                  </p>
+                )}
                 {customer.lastContactDate && (
-                  <p><strong>Last Contact:</strong> {new Date(customer.lastContactDate).toLocaleDateString()}</p>
+                  <p>
+                    <strong>Last Contact:</strong>{' '}
+                    {new Date(customer.lastContactDate).toLocaleDateString()}
+                  </p>
                 )}
               </div>
 
               {customer.notes && (
                 <div className={styles.notes}>
-                  <p><strong>Notes:</strong> {customer.notes}</p>
+                  <p>
+                    <strong>Notes:</strong> {customer.notes}
+                  </p>
                 </div>
               )}
 
               {customer.tags && customer.tags.length > 0 && (
                 <div className={styles.tags}>
                   {customer.tags.map((tag, index) => (
-                    <span key={index} className={styles.tag}>{tag}</span>
+                    <span key={index} className={styles.tag}>
+                      {tag}
+                    </span>
                   ))}
                 </div>
               )}
@@ -366,9 +415,7 @@ export function CustomerManagement() {
               >
                 Edit
               </button>
-              <button className={styles.primaryButton}>
-                View Details
-              </button>
+              <button className={styles.primaryButton}>View Details</button>
             </div>
           </div>
         ))}
@@ -388,7 +435,12 @@ export function CustomerManagement() {
               <button onClick={() => setShowCreateForm(false)}>×</button>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); createCustomer(); }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                createCustomer();
+              }}
+            >
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
                   <label>First Name *</label>
@@ -396,7 +448,12 @@ export function CustomerManagement() {
                     type="text"
                     required
                     value={formData.firstName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        firstName: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -406,7 +463,12 @@ export function CustomerManagement() {
                     type="text"
                     required
                     value={formData.lastName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        lastName: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -416,7 +478,12 @@ export function CustomerManagement() {
                     type="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -426,7 +493,12 @@ export function CustomerManagement() {
                     type="tel"
                     required
                     value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -436,10 +508,12 @@ export function CustomerManagement() {
                     type="text"
                     required
                     value={formData.address.street}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      address: { ...prev.address, street: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address: { ...prev.address, street: e.target.value },
+                      }))
+                    }
                   />
                 </div>
 
@@ -449,10 +523,12 @@ export function CustomerManagement() {
                     type="text"
                     required
                     value={formData.address.city}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      address: { ...prev.address, city: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address: { ...prev.address, city: e.target.value },
+                      }))
+                    }
                   />
                 </div>
 
@@ -462,10 +538,12 @@ export function CustomerManagement() {
                     type="text"
                     required
                     value={formData.address.state}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      address: { ...prev.address, state: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address: { ...prev.address, state: e.target.value },
+                      }))
+                    }
                   />
                 </div>
 
@@ -475,10 +553,12 @@ export function CustomerManagement() {
                     type="text"
                     required
                     value={formData.address.zipCode}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      address: { ...prev.address, zipCode: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        address: { ...prev.address, zipCode: e.target.value },
+                      }))
+                    }
                   />
                 </div>
 
@@ -486,7 +566,12 @@ export function CustomerManagement() {
                   <label>Customer Type *</label>
                   <select
                     value={formData.type}
-                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'residential' | 'commercial' }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        type: e.target.value as 'residential' | 'commercial',
+                      }))
+                    }
                   >
                     <option value="residential">Residential</option>
                     <option value="commercial">Commercial</option>
@@ -497,7 +582,12 @@ export function CustomerManagement() {
                   <label>Source *</label>
                   <select
                     value={formData.source}
-                    onChange={(e) => setFormData(prev => ({ ...prev, source: e.target.value as any }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        source: e.target.value as any,
+                      }))
+                    }
                   >
                     <option value="website">Website</option>
                     <option value="referral">Referral</option>
@@ -512,7 +602,15 @@ export function CustomerManagement() {
                   <label>Preferred Contact Method *</label>
                   <select
                     value={formData.preferredContactMethod}
-                    onChange={(e) => setFormData(prev => ({ ...prev, preferredContactMethod: e.target.value as 'email' | 'phone' | 'text' }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        preferredContactMethod: e.target.value as
+                          | 'email'
+                          | 'phone'
+                          | 'text',
+                      }))
+                    }
                   >
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
@@ -526,7 +624,12 @@ export function CustomerManagement() {
                     <input
                       type="text"
                       value={formData.companyName || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          companyName: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                 )}
@@ -535,14 +638,23 @@ export function CustomerManagement() {
                   <label>Notes</label>
                   <textarea
                     value={formData.notes || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        notes: e.target.value,
+                      }))
+                    }
                     rows={3}
                   />
                 </div>
               </div>
 
               <div className={styles.modalActions}>
-                <button type="button" onClick={() => setShowCreateForm(false)} className={styles.secondaryButton}>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateForm(false)}
+                  className={styles.secondaryButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.primaryButton}>

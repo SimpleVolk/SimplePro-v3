@@ -1,4 +1,12 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+  OnModuleInit,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -14,22 +22,29 @@ import {
   JwtPayload,
   UserSession,
   DEFAULT_ROLES,
-  Permission
+  Permission,
 } from './interfaces/user.interface';
 import { User as UserSchema, UserDocument } from './schemas/user.schema';
-import { UserSession as UserSessionSchema, UserSessionDocument } from './schemas/user-session.schema';
+import {
+  UserSession as UserSessionSchema,
+  UserSessionDocument,
+} from './schemas/user-session.schema';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   private readonly logger = new Logger(AuthService.name);
   private roles = new Map<string, UserRole>();
-  private tokenRefreshMutex = new Map<string, Promise<{ access_token: string; refresh_token?: string }>>(); // Prevent concurrent refreshes
+  private tokenRefreshMutex = new Map<
+    string,
+    Promise<{ access_token: string; refresh_token?: string }>
+  >(); // Prevent concurrent refreshes
   private readonly REFRESH_TOKEN_ROTATION_ENABLED = true; // Enable refresh token rotation for security
 
   constructor(
     private jwtService: JwtService,
     @InjectModel(UserSchema.name) private userModel: Model<UserDocument>,
-    @InjectModel(UserSessionSchema.name) private sessionModel: Model<UserSessionDocument>
+    @InjectModel(UserSessionSchema.name)
+    private sessionModel: Model<UserSessionDocument>,
   ) {
     this.initializeDefaultRoles();
   }
@@ -52,14 +67,42 @@ export class AuthService implements OnModuleInit {
           { id: 'perm_all_users_update', resource: 'users', action: 'update' },
           { id: 'perm_all_users_delete', resource: 'users', action: 'delete' },
           { id: 'perm_all_customers', resource: 'customers', action: 'create' },
-          { id: 'perm_all_customers_read', resource: 'customers', action: 'read' },
-          { id: 'perm_all_customers_update', resource: 'customers', action: 'update' },
-          { id: 'perm_all_customers_delete', resource: 'customers', action: 'delete' },
+          {
+            id: 'perm_all_customers_read',
+            resource: 'customers',
+            action: 'read',
+          },
+          {
+            id: 'perm_all_customers_update',
+            resource: 'customers',
+            action: 'update',
+          },
+          {
+            id: 'perm_all_customers_delete',
+            resource: 'customers',
+            action: 'delete',
+          },
           { id: 'perm_all_estimates', resource: 'estimates', action: 'create' },
-          { id: 'perm_all_estimates_read', resource: 'estimates', action: 'read' },
-          { id: 'perm_all_estimates_update', resource: 'estimates', action: 'update' },
-          { id: 'perm_all_estimates_delete', resource: 'estimates', action: 'delete' },
-          { id: 'perm_all_estimates_approve', resource: 'estimates', action: 'approve' },
+          {
+            id: 'perm_all_estimates_read',
+            resource: 'estimates',
+            action: 'read',
+          },
+          {
+            id: 'perm_all_estimates_update',
+            resource: 'estimates',
+            action: 'update',
+          },
+          {
+            id: 'perm_all_estimates_delete',
+            resource: 'estimates',
+            action: 'delete',
+          },
+          {
+            id: 'perm_all_estimates_approve',
+            resource: 'estimates',
+            action: 'approve',
+          },
           { id: 'perm_all_jobs', resource: 'jobs', action: 'create' },
           { id: 'perm_all_jobs_read', resource: 'jobs', action: 'read' },
           { id: 'perm_all_jobs_update', resource: 'jobs', action: 'update' },
@@ -71,25 +114,85 @@ export class AuthService implements OnModuleInit {
           { id: 'perm_all_crews_delete', resource: 'crews', action: 'delete' },
           { id: 'perm_all_crews_assign', resource: 'crews', action: 'assign' },
           { id: 'perm_all_inventory', resource: 'inventory', action: 'create' },
-          { id: 'perm_all_inventory_read', resource: 'inventory', action: 'read' },
-          { id: 'perm_all_inventory_update', resource: 'inventory', action: 'update' },
-          { id: 'perm_all_inventory_delete', resource: 'inventory', action: 'delete' },
+          {
+            id: 'perm_all_inventory_read',
+            resource: 'inventory',
+            action: 'read',
+          },
+          {
+            id: 'perm_all_inventory_update',
+            resource: 'inventory',
+            action: 'update',
+          },
+          {
+            id: 'perm_all_inventory_delete',
+            resource: 'inventory',
+            action: 'delete',
+          },
           { id: 'perm_all_billing', resource: 'billing', action: 'create' },
           { id: 'perm_all_billing_read', resource: 'billing', action: 'read' },
-          { id: 'perm_all_billing_update', resource: 'billing', action: 'update' },
-          { id: 'perm_all_billing_delete', resource: 'billing', action: 'delete' },
-          { id: 'perm_all_billing_approve', resource: 'billing', action: 'approve' },
-          { id: 'perm_all_system', resource: 'system_settings', action: 'read' },
-          { id: 'perm_all_system_update', resource: 'system_settings', action: 'update' },
+          {
+            id: 'perm_all_billing_update',
+            resource: 'billing',
+            action: 'update',
+          },
+          {
+            id: 'perm_all_billing_delete',
+            resource: 'billing',
+            action: 'delete',
+          },
+          {
+            id: 'perm_all_billing_approve',
+            resource: 'billing',
+            action: 'approve',
+          },
+          {
+            id: 'perm_all_system',
+            resource: 'system_settings',
+            action: 'read',
+          },
+          {
+            id: 'perm_all_system_update',
+            resource: 'system_settings',
+            action: 'update',
+          },
           { id: 'perm_all_pricing', resource: 'pricing_rules', action: 'read' },
-          { id: 'perm_all_pricing_update', resource: 'pricing_rules', action: 'update' },
+          {
+            id: 'perm_all_pricing_update',
+            resource: 'pricing_rules',
+            action: 'update',
+          },
           { id: 'perm_all_reports', resource: 'reports', action: 'read' },
-          { id: 'perm_all_reports_export', resource: 'reports', action: 'export' },
-          { id: 'perm_all_tariff_settings', resource: 'tariff_settings', action: 'read' },
-          { id: 'perm_all_tariff_settings_create', resource: 'tariff_settings', action: 'create' },
-          { id: 'perm_all_tariff_settings_update', resource: 'tariff_settings', action: 'update' },
-          { id: 'perm_all_tariff_settings_delete', resource: 'tariff_settings', action: 'delete' },
-          { id: 'perm_all_tariff_settings_activate', resource: 'tariff_settings', action: 'activate' },
+          {
+            id: 'perm_all_reports_export',
+            resource: 'reports',
+            action: 'export',
+          },
+          {
+            id: 'perm_all_tariff_settings',
+            resource: 'tariff_settings',
+            action: 'read',
+          },
+          {
+            id: 'perm_all_tariff_settings_create',
+            resource: 'tariff_settings',
+            action: 'create',
+          },
+          {
+            id: 'perm_all_tariff_settings_update',
+            resource: 'tariff_settings',
+            action: 'update',
+          },
+          {
+            id: 'perm_all_tariff_settings_delete',
+            resource: 'tariff_settings',
+            action: 'delete',
+          },
+          {
+            id: 'perm_all_tariff_settings_activate',
+            resource: 'tariff_settings',
+            action: 'activate',
+          },
         ];
         role.permissions = allPermissions;
       }
@@ -106,7 +209,6 @@ export class AuthService implements OnModuleInit {
     let password: string;
 
     if (isProduction) {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const crypto = require('crypto');
       password = crypto.randomBytes(16).toString('hex');
     } else {
@@ -151,9 +253,7 @@ export class AuthService implements OnModuleInit {
 
     // SECURITY FIX: Never log credentials to console
     // Store the initial admin credentials securely in .secrets directory
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path');
     const secretsPath = path.join(process.cwd(), '.secrets');
 
@@ -186,36 +286,48 @@ Environment: ${process.env.NODE_ENV || 'development'}
       fs.writeFileSync(credentialsFile, credentialContent, { mode: 0o600 });
 
       this.logger.log('Default admin user created successfully');
-      this.logger.log(`Admin credentials stored securely in: ${credentialsFile}`);
-      this.logger.warn('IMPORTANT: Change the default admin password after first login!');
+      this.logger.log(
+        `Admin credentials stored securely in: ${credentialsFile}`,
+      );
+      this.logger.warn(
+        'IMPORTANT: Change the default admin password after first login!',
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error('Failed to store admin credentials securely:', errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        'Failed to store admin credentials securely:',
+        errorMessage,
+      );
       this.logger.error('Please set admin password manually');
     }
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponse> {
     const user = await this.userModel.findOne({
-      $or: [
-        { username: loginDto.username },
-        { email: loginDto.username }
-      ],
-      isActive: true
+      $or: [{ username: loginDto.username }, { email: loginDto.username }],
+      isActive: true,
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials or account deactivated');
+      throw new UnauthorizedException(
+        'Invalid credentials or account deactivated',
+      );
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     // Check if password change is required
     if (user.mustChangePassword) {
-      throw new UnauthorizedException('Password change required. Please change your password before continuing.');
+      throw new UnauthorizedException(
+        'Password change required. Please change your password before continuing.',
+      );
     }
 
     // Update last login
@@ -228,11 +340,14 @@ Environment: ${process.env.NODE_ENV || 'development'}
       username: user.username,
       email: user.email,
       role: user.role.name,
-      permissions: user.permissions.map(p => `${p.resource}:${p.action}`),
+      permissions: user.permissions.map((p) => `${p.resource}:${p.action}`),
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-    const refreshToken = this.jwtService.sign({ sub: (user._id as any).toString() }, { expiresIn: '7d' });
+    const refreshToken = this.jwtService.sign(
+      { sub: (user._id as any).toString() },
+      { expiresIn: '7d' },
+    );
 
     // SECURITY ENHANCEMENT: Create session with enhanced security features
     const session = new this.sessionModel({
@@ -245,7 +360,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
       tokenRefreshCount: 0,
       lastTokenRefreshAt: null,
       // Generate session fingerprint for additional security
-      sessionFingerprint: this.generateSessionFingerprint(user.id, Date.now())
+      sessionFingerprint: this.generateSessionFingerprint(user.id, Date.now()),
     });
 
     await session.save();
@@ -258,7 +373,9 @@ Environment: ${process.env.NODE_ENV || 'development'}
     };
   }
 
-  async refreshToken(refreshToken: string): Promise<{ access_token: string; refresh_token?: string }> {
+  async refreshToken(
+    refreshToken: string,
+  ): Promise<{ access_token: string; refresh_token?: string }> {
     // SECURITY FIX: Implement database-level atomic token rotation to prevent race conditions
     const mutexKey = `refresh_${refreshToken}`;
 
@@ -281,7 +398,9 @@ Environment: ${process.env.NODE_ENV || 'development'}
     }
   }
 
-  private async performAtomicTokenRefresh(refreshToken: string): Promise<{ access_token: string; refresh_token?: string }> {
+  private async performAtomicTokenRefresh(
+    refreshToken: string,
+  ): Promise<{ access_token: string; refresh_token?: string }> {
     try {
       // SECURITY FIX: Verify refresh token before database operations
       const decoded = this.jwtService.verify(refreshToken);
@@ -290,7 +409,9 @@ Environment: ${process.env.NODE_ENV || 'development'}
       // SECURITY FIX: Get user with atomic validation
       const user = await this.userModel.findById(userId);
       if (!user || !user.isActive) {
-        throw new UnauthorizedException('Invalid refresh token - user not found or inactive');
+        throw new UnauthorizedException(
+          'Invalid refresh token - user not found or inactive',
+        );
       }
 
       // SECURITY FIX: Implement atomic token rotation with database-level locking
@@ -306,7 +427,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
           userId: userId,
           refreshToken: refreshToken, // Exact match for the current refresh token
           isActive: true,
-          expiresAt: { $gt: now }
+          expiresAt: { $gt: now },
         },
         {
           // Atomically update all session fields in a single operation
@@ -315,22 +436,24 @@ Environment: ${process.env.NODE_ENV || 'development'}
             lastAccessedAt: now,
             // Add concurrency protection
             lastTokenRefreshAt: now,
-            tokenRefreshCount: { $inc: 1 }
-          }
+            tokenRefreshCount: { $inc: 1 },
+          },
         },
         {
           new: true,
           runValidators: true,
           // CRITICAL: This ensures only ONE request can update this session
           // If another request already updated it, this will return null
-          upsert: false
-        }
+          upsert: false,
+        },
       );
 
       // SECURITY FIX: Detect race condition - if session is null, the refresh token was already used
       if (!session) {
         // SECURITY ALERT: Potential token replay attack or race condition detected
-        console.error(`SECURITY ALERT: Refresh token reuse detected for user ${userId}. Token: ${refreshToken.substring(0, 10)}...`);
+        console.error(
+          `SECURITY ALERT: Refresh token reuse detected for user ${userId}. Token: ${refreshToken.substring(0, 10)}...`,
+        );
 
         // Revoke all sessions for this user as a security measure
         await this.sessionModel.updateMany(
@@ -339,12 +462,14 @@ Environment: ${process.env.NODE_ENV || 'development'}
             $set: {
               isActive: false,
               revokedAt: now,
-              revokedReason: 'Token reuse detected - security violation'
-            }
-          }
+              revokedReason: 'Token reuse detected - security violation',
+            },
+          },
         );
 
-        throw new UnauthorizedException('Refresh token already used or session expired - all sessions revoked for security');
+        throw new UnauthorizedException(
+          'Refresh token already used or session expired - all sessions revoked for security',
+        );
       }
 
       // Generate new access token with enhanced security
@@ -353,10 +478,10 @@ Environment: ${process.env.NODE_ENV || 'development'}
         username: user.username,
         email: user.email,
         role: user.role.name,
-        permissions: user.permissions.map(p => `${p.resource}:${p.action}`),
+        permissions: user.permissions.map((p) => `${p.resource}:${p.action}`),
         iat: Math.floor(Date.now() / 1000),
         jti: `${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Enhanced unique token ID
-        sessionId: session._id!.toString() // Link token to specific session
+        sessionId: session._id!.toString(), // Link token to specific session
       };
 
       const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -367,15 +492,15 @@ Environment: ${process.env.NODE_ENV || 'development'}
         {
           $set: {
             token: accessToken,
-            lastAccessedAt: now
-          }
+            lastAccessedAt: now,
+          },
         },
-        { runValidators: true }
+        { runValidators: true },
       );
 
       // Return both tokens (refresh token only if rotation is enabled)
       const result: { access_token: string; refresh_token?: string } = {
-        access_token: accessToken
+        access_token: accessToken,
       };
 
       if (this.REFRESH_TOKEN_ROTATION_ENABLED) {
@@ -388,7 +513,8 @@ Environment: ${process.env.NODE_ENV || 'development'}
         throw error;
       }
       // Log security-relevant errors
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       console.error('Token refresh error:', errorMessage);
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -397,8 +523,8 @@ Environment: ${process.env.NODE_ENV || 'development'}
   async logout(userId: string, sessionId?: string): Promise<void> {
     // Clear any pending refresh operations for this user
     Array.from(this.tokenRefreshMutex.keys())
-      .filter(key => key.includes(userId))
-      .forEach(key => this.tokenRefreshMutex.delete(key));
+      .filter((key) => key.includes(userId))
+      .forEach((key) => this.tokenRefreshMutex.delete(key));
 
     const now = new Date();
 
@@ -411,10 +537,10 @@ Environment: ${process.env.NODE_ENV || 'development'}
             isActive: false,
             revokedAt: now,
             revokedReason: 'User logout',
-            lastAccessedAt: now
-          }
+            lastAccessedAt: now,
+          },
         },
-        { runValidators: true }
+        { runValidators: true },
       );
     } else {
       // SECURITY ENHANCEMENT: Deactivate all user sessions with audit trail
@@ -425,9 +551,9 @@ Environment: ${process.env.NODE_ENV || 'development'}
             isActive: false,
             revokedAt: now,
             revokedReason: 'User logout all sessions',
-            lastAccessedAt: now
-          }
-        }
+            lastAccessedAt: now,
+          },
+        },
       );
     }
   }
@@ -445,8 +571,8 @@ Environment: ${process.env.NODE_ENV || 'development'}
     const existingUser = await this.userModel.findOne({
       $or: [
         { username: createUserDto.username },
-        { email: createUserDto.email }
-      ]
+        { email: createUserDto.email },
+      ],
     });
 
     if (existingUser) {
@@ -498,7 +624,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
 
   async findAll(): Promise<User[]> {
     const users = await this.userModel.find().sort({ lastName: 1 });
-    return users.map(user => this.convertUserDocument(user));
+    return users.map((user) => this.convertUserDocument(user));
   }
 
   async findOne(id: string): Promise<User> {
@@ -519,7 +645,11 @@ Environment: ${process.env.NODE_ENV || 'development'}
     return user ? this.convertUserDocument(user) : null;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto, updatedBy: string): Promise<User> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    updatedBy: string,
+  ): Promise<User> {
     const user = await this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -537,14 +667,18 @@ Environment: ${process.env.NODE_ENV || 'development'}
 
     // Check for username/email conflicts if being updated
     if (updateUserDto.username && updateUserDto.username !== user.username) {
-      const existingUser = await this.userModel.findOne({ username: updateUserDto.username });
+      const existingUser = await this.userModel.findOne({
+        username: updateUserDto.username,
+      });
       if (existingUser && (existingUser._id as any).toString() !== id) {
         throw new ConflictException('Username already exists');
       }
     }
 
     if (updateUserDto.email && updateUserDto.email !== user.email) {
-      const existingUser = await this.userModel.findOne({ email: updateUserDto.email });
+      const existingUser = await this.userModel.findOne({
+        email: updateUserDto.email,
+      });
       if (existingUser && (existingUser._id as any).toString() !== id) {
         throw new ConflictException('Email already exists');
       }
@@ -563,7 +697,10 @@ Environment: ${process.env.NODE_ENV || 'development'}
     return this.convertUserDocument(user);
   }
 
-  async changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<void> {
+  async changePassword(
+    id: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
     const user = await this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -572,7 +709,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
     // Verify current password
     const isCurrentPasswordValid = await bcrypt.compare(
       changePasswordDto.currentPassword,
-      user.passwordHash
+      user.passwordHash,
     );
 
     if (!isCurrentPasswordValid) {
@@ -581,11 +718,16 @@ Environment: ${process.env.NODE_ENV || 'development'}
 
     // Verify new password confirmation
     if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword) {
-      throw new BadRequestException('New password and confirmation do not match');
+      throw new BadRequestException(
+        'New password and confirmation do not match',
+      );
     }
 
     // Hash new password
-    const newPasswordHash = await bcrypt.hash(changePasswordDto.newPassword, 12);
+    const newPasswordHash = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      12,
+    );
 
     // Update user
     user.passwordHash = newPasswordHash;
@@ -618,8 +760,9 @@ Environment: ${process.env.NODE_ENV || 'development'}
   }
 
   async getAllRoles(): Promise<UserRole[]> {
-    return Array.from(this.roles.values())
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+    return Array.from(this.roles.values()).sort((a, b) =>
+      a.displayName.localeCompare(b.displayName),
+    );
   }
 
   async getRole(id: string): Promise<UserRole> {
@@ -631,9 +774,10 @@ Environment: ${process.env.NODE_ENV || 'development'}
   }
 
   async getUserSessions(userId: string): Promise<UserSession[]> {
-    const sessions = await this.sessionModel.find({ userId, isActive: true })
+    const sessions = await this.sessionModel
+      .find({ userId, isActive: true })
       .sort({ lastAccessedAt: -1 });
-    return sessions.map(session => this.convertSessionDocument(session));
+    return sessions.map((session) => this.convertSessionDocument(session));
   }
 
   async revokeSession(sessionId: string): Promise<void> {
@@ -641,7 +785,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
   }
 
   private sanitizeUser(user: User): Omit<User, 'passwordHash'> {
-    const { passwordHash: _, ...sanitizedUser } = user;
+    const { passwordHash, ...sanitizedUser } = user;
     return sanitizedUser;
   }
 
@@ -691,38 +835,57 @@ Environment: ${process.env.NODE_ENV || 'development'}
     };
   }
 
-
   // Permission checking utilities
   hasPermission(user: User, resource: string, action: string): boolean {
     return user.permissions.some(
-      permission => permission.resource === resource && permission.action === action
+      (permission) =>
+        permission.resource === resource && permission.action === action,
     );
   }
 
-  hasAnyPermission(user: User, permissions: { resource: string; action: string }[]): boolean {
-    return permissions.some(p => this.hasPermission(user, p.resource, p.action));
+  hasAnyPermission(
+    user: User,
+    permissions: { resource: string; action: string }[],
+  ): boolean {
+    return permissions.some((p) =>
+      this.hasPermission(user, p.resource, p.action),
+    );
   }
 
-  hasAllPermissions(user: User, permissions: { resource: string; action: string }[]): boolean {
-    return permissions.every(p => this.hasPermission(user, p.resource, p.action));
+  hasAllPermissions(
+    user: User,
+    permissions: { resource: string; action: string }[],
+  ): boolean {
+    return permissions.every((p) =>
+      this.hasPermission(user, p.resource, p.action),
+    );
   }
 
   // SECURITY ENHANCEMENT: Session fingerprinting for additional security
-  private generateSessionFingerprint(userId: string, timestamp: number): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+  private generateSessionFingerprint(
+    userId: string,
+    timestamp: number,
+  ): string {
     const crypto = require('crypto');
     const data = `${userId}_${timestamp}_${process.env.JWT_SECRET}`;
-    return crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);
+    return crypto
+      .createHash('sha256')
+      .update(data)
+      .digest('hex')
+      .substring(0, 32);
   }
 
   // SECURITY ENHANCEMENT: Detect concurrent session usage
-  async detectConcurrentRefreshUsage(userId: string, refreshToken: string): Promise<boolean> {
+  async detectConcurrentRefreshUsage(
+    userId: string,
+    refreshToken: string,
+  ): Promise<boolean> {
     const recentRefreshes = await this.sessionModel.find({
       userId,
       refreshToken,
       lastTokenRefreshAt: {
-        $gte: new Date(Date.now() - 5000) // Check for refreshes in last 5 seconds
-      }
+        $gte: new Date(Date.now() - 5000), // Check for refreshes in last 5 seconds
+      },
     });
 
     return recentRefreshes.length > 0;
@@ -738,15 +901,15 @@ Environment: ${process.env.NODE_ENV || 'development'}
           isActive: false,
           revokedAt: now,
           revokedReason: reason,
-          lastAccessedAt: now
-        }
-      }
+          lastAccessedAt: now,
+        },
+      },
     );
 
     // Clear any pending refresh operations
     Array.from(this.tokenRefreshMutex.keys())
-      .filter(key => key.includes(userId))
-      .forEach(key => this.tokenRefreshMutex.delete(key));
+      .filter((key) => key.includes(userId))
+      .forEach((key) => this.tokenRefreshMutex.delete(key));
   }
 
   /**
@@ -769,24 +932,18 @@ Environment: ${process.env.NODE_ENV || 'development'}
    * Remove FCM token (e.g., on logout or when token becomes invalid)
    */
   async removeFcmToken(userId: string, fcmToken: string): Promise<void> {
-    await this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        $pull: { fcmTokens: fcmToken }
-      }
-    );
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { fcmTokens: fcmToken },
+    });
   }
 
   /**
    * Remove multiple FCM tokens (e.g., when tokens are invalid)
    */
   async removeFcmTokens(userId: string, fcmTokens: string[]): Promise<void> {
-    await this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        $pullAll: { fcmTokens: fcmTokens }
-      }
-    );
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pullAll: { fcmTokens: fcmTokens },
+    });
   }
 
   /**

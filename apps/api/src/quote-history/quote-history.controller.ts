@@ -37,9 +37,8 @@ export class QuoteHistoryController {
 
   @Get('customer/:customerId')
   async getCustomerQuotes(@Param('customerId') customerId: string) {
-    const quotes = await this.quoteHistoryService.getQuotesByCustomer(
-      customerId,
-    );
+    const quotes =
+      await this.quoteHistoryService.getQuotesByCustomer(customerId);
     return {
       success: true,
       quotes,
@@ -49,9 +48,8 @@ export class QuoteHistoryController {
 
   @Get('opportunity/:opportunityId')
   async getOpportunityQuotes(@Param('opportunityId') opportunityId: string) {
-    const quotes = await this.quoteHistoryService.getQuotesByOpportunity(
-      opportunityId,
-    );
+    const quotes =
+      await this.quoteHistoryService.getQuotesByOpportunity(opportunityId);
     return {
       success: true,
       quotes,
@@ -105,7 +103,10 @@ export class QuoteHistoryController {
   }
 
   @Patch(':id/status')
-  async updateStatus(@Param('id') id: string, @Body() dto: UpdateQuoteStatusDto) {
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateQuoteStatusDto,
+  ) {
     const quoteHistory = await this.quoteHistoryService.updateQuoteStatus(
       id,
       dto,

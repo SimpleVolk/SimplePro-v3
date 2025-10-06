@@ -10,20 +10,20 @@ const wsConnectionDuration = new Trend('websocket_connection_duration');
 
 export let options = {
   stages: [
-    { duration: '30s', target: 100 },   // Ramp up to 100 connections
-    { duration: '1m', target: 500 },    // Ramp up to 500 connections
-    { duration: '2m', target: 1000 },   // Ramp up to 1000 connections
-    { duration: '5m', target: 1000 },   // Stay at 1000 for 5 minutes
-    { duration: '1m', target: 3000 },   // Spike to 3000 connections
-    { duration: '2m', target: 3000 },   // Hold at 3000
-    { duration: '1m', target: 5000 },   // Final spike to 5000
-    { duration: '2m', target: 5000 },   // Hold at 5000
-    { duration: '2m', target: 0 },      // Ramp down to 0
+    { duration: '30s', target: 100 }, // Ramp up to 100 connections
+    { duration: '1m', target: 500 }, // Ramp up to 500 connections
+    { duration: '2m', target: 1000 }, // Ramp up to 1000 connections
+    { duration: '5m', target: 1000 }, // Stay at 1000 for 5 minutes
+    { duration: '1m', target: 3000 }, // Spike to 3000 connections
+    { duration: '2m', target: 3000 }, // Hold at 3000
+    { duration: '1m', target: 5000 }, // Final spike to 5000
+    { duration: '2m', target: 5000 }, // Hold at 5000
+    { duration: '2m', target: 0 }, // Ramp down to 0
   ],
   thresholds: {
-    'websocket_connection_duration': ['p(95)<2000'], // 95% of connections establish < 2s
-    'websocket_messages_received': ['count>10000'],  // At least 10k messages received
-    'checks': ['rate>0.95'],                         // 95% of checks pass
+    websocket_connection_duration: ['p(95)<2000'], // 95% of connections establish < 2s
+    websocket_messages_received: ['count>10000'], // At least 10k messages received
+    checks: ['rate>0.95'], // 95% of checks pass
   },
 };
 
@@ -37,7 +37,7 @@ export default function () {
 
   const params = {
     headers: {
-      'Authorization': `Bearer ${JWT_TOKEN}`,
+      Authorization: `Bearer ${JWT_TOKEN}`,
     },
   };
 
@@ -53,25 +53,31 @@ export default function () {
       });
 
       // Subscribe to job updates
-      socket.send(JSON.stringify({
-        event: 'subscribe.job',
-        data: jobId,
-      }));
+      socket.send(
+        JSON.stringify({
+          event: 'subscribe.job',
+          data: jobId,
+        }),
+      );
       wsMessagesSent.add(1);
 
       // Subscribe to notifications
-      socket.send(JSON.stringify({
-        event: 'subscribe.notifications',
-        data: userId,
-      }));
+      socket.send(
+        JSON.stringify({
+          event: 'subscribe.notifications',
+          data: userId,
+        }),
+      );
       wsMessagesSent.add(1);
 
       // Send periodic heartbeat
       socket.setInterval(() => {
-        socket.send(JSON.stringify({
-          event: 'heartbeat',
-          timestamp: Date.now(),
-        }));
+        socket.send(
+          JSON.stringify({
+            event: 'heartbeat',
+            timestamp: Date.now(),
+          }),
+        );
         wsMessagesSent.add(1);
       }, 30000); // Every 30 seconds
     });
@@ -83,7 +89,8 @@ export default function () {
 
       check(message, {
         'Message has event type': (msg) => msg.event !== undefined,
-        'Message has valid structure': (msg) => msg.data !== undefined || msg.error !== undefined,
+        'Message has valid structure': (msg) =>
+          msg.data !== undefined || msg.error !== undefined,
       });
 
       // Simulate different event types
@@ -94,32 +101,37 @@ export default function () {
 
         // Simulate job status update after subscription
         setTimeout(() => {
-          socket.send(JSON.stringify({
-            event: 'job.update',
-            data: {
-              jobId,
-              status: 'in_progress',
-              updatedBy: userId,
-            },
-          }));
+          socket.send(
+            JSON.stringify({
+              event: 'job.update',
+              data: {
+                jobId,
+                status: 'in_progress',
+                updatedBy: userId,
+              },
+            }),
+          );
           wsMessagesSent.add(1);
         }, Math.random() * 5000); // Random delay 0-5 seconds
       }
 
       if (message.event === 'notification.new') {
         check(message, {
-          'Notification received': (msg) => msg.data.notificationId !== undefined,
+          'Notification received': (msg) =>
+            msg.data.notificationId !== undefined,
         });
 
         // Mark notification as read
         setTimeout(() => {
-          socket.send(JSON.stringify({
-            event: 'notification.read',
-            data: {
-              notificationId: message.data.notificationId,
-              userId,
-            },
-          }));
+          socket.send(
+            JSON.stringify({
+              event: 'notification.read',
+              data: {
+                notificationId: message.data.notificationId,
+                userId,
+              },
+            }),
+          );
           wsMessagesSent.add(1);
         }, Math.random() * 3000);
       }

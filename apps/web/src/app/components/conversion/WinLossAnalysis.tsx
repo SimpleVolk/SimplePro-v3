@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from 'recharts';
 import styles from './WinLossAnalysis.module.css';
 
 interface WinLossData {
@@ -156,7 +163,9 @@ export default function WinLossAnalysis({
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={(props: any) => `${props.percent ? (props.percent * 100).toFixed(1) : '0'}%`}
+                  label={(props: any) =>
+                    `${props.percent ? (props.percent * 100).toFixed(1) : '0'}%`
+                  }
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -196,7 +205,9 @@ export default function WinLossAnalysis({
                 <div key={index} className={styles.reasonItem}>
                   <div
                     className={styles.reasonColor}
-                    style={{ backgroundColor: COLORS.won[index % COLORS.won.length] }}
+                    style={{
+                      backgroundColor: COLORS.won[index % COLORS.won.length],
+                    }}
                   ></div>
                   <span className={styles.reasonName}>
                     {formatReasonLabel(reason.reason)}
@@ -219,7 +230,9 @@ export default function WinLossAnalysis({
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={(props: any) => `${props.percent ? (props.percent * 100).toFixed(1) : '0'}%`}
+                  label={(props: any) =>
+                    `${props.percent ? (props.percent * 100).toFixed(1) : '0'}%`
+                  }
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -259,7 +272,9 @@ export default function WinLossAnalysis({
                 <div key={index} className={styles.reasonItem}>
                   <div
                     className={styles.reasonColor}
-                    style={{ backgroundColor: COLORS.lost[index % COLORS.lost.length] }}
+                    style={{
+                      backgroundColor: COLORS.lost[index % COLORS.lost.length],
+                    }}
                   ></div>
                   <span className={styles.reasonName}>
                     {formatReasonLabel(reason.reason)}

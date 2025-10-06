@@ -3,7 +3,10 @@
     "allow": [
       "Bash(git log:*)",
       "Bash(tee:*)",
-      "Read(//d//**)"
+      "Read(//d//**)",
+      "Bash(npx prettier:*)",
+      "Bash(NODE_ENV=test npm test)",
+      "Bash(set NODE_ENV=test)"
     ],
     "deny": [],
     "ask": []

@@ -39,7 +39,9 @@ export function CrewPerformance() {
   const [filterRole, setFilterRole] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'rating' | 'jobs' | 'onTime'>('rating');
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
 
@@ -147,9 +149,15 @@ export function CrewPerformance() {
 
     return {
       topPerformer: sortedByRating[0]?.crewMemberName || 'N/A',
-      averageRating: data.length > 0 ? parseFloat((totalRating / data.length).toFixed(2)) : 0,
+      averageRating:
+        data.length > 0
+          ? parseFloat((totalRating / data.length).toFixed(2))
+          : 0,
       totalJobsCompleted: totalCompleted,
-      overallOnTimeRate: totalCompleted > 0 ? parseFloat(((totalOnTime / totalCompleted) * 100).toFixed(1)) : 0,
+      overallOnTimeRate:
+        totalCompleted > 0
+          ? parseFloat(((totalOnTime / totalCompleted) * 100).toFixed(1))
+          : 0,
     };
   };
 
@@ -177,7 +185,7 @@ export function CrewPerformance() {
   };
 
   const filteredPerformances = performances
-    .filter(p => filterRole === 'all' || p.role === filterRole)
+    .filter((p) => filterRole === 'all' || p.role === filterRole)
     .sort((a, b) => {
       if (sortBy === 'rating') return b.rating - a.rating;
       if (sortBy === 'jobs') return b.completedJobs - a.completedJobs;
@@ -199,7 +207,9 @@ export function CrewPerformance() {
       <div className={styles.header}>
         <div>
           <h2>Crew Performance</h2>
-          <p className={styles.subtitle}>Performance metrics and crew member ratings</p>
+          <p className={styles.subtitle}>
+            Performance metrics and crew member ratings
+          </p>
         </div>
       </div>
 
@@ -224,11 +234,15 @@ export function CrewPerformance() {
           </div>
           <div className={styles.metricCard}>
             <div className={styles.metricLabel}>Jobs Completed</div>
-            <div className={styles.metricValue}>{metrics.totalJobsCompleted}</div>
+            <div className={styles.metricValue}>
+              {metrics.totalJobsCompleted}
+            </div>
           </div>
           <div className={styles.metricCard}>
             <div className={styles.metricLabel}>On-Time Rate</div>
-            <div className={styles.metricValue}>{metrics.overallOnTimeRate}%</div>
+            <div className={styles.metricValue}>
+              {metrics.overallOnTimeRate}%
+            </div>
           </div>
         </div>
       )}
@@ -239,14 +253,18 @@ export function CrewPerformance() {
           <input
             type="date"
             value={dateRange.startDate}
-            onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+            onChange={(e) =>
+              setDateRange({ ...dateRange, startDate: e.target.value })
+            }
             className={styles.dateInput}
           />
           <label>To:</label>
           <input
             type="date"
             value={dateRange.endDate}
-            onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+            onChange={(e) =>
+              setDateRange({ ...dateRange, endDate: e.target.value })
+            }
             className={styles.dateInput}
           />
         </div>
@@ -265,7 +283,9 @@ export function CrewPerformance() {
 
         <select
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'rating' | 'jobs' | 'onTime')}
+          onChange={(e) =>
+            setSortBy(e.target.value as 'rating' | 'jobs' | 'onTime')
+          }
           className={styles.filterSelect}
         >
           <option value="rating">Sort by Rating</option>
@@ -318,14 +338,18 @@ export function CrewPerformance() {
             <div className={styles.cardBody}>
               <div className={styles.statRow}>
                 <span className={styles.statLabel}>Jobs Completed:</span>
-                <span className={styles.statValue}>{perf.completedJobs}/{perf.totalJobs}</span>
+                <span className={styles.statValue}>
+                  {perf.completedJobs}/{perf.totalJobs}
+                </span>
               </div>
 
               <div className={styles.statRow}>
                 <span className={styles.statLabel}>On-Time Rate:</span>
                 <span
                   className={styles.statValue}
-                  style={{ color: perf.onTimeRate >= 90 ? '#10b981' : '#f59e0b' }}
+                  style={{
+                    color: perf.onTimeRate >= 90 ? '#10b981' : '#f59e0b',
+                  }}
                 >
                   {perf.onTimeRate}%
                 </span>
@@ -333,7 +357,9 @@ export function CrewPerformance() {
 
               <div className={styles.statRow}>
                 <span className={styles.statLabel}>Avg Job Duration:</span>
-                <span className={styles.statValue}>{perf.averageJobDuration}h</span>
+                <span className={styles.statValue}>
+                  {perf.averageJobDuration}h
+                </span>
               </div>
 
               <div className={styles.statRow}>
@@ -345,9 +371,13 @@ export function CrewPerformance() {
                 <span className={styles.statLabel}>Monthly Trend:</span>
                 <span
                   className={styles.statValue}
-                  style={{ color: perf.monthlyTrend > 0 ? '#10b981' : '#dc2626' }}
+                  style={{
+                    color: perf.monthlyTrend > 0 ? '#10b981' : '#dc2626',
+                  }}
                 >
-                  {getTrendIcon(perf.monthlyTrend)} {perf.monthlyTrend > 0 ? '+' : ''}{perf.monthlyTrend}%
+                  {getTrendIcon(perf.monthlyTrend)}{' '}
+                  {perf.monthlyTrend > 0 ? '+' : ''}
+                  {perf.monthlyTrend}%
                 </span>
               </div>
             </div>
@@ -378,9 +408,15 @@ export function CrewPerformance() {
                 ></div>
               </div>
               <div className={styles.feedbackLegend}>
-                <span className={styles.legendPositive}>👍 {perf.customerFeedback.positive}</span>
-                <span className={styles.legendNeutral}>😐 {perf.customerFeedback.neutral}</span>
-                <span className={styles.legendNegative}>👎 {perf.customerFeedback.negative}</span>
+                <span className={styles.legendPositive}>
+                  👍 {perf.customerFeedback.positive}
+                </span>
+                <span className={styles.legendNeutral}>
+                  😐 {perf.customerFeedback.neutral}
+                </span>
+                <span className={styles.legendNegative}>
+                  👎 {perf.customerFeedback.negative}
+                </span>
               </div>
             </div>
           </div>

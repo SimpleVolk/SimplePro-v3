@@ -15,38 +15,38 @@ This comprehensive checklist covers all aspects of mobile testing for the Simple
 
 ### iOS Devices
 
-| Device | Screen Size | Resolution | Safari Version | Priority |
-|--------|-------------|------------|----------------|----------|
-| iPhone SE (2022) | 4.7" | 375×667 | iOS 17+ | High |
-| iPhone 12/13 | 6.1" | 390×844 | iOS 17+ | Critical |
-| iPhone 12/13 mini | 5.4" | 375×812 | iOS 17+ | Medium |
-| iPhone 14 Pro | 6.1" | 393×852 | iOS 17+ | High |
-| iPhone 14 Pro Max | 6.7" | 430×932 | iOS 17+ | High |
-| iPhone 15 | 6.1" | 393×852 | iOS 17+ | Critical |
-| iPad (10th gen) | 10.9" | 820×1180 | iOS 17+ | High |
-| iPad Pro 11" | 11" | 834×1194 | iOS 17+ | Medium |
-| iPad Pro 12.9" | 12.9" | 1024×1366 | iOS 17+ | Medium |
+| Device            | Screen Size | Resolution | Safari Version | Priority |
+| ----------------- | ----------- | ---------- | -------------- | -------- |
+| iPhone SE (2022)  | 4.7"        | 375×667    | iOS 17+        | High     |
+| iPhone 12/13      | 6.1"        | 390×844    | iOS 17+        | Critical |
+| iPhone 12/13 mini | 5.4"        | 375×812    | iOS 17+        | Medium   |
+| iPhone 14 Pro     | 6.1"        | 393×852    | iOS 17+        | High     |
+| iPhone 14 Pro Max | 6.7"        | 430×932    | iOS 17+        | High     |
+| iPhone 15         | 6.1"        | 393×852    | iOS 17+        | Critical |
+| iPad (10th gen)   | 10.9"       | 820×1180   | iOS 17+        | High     |
+| iPad Pro 11"      | 11"         | 834×1194   | iOS 17+        | Medium   |
+| iPad Pro 12.9"    | 12.9"       | 1024×1366  | iOS 17+        | Medium   |
 
 ### Android Devices
 
-| Device | Screen Size | Resolution | Chrome Version | Priority |
-|--------|-------------|------------|----------------|----------|
-| Samsung Galaxy S21 | 6.2" | 360×800 | Chrome 120+ | Critical |
-| Samsung Galaxy S23 | 6.1" | 360×780 | Chrome 120+ | High |
-| Google Pixel 6 | 6.4" | 412×915 | Chrome 120+ | High |
-| Google Pixel 7 Pro | 6.7" | 412×892 | Chrome 120+ | Medium |
-| OnePlus 10 Pro | 6.7" | 412×919 | Chrome 120+ | Medium |
-| Samsung Galaxy Tab S8 | 11" | 800×1280 | Chrome 120+ | High |
-| Samsung Galaxy A53 | 6.5" | 412×915 | Chrome 120+ | Low |
+| Device                | Screen Size | Resolution | Chrome Version | Priority |
+| --------------------- | ----------- | ---------- | -------------- | -------- |
+| Samsung Galaxy S21    | 6.2"        | 360×800    | Chrome 120+    | Critical |
+| Samsung Galaxy S23    | 6.1"        | 360×780    | Chrome 120+    | High     |
+| Google Pixel 6        | 6.4"        | 412×915    | Chrome 120+    | High     |
+| Google Pixel 7 Pro    | 6.7"        | 412×892    | Chrome 120+    | Medium   |
+| OnePlus 10 Pro        | 6.7"        | 412×919    | Chrome 120+    | Medium   |
+| Samsung Galaxy Tab S8 | 11"         | 800×1280   | Chrome 120+    | High     |
+| Samsung Galaxy A53    | 6.5"        | 412×915    | Chrome 120+    | Low      |
 
 ### Emulators/Simulators
 
-| Platform | Recommended Sizes | Notes |
-|----------|-------------------|-------|
-| Chrome DevTools | 320px, 375px, 390px, 412px, 768px, 1024px | Primary testing tool |
-| Xcode iOS Simulator | iPhone 13, iPhone 15, iPad Pro | Mac only |
-| Android Studio Emulator | Pixel 6, Galaxy S21 | Cross-platform |
-| BrowserStack/Sauce Labs | All devices listed above | Paid service, real devices |
+| Platform                | Recommended Sizes                         | Notes                      |
+| ----------------------- | ----------------------------------------- | -------------------------- |
+| Chrome DevTools         | 320px, 375px, 390px, 412px, 768px, 1024px | Primary testing tool       |
+| Xcode iOS Simulator     | iPhone 13, iPhone 15, iPad Pro            | Mac only                   |
+| Android Studio Emulator | Pixel 6, Galaxy S21                       | Cross-platform             |
+| BrowserStack/Sauce Labs | All devices listed above                  | Paid service, real devices |
 
 ---
 
@@ -54,19 +54,20 @@ This comprehensive checklist covers all aspects of mobile testing for the Simple
 
 ### Critical Breakpoints to Test
 
-| Breakpoint | Width | Device Category | Sidebar Behavior |
-|------------|-------|-----------------|------------------|
-| Very Small | 320px | Old iPhones | Hidden, hamburger menu |
-| Small | 375px | iPhone SE, 12 mini | Hidden, hamburger menu |
-| Medium | 390px | iPhone 12/13/14 | Hidden, hamburger menu |
-| Large Phone | 414px | iPhone 14 Pro Max | Hidden, hamburger menu |
-| Small Tablet | 768px | iPad mini, portrait | Visible, static |
-| Large Tablet | 1024px | iPad, landscape | Visible, collapsible |
-| Desktop | 1280px+ | Desktop browsers | Visible, collapsible |
+| Breakpoint   | Width   | Device Category     | Sidebar Behavior       |
+| ------------ | ------- | ------------------- | ---------------------- |
+| Very Small   | 320px   | Old iPhones         | Hidden, hamburger menu |
+| Small        | 375px   | iPhone SE, 12 mini  | Hidden, hamburger menu |
+| Medium       | 390px   | iPhone 12/13/14     | Hidden, hamburger menu |
+| Large Phone  | 414px   | iPhone 14 Pro Max   | Hidden, hamburger menu |
+| Small Tablet | 768px   | iPad mini, portrait | Visible, static        |
+| Large Tablet | 1024px  | iPad, landscape     | Visible, collapsible   |
+| Desktop      | 1280px+ | Desktop browsers    | Visible, collapsible   |
 
 ### Viewport Testing Procedure
 
 For each breakpoint, verify:
+
 - Layout doesn't break
 - Content is readable
 - Interactive elements are accessible
@@ -83,6 +84,7 @@ For each breakpoint, verify:
 #### 1.1 Hamburger Menu Functionality
 
 **Mobile (<768px):**
+
 - [ ] Hamburger menu button is visible in top-left corner
 - [ ] Button is 44×44px minimum (touch target compliant)
 - [ ] Button has proper color (`#1e40af` background)
@@ -93,6 +95,7 @@ For each breakpoint, verify:
 - [ ] Z-index correct (button at 1100, above all other elements)
 
 **Tablet/Desktop (≥768px):**
+
 - [ ] Hamburger menu button is hidden
 - [ ] Sidebar is always visible
 - [ ] Collapse button (◀/▶) is visible
@@ -101,6 +104,7 @@ For each breakpoint, verify:
 #### 1.2 Backdrop Overlay
 
 **Mobile (<768px):**
+
 - [ ] Backdrop appears when sidebar opens
 - [ ] Backdrop has semi-transparent black background (`rgba(0,0,0,0.5)`)
 - [ ] Backdrop has blur effect (`backdrop-filter: blur(2px)`)
@@ -109,11 +113,13 @@ For each breakpoint, verify:
 - [ ] Z-index correct (999, below hamburger, above content)
 
 **Tablet/Desktop (≥768px):**
+
 - [ ] Backdrop never appears
 
 #### 1.3 Sidebar Slide Animation
 
 **Mobile (<768px):**
+
 - [ ] Sidebar slides in from left smoothly
 - [ ] Initial position: `translateX(-100%)`
 - [ ] Final position: `translateX(0)`
@@ -127,6 +133,7 @@ For each breakpoint, verify:
 #### 1.4 Navigation Item Interaction
 
 **All Viewports:**
+
 - [ ] All navigation items visible and readable
 - [ ] Active tab highlighted correctly
 - [ ] Click/tap on navigation item changes view
@@ -135,6 +142,7 @@ For each breakpoint, verify:
 - [ ] Hover state works (desktop/tablet)
 
 **Mobile (<768px) Specific:**
+
 - [ ] Sidebar auto-closes after navigation item click
 - [ ] Animation smooth when closing after navigation
 - [ ] No double-tap required
@@ -143,6 +151,7 @@ For each breakpoint, verify:
 #### 1.5 Body Scroll Prevention
 
 **Mobile (<768px):**
+
 - [ ] Body scroll disabled when sidebar is open
 - [ ] Background content doesn't scroll when swiping over backdrop
 - [ ] Body scroll re-enabled when sidebar closes
@@ -150,11 +159,13 @@ For each breakpoint, verify:
 - [ ] No scroll lock on page reload
 
 **Tablet/Desktop (≥768px):**
+
 - [ ] Body scroll always enabled (sidebar always visible)
 
 #### 1.6 Sidebar Collapse (Desktop Only)
 
 **Desktop (≥1024px):**
+
 - [ ] Collapse button visible next to logo
 - [ ] Click collapse button transitions sidebar from 280px to 70px
 - [ ] Navigation labels hide when collapsed
@@ -169,6 +180,7 @@ For each breakpoint, verify:
 #### 2.1 Touch Target Sizes
 
 **All Interactive Elements:**
+
 - [ ] Hamburger menu button: ≥44×44px
 - [ ] Navigation items: ≥44px height
 - [ ] Collapse button: ≥44×44px
@@ -199,6 +211,7 @@ For each breakpoint, verify:
 #### 3.1 Button Color Consistency
 
 **Primary Buttons:**
+
 - [ ] All primary buttons use `#2563eb` (blue-600)
 - [ ] Hover state uses `#1d4ed8` (blue-700)
 - [ ] Focus ring uses `#60a5fa` (blue-400) with 3px outline
@@ -206,6 +219,7 @@ For each breakpoint, verify:
 - [ ] No color inconsistencies across components
 
 **Affected Components:**
+
 - [ ] LoginForm submit button
 - [ ] ReportsManagement primary buttons
 - [ ] CustomerManagement action buttons
@@ -217,6 +231,7 @@ For each breakpoint, verify:
 #### 3.2 Text Readability
 
 **All Viewports:**
+
 - [ ] Font size ≥14px for body text
 - [ ] Font size ≥16px for form inputs (prevents iOS zoom)
 - [ ] Headings properly sized and hierarchical
@@ -225,6 +240,7 @@ For each breakpoint, verify:
 - [ ] No text truncation (unless intentional with ellipsis)
 
 **Mobile Specific:**
+
 - [ ] Text still readable at 320px width
 - [ ] No text overflow outside containers
 - [ ] Navigation labels not cut off
@@ -243,6 +259,7 @@ For each breakpoint, verify:
 #### 3.4 Layout and Spacing
 
 **All Viewports:**
+
 - [ ] Consistent spacing between sections
 - [ ] Proper padding in containers
 - [ ] No horizontal scrolling
@@ -251,6 +268,7 @@ For each breakpoint, verify:
 - [ ] Tables scroll or stack appropriately on mobile
 
 **Mobile Specific:**
+
 - [ ] Single column layout for forms
 - [ ] Cards stack vertically
 - [ ] Dashboard widgets reflow correctly
@@ -262,6 +280,7 @@ For each breakpoint, verify:
 #### 4.1 Input Field Accessibility
 
 **All Viewports:**
+
 - [ ] All inputs have visible labels
 - [ ] Labels properly associated (for/id)
 - [ ] Input font size ≥16px (prevents iOS zoom)
@@ -270,6 +289,7 @@ For each breakpoint, verify:
 - [ ] Focus states clearly visible
 
 **Mobile Specific:**
+
 - [ ] Keyboard doesn't hide active input
 - [ ] Page scrolls to bring input into view
 - [ ] Keyboard type appropriate (email, number, tel, etc.)
@@ -299,6 +319,7 @@ For each breakpoint, verify:
 #### 4.4 Keyboard Interaction
 
 **iOS Keyboard:**
+
 - [ ] Keyboard appears immediately on input focus
 - [ ] "Done" button closes keyboard
 - [ ] "Next" button moves to next field
@@ -306,6 +327,7 @@ For each breakpoint, verify:
 - [ ] Viewport adjusts for keyboard height
 
 **Android Keyboard:**
+
 - [ ] Keyboard appears on input focus
 - [ ] Enter/Go button submits form (single field) or moves to next
 - [ ] Back button closes keyboard
@@ -323,6 +345,7 @@ For each breakpoint, verify:
 - [ ] GPU-accelerated transforms used (`translateX`, not `left`)
 
 **Testing Method:**
+
 - Open Chrome DevTools Performance tab
 - Record while opening/closing sidebar
 - Check for long tasks (>50ms)
@@ -331,6 +354,7 @@ For each breakpoint, verify:
 #### 5.2 Page Load Performance
 
 **Mobile 4G Network:**
+
 - [ ] First Contentful Paint (FCP) < 2.5s
 - [ ] Largest Contentful Paint (LCP) < 2.5s
 - [ ] Time to Interactive (TTI) < 3.5s
@@ -338,12 +362,14 @@ For each breakpoint, verify:
 - [ ] Total Blocking Time (TBT) < 200ms
 
 **Mobile 3G Network:**
+
 - [ ] FCP < 4s
 - [ ] LCP < 4s
 - [ ] TTI < 5s
 - [ ] Page usable within 7s
 
 **WiFi:**
+
 - [ ] FCP < 1.5s
 - [ ] LCP < 1.5s
 - [ ] TTI < 2s
@@ -357,6 +383,7 @@ For each breakpoint, verify:
 - [ ] No detached DOM trees
 
 **Testing Method:**
+
 - Chrome DevTools Memory tab
 - Take heap snapshot
 - Navigate through app
@@ -413,6 +440,7 @@ For each breakpoint, verify:
 #### 7.1 Screen Reader Navigation
 
 **iOS VoiceOver:**
+
 - [ ] Hamburger button announced correctly ("Open menu" / "Close menu")
 - [ ] Navigation items announced
 - [ ] Active tab state announced
@@ -420,6 +448,7 @@ For each breakpoint, verify:
 - [ ] Form labels read correctly
 
 **Android TalkBack:**
+
 - [ ] All interactive elements announced
 - [ ] Navigation context clear
 - [ ] Form validation errors announced
@@ -533,6 +562,7 @@ For each breakpoint, verify:
 ### 3. Issue Logging
 
 For each issue found:
+
 1. Record device/browser/OS version
 2. Screenshot or video capture
 3. Steps to reproduce
@@ -543,6 +573,7 @@ For each issue found:
 ### 4. Regression Testing
 
 After fixes:
+
 1. Retest failed scenarios
 2. Verify fix doesn't break other features
 3. Test on multiple devices
@@ -614,9 +645,9 @@ test.describe('Mobile Navigation', () => {
 
 ## Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | Claude Code | Initial checklist creation |
+| Version | Date       | Author      | Changes                    |
+| ------- | ---------- | ----------- | -------------------------- |
+| 1.0     | 2025-10-02 | Claude Code | Initial checklist creation |
 
 ---
 

@@ -1,11 +1,25 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { getApiUrl } from '../../lib/config';
 
 interface UserRole {
   id: string;
-  name: 'super_admin' | 'admin' | 'manager' | 'dispatcher' | 'sales' | 'crew_lead' | 'crew_member' | 'customer_service';
+  name:
+    | 'super_admin'
+    | 'admin'
+    | 'manager'
+    | 'dispatcher'
+    | 'sales'
+    | 'crew_lead'
+    | 'crew_member'
+    | 'customer_service';
   displayName: string;
   description: string;
   isSystemRole: boolean;
@@ -86,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('📋 Environment variables check:', {
         NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
         NODE_ENV: process.env.NODE_ENV,
-        windowDefined: typeof window !== 'undefined'
+        windowDefined: typeof window !== 'undefined',
       });
 
       const requestPayload = { username: email, password };
@@ -113,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ok: response.ok,
         headers: response.headers,
         url: response.url,
-        type: response.type
+        type: response.type,
       });
 
       if (response.ok) {
@@ -145,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           stack: error.stack,
           isNetworkError: error.message.includes('Failed to fetch'),
           isCORSError: error.message.includes('CORS'),
-          isConnectionError: error.message.includes('ERR_CONNECTION')
+          isConnectionError: error.message.includes('ERR_CONNECTION'),
         });
       }
 

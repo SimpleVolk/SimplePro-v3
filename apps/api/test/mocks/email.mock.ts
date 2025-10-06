@@ -12,7 +12,7 @@ export class EmailServiceMock {
     to: string,
     subject: string,
     html?: string,
-    text?: string
+    text?: string,
   ): Promise<{
     messageId: string;
     accepted: string[];
@@ -41,7 +41,7 @@ export class EmailServiceMock {
     recipients: string[],
     subject: string,
     html?: string,
-    text?: string
+    text?: string,
   ): Promise<{
     successful: string[];
     failed: string[];

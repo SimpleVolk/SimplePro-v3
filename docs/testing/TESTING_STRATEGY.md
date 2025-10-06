@@ -20,15 +20,15 @@ This document outlines the complete end-to-end testing framework for SimplePro-v
 
 ### Technology Stack
 
-| Test Type | Framework | Purpose |
-|-----------|-----------|---------|
-| **Unit Tests** | Jest + ts-jest | Component and function testing |
-| **Integration Tests** | Jest + Supertest | API endpoint and database testing |
-| **E2E API Tests** | Jest + Supertest | Complete workflow validation |
-| **Web E2E Tests** | Playwright | Browser-based user workflow testing |
-| **Mobile E2E Tests** | Detox | React Native app testing |
-| **Load Tests** | k6 | Performance and scalability testing |
-| **Coverage** | Istanbul/nyc | Code coverage reporting |
+| Test Type             | Framework        | Purpose                             |
+| --------------------- | ---------------- | ----------------------------------- |
+| **Unit Tests**        | Jest + ts-jest   | Component and function testing      |
+| **Integration Tests** | Jest + Supertest | API endpoint and database testing   |
+| **E2E API Tests**     | Jest + Supertest | Complete workflow validation        |
+| **Web E2E Tests**     | Playwright       | Browser-based user workflow testing |
+| **Mobile E2E Tests**  | Detox            | React Native app testing            |
+| **Load Tests**        | k6               | Performance and scalability testing |
+| **Coverage**          | Istanbul/nyc     | Code coverage reporting             |
 
 ### Test File Structure
 
@@ -98,14 +98,14 @@ SimplePro-v3/
 
 ### Coverage Goals by Layer
 
-| Layer | Target Coverage | Test Count (Current) |
-|-------|-----------------|---------------------|
-| **Unit Tests** | 80%+ | 38 (pricing-engine) + expanding |
-| **Integration Tests** | All critical paths | 6 test files |
-| **E2E API Tests** | Complete workflows | 1 comprehensive suite |
-| **Web E2E Tests** | Major user flows | 1 complete workflow |
-| **Mobile E2E Tests** | Core functionality | To be implemented |
-| **Load Tests** | Performance benchmarks | 2 scenarios |
+| Layer                 | Target Coverage        | Test Count (Current)            |
+| --------------------- | ---------------------- | ------------------------------- |
+| **Unit Tests**        | 80%+                   | 38 (pricing-engine) + expanding |
+| **Integration Tests** | All critical paths     | 6 test files                    |
+| **E2E API Tests**     | Complete workflows     | 1 comprehensive suite           |
+| **Web E2E Tests**     | Major user flows       | 1 complete workflow             |
+| **Mobile E2E Tests**  | Core functionality     | To be implemented               |
+| **Load Tests**        | Performance benchmarks | 2 scenarios                     |
 
 ---
 
@@ -116,6 +116,7 @@ SimplePro-v3/
 **Test File:** `apps/api/test/e2e/complete-job-lifecycle.e2e-spec.ts`
 
 **Steps Validated:**
+
 1. ✅ Create customer via API
 2. ✅ Create opportunity with room-by-room inventory
 3. ✅ Calculate estimate using deterministic pricing engine
@@ -130,6 +131,7 @@ SimplePro-v3/
 12. ✅ Send completion notification
 
 **Assertions:**
+
 - Customer created with correct data
 - Estimate matches expected price (deterministic)
 - Optimal crew assigned (score > 80)
@@ -146,6 +148,7 @@ SimplePro-v3/
 **Test File:** `apps/api/test/integration/offline-sync.integration-spec.ts`
 
 **Steps Validated:**
+
 1. ✅ Fetch job schedule while online
 2. ✅ Queue check-in action while offline
 3. ✅ Queue 3 photo uploads while offline
@@ -157,6 +160,7 @@ SimplePro-v3/
 9. ✅ Server state matches local state
 
 **Assertions:**
+
 - Offline queue length = 6 actions
 - Check-in synced with correct GPS
 - All photos uploaded (3 total)
@@ -172,6 +176,7 @@ SimplePro-v3/
 **Test File:** `apps/api/test/integration/websocket-realtime.integration-spec.ts`
 
 **Steps Validated:**
+
 1. ✅ Create notification with multi-channel delivery
 2. ✅ Verify in-app delivery (< 100ms)
 3. ✅ Verify email sent (< 5 seconds)
@@ -183,6 +188,7 @@ SimplePro-v3/
 9. ✅ Unread count updates in real-time
 
 **Assertions:**
+
 - WebSocket connection established < 100ms
 - All channels delivered successfully
 - Read receipt received by sender
@@ -197,6 +203,7 @@ SimplePro-v3/
 **Status:** To be implemented
 
 **Planned Steps:**
+
 1. Create opportunity with leadSource = 'website'
 2. Automation rule triggers (call within 1 hour)
 3. Sales rep completes activity with outcome
@@ -211,6 +218,7 @@ SimplePro-v3/
 **Status:** To be implemented
 
 **Planned Steps:**
+
 1. Create partner with tiered commission structure
 2. Partner submits referral
 3. Referral converted to opportunity → job
@@ -226,6 +234,7 @@ SimplePro-v3/
 **Status:** To be implemented
 
 **Planned Steps:**
+
 1. Create crew members with skills and ratings
 2. Run auto-assignment algorithm
 3. Verify optimal crew selection (score-based)
@@ -240,6 +249,7 @@ SimplePro-v3/
 **Status:** To be implemented
 
 **Planned Steps:**
+
 1. Upload PDF contract for job
 2. Verify file stored in MinIO bucket
 3. Generate pre-signed download URL
@@ -375,31 +385,33 @@ detox test -f "offline mode" --configuration ios.sim.debug
 
 ### API Endpoint Performance
 
-| Endpoint | P95 Latency | Target | Status |
-|----------|-------------|--------|--------|
-| `POST /api/estimates/calculate` | < 1000ms | < 800ms | ⚠️ Needs optimization |
-| `GET /api/jobs` | < 300ms | < 200ms | ✅ Passing |
-| `POST /api/customers` | < 500ms | < 400ms | ✅ Passing |
-| `PATCH /api/jobs/:id/status` | < 300ms | < 200ms | ✅ Passing |
-| `GET /api/jobs/calendar/week/:date` | < 400ms | < 300ms | ✅ Passing |
+| Endpoint                            | P95 Latency | Target  | Status                |
+| ----------------------------------- | ----------- | ------- | --------------------- |
+| `POST /api/estimates/calculate`     | < 1000ms    | < 800ms | ⚠️ Needs optimization |
+| `GET /api/jobs`                     | < 300ms     | < 200ms | ✅ Passing            |
+| `POST /api/customers`               | < 500ms     | < 400ms | ✅ Passing            |
+| `PATCH /api/jobs/:id/status`        | < 300ms     | < 200ms | ✅ Passing            |
+| `GET /api/jobs/calendar/week/:date` | < 400ms     | < 300ms | ✅ Passing            |
 
 ### WebSocket Performance
 
-| Metric | Target | Load Test Result |
-|--------|--------|------------------|
-| **Concurrent Connections** | 5000 | To be tested |
-| **Message Throughput** | 10,000/sec | To be tested |
-| **Connection Establishment** | < 2000ms (P95) | To be tested |
-| **Message Delivery Latency** | < 100ms | To be tested |
+| Metric                       | Target         | Load Test Result |
+| ---------------------------- | -------------- | ---------------- |
+| **Concurrent Connections**   | 5000           | To be tested     |
+| **Message Throughput**       | 10,000/sec     | To be tested     |
+| **Connection Establishment** | < 2000ms (P95) | To be tested     |
+| **Message Delivery Latency** | < 100ms        | To be tested     |
 
 ### Load Test Scenarios
 
 **Scenario 1: API Endpoints (100 VUs, 5 minutes)**
+
 - Target: 95% of requests < 500ms
 - Error rate: < 1%
 - Throughput: > 100 requests/second
 
 **Scenario 2: WebSocket Connections (5000 concurrent)**
+
 - Target: 95% connection time < 2000ms
 - Message delivery: < 100ms
 - No connection failures
@@ -423,21 +435,25 @@ detox test -f "offline mode" --configuration ios.sim.debug
 ### Mock Services
 
 **Email Service Mock:** `apps/api/test/mocks/email.mock.ts`
+
 - Tracks sent emails
 - Simulates delivery success
 - Supports bulk operations
 
 **SMS Service Mock:** `apps/api/test/mocks/sms.mock.ts`
+
 - Simulates Twilio API
 - Tracks message status
 - Supports delivery simulation
 
 **Push Notification Mock:** `apps/api/test/mocks/push-notification.mock.ts`
+
 - Simulates Firebase FCM
 - Manages device tokens
 - Tracks delivery status
 
 **MinIO Mock:** `apps/api/test/mocks/minio.mock.ts`
+
 - In-memory file storage
 - Supports all S3 operations
 - Pre-signed URL generation
@@ -515,14 +531,14 @@ npx playwright show-trace trace.zip
 
 ### Test Execution Times
 
-| Test Suite | Execution Time | Parallel? |
-|------------|----------------|-----------|
-| Pricing Engine Unit Tests | ~5 seconds | Yes |
-| API Unit Tests | ~15 seconds | Yes |
-| API Integration Tests | ~30 seconds | Sequential |
-| E2E API Tests | ~60 seconds | Sequential |
-| Web E2E Tests (Playwright) | ~120 seconds | Parallel |
-| Load Tests (k6) | ~15 minutes | N/A |
+| Test Suite                 | Execution Time | Parallel?  |
+| -------------------------- | -------------- | ---------- |
+| Pricing Engine Unit Tests  | ~5 seconds     | Yes        |
+| API Unit Tests             | ~15 seconds    | Yes        |
+| API Integration Tests      | ~30 seconds    | Sequential |
+| E2E API Tests              | ~60 seconds    | Sequential |
+| Web E2E Tests (Playwright) | ~120 seconds   | Parallel   |
+| Load Tests (k6)            | ~15 minutes    | N/A        |
 
 ### Resources
 

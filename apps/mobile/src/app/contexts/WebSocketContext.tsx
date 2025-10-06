@@ -20,9 +20,13 @@ interface WebSocketContextType {
   getUnreadNotifications: () => any[];
 }
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
+const WebSocketContext = createContext<WebSocketContextType | undefined>(
+  undefined,
+);
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isAuthenticated } = useAuth();
   const webSocket = useWebSocket();
   const [lastKnownLocation, setLastKnownLocation] = useState<any>(null);
@@ -75,7 +79,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             enableHighAccuracy: true,
             timeout: 10000,
             maximumAge: 60000, // 1 minute
-          }
+          },
         );
       }
     };
@@ -117,7 +121,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 export const useWebSocketContext = (): WebSocketContextType => {
   const context = useContext(WebSocketContext);
   if (!context) {
-    throw new Error('useWebSocketContext must be used within a WebSocketProvider');
+    throw new Error(
+      'useWebSocketContext must be used within a WebSocketProvider',
+    );
   }
   return context;
 };

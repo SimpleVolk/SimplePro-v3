@@ -39,7 +39,7 @@ export const authApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },
@@ -71,7 +71,11 @@ export const authApi = {
   /**
    * Change password
    */
-  changePassword: async (token: string, oldPassword: string, newPassword: string) => {
+  changePassword: async (
+    token: string,
+    oldPassword: string,
+    newPassword: string,
+  ) => {
     const response = await apiClient.post(
       '/auth/change-password',
       {
@@ -82,7 +86,7 @@ export const authApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },

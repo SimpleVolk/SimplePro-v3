@@ -54,7 +54,7 @@ export const initializeNetworkListener = createAsyncThunk(
     dispatch(setOnlineStatus(state.isConnected ?? false));
 
     return unsubscribe;
-  }
+  },
 );
 
 export const syncPendingActions = createAsyncThunk(
@@ -84,7 +84,7 @@ export const syncPendingActions = createAsyncThunk(
           dispatch(
             incrementRetryCount({
               actionId: queuedAction.id,
-            })
+            }),
           );
         } else {
           // Max retries reached, add to error log and remove from queue
@@ -93,7 +93,7 @@ export const syncPendingActions = createAsyncThunk(
               actionId: queuedAction.id,
               error: error.message || 'Unknown error',
               timestamp: new Date().toISOString(),
-            })
+            }),
           );
           dispatch(removeQueuedAction(queuedAction.id));
         }
@@ -101,7 +101,7 @@ export const syncPendingActions = createAsyncThunk(
     }
 
     return { synced, failed };
-  }
+  },
 );
 
 // Slice
@@ -123,17 +123,28 @@ const offlineSlice = createSlice({
       state.pendingActions.push(queuedAction);
     },
     removeQueuedAction: (state, action: PayloadAction<string>) => {
-      state.pendingActions = state.pendingActions.filter((item) => item.id !== action.payload);
+      state.pendingActions = state.pendingActions.filter(
+        (item) => item.id !== action.payload,
+      );
     },
-    incrementRetryCount: (state, action: PayloadAction<{ actionId: string }>) => {
-      const action_ = state.pendingActions.find((item) => item.id === action.payload.actionId);
+    incrementRetryCount: (
+      state,
+      action: PayloadAction<{ actionId: string }>,
+    ) => {
+      const action_ = state.pendingActions.find(
+        (item) => item.id === action.payload.actionId,
+      );
       if (action_) {
         action_.retryCount++;
       }
     },
     addSyncError: (
       state,
-      action: PayloadAction<{ actionId: string; error: string; timestamp: string }>
+      action: PayloadAction<{
+        actionId: string;
+        error: string;
+        timestamp: string;
+      }>,
     ) => {
       state.syncErrors.push(action.payload);
     },

@@ -7,7 +7,7 @@ import {
   Request,
   HttpStatus,
   HttpCode,
-  UnauthorizedException
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PartnersService } from '../partners/partners.service';
@@ -37,7 +37,7 @@ export class PartnerPortalController {
     // Verify partner credentials
     const partner = await this.partnersService.verifyPortalCredentials(
       loginDto.username,
-      loginDto.password
+      loginDto.password,
     );
 
     if (!partner) {
@@ -49,13 +49,13 @@ export class PartnerPortalController {
       partnerId: (partner as any)._id.toString(),
       email: partner.email,
       companyName: partner.companyName,
-      type: 'partner'
+      type: 'partner',
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '8h' });
     const refreshToken = this.jwtService.sign(
       { ...payload, tokenType: 'refresh' },
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     );
 
     return {
@@ -68,8 +68,8 @@ export class PartnerPortalController {
         companyName: partner.companyName,
         contactName: partner.contactName,
         email: partner.email,
-        partnerType: partner.partnerType
-      }
+        partnerType: partner.partnerType,
+      },
     };
   }
 
@@ -91,7 +91,8 @@ export class PartnerPortalController {
     const funnel = await this.referralsService.getConversionFunnel(partnerId);
 
     // Get recent referrals
-    const recentReferrals = await this.referralsService.findByPartner(partnerId);
+    const recentReferrals =
+      await this.referralsService.findByPartner(partnerId);
 
     return {
       success: true,
@@ -100,12 +101,12 @@ export class PartnerPortalController {
           companyName: partner.companyName,
           contactName: partner.contactName,
           email: partner.email,
-          statistics: partner.statistics
+          statistics: partner.statistics,
         },
         statistics,
         funnel,
-        recentReferrals: recentReferrals.slice(0, 10)
-      }
+        recentReferrals: recentReferrals.slice(0, 10),
+      },
     };
   }
 
@@ -121,7 +122,7 @@ export class PartnerPortalController {
     return {
       success: true,
       referrals,
-      total: referrals.length
+      total: referrals.length,
     };
   }
 
@@ -130,13 +131,16 @@ export class PartnerPortalController {
    */
   @Post('referrals')
   @UseGuards(PartnerJwtAuthGuard)
-  async submitReferral(@Request() req: any, @Body() createReferralDto: CreateReferralDto) {
+  async submitReferral(
+    @Request() req: any,
+    @Body() createReferralDto: CreateReferralDto,
+  ) {
     const partnerId = req.user.partnerId;
 
     // Override partnerId to ensure partner can only create referrals for themselves
     const referralData = {
       ...createReferralDto,
-      partnerId
+      partnerId,
     };
 
     const referral = await this.referralsService.create(referralData);
@@ -144,7 +148,7 @@ export class PartnerPortalController {
     return {
       success: true,
       message: 'Referral submitted successfully',
-      referral
+      referral,
     };
   }
 
@@ -157,9 +161,11 @@ export class PartnerPortalController {
     const partnerId = req.user.partnerId;
 
     // Get all won referrals with commission details
-    const referrals = await this.referralsService.findByPartner(partnerId, { status: 'won' });
+    const referrals = await this.referralsService.findByPartner(partnerId, {
+      status: 'won',
+    });
 
-    const commissions = referrals.map(ref => ({
+    const commissions = referrals.map((ref) => ({
       referralId: ref._id,
       customerName: ref.customerFullName,
       moveDate: ref.moveDetails.moveDate,
@@ -167,12 +173,15 @@ export class PartnerPortalController {
       commissionAmount: ref.commissionDetails.commissionAmount,
       isPaid: ref.commissionDetails.isPaid,
       paidDate: ref.commissionDetails.paidDate,
-      paymentReference: ref.commissionDetails.paymentReference
+      paymentReference: ref.commissionDetails.paymentReference,
     }));
 
-    const totalCommissions = commissions.reduce((sum, c) => sum + c.commissionAmount, 0);
+    const totalCommissions = commissions.reduce(
+      (sum, c) => sum + c.commissionAmount,
+      0,
+    );
     const paidCommissions = commissions
-      .filter(c => c.isPaid)
+      .filter((c) => c.isPaid)
       .reduce((sum, c) => sum + c.commissionAmount, 0);
     const unpaidCommissions = totalCommissions - paidCommissions;
 
@@ -182,8 +191,8 @@ export class PartnerPortalController {
       summary: {
         total: totalCommissions,
         paid: paidCommissions,
-        unpaid: unpaidCommissions
-      }
+        unpaid: unpaidCommissions,
+      },
     };
   }
 
@@ -208,8 +217,8 @@ export class PartnerPortalController {
         address: partner.address,
         website: partner.website,
         statistics: partner.statistics,
-        settings: partner.settings
-      }
+        settings: partner.settings,
+      },
     };
   }
 }

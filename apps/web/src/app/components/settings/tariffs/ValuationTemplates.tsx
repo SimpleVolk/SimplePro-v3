@@ -22,9 +22,36 @@ export default function ValuationTemplates() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [templates, setTemplates] = useState<ValuationTemplate[]>([
-    { id: '1', name: 'Basic Released Value', coveragePerPound: 0.60, maxLiability: 0, premiumCalculation: 'fixed', premiumValue: 0, description: 'Standard carrier liability at $0.60 per pound', active: true },
-    { id: '2', name: 'Full Value Protection', coveragePerPound: 0, maxLiability: 100000, premiumCalculation: 'percentage', premiumValue: 1.5, description: 'Full replacement value coverage', active: true },
-    { id: '3', name: 'Premium Coverage', coveragePerPound: 0, maxLiability: 250000, premiumCalculation: 'percentage', premiumValue: 2.5, description: 'Enhanced coverage for high-value items', active: true },
+    {
+      id: '1',
+      name: 'Basic Released Value',
+      coveragePerPound: 0.6,
+      maxLiability: 0,
+      premiumCalculation: 'fixed',
+      premiumValue: 0,
+      description: 'Standard carrier liability at $0.60 per pound',
+      active: true,
+    },
+    {
+      id: '2',
+      name: 'Full Value Protection',
+      coveragePerPound: 0,
+      maxLiability: 100000,
+      premiumCalculation: 'percentage',
+      premiumValue: 1.5,
+      description: 'Full replacement value coverage',
+      active: true,
+    },
+    {
+      id: '3',
+      name: 'Premium Coverage',
+      coveragePerPound: 0,
+      maxLiability: 250000,
+      premiumCalculation: 'percentage',
+      premiumValue: 2.5,
+      description: 'Enhanced coverage for high-value items',
+      active: true,
+    },
   ]);
 
   const [editForm, setEditForm] = useState<Partial<ValuationTemplate>>({});
@@ -40,12 +67,15 @@ export default function ValuationTemplates() {
 
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(getApiUrl('tariff-settings/valuation-templates'), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await fetch(
+        getApiUrl('tariff-settings/valuation-templates'),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -73,14 +103,17 @@ export default function ValuationTemplates() {
 
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(getApiUrl('tariff-settings/valuation-templates'), {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl('tariff-settings/valuation-templates'),
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ templates }),
         },
-        body: JSON.stringify({ templates }),
-      });
+      );
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -94,7 +127,9 @@ export default function ValuationTemplates() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving valuation templates:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -130,7 +165,7 @@ export default function ValuationTemplates() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this valuation template?')) {
-      setTemplates(templates.filter(t => t.id !== id));
+      setTemplates(templates.filter((t) => t.id !== id));
       setSuccess('Valuation template deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -175,7 +210,9 @@ export default function ValuationTemplates() {
                 id="name"
                 type="text"
                 value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., Basic Coverage"
               />
@@ -189,7 +226,12 @@ export default function ValuationTemplates() {
                 step="0.01"
                 min="0"
                 value={editForm.coveragePerPound || 0}
-                onChange={(e) => setEditForm({ ...editForm, coveragePerPound: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    coveragePerPound: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -201,7 +243,12 @@ export default function ValuationTemplates() {
                 type="number"
                 min="0"
                 value={editForm.maxLiability || 0}
-                onChange={(e) => setEditForm({ ...editForm, maxLiability: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    maxLiability: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -211,7 +258,12 @@ export default function ValuationTemplates() {
               <select
                 id="premiumCalculation"
                 value={editForm.premiumCalculation || 'fixed'}
-                onChange={(e) => setEditForm({ ...editForm, premiumCalculation: e.target.value as any })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    premiumCalculation: e.target.value as any,
+                  })
+                }
                 className={styles.select}
               >
                 <option value="fixed">Fixed Amount</option>
@@ -221,7 +273,8 @@ export default function ValuationTemplates() {
 
             <div className={styles.formGroup}>
               <label htmlFor="premiumValue">
-                Premium {editForm.premiumCalculation === 'percentage' ? '(%)' : '($)'}
+                Premium{' '}
+                {editForm.premiumCalculation === 'percentage' ? '(%)' : '($)'}
               </label>
               <input
                 id="premiumValue"
@@ -229,7 +282,12 @@ export default function ValuationTemplates() {
                 step="0.01"
                 min="0"
                 value={editForm.premiumValue || 0}
-                onChange={(e) => setEditForm({ ...editForm, premiumValue: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    premiumValue: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -240,7 +298,9 @@ export default function ValuationTemplates() {
             <textarea
               id="description"
               value={editForm.description || ''}
-              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, description: e.target.value })
+              }
               className={styles.textarea}
               rows={3}
               placeholder="Brief description of coverage"
@@ -267,11 +327,15 @@ export default function ValuationTemplates() {
             </tr>
           </thead>
           <tbody>
-            {templates.map(template => (
+            {templates.map((template) => (
               <tr key={template.id}>
                 <td>{template.name}</td>
                 <td>${template.coveragePerPound.toFixed(2)}</td>
-                <td>{template.maxLiability > 0 ? `$${template.maxLiability.toLocaleString()}` : 'Unlimited'}</td>
+                <td>
+                  {template.maxLiability > 0
+                    ? `$${template.maxLiability.toLocaleString()}`
+                    : 'Unlimited'}
+                </td>
                 <td>
                   {template.premiumValue > 0
                     ? template.premiumCalculation === 'percentage'
@@ -281,16 +345,30 @@ export default function ValuationTemplates() {
                 </td>
                 <td>{template.description}</td>
                 <td>
-                  <span className={template.active ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      template.active
+                        ? styles.statusActive
+                        : styles.statusInactive
+                    }
+                  >
                     {template.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td>
                   <div className={styles.actions}>
-                    <button className={styles.actionButton} onClick={() => _handleEdit(template)} title="Edit">
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => _handleEdit(template)}
+                      title="Edit"
+                    >
                       ✏️
                     </button>
-                    <button className={styles.actionButton} onClick={() => handleDelete(template.id)} title="Delete">
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => handleDelete(template.id)}
+                      title="Delete"
+                    >
                       🗑️
                     </button>
                   </div>
@@ -302,7 +380,11 @@ export default function ValuationTemplates() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

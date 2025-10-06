@@ -5,12 +5,15 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
 
   test.beforeAll(async ({ request }) => {
     // Login to get auth token
-    const loginResponse = await request.post('http://localhost:3001/api/auth/login', {
-      data: {
-        username: 'admin',
-        password: 'Admin123!',
+    const loginResponse = await request.post(
+      'http://localhost:3001/api/auth/login',
+      {
+        data: {
+          username: 'admin',
+          password: 'Admin123!',
+        },
       },
-    });
+    );
 
     expect(loginResponse.ok()).toBeTruthy();
     const loginData = await loginResponse.json();
@@ -31,7 +34,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.goto('http://localhost:3009');
   });
 
-  test('should create customer and opportunity with complete estimate', async ({ page }) => {
+  test('should create customer and opportunity with complete estimate', async ({
+    page,
+  }) => {
     // Navigate to customers page
     await page.click('text=Customers');
     await expect(page).toHaveURL(/.*customers/);
@@ -58,7 +63,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('button[type="submit"]:has-text("Create Customer")');
 
     // Wait for success message
-    await expect(page.locator('text=Customer created successfully')).toBeVisible({
+    await expect(
+      page.locator('text=Customer created successfully'),
+    ).toBeVisible({
       timeout: 5000,
     });
 
@@ -79,12 +86,18 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.fill('input[name="estimatedMoveDate"]', '2025-10-15');
 
     // Pickup location
-    await page.fill('input[name="pickupAddress"]', '999 Test Ave, San Francisco, CA 94105');
+    await page.fill(
+      'input[name="pickupAddress"]',
+      '999 Test Ave, San Francisco, CA 94105',
+    );
     await page.selectOption('select[name="pickupAccessDifficulty"]', 'medium');
     await page.fill('input[name="pickupStairs"]', '2');
 
     // Delivery location
-    await page.fill('input[name="deliveryAddress"]', '123 Oak St, San Francisco, CA 94102');
+    await page.fill(
+      'input[name="deliveryAddress"]',
+      '123 Oak St, San Francisco, CA 94102',
+    );
     await page.selectOption('select[name="deliveryAccessDifficulty"]', 'easy');
     await page.fill('input[name="deliveryStairs"]', '0');
 
@@ -116,11 +129,15 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('button:has-text("Calculate Estimate")');
 
     // Wait for estimate results
-    await expect(page.locator('text=Estimate Results')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Estimate Results')).toBeVisible({
+      timeout: 10000,
+    });
 
     // Verify estimate components
     await expect(page.locator('text=Final Price:')).toBeVisible();
-    await expect(page.locator('[data-testid="final-price"]')).toContainText('$');
+    await expect(page.locator('[data-testid="final-price"]')).toContainText(
+      '$',
+    );
 
     // Verify applied rules
     await expect(page.locator('text=Applied Pricing Rules')).toBeVisible();
@@ -135,7 +152,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('button:has-text("Save Opportunity")');
 
     // Verify success
-    await expect(page.locator('text=Opportunity created successfully')).toBeVisible({
+    await expect(
+      page.locator('text=Opportunity created successfully'),
+    ).toBeVisible({
       timeout: 5000,
     });
 
@@ -152,7 +171,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('text=Test Customer >> .. >> button:has-text("View")');
 
     // Wait for opportunity details
-    await expect(page.locator('h1:has-text("Opportunity Details")')).toBeVisible();
+    await expect(
+      page.locator('h1:has-text("Opportunity Details")'),
+    ).toBeVisible();
 
     // Click "Convert to Job" button
     await page.click('button:has-text("Convert to Job")');
@@ -178,7 +199,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await expect(page.locator('text=Status: scheduled')).toBeVisible();
   });
 
-  test('should update settings and recalculate estimate with new rates', async ({ page }) => {
+  test('should update settings and recalculate estimate with new rates', async ({
+    page,
+  }) => {
     // Navigate to settings
     await page.goto('http://localhost:3009/settings');
 
@@ -196,7 +219,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('button:has-text("Save Changes")');
 
     // Verify success message
-    await expect(page.locator('text=Settings updated successfully')).toBeVisible({
+    await expect(
+      page.locator('text=Settings updated successfully'),
+    ).toBeVisible({
       timeout: 5000,
     });
 
@@ -217,7 +242,9 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('button:has-text("Calculate Estimate")');
 
     // Verify new rate is applied
-    await expect(page.locator('[data-testid="hourly-rate"]')).toContainText(newRate);
+    await expect(page.locator('[data-testid="hourly-rate"]')).toContainText(
+      newRate,
+    );
   });
 
   test('should filter and search opportunities', async ({ page }) => {
@@ -227,9 +254,12 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.selectOption('select[name="statusFilter"]', 'new');
 
     // Verify filtered results
-    await expect(page.locator('[data-testid="opportunity-card"]')).toHaveCount(1, {
-      timeout: 3000,
-    });
+    await expect(page.locator('[data-testid="opportunity-card"]')).toHaveCount(
+      1,
+      {
+        timeout: 3000,
+      },
+    );
 
     // Search by customer name
     await page.fill('input[name="search"]', 'Test Customer');
@@ -242,12 +272,17 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     await page.click('button:has-text("Clear Filters")');
 
     // Verify all opportunities shown
-    await expect(page.locator('[data-testid="opportunity-card"]')).toHaveCount(1, {
-      timeout: 3000,
-    });
+    await expect(page.locator('[data-testid="opportunity-card"]')).toHaveCount(
+      1,
+      {
+        timeout: 3000,
+      },
+    );
   });
 
-  test('should verify real-time estimate recalculation on changes', async ({ page }) => {
+  test('should verify real-time estimate recalculation on changes', async ({
+    page,
+  }) => {
     await page.goto('http://localhost:3009/opportunities/new');
 
     // Fill basic details
@@ -274,10 +309,15 @@ test.describe('Opportunity Creation and Estimate Workflow', () => {
     const updatedPrice = await page.textContent('[data-testid="final-price"]');
 
     // Verify price changed
-    await expect(initialPrice).not.toHaveText('[data-testid="final-price"]', updatedPrice);
+    await expect(initialPrice).not.toHaveText(
+      '[data-testid="final-price"]',
+      updatedPrice,
+    );
   });
 
-  test('should validate required fields on opportunity form', async ({ page }) => {
+  test('should validate required fields on opportunity form', async ({
+    page,
+  }) => {
     await page.goto('http://localhost:3009/opportunities/new');
 
     // Try to submit without filling required fields

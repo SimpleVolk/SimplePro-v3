@@ -35,6 +35,7 @@ LeadActivity {
 ```
 
 **Indexes:**
+
 - `activityId` (unique)
 - `opportunityId + activityType`
 - `customerId + createdAt`
@@ -56,19 +57,19 @@ LeadActivity {
 
 #### REST API Endpoints
 
-| Method | Endpoint | Description | Roles |
-|--------|----------|-------------|-------|
-| POST | `/api/lead-activities` | Create new activity | admin, dispatcher, sales |
-| GET | `/api/lead-activities` | List all activities (filtered by role) | admin, dispatcher, sales |
-| GET | `/api/lead-activities/opportunity/:id` | Get activities for opportunity | admin, dispatcher, sales |
-| GET | `/api/lead-activities/customer/:id` | Get activities for customer | admin, dispatcher, sales |
-| GET | `/api/lead-activities/pending` | Get pending follow-ups | admin, dispatcher, sales |
-| GET | `/api/lead-activities/overdue` | Get overdue activities | admin, dispatcher, sales |
-| GET | `/api/lead-activities/statistics` | Activity analytics | admin, dispatcher, sales |
-| GET | `/api/lead-activities/timeline/:opportunityId` | Chronological timeline | admin, dispatcher, sales |
-| GET | `/api/lead-activities/:activityId` | Get single activity | admin, dispatcher, sales |
-| PATCH | `/api/lead-activities/:activityId/complete` | Mark activity complete | admin, dispatcher, sales |
-| DELETE | `/api/lead-activities/:activityId` | Delete activity | super_admin, admin |
+| Method | Endpoint                                       | Description                            | Roles                    |
+| ------ | ---------------------------------------------- | -------------------------------------- | ------------------------ |
+| POST   | `/api/lead-activities`                         | Create new activity                    | admin, dispatcher, sales |
+| GET    | `/api/lead-activities`                         | List all activities (filtered by role) | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/opportunity/:id`         | Get activities for opportunity         | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/customer/:id`            | Get activities for customer            | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/pending`                 | Get pending follow-ups                 | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/overdue`                 | Get overdue activities                 | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/statistics`              | Activity analytics                     | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/timeline/:opportunityId` | Chronological timeline                 | admin, dispatcher, sales |
+| GET    | `/api/lead-activities/:activityId`             | Get single activity                    | admin, dispatcher, sales |
+| PATCH  | `/api/lead-activities/:activityId/complete`    | Mark activity complete                 | admin, dispatcher, sales |
+| DELETE | `/api/lead-activities/:activityId`             | Delete activity                        | super_admin, admin       |
 
 ### 2. Follow-up Rules Module (`apps/api/src/follow-up-rules/`)
 
@@ -109,6 +110,7 @@ FollowUpRule {
 ```
 
 **Indexes:**
+
 - `ruleId` (unique)
 - `isActive + priority`
 - `trigger.eventType`
@@ -123,6 +125,7 @@ FollowUpRule {
 - **testRule()** - Simulate rule execution without actually executing
 
 **Event Listeners:**
+
 - `@OnEvent('opportunity.created')` - Triggers when new opportunity created
 - `@OnEvent('opportunity.status_changed')` - Triggers on status changes
 - `@OnEvent('estimate.created')` - Triggers when estimate/quote sent
@@ -130,15 +133,15 @@ FollowUpRule {
 
 #### REST API Endpoints
 
-| Method | Endpoint | Description | Roles |
-|--------|----------|-------------|-------|
-| POST | `/api/follow-up-rules` | Create automation rule | super_admin, admin |
-| GET | `/api/follow-up-rules` | List all rules | admin, dispatcher |
-| GET | `/api/follow-up-rules/active` | Get active rules | admin, dispatcher |
-| GET | `/api/follow-up-rules/:ruleId` | Get single rule | admin, dispatcher |
-| PATCH | `/api/follow-up-rules/:ruleId` | Update rule | super_admin, admin |
-| DELETE | `/api/follow-up-rules/:ruleId` | Delete rule | super_admin, admin |
-| POST | `/api/follow-up-rules/:ruleId/test` | Test rule with sample data | super_admin, admin |
+| Method | Endpoint                            | Description                | Roles              |
+| ------ | ----------------------------------- | -------------------------- | ------------------ |
+| POST   | `/api/follow-up-rules`              | Create automation rule     | super_admin, admin |
+| GET    | `/api/follow-up-rules`              | List all rules             | admin, dispatcher  |
+| GET    | `/api/follow-up-rules/active`       | Get active rules           | admin, dispatcher  |
+| GET    | `/api/follow-up-rules/:ruleId`      | Get single rule            | admin, dispatcher  |
+| PATCH  | `/api/follow-up-rules/:ruleId`      | Update rule                | super_admin, admin |
+| DELETE | `/api/follow-up-rules/:ruleId`      | Delete rule                | super_admin, admin |
+| POST   | `/api/follow-up-rules/:ruleId/test` | Test rule with sample data | super_admin, admin |
 
 ### 3. Follow-up Scheduler Module (`apps/api/src/follow-up-scheduler/`)
 
@@ -177,6 +180,7 @@ Background task system with cron jobs for automated follow-up management.
 Updated `opportunities.service.ts` to emit events for automation:
 
 **Events Emitted:**
+
 - `opportunity.created` - When new opportunity is created
   - Payload: `{ opportunity, userId, leadSource }`
 
@@ -261,6 +265,7 @@ Eight predefined automation rules (`default-follow-up-rules.seed.ts`):
 ## Testing the System
 
 ### 1. Create an Opportunity
+
 ```bash
 POST /api/opportunities
 {
@@ -273,6 +278,7 @@ POST /api/opportunities
 ```
 
 ### 2. Verify Activity Created
+
 ```bash
 GET /api/lead-activities/opportunity/:opportunityId
 ```
@@ -280,6 +286,7 @@ GET /api/lead-activities/opportunity/:opportunityId
 Expected: Automated activity created based on matching rules (website lead + urgent priority)
 
 ### 3. Complete Activity
+
 ```bash
 PATCH /api/lead-activities/:activityId/complete
 {
@@ -290,16 +297,19 @@ PATCH /api/lead-activities/:activityId/complete
 Expected: New follow-up activity created automatically (callback rule triggers)
 
 ### 4. Check Overdue Activities
+
 ```bash
 GET /api/lead-activities/overdue
 ```
 
 ### 5. View Activity Statistics
+
 ```bash
 GET /api/lead-activities/statistics
 ```
 
 Returns:
+
 - Total activities
 - Completed count
 - Pending count
@@ -311,6 +321,7 @@ Returns:
 ## Integration with AppModule
 
 Updated `app.module.ts`:
+
 - Added `EventEmitterModule.forRoot()` for event system
 - Imported `LeadActivitiesModule`
 - Imported `FollowUpRulesModule`
@@ -319,6 +330,7 @@ Updated `app.module.ts`:
 ## Database Seeding
 
 To seed default rules:
+
 ```typescript
 import { seedDefaultFollowUpRules } from './database/seeds/default-follow-up-rules.seed';
 
@@ -329,13 +341,16 @@ await seedDefaultFollowUpRules(followUpRuleModel);
 ## Monitoring & Observability
 
 ### Logs
+
 - All rule evaluations logged with Logger
 - Activity creation/completion tracked
 - Cron job execution logged
 - Error handling with detailed error logs
 
 ### Notifications
+
 Events emitted for:
+
 - Overdue activities (hourly)
 - Upcoming activities (every 30 min)
 - Daily summaries (8 AM)
@@ -357,6 +372,7 @@ Events emitted for:
 **Total New Endpoints: 17**
 
 ### Lead Activities (11 endpoints)
+
 - POST /api/lead-activities
 - GET /api/lead-activities
 - GET /api/lead-activities/opportunity/:id
@@ -370,6 +386,7 @@ Events emitted for:
 - DELETE /api/lead-activities/:activityId
 
 ### Follow-up Rules (6 endpoints)
+
 - POST /api/follow-up-rules
 - GET /api/follow-up-rules
 - GET /api/follow-up-rules/active
@@ -381,6 +398,7 @@ Events emitted for:
 ## Files Created
 
 ### Lead Activities Module
+
 - `apps/api/src/lead-activities/schemas/lead-activity.schema.ts`
 - `apps/api/src/lead-activities/dto/create-activity.dto.ts`
 - `apps/api/src/lead-activities/dto/complete-activity.dto.ts`
@@ -390,6 +408,7 @@ Events emitted for:
 - `apps/api/src/lead-activities/lead-activities.module.ts`
 
 ### Follow-up Rules Module
+
 - `apps/api/src/follow-up-rules/schemas/follow-up-rule.schema.ts`
 - `apps/api/src/follow-up-rules/dto/create-rule.dto.ts`
 - `apps/api/src/follow-up-rules/dto/update-rule.dto.ts`
@@ -398,13 +417,16 @@ Events emitted for:
 - `apps/api/src/follow-up-rules/follow-up-rules.module.ts`
 
 ### Follow-up Scheduler Module
+
 - `apps/api/src/follow-up-scheduler/follow-up-scheduler.service.ts`
 - `apps/api/src/follow-up-scheduler/follow-up-scheduler.module.ts`
 
 ### Database Seeds
+
 - `apps/api/src/database/seeds/default-follow-up-rules.seed.ts`
 
 ### Modified Files
+
 - `apps/api/src/app.module.ts` - Added new modules and EventEmitterModule
 - `apps/api/src/opportunities/opportunities.service.ts` - Added event emission
 

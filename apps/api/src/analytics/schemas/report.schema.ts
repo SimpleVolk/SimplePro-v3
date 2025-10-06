@@ -17,8 +17,15 @@ export class Report {
   @Prop({
     required: true,
     type: String,
-    enum: ['revenue', 'performance', 'operations', 'crew', 'customer', 'custom'],
-    index: true
+    enum: [
+      'revenue',
+      'performance',
+      'operations',
+      'crew',
+      'customer',
+      'custom',
+    ],
+    index: true,
   })
   type!: string;
 
@@ -26,7 +33,7 @@ export class Report {
     required: true,
     type: String,
     enum: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly', 'custom'],
-    index: true
+    index: true,
   })
   period!: string;
 
@@ -51,7 +58,7 @@ export class Report {
     type: String,
     enum: ['pending', 'generating', 'completed', 'failed'],
     default: 'pending',
-    index: true
+    index: true,
   })
   status!: string;
 
@@ -73,7 +80,7 @@ export class Report {
     type: String,
     enum: ['private', 'team', 'company'],
     default: 'private',
-    index: true
+    index: true,
   })
   visibility!: string;
 
@@ -98,8 +105,8 @@ export class Report {
       dayOfMonth: Number,
       time: String,
       timezone: String,
-      recipients: [String]
-    }
+      recipients: [String],
+    },
   })
   scheduleConfig?: {
     frequency: 'daily' | 'weekly' | 'monthly';
@@ -152,5 +159,5 @@ ReportSchema.index({ tags: 1 });
 ReportSchema.index({
   name: 'text',
   description: 'text',
-  tags: 'text'
+  tags: 'text',
 });

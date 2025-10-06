@@ -10,7 +10,7 @@ import {
   UseGuards,
   Request,
   HttpStatus,
-  HttpCode
+  HttpCode,
 } from '@nestjs/common';
 import { PartnersService } from './partners.service';
 import { CreatePartnerDto } from './dto/create-partner.dto';
@@ -31,12 +31,18 @@ export class PartnersController {
    */
   @Post()
   @Roles('super_admin', 'admin')
-  async create(@Body() createPartnerDto: CreatePartnerDto, @Request() req: any) {
-    const partner = await this.partnersService.create(createPartnerDto, req.user.userId);
+  async create(
+    @Body() createPartnerDto: CreatePartnerDto,
+    @Request() req: any,
+  ) {
+    const partner = await this.partnersService.create(
+      createPartnerDto,
+      req.user.userId,
+    );
     return {
       success: true,
       message: 'Partner created successfully',
-      partner
+      partner,
     };
   }
 
@@ -49,7 +55,7 @@ export class PartnersController {
     const result = await this.partnersService.findAll(query);
     return {
       success: true,
-      ...result
+      ...result,
     };
   }
 
@@ -60,15 +66,15 @@ export class PartnersController {
   @Roles('super_admin', 'admin')
   async getTopPartners(
     @Query('limit') limit?: string,
-    @Query('sortBy') sortBy?: 'leads' | 'revenue' | 'conversion'
+    @Query('sortBy') sortBy?: 'leads' | 'revenue' | 'conversion',
   ) {
     const partners = await this.partnersService.getTopPartners(
       limit ? parseInt(limit, 10) : 10,
-      sortBy || 'leads'
+      sortBy || 'leads',
     );
     return {
       success: true,
-      partners
+      partners,
     };
   }
 
@@ -77,14 +83,17 @@ export class PartnersController {
    */
   @Get('search')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async searchPartners(@Query('q') searchTerm: string, @Query('limit') limit?: string) {
+  async searchPartners(
+    @Query('q') searchTerm: string,
+    @Query('limit') limit?: string,
+  ) {
     const partners = await this.partnersService.searchPartners(
       searchTerm,
-      limit ? parseInt(limit, 10) : 20
+      limit ? parseInt(limit, 10) : 20,
     );
     return {
       success: true,
-      partners
+      partners,
     };
   }
 
@@ -97,7 +106,7 @@ export class PartnersController {
     const partner = await this.partnersService.findById(id);
     return {
       success: true,
-      partner
+      partner,
     };
   }
 
@@ -110,7 +119,7 @@ export class PartnersController {
     const partner = await this.partnersService.findById(id);
     return {
       success: true,
-      statistics: partner.statistics
+      statistics: partner.statistics,
     };
   }
 
@@ -119,12 +128,15 @@ export class PartnersController {
    */
   @Patch(':id')
   @Roles('super_admin', 'admin')
-  async update(@Param('id') id: string, @Body() updatePartnerDto: UpdatePartnerDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updatePartnerDto: UpdatePartnerDto,
+  ) {
     const partner = await this.partnersService.update(id, updatePartnerDto);
     return {
       success: true,
       message: 'Partner updated successfully',
-      partner
+      partner,
     };
   }
 
@@ -133,12 +145,20 @@ export class PartnersController {
    */
   @Post(':id/portal')
   @Roles('super_admin', 'admin')
-  async updatePortalAccess(@Param('id') id: string, @Body() enablePortalDto: EnablePortalAccessDto) {
-    const partner = await this.partnersService.updatePortalAccess(id, enablePortalDto);
+  async updatePortalAccess(
+    @Param('id') id: string,
+    @Body() enablePortalDto: EnablePortalAccessDto,
+  ) {
+    const partner = await this.partnersService.updatePortalAccess(
+      id,
+      enablePortalDto,
+    );
     return {
       success: true,
-      message: enablePortalDto.enabled ? 'Portal access enabled' : 'Portal access disabled',
-      partner
+      message: enablePortalDto.enabled
+        ? 'Portal access enabled'
+        : 'Portal access disabled',
+      partner,
     };
   }
 
@@ -147,14 +167,20 @@ export class PartnersController {
    */
   @Post(':id/calculate-commission')
   @Roles('super_admin', 'admin', 'dispatcher')
-  async calculateCommission(@Param('id') id: string, @Body('jobValue') jobValue: number) {
+  async calculateCommission(
+    @Param('id') id: string,
+    @Body('jobValue') jobValue: number,
+  ) {
     const partner = await this.partnersService.findById(id);
-    const commission = this.partnersService.calculateCommission(partner, jobValue);
+    const commission = this.partnersService.calculateCommission(
+      partner,
+      jobValue,
+    );
     return {
       success: true,
       commission,
       jobValue,
-      commissionStructure: partner.commissionStructure
+      commissionStructure: partner.commissionStructure,
     };
   }
 
@@ -169,7 +195,7 @@ export class PartnersController {
     return {
       success: true,
       message: 'Partner deactivated successfully',
-      partner
+      partner,
     };
   }
 }

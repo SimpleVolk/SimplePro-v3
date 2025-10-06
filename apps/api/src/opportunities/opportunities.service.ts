@@ -15,7 +15,10 @@ export class OpportunitiesService {
     private transactionService: TransactionService,
   ) {}
 
-  async create(dto: CreateOpportunityDto, userId: string): Promise<OpportunityDocument> {
+  async create(
+    dto: CreateOpportunityDto,
+    userId: string,
+  ): Promise<OpportunityDocument> {
     const opportunity = new this.opportunityModel({
       ...dto,
       createdBy: userId,
@@ -63,10 +66,7 @@ export class OpportunitiesService {
       }
     }
 
-    return this.opportunityModel
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .exec();
+    return this.opportunityModel.find(filter).sort({ createdAt: -1 }).exec();
   }
 
   async findById(id: string): Promise<OpportunityDocument> {
@@ -79,12 +79,14 @@ export class OpportunitiesService {
     return opportunity;
   }
 
-  async update(id: string, updates: Partial<CreateOpportunityDto>, userId: string): Promise<OpportunityDocument> {
-    const opportunity = await this.opportunityModel.findByIdAndUpdate(
-      id,
-      { ...updates, updatedBy: userId },
-      { new: true },
-    ).exec();
+  async update(
+    id: string,
+    updates: Partial<CreateOpportunityDto>,
+    userId: string,
+  ): Promise<OpportunityDocument> {
+    const opportunity = await this.opportunityModel
+      .findByIdAndUpdate(id, { ...updates, updatedBy: userId }, { new: true })
+      .exec();
 
     if (!opportunity) {
       throw new NotFoundException(`Opportunity with ID ${id} not found`);
@@ -93,18 +95,20 @@ export class OpportunitiesService {
     return opportunity;
   }
 
-  async updateStatus(id: string, status: string, userId: string): Promise<OpportunityDocument> {
+  async updateStatus(
+    id: string,
+    status: string,
+    userId: string,
+  ): Promise<OpportunityDocument> {
     const oldOpportunity = await this.opportunityModel.findById(id).exec();
 
     if (!oldOpportunity) {
       throw new NotFoundException(`Opportunity with ID ${id} not found`);
     }
 
-    const opportunity = await this.opportunityModel.findByIdAndUpdate(
-      id,
-      { status, updatedBy: userId },
-      { new: true },
-    ).exec();
+    const opportunity = await this.opportunityModel
+      .findByIdAndUpdate(id, { status, updatedBy: userId }, { new: true })
+      .exec();
 
     if (!opportunity) {
       throw new NotFoundException(`Opportunity with ID ${id} not found`);
@@ -146,8 +150,14 @@ export class OpportunitiesService {
 
     return {
       total,
-      byStatus: byStatus.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
-      byLeadSource: byLeadSource.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
+      byStatus: byStatus.reduce(
+        (acc, item) => ({ ...acc, [item._id]: item.count }),
+        {},
+      ),
+      byLeadSource: byLeadSource.reduce(
+        (acc, item) => ({ ...acc, [item._id]: item.count }),
+        {},
+      ),
     };
   }
 
@@ -165,13 +175,22 @@ export class OpportunitiesService {
    * @param jobId - The newly created job ID
    * @param userId - User performing the conversion
    */
-  async markAsWon(opportunityId: string, jobId: string, userId: string): Promise<OpportunityDocument> {
+  async markAsWon(
+    opportunityId: string,
+    jobId: string,
+    userId: string,
+  ): Promise<OpportunityDocument> {
     return this.transactionService.withTransaction(async (session) => {
       // 1. Find and update opportunity
-      const opportunity = await this.opportunityModel.findById(opportunityId).session(session).exec();
+      const opportunity = await this.opportunityModel
+        .findById(opportunityId)
+        .session(session)
+        .exec();
 
       if (!opportunity) {
-        throw new NotFoundException(`Opportunity with ID ${opportunityId} not found`);
+        throw new NotFoundException(
+          `Opportunity with ID ${opportunityId} not found`,
+        );
       }
 
       // 2. Update opportunity status to won

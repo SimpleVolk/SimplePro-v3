@@ -17,8 +17,8 @@
     // Progress: Pricing engine (100% strict), Web (100% strict), API (in progress)
     "strict": false,
     "strictPropertyInitialization": false,
-    "noImplicitAny": false,  // TODO: Enable and fix ~22 errors in cache/decorator files
-    "strictNullChecks": false,  // TODO: Enable and fix ~185 null check errors
+    "noImplicitAny": false, // TODO: Enable and fix ~22 errors in cache/decorator files
+    "strictNullChecks": false, // TODO: Enable and fix ~185 null check errors
     "strictFunctionTypes": false,
     "strictBindCallApply": false,
     "noImplicitThis": false,

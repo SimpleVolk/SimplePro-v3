@@ -41,7 +41,7 @@ export const fetchShifts = createAsyncThunk(
   async (_, { getState }: any) => {
     const { auth } = getState();
     return await shiftsApi.getShifts(auth.accessToken);
-  }
+  },
 );
 
 export const fetchShiftsByDate = createAsyncThunk(
@@ -49,7 +49,7 @@ export const fetchShiftsByDate = createAsyncThunk(
   async (date: string, { getState }: any) => {
     const { auth } = getState();
     return await shiftsApi.getShiftsByDate(auth.accessToken, date);
-  }
+  },
 );
 
 // Slice

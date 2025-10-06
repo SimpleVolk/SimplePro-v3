@@ -5,7 +5,7 @@ import {
   IsDate,
   IsInt,
   Min,
-  Max
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 

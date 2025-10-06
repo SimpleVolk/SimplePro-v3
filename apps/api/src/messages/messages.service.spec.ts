@@ -21,7 +21,10 @@ describe('MessagesService', () => {
 
   const createMockThread = (overrides = {}) => ({
     _id: new Types.ObjectId(),
-    participants: [new Types.ObjectId(mockUserId), new Types.ObjectId(mockUser2Id)],
+    participants: [
+      new Types.ObjectId(mockUserId),
+      new Types.ObjectId(mockUser2Id),
+    ],
     threadType: 'direct',
     threadName: null,
     jobId: null,
@@ -131,7 +134,11 @@ describe('MessagesService', () => {
 
     it('should create a group thread', async () => {
       const dto: CreateThreadDto = {
-        participants: [mockUserId, mockUser2Id, new Types.ObjectId().toString()],
+        participants: [
+          mockUserId,
+          mockUser2Id,
+          new Types.ObjectId().toString(),
+        ],
         threadType: 'group',
         threadName: 'Team Chat',
       };
@@ -162,7 +169,9 @@ describe('MessagesService', () => {
         threadType: 'direct',
       };
 
-      mockMessageThreadModel.findOne.mockRejectedValue(new Error('Database error'));
+      mockMessageThreadModel.findOne.mockRejectedValue(
+        new Error('Database error'),
+      );
 
       await expect(service.createThread(dto)).rejects.toThrow();
     });
@@ -173,7 +182,10 @@ describe('MessagesService', () => {
       const existingThread = createMockThread();
       mockMessageThreadModel.findOne.mockResolvedValue(existingThread);
 
-      const result = await service.findOrCreateDirectThread(mockUserId, mockUser2Id);
+      const result = await service.findOrCreateDirectThread(
+        mockUserId,
+        mockUser2Id,
+      );
 
       expect(result).toEqual(existingThread);
       expect(mockMessageThreadModel.findOne).toHaveBeenCalledWith(
@@ -186,16 +198,23 @@ describe('MessagesService', () => {
     it('should create new direct thread if none exists', async () => {
       mockMessageThreadModel.findOne.mockResolvedValue(null);
 
-      const result = await service.findOrCreateDirectThread(mockUserId, mockUser2Id);
+      const result = await service.findOrCreateDirectThread(
+        mockUserId,
+        mockUser2Id,
+      );
 
       expect(result.threadType).toBe('direct');
       expect(result.participants).toHaveLength(2);
     });
 
     it('should handle errors when finding or creating thread', async () => {
-      mockMessageThreadModel.findOne.mockRejectedValue(new Error('Database error'));
+      mockMessageThreadModel.findOne.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(service.findOrCreateDirectThread(mockUserId, mockUser2Id)).rejects.toThrow();
+      await expect(
+        service.findOrCreateDirectThread(mockUserId, mockUser2Id),
+      ).rejects.toThrow();
     });
   });
 
@@ -252,7 +271,9 @@ describe('MessagesService', () => {
     });
 
     it('should filter by job ID', async () => {
-      const mockThreads = [createMockThread({ threadType: 'job', jobId: mockJobId })];
+      const mockThreads = [
+        createMockThread({ threadType: 'job', jobId: mockJobId }),
+      ];
       mockMessageThreadModel.find.mockReturnValue(createMockQuery(mockThreads));
 
       await service.getThreads(mockUserId, { jobId: mockJobId });
@@ -331,7 +352,9 @@ describe('MessagesService', () => {
         content: 'Hello',
       };
 
-      await expect(service.sendMessage(dto, mockUserId)).rejects.toThrow(NotFoundException);
+      await expect(service.sendMessage(dto, mockUserId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ForbiddenException if user not participant', async () => {
@@ -346,7 +369,9 @@ describe('MessagesService', () => {
         content: 'Hello',
       };
 
-      await expect(service.sendMessage(dto, mockUserId)).rejects.toThrow(ForbiddenException);
+      await expect(service.sendMessage(dto, mockUserId)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should send message with attachments', async () => {
@@ -426,7 +451,10 @@ describe('MessagesService', () => {
       mockMessageModel.find.mockReturnValue(createMockQuery(mockMessages));
 
       await expect(
-        service.getMessages('invalid-thread-id', mockUserId, { page: 1, limit: 20 }),
+        service.getMessages('invalid-thread-id', mockUserId, {
+          page: 1,
+          limit: 20,
+        }),
       ).rejects.toThrow();
     });
 
@@ -438,7 +466,10 @@ describe('MessagesService', () => {
       mockMessageModel.find.mockReturnValue(createMockQuery(mockMessages));
       mockMessageModel.countDocuments.mockResolvedValue(2);
 
-      await service.getMessages(mockThreadId, mockUserId, { page: 1, limit: 20 });
+      await service.getMessages(mockThreadId, mockUserId, {
+        page: 1,
+        limit: 20,
+      });
 
       expect(mockMessageModel.find).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -473,9 +504,9 @@ describe('MessagesService', () => {
     it('should throw NotFoundException for invalid message', async () => {
       mockMessageModel.findById.mockResolvedValue(null);
 
-      await expect(service.markAsRead(mockMessageId, mockUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.markAsRead(mockMessageId, mockUserId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -499,7 +530,9 @@ describe('MessagesService', () => {
     it('should handle empty thread', async () => {
       mockMessageModel.updateMany.mockResolvedValue({ modifiedCount: 0 });
 
-      await expect(service.markThreadAsRead(mockThreadId, mockUserId)).resolves.not.toThrow();
+      await expect(
+        service.markThreadAsRead(mockThreadId, mockUserId),
+      ).resolves.not.toThrow();
     });
   });
 
@@ -517,9 +550,9 @@ describe('MessagesService', () => {
     it('should throw NotFoundException for invalid message', async () => {
       mockMessageModel.findById.mockResolvedValue(null);
 
-      await expect(service.deleteMessage(mockMessageId, mockUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.deleteMessage(mockMessageId, mockUserId),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if not sender', async () => {
@@ -528,9 +561,9 @@ describe('MessagesService', () => {
       });
       mockMessageModel.findById.mockResolvedValue(message);
 
-      await expect(service.deleteMessage(mockMessageId, mockUserId)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.deleteMessage(mockMessageId, mockUserId),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -583,9 +616,9 @@ describe('MessagesService', () => {
     it('should throw NotFoundException for invalid thread', async () => {
       mockMessageThreadModel.findById.mockResolvedValue(null);
 
-      await expect(service.archiveThread(mockThreadId, mockUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.archiveThread(mockThreadId, mockUserId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -655,7 +688,9 @@ describe('MessagesService', () => {
     });
 
     it('should handle large pagination requests', async () => {
-      const mockMessages = Array.from({ length: 100 }, () => createMockMessage());
+      const mockMessages = Array.from({ length: 100 }, () =>
+        createMockMessage(),
+      );
       mockMessageModel.find.mockReturnValue(createMockQuery(mockMessages));
       mockMessageModel.countDocuments.mockResolvedValue(1000);
 

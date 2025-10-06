@@ -18,6 +18,7 @@ SimplePro v3 implements a multi-layered network security architecture with:
 ### Development Environment (`docker-compose.dev-secure.yml`)
 
 #### Networks
+
 1. **frontend-network** (172.20.0.0/24)
    - External access allowed (nginx only)
    - Web application and reverse proxy
@@ -35,6 +36,7 @@ SimplePro v3 implements a multi-layered network security architecture with:
    - Observability and monitoring tools
 
 #### Exposed Ports (Development)
+
 - **Port 80**: HTTP (nginx) - redirects to HTTPS
 - **Port 443**: HTTPS (nginx) - main application access
 - **Port 9001**: MinIO Console (localhost only) - for development debugging
@@ -43,6 +45,7 @@ SimplePro v3 implements a multi-layered network security architecture with:
 ### Production Environment (`docker-compose.prod-secure.yml`)
 
 #### Networks
+
 Same network structure as development but with stricter security:
 
 1. **frontend-network** (172.20.0.0/24)
@@ -62,6 +65,7 @@ Same network structure as development but with stricter security:
    - Prometheus, Grafana, and exporters
 
 #### Exposed Ports (Production)
+
 - **Port 80**: HTTP (nginx) - redirects to HTTPS only
 - **Port 443**: HTTPS (nginx) - main application access only
 
@@ -70,31 +74,35 @@ Same network structure as development but with stricter security:
 ### 1. Eliminated Direct Database Access
 
 **Before:**
+
 ```yaml
 # Insecure - Direct external access
 ports:
-  - "27017:27017"  # MongoDB
-  - "6379:6379"    # Redis
-  - "9000:9000"    # MinIO API
+  - '27017:27017' # MongoDB
+  - '6379:6379' # Redis
+  - '9000:9000' # MinIO API
 ```
 
 **After:**
+
 ```yaml
 # Secure - No direct external access
 # Databases only accessible via internal networks
 networks:
-  - storage-network  # Internal only
+  - storage-network # Internal only
 ```
 
 ### 2. Network Segmentation
 
 **Implementation:**
+
 - **Frontend Network**: Web UI and reverse proxy only
 - **Backend Network**: API services and business logic
 - **Storage Network**: Databases, cache, and file storage
 - **Monitoring Network**: Observability tools
 
 **Benefits:**
+
 - Prevents lateral movement between service tiers
 - Isolates sensitive data storage
 - Enables granular access control
@@ -102,6 +110,7 @@ networks:
 ### 3. Reverse Proxy Security
 
 **nginx Configuration Features:**
+
 - SSL/TLS termination with modern protocols (TLS 1.2/1.3)
 - Security headers (HSTS, CSP, X-Frame-Options, etc.)
 - Rate limiting per endpoint and IP
@@ -111,13 +120,14 @@ networks:
 ### 4. Container Security Hardening
 
 **Implemented Measures:**
+
 ```yaml
 security_opt:
   - no-new-privileges:true
 cap_drop:
   - ALL
 cap_add:
-  - CHOWN  # Only necessary capabilities
+  - CHOWN # Only necessary capabilities
   - SETGID
   - SETUID
 ```
@@ -128,6 +138,7 @@ All containers run as non-root users with minimal privileges.
 ### 5. SSL/TLS Security
 
 **Production Configuration:**
+
 - Modern TLS protocols (1.2 and 1.3 only)
 - Secure cipher suites
 - OCSP stapling
@@ -154,11 +165,13 @@ SimplePro-v3/
 ### Development Environment
 
 1. **Start the secure development environment:**
+
    ```bash
    docker-compose -f docker-compose.dev-secure.yml up -d
    ```
 
 2. **Verify security configuration:**
+
    ```bash
    ./scripts/network-security-test.sh dev test
    ```
@@ -171,6 +184,7 @@ SimplePro-v3/
 ### Production Environment
 
 1. **Set required environment variables:**
+
    ```bash
    export MONGODB_PASSWORD="secure_mongodb_password"
    export REDIS_PASSWORD="secure_redis_password"
@@ -181,11 +195,13 @@ SimplePro-v3/
    ```
 
 2. **Start the secure production environment:**
+
    ```bash
    docker-compose -f docker-compose.prod-secure.yml up -d
    ```
 
 3. **Verify security configuration:**
+
    ```bash
    ./scripts/network-security-test.sh prod test
    ```
@@ -222,6 +238,7 @@ The included security test script validates:
 ### Manual Verification
 
 1. **Verify Database Isolation:**
+
    ```bash
    # Should fail - no external access
    telnet localhost 27017
@@ -229,6 +246,7 @@ The included security test script validates:
    ```
 
 2. **Verify Web Access:**
+
    ```bash
    # Should work - external access via nginx
    curl -I https://localhost
@@ -365,21 +383,25 @@ docker network inspect <network_name>
 ## Security Best Practices
 
 ### 1. Regular Updates
+
 - Keep base images updated
 - Update nginx and SSL configurations
 - Rotate secrets and certificates regularly
 
 ### 2. Access Control
+
 - Use strong passwords for all services
 - Implement proper user roles and permissions
 - Monitor access logs regularly
 
 ### 3. Network Security
+
 - Regularly review network configurations
 - Monitor for unusual traffic patterns
 - Keep firewall rules updated
 
 ### 4. Container Security
+
 - Scan images for vulnerabilities
 - Use minimal base images
 - Implement resource limits
@@ -399,6 +421,7 @@ This configuration follows:
 To migrate from the original insecure configuration:
 
 1. **Backup existing data:**
+
    ```bash
    docker-compose -f docker-compose.prod.yml down
    # Backup volumes if needed
@@ -409,6 +432,7 @@ To migrate from the original insecure configuration:
    - Remove direct port dependencies in application code
 
 3. **Deploy secure configuration:**
+
    ```bash
    docker-compose -f docker-compose.prod-secure.yml up -d
    ```

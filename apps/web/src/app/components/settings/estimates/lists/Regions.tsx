@@ -21,9 +21,33 @@ export default function Regions() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [regions, setRegions] = useState<Region[]>([
-    { id: '1', name: 'Downtown', zipCodeRanges: '75201-75299', cities: ['Dallas'], travelCharge: 0, minimumCharge: 500, active: true },
-    { id: '2', name: 'North Dallas', zipCodeRanges: '75200-75250', cities: ['Plano', 'Frisco', 'McKinney'], travelCharge: 50, minimumCharge: 600, active: true },
-    { id: '3', name: 'Fort Worth', zipCodeRanges: '76100-76199', cities: ['Fort Worth', 'Arlington'], travelCharge: 75, minimumCharge: 650, active: true },
+    {
+      id: '1',
+      name: 'Downtown',
+      zipCodeRanges: '75201-75299',
+      cities: ['Dallas'],
+      travelCharge: 0,
+      minimumCharge: 500,
+      active: true,
+    },
+    {
+      id: '2',
+      name: 'North Dallas',
+      zipCodeRanges: '75200-75250',
+      cities: ['Plano', 'Frisco', 'McKinney'],
+      travelCharge: 50,
+      minimumCharge: 600,
+      active: true,
+    },
+    {
+      id: '3',
+      name: 'Fort Worth',
+      zipCodeRanges: '76100-76199',
+      cities: ['Fort Worth', 'Arlington'],
+      travelCharge: 75,
+      minimumCharge: 650,
+      active: true,
+    },
   ]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -42,9 +66,9 @@ export default function Regions() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/regions'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -77,7 +101,7 @@ export default function Regions() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ regions }),
       });
@@ -94,7 +118,9 @@ export default function Regions() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving regions:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -130,9 +156,11 @@ export default function Regions() {
 
   const handleUpdate = () => {
     if (editingId) {
-      setRegions(regions.map(reg =>
-        reg.id === editingId ? { ...reg, ...editForm } : reg
-      ));
+      setRegions(
+        regions.map((reg) =>
+          reg.id === editingId ? { ...reg, ...editForm } : reg,
+        ),
+      );
       setEditingId(null);
       setEditForm({});
       setSuccess('Region updated');
@@ -142,7 +170,7 @@ export default function Regions() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this region?')) {
-      setRegions(regions.filter(reg => reg.id !== id));
+      setRegions(regions.filter((reg) => reg.id !== id));
       setSuccess('Region deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -187,7 +215,9 @@ export default function Regions() {
                 id="name"
                 type="text"
                 value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., North Dallas"
               />
@@ -199,7 +229,9 @@ export default function Regions() {
                 id="zipCodeRanges"
                 type="text"
                 value={editForm.zipCodeRanges || ''}
-                onChange={(e) => setEditForm({ ...editForm, zipCodeRanges: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, zipCodeRanges: e.target.value })
+                }
                 className={styles.input}
                 placeholder="75200-75250, 75300"
               />
@@ -212,7 +244,12 @@ export default function Regions() {
                 type="number"
                 min="0"
                 value={editForm.travelCharge || 0}
-                onChange={(e) => setEditForm({ ...editForm, travelCharge: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    travelCharge: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -224,7 +261,12 @@ export default function Regions() {
                 type="number"
                 min="0"
                 value={editForm.minimumCharge || 0}
-                onChange={(e) => setEditForm({ ...editForm, minimumCharge: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    minimumCharge: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -236,7 +278,12 @@ export default function Regions() {
               id="cities"
               type="text"
               value={(editForm.cities || []).join(', ')}
-              onChange={(e) => setEditForm({ ...editForm, cities: e.target.value.split(',').map(c => c.trim()) })}
+              onChange={(e) =>
+                setEditForm({
+                  ...editForm,
+                  cities: e.target.value.split(',').map((c) => c.trim()),
+                })
+              }
               className={styles.input}
               placeholder="Dallas, Plano, Frisco"
             />
@@ -262,14 +309,16 @@ export default function Regions() {
             </tr>
           </thead>
           <tbody>
-            {regions.map(region => (
+            {regions.map((region) => (
               <tr key={region.id}>
                 <td>
                   {editingId === region.id ? (
                     <input
                       type="text"
                       value={editForm.name || ''}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -281,7 +330,12 @@ export default function Regions() {
                     <input
                       type="text"
                       value={editForm.zipCodeRanges || ''}
-                      onChange={(e) => setEditForm({ ...editForm, zipCodeRanges: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          zipCodeRanges: e.target.value,
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -293,7 +347,14 @@ export default function Regions() {
                     <input
                       type="text"
                       value={(editForm.cities || []).join(', ')}
-                      onChange={(e) => setEditForm({ ...editForm, cities: e.target.value.split(',').map(c => c.trim()) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          cities: e.target.value
+                            .split(',')
+                            .map((c) => c.trim()),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -305,7 +366,12 @@ export default function Regions() {
                     <input
                       type="number"
                       value={editForm.travelCharge || 0}
-                      onChange={(e) => setEditForm({ ...editForm, travelCharge: parseFloat(e.target.value) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          travelCharge: parseFloat(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -317,7 +383,12 @@ export default function Regions() {
                     <input
                       type="number"
                       value={editForm.minimumCharge || 0}
-                      onChange={(e) => setEditForm({ ...editForm, minimumCharge: parseFloat(e.target.value) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          minimumCharge: parseFloat(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -325,7 +396,13 @@ export default function Regions() {
                   )}
                 </td>
                 <td>
-                  <span className={region.active ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      region.active
+                        ? styles.statusActive
+                        : styles.statusInactive
+                    }
+                  >
                     {region.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -333,19 +410,38 @@ export default function Regions() {
                   <div className={styles.actions}>
                     {editingId === region.id ? (
                       <>
-                        <button className={styles.actionButton} onClick={handleUpdate} title="Save">
+                        <button
+                          className={styles.actionButton}
+                          onClick={handleUpdate}
+                          title="Save"
+                        >
                           💾
                         </button>
-                        <button className={styles.actionButton} onClick={() => { setEditingId(null); setEditForm({}); }} title="Cancel">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditForm({});
+                          }}
+                          title="Cancel"
+                        >
                           ✕
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className={styles.actionButton} onClick={() => handleEdit(region)} title="Edit">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleEdit(region)}
+                          title="Edit"
+                        >
                           ✏️
                         </button>
-                        <button className={styles.actionButton} onClick={() => handleDelete(region.id)} title="Delete">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(region.id)}
+                          title="Delete"
+                        >
                           🗑️
                         </button>
                       </>
@@ -359,7 +455,11 @@ export default function Regions() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

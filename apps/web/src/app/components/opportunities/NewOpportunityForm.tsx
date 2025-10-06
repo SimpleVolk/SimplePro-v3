@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DeterministicEstimator } from '@simplepro/pricing-engine';
-import type { EstimateInput, EstimateResult, PricingRule, LocationHandicap, InventoryRoom } from '@simplepro/pricing-engine';
+import type {
+  EstimateInput,
+  EstimateResult,
+  PricingRule,
+  LocationHandicap,
+  InventoryRoom,
+} from '@simplepro/pricing-engine';
 import { useAuth } from '../../contexts/AuthContext';
 import { getApiUrl } from '../../../lib/config';
 import styles from './NewOpportunityForm.module.css';
@@ -137,7 +143,9 @@ export function NewOpportunityForm() {
   const [searchTerm, setSearchTerm] = useState('');
   const [estimate, setEstimate] = useState<EstimateResult | null>(null);
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
-  const [locationHandicaps, setLocationHandicaps] = useState<LocationHandicap[]>([]);
+  const [locationHandicaps, setLocationHandicaps] = useState<
+    LocationHandicap[]
+  >([]);
   const [isCalculating, setIsCalculating] = useState(false);
 
   const [formData, setFormData] = useState<OpportunityFormData>({
@@ -314,15 +322,21 @@ export function NewOpportunityForm() {
         },
         distance: formData.distance,
         estimatedDuration: formData.estimatedDuration,
-        rooms: formData.rooms.length > 0 ? formData.rooms : [{
-          id: 'default',
-          type: 'mixed',
-          description: 'Combined inventory',
-          items: [],
-          packingRequired: formData.additionalServices.packing !== 'none',
-          totalWeight: formData.totalWeight,
-          totalVolume: formData.totalVolume,
-        }] as InventoryRoom[],
+        rooms:
+          formData.rooms.length > 0
+            ? formData.rooms
+            : ([
+                {
+                  id: 'default',
+                  type: 'mixed',
+                  description: 'Combined inventory',
+                  items: [],
+                  packingRequired:
+                    formData.additionalServices.packing !== 'none',
+                  totalWeight: formData.totalWeight,
+                  totalVolume: formData.totalVolume,
+                },
+              ] as InventoryRoom[]),
         totalWeight: formData.totalWeight,
         totalVolume: formData.totalVolume,
         specialItems: formData.specialItems,
@@ -337,16 +351,22 @@ export function NewOpportunityForm() {
         isHoliday: formData.isHoliday,
         seasonalPeriod: formData.seasonalPeriod,
         crewSize: formData.crewSize,
-        specialtyCrewRequired: formData.specialItems.piano || formData.specialItems.poolTable || formData.specialItems.safe,
+        specialtyCrewRequired:
+          formData.specialItems.piano ||
+          formData.specialItems.poolTable ||
+          formData.specialItems.safe,
       };
 
       // Use dynamic pricing rules if available, otherwise use defaults
       const estimator = new DeterministicEstimator(
-        pricingRules.length > 0 ? pricingRules as any : undefined,
-        locationHandicaps.length > 0 ? locationHandicaps as any : undefined
+        pricingRules.length > 0 ? (pricingRules as any) : undefined,
+        locationHandicaps.length > 0 ? (locationHandicaps as any) : undefined,
       );
 
-      const result = estimator.calculateEstimate(estimateInput, user?.id || 'web-user');
+      const result = estimator.calculateEstimate(
+        estimateInput,
+        user?.id || 'web-user',
+      );
       setEstimate(result);
     } catch (err) {
       console.error('Error calculating estimate:', err);
@@ -387,28 +407,30 @@ export function NewOpportunityForm() {
       totalWeight: 0,
       totalVolume: 0,
     };
-    setFormData(prev => ({ ...prev, rooms: [...prev.rooms, newRoom] }));
+    setFormData((prev) => ({ ...prev, rooms: [...prev.rooms, newRoom] }));
   };
 
   // Remove room from inventory
   const removeRoom = (roomId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      rooms: prev.rooms.filter(r => r.id !== roomId),
+      rooms: prev.rooms.filter((r) => r.id !== roomId),
     }));
   };
 
   // Update room
   const updateRoom = (roomId: string, updates: Partial<RoomData>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      rooms: prev.rooms.map(r => r.id === roomId ? { ...r, ...updates } : r),
+      rooms: prev.rooms.map((r) =>
+        r.id === roomId ? { ...r, ...updates } : r,
+      ),
     }));
   };
 
   // Copy pickup to delivery
   const copyPickupToDelivery = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       delivery: { ...prev.pickup },
     }));
@@ -456,10 +478,13 @@ export function NewOpportunityForm() {
   };
 
   // Filter customers by search
-  const filteredCustomers = customers.filter(c =>
-    `${c.firstName} ${c.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.phone.includes(searchTerm)
+  const filteredCustomers = customers.filter(
+    (c) =>
+      `${c.firstName} ${c.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.phone.includes(searchTerm),
   );
 
   const totalSteps = 7;
@@ -469,18 +494,35 @@ export function NewOpportunityForm() {
     <div className={styles.opportunityForm}>
       {/* Progress Bar */}
       <div className={styles.progressBar}>
-        <div className={styles.progressFill} style={{ width: `${progressPercent}%` }} />
+        <div
+          className={styles.progressFill}
+          style={{ width: `${progressPercent}%` }}
+        />
       </div>
 
       {/* Step Indicator */}
       <div className={styles.stepIndicator}>
-        <span className={currentStep === 1 ? styles.activeStep : ''}>1. Customer</span>
-        <span className={currentStep === 2 ? styles.activeStep : ''}>2. Move Details</span>
-        <span className={currentStep === 3 ? styles.activeStep : ''}>3. Pickup</span>
-        <span className={currentStep === 4 ? styles.activeStep : ''}>4. Delivery</span>
-        <span className={currentStep === 5 ? styles.activeStep : ''}>5. Inventory</span>
-        <span className={currentStep === 6 ? styles.activeStep : ''}>6. Services</span>
-        <span className={currentStep === 7 ? styles.activeStep : ''}>7. Review</span>
+        <span className={currentStep === 1 ? styles.activeStep : ''}>
+          1. Customer
+        </span>
+        <span className={currentStep === 2 ? styles.activeStep : ''}>
+          2. Move Details
+        </span>
+        <span className={currentStep === 3 ? styles.activeStep : ''}>
+          3. Pickup
+        </span>
+        <span className={currentStep === 4 ? styles.activeStep : ''}>
+          4. Delivery
+        </span>
+        <span className={currentStep === 5 ? styles.activeStep : ''}>
+          5. Inventory
+        </span>
+        <span className={currentStep === 6 ? styles.activeStep : ''}>
+          6. Services
+        </span>
+        <span className={currentStep === 7 ? styles.activeStep : ''}>
+          7. Review
+        </span>
       </div>
 
       {error && (
@@ -500,7 +542,9 @@ export function NewOpportunityForm() {
               <input
                 type="radio"
                 checked={formData.customerType === 'existing'}
-                onChange={() => setFormData(prev => ({ ...prev, customerType: 'existing' }))}
+                onChange={() =>
+                  setFormData((prev) => ({ ...prev, customerType: 'existing' }))
+                }
               />
               Existing Customer
             </label>
@@ -508,7 +552,9 @@ export function NewOpportunityForm() {
               <input
                 type="radio"
                 checked={formData.customerType === 'new'}
-                onChange={() => setFormData(prev => ({ ...prev, customerType: 'new' }))}
+                onChange={() =>
+                  setFormData((prev) => ({ ...prev, customerType: 'new' }))
+                }
               />
               New Customer
             </label>
@@ -525,16 +571,26 @@ export function NewOpportunityForm() {
               />
 
               <div className={styles.customerList}>
-                {filteredCustomers.map(customer => (
+                {filteredCustomers.map((customer) => (
                   <div
                     key={customer.id}
                     className={`${styles.customerItem} ${formData.customerId === customer.id ? styles.selected : ''}`}
-                    onClick={() => setFormData(prev => ({ ...prev, customerId: customer.id }))}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        customerId: customer.id,
+                      }))
+                    }
                   >
-                    <h4>{customer.firstName} {customer.lastName}</h4>
-                    <p>{customer.email} • {customer.phone}</p>
+                    <h4>
+                      {customer.firstName} {customer.lastName}
+                    </h4>
+                    <p>
+                      {customer.email} • {customer.phone}
+                    </p>
                     <p className={styles.address}>
-                      {customer.address.street}, {customer.address.city}, {customer.address.state}
+                      {customer.address.street}, {customer.address.city},{' '}
+                      {customer.address.state}
                     </p>
                   </div>
                 ))}
@@ -546,40 +602,60 @@ export function NewOpportunityForm() {
                 type="text"
                 placeholder="First Name *"
                 value={formData.newCustomer?.firstName || ''}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  newCustomer: { ...prev.newCustomer!, firstName: e.target.value }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    newCustomer: {
+                      ...prev.newCustomer!,
+                      firstName: e.target.value,
+                    },
+                  }))
+                }
                 required
               />
               <input
                 type="text"
                 placeholder="Last Name *"
                 value={formData.newCustomer?.lastName || ''}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  newCustomer: { ...prev.newCustomer!, lastName: e.target.value }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    newCustomer: {
+                      ...prev.newCustomer!,
+                      lastName: e.target.value,
+                    },
+                  }))
+                }
                 required
               />
               <input
                 type="email"
                 placeholder="Email *"
                 value={formData.newCustomer?.email || ''}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  newCustomer: { ...prev.newCustomer!, email: e.target.value }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    newCustomer: {
+                      ...prev.newCustomer!,
+                      email: e.target.value,
+                    },
+                  }))
+                }
                 required
               />
               <input
                 type="tel"
                 placeholder="Phone *"
                 value={formData.newCustomer?.phone || ''}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  newCustomer: { ...prev.newCustomer!, phone: e.target.value }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    newCustomer: {
+                      ...prev.newCustomer!,
+                      phone: e.target.value,
+                    },
+                  }))
+                }
                 required
               />
             </div>
@@ -596,7 +672,12 @@ export function NewOpportunityForm() {
             <label>Service Type *</label>
             <select
               value={formData.service}
-              onChange={(e) => setFormData(prev => ({ ...prev, service: e.target.value as any }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  service: e.target.value as any,
+                }))
+              }
             >
               <option value="local">Local Move</option>
               <option value="long_distance">Long Distance</option>
@@ -614,8 +695,14 @@ export function NewOpportunityForm() {
                 const date = new Date(e.target.value);
                 const isWeekend = date.getDay() === 0 || date.getDay() === 6;
                 const month = date.getMonth();
-                const seasonalPeriod = month >= 4 && month <= 8 ? 'peak' : 'standard';
-                setFormData(prev => ({ ...prev, moveDate: date, isWeekend, seasonalPeriod }));
+                const seasonalPeriod =
+                  month >= 4 && month <= 8 ? 'peak' : 'standard';
+                setFormData((prev) => ({
+                  ...prev,
+                  moveDate: date,
+                  isWeekend,
+                  seasonalPeriod,
+                }));
               }}
             />
           </div>
@@ -624,7 +711,12 @@ export function NewOpportunityForm() {
             <label>Move Size *</label>
             <select
               value={formData.moveSize}
-              onChange={(e) => setFormData(prev => ({ ...prev, moveSize: e.target.value as any }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  moveSize: e.target.value as any,
+                }))
+              }
             >
               <option value="studio">Studio</option>
               <option value="1br">1 Bedroom</option>
@@ -640,7 +732,12 @@ export function NewOpportunityForm() {
             <label>Date Flexibility</label>
             <select
               value={formData.flexibility}
-              onChange={(e) => setFormData(prev => ({ ...prev, flexibility: e.target.value as any }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  flexibility: e.target.value as any,
+                }))
+              }
             >
               <option value="exact">Exact Date</option>
               <option value="week">Flexible (Within Week)</option>
@@ -661,10 +758,12 @@ export function NewOpportunityForm() {
               type="text"
               placeholder="123 Main St, City, State ZIP"
               value={formData.pickup.address}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                pickup: { ...prev.pickup, address: e.target.value }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pickup: { ...prev.pickup, address: e.target.value },
+                }))
+              }
               required
             />
           </div>
@@ -674,10 +773,15 @@ export function NewOpportunityForm() {
               <label>Building Type</label>
               <select
                 value={formData.pickup.buildingType}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, buildingType: e.target.value as any }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: {
+                      ...prev.pickup,
+                      buildingType: e.target.value as any,
+                    },
+                  }))
+                }
               >
                 <option value="house">House</option>
                 <option value="apartment">Apartment</option>
@@ -693,10 +797,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="1"
                 value={formData.pickup.floorLevel}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, floorLevel: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: {
+                      ...prev.pickup,
+                      floorLevel: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
 
@@ -706,10 +815,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="0"
                 value={formData.pickup.stairsCount}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, stairsCount: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: {
+                      ...prev.pickup,
+                      stairsCount: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
 
@@ -719,10 +833,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="0"
                 value={formData.pickup.parkingDistance}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, parkingDistance: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: {
+                      ...prev.pickup,
+                      parkingDistance: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
           </div>
@@ -731,10 +850,15 @@ export function NewOpportunityForm() {
             <label>Access Difficulty</label>
             <select
               value={formData.pickup.accessDifficulty}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                pickup: { ...prev.pickup, accessDifficulty: e.target.value as any }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pickup: {
+                    ...prev.pickup,
+                    accessDifficulty: e.target.value as any,
+                  },
+                }))
+              }
             >
               <option value="easy">Easy</option>
               <option value="moderate">Moderate</option>
@@ -748,10 +872,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.pickup.elevatorAccess}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, elevatorAccess: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: {
+                      ...prev.pickup,
+                      elevatorAccess: e.target.checked,
+                    },
+                  }))
+                }
               />
               Elevator Available
             </label>
@@ -759,10 +888,12 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.pickup.longCarry}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, longCarry: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: { ...prev.pickup, longCarry: e.target.checked },
+                  }))
+                }
               />
               Long Walk (&gt;75 ft)
             </label>
@@ -770,10 +901,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.pickup.narrowHallways}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  pickup: { ...prev.pickup, narrowHallways: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    pickup: {
+                      ...prev.pickup,
+                      narrowHallways: e.target.checked,
+                    },
+                  }))
+                }
               />
               Narrow Hallways
             </label>
@@ -784,10 +920,12 @@ export function NewOpportunityForm() {
             <textarea
               rows={3}
               value={formData.pickup.specialNotes}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                pickup: { ...prev.pickup, specialNotes: e.target.value }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pickup: { ...prev.pickup, specialNotes: e.target.value },
+                }))
+              }
               placeholder="Gate codes, parking permits, building restrictions, etc."
             />
           </div>
@@ -814,10 +952,12 @@ export function NewOpportunityForm() {
               type="text"
               placeholder="456 Oak Ave, City, State ZIP"
               value={formData.delivery.address}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                delivery: { ...prev.delivery, address: e.target.value }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  delivery: { ...prev.delivery, address: e.target.value },
+                }))
+              }
               required
             />
           </div>
@@ -827,10 +967,15 @@ export function NewOpportunityForm() {
               <label>Building Type</label>
               <select
                 value={formData.delivery.buildingType}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, buildingType: e.target.value as any }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: {
+                      ...prev.delivery,
+                      buildingType: e.target.value as any,
+                    },
+                  }))
+                }
               >
                 <option value="house">House</option>
                 <option value="apartment">Apartment</option>
@@ -846,10 +991,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="1"
                 value={formData.delivery.floorLevel}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, floorLevel: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: {
+                      ...prev.delivery,
+                      floorLevel: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
 
@@ -859,10 +1009,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="0"
                 value={formData.delivery.stairsCount}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, stairsCount: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: {
+                      ...prev.delivery,
+                      stairsCount: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
 
@@ -872,10 +1027,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="0"
                 value={formData.delivery.parkingDistance}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, parkingDistance: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: {
+                      ...prev.delivery,
+                      parkingDistance: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
           </div>
@@ -884,10 +1044,15 @@ export function NewOpportunityForm() {
             <label>Access Difficulty</label>
             <select
               value={formData.delivery.accessDifficulty}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                delivery: { ...prev.delivery, accessDifficulty: e.target.value as any }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  delivery: {
+                    ...prev.delivery,
+                    accessDifficulty: e.target.value as any,
+                  },
+                }))
+              }
             >
               <option value="easy">Easy</option>
               <option value="moderate">Moderate</option>
@@ -901,10 +1066,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.delivery.elevatorAccess}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, elevatorAccess: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: {
+                      ...prev.delivery,
+                      elevatorAccess: e.target.checked,
+                    },
+                  }))
+                }
               />
               Elevator Available
             </label>
@@ -912,10 +1082,12 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.delivery.longCarry}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, longCarry: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: { ...prev.delivery, longCarry: e.target.checked },
+                  }))
+                }
               />
               Long Walk (&gt;75 ft)
             </label>
@@ -923,10 +1095,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.delivery.narrowHallways}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  delivery: { ...prev.delivery, narrowHallways: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    delivery: {
+                      ...prev.delivery,
+                      narrowHallways: e.target.checked,
+                    },
+                  }))
+                }
               />
               Narrow Hallways
             </label>
@@ -937,10 +1114,12 @@ export function NewOpportunityForm() {
             <textarea
               rows={3}
               value={formData.delivery.specialNotes}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                delivery: { ...prev.delivery, specialNotes: e.target.value }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  delivery: { ...prev.delivery, specialNotes: e.target.value },
+                }))
+              }
               placeholder="Gate codes, parking permits, building restrictions, etc."
             />
           </div>
@@ -953,7 +1132,11 @@ export function NewOpportunityForm() {
           <h2>Inventory Details</h2>
 
           <div className={styles.inventoryHeader}>
-            <button type="button" onClick={addRoom} className={styles.primaryButton}>
+            <button
+              type="button"
+              onClick={addRoom}
+              className={styles.primaryButton}
+            >
               Add Room
             </button>
           </div>
@@ -962,7 +1145,11 @@ export function NewOpportunityForm() {
             <div key={room.id} className={styles.roomCard}>
               <div className={styles.roomHeader}>
                 <h4>Room {index + 1}</h4>
-                <button type="button" onClick={() => removeRoom(room.id)} className={styles.deleteButton}>
+                <button
+                  type="button"
+                  onClick={() => removeRoom(room.id)}
+                  className={styles.deleteButton}
+                >
                   Remove
                 </button>
               </div>
@@ -970,7 +1157,9 @@ export function NewOpportunityForm() {
               <div className={styles.formGrid}>
                 <select
                   value={room.type}
-                  onChange={(e) => updateRoom(room.id, { type: e.target.value })}
+                  onChange={(e) =>
+                    updateRoom(room.id, { type: e.target.value })
+                  }
                 >
                   <option value="living_room">Living Room</option>
                   <option value="bedroom">Bedroom</option>
@@ -987,21 +1176,27 @@ export function NewOpportunityForm() {
                   type="text"
                   placeholder="Description (optional)"
                   value={room.description}
-                  onChange={(e) => updateRoom(room.id, { description: e.target.value })}
+                  onChange={(e) =>
+                    updateRoom(room.id, { description: e.target.value })
+                  }
                 />
 
                 <input
                   type="number"
                   placeholder="Weight (lbs)"
                   value={room.totalWeight}
-                  onChange={(e) => updateRoom(room.id, { totalWeight: Number(e.target.value) })}
+                  onChange={(e) =>
+                    updateRoom(room.id, { totalWeight: Number(e.target.value) })
+                  }
                 />
 
                 <input
                   type="number"
                   placeholder="Volume (cu ft)"
                   value={room.totalVolume}
-                  onChange={(e) => updateRoom(room.id, { totalVolume: Number(e.target.value) })}
+                  onChange={(e) =>
+                    updateRoom(room.id, { totalVolume: Number(e.target.value) })
+                  }
                 />
               </div>
 
@@ -1009,7 +1204,9 @@ export function NewOpportunityForm() {
                 <input
                   type="checkbox"
                   checked={room.packingRequired}
-                  onChange={(e) => updateRoom(room.id, { packingRequired: e.target.checked })}
+                  onChange={(e) =>
+                    updateRoom(room.id, { packingRequired: e.target.checked })
+                  }
                 />
                 Packing Required
               </label>
@@ -1024,7 +1221,12 @@ export function NewOpportunityForm() {
                 <input
                   type="number"
                   value={formData.totalWeight}
-                  onChange={(e) => setFormData(prev => ({ ...prev, totalWeight: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      totalWeight: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
               <div className={styles.formGroup}>
@@ -1032,7 +1234,12 @@ export function NewOpportunityForm() {
                 <input
                   type="number"
                   value={formData.totalVolume}
-                  onChange={(e) => setFormData(prev => ({ ...prev, totalVolume: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      totalVolume: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -1045,10 +1252,15 @@ export function NewOpportunityForm() {
                 <input
                   type="checkbox"
                   checked={formData.specialItems.piano}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, piano: e.target.checked }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        piano: e.target.checked,
+                      },
+                    }))
+                  }
                 />
                 Piano
               </label>
@@ -1056,10 +1268,15 @@ export function NewOpportunityForm() {
                 <input
                   type="checkbox"
                   checked={formData.specialItems.poolTable}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, poolTable: e.target.checked }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        poolTable: e.target.checked,
+                      },
+                    }))
+                  }
                 />
                 Pool Table
               </label>
@@ -1067,10 +1284,15 @@ export function NewOpportunityForm() {
                 <input
                   type="checkbox"
                   checked={formData.specialItems.safe}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, safe: e.target.checked }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        safe: e.target.checked,
+                      },
+                    }))
+                  }
                 />
                 Safe
               </label>
@@ -1078,10 +1300,15 @@ export function NewOpportunityForm() {
                 <input
                   type="checkbox"
                   checked={formData.specialItems.antiques}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, antiques: e.target.checked }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        antiques: e.target.checked,
+                      },
+                    }))
+                  }
                 />
                 Antiques
               </label>
@@ -1089,10 +1316,15 @@ export function NewOpportunityForm() {
                 <input
                   type="checkbox"
                   checked={formData.specialItems.artwork}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, artwork: e.target.checked }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        artwork: e.target.checked,
+                      },
+                    }))
+                  }
                 />
                 Artwork
               </label>
@@ -1105,10 +1337,15 @@ export function NewOpportunityForm() {
                   type="number"
                   min="0"
                   value={formData.specialItems.fragileItems}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, fragileItems: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        fragileItems: Number(e.target.value),
+                      },
+                    }))
+                  }
                 />
               </div>
               <div className={styles.formGroup}>
@@ -1117,10 +1354,15 @@ export function NewOpportunityForm() {
                   type="number"
                   min="0"
                   value={formData.specialItems.valuableItems}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    specialItems: { ...prev.specialItems, valuableItems: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialItems: {
+                        ...prev.specialItems,
+                        valuableItems: Number(e.target.value),
+                      },
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -1137,10 +1379,15 @@ export function NewOpportunityForm() {
             <label>Packing Services</label>
             <select
               value={formData.additionalServices.packing}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                additionalServices: { ...prev.additionalServices, packing: e.target.value as any }
-              }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  additionalServices: {
+                    ...prev.additionalServices,
+                    packing: e.target.value as any,
+                  },
+                }))
+              }
             >
               <option value="none">No Packing</option>
               <option value="full">Full Pack</option>
@@ -1154,10 +1401,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.additionalServices.unpacking}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  additionalServices: { ...prev.additionalServices, unpacking: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    additionalServices: {
+                      ...prev.additionalServices,
+                      unpacking: e.target.checked,
+                    },
+                  }))
+                }
               />
               Unpacking
             </label>
@@ -1165,10 +1417,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.additionalServices.assembly}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  additionalServices: { ...prev.additionalServices, assembly: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    additionalServices: {
+                      ...prev.additionalServices,
+                      assembly: e.target.checked,
+                    },
+                  }))
+                }
               />
               Assembly/Disassembly
             </label>
@@ -1176,10 +1433,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.additionalServices.storage}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  additionalServices: { ...prev.additionalServices, storage: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    additionalServices: {
+                      ...prev.additionalServices,
+                      storage: e.target.checked,
+                    },
+                  }))
+                }
               />
               Storage
             </label>
@@ -1187,10 +1449,15 @@ export function NewOpportunityForm() {
               <input
                 type="checkbox"
                 checked={formData.additionalServices.cleaning}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  additionalServices: { ...prev.additionalServices, cleaning: e.target.checked }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    additionalServices: {
+                      ...prev.additionalServices,
+                      cleaning: e.target.checked,
+                    },
+                  }))
+                }
               />
               Cleaning
             </label>
@@ -1203,10 +1470,15 @@ export function NewOpportunityForm() {
                 type="number"
                 min="1"
                 value={formData.additionalServices.storageDuration || 1}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  additionalServices: { ...prev.additionalServices, storageDuration: Number(e.target.value) }
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    additionalServices: {
+                      ...prev.additionalServices,
+                      storageDuration: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </div>
           )}
@@ -1218,7 +1490,12 @@ export function NewOpportunityForm() {
               <label>Lead Source</label>
               <select
                 value={formData.leadSource}
-                onChange={(e) => setFormData(prev => ({ ...prev, leadSource: e.target.value as any }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    leadSource: e.target.value as any,
+                  }))
+                }
               >
                 <option value="website">Website</option>
                 <option value="phone">Phone</option>
@@ -1233,7 +1510,12 @@ export function NewOpportunityForm() {
               <label>Priority</label>
               <select
                 value={formData.priority}
-                onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as any }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    priority: e.target.value as any,
+                  }))
+                }
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -1247,7 +1529,12 @@ export function NewOpportunityForm() {
               <textarea
                 rows={4}
                 value={formData.internalNotes}
-                onChange={(e) => setFormData(prev => ({ ...prev, internalNotes: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    internalNotes: e.target.value,
+                  }))
+                }
                 placeholder="Any internal notes or special instructions..."
               />
             </div>
@@ -1257,7 +1544,12 @@ export function NewOpportunityForm() {
               <input
                 type="date"
                 value={formData.followUpDate?.toISOString().split('T')[0] || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, followUpDate: new Date(e.target.value) }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    followUpDate: new Date(e.target.value),
+                  }))
+                }
               />
             </div>
           </div>
@@ -1287,23 +1579,38 @@ export function NewOpportunityForm() {
                 <h4>Price Breakdown</h4>
                 <div className={styles.breakdownItem}>
                   <span>Base Labor:</span>
-                  <span>${estimate.calculations.breakdown.baseLabor.toLocaleString()}</span>
+                  <span>
+                    $
+                    {estimate.calculations.breakdown.baseLabor.toLocaleString()}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Materials:</span>
-                  <span>${estimate.calculations.breakdown.materials.toLocaleString()}</span>
+                  <span>
+                    $
+                    {estimate.calculations.breakdown.materials.toLocaleString()}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Transportation:</span>
-                  <span>${estimate.calculations.breakdown.transportation.toLocaleString()}</span>
+                  <span>
+                    $
+                    {estimate.calculations.breakdown.transportation.toLocaleString()}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Location Handicaps:</span>
-                  <span>${estimate.calculations.breakdown.locationHandicaps.toLocaleString()}</span>
+                  <span>
+                    $
+                    {estimate.calculations.breakdown.locationHandicaps.toLocaleString()}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Special Services:</span>
-                  <span>${estimate.calculations.breakdown.specialServices.toLocaleString()}</span>
+                  <span>
+                    $
+                    {estimate.calculations.breakdown.specialServices.toLocaleString()}
+                  </span>
                 </div>
               </div>
 
@@ -1312,8 +1619,15 @@ export function NewOpportunityForm() {
                 {estimate.calculations.appliedRules.map((rule, index) => (
                   <div key={index} className={styles.ruleItem}>
                     <strong>{rule.ruleName}</strong>
-                    <span className={rule.priceImpact >= 0 ? styles.positive : styles.negative}>
-                      {rule.priceImpact >= 0 ? '+' : ''}${rule.priceImpact.toLocaleString()}
+                    <span
+                      className={
+                        rule.priceImpact >= 0
+                          ? styles.positive
+                          : styles.negative
+                      }
+                    >
+                      {rule.priceImpact >= 0 ? '+' : ''}$
+                      {rule.priceImpact.toLocaleString()}
                     </span>
                   </div>
                 ))}
@@ -1322,19 +1636,31 @@ export function NewOpportunityForm() {
               {estimate.calculations.locationHandicaps.length > 0 && (
                 <div className={styles.handicaps}>
                   <h4>Location Handicaps</h4>
-                  {estimate.calculations.locationHandicaps.map((handicap, index) => (
-                    <div key={index} className={styles.handicapItem}>
-                      <strong>{handicap.name} ({handicap.type})</strong>
-                      <span>+${handicap.priceImpact.toLocaleString()}</span>
-                    </div>
-                  ))}
+                  {estimate.calculations.locationHandicaps.map(
+                    (handicap, index) => (
+                      <div key={index} className={styles.handicapItem}>
+                        <strong>
+                          {handicap.name} ({handicap.type})
+                        </strong>
+                        <span>+${handicap.priceImpact.toLocaleString()}</span>
+                      </div>
+                    ),
+                  )}
                 </div>
               )}
 
               <div className={styles.metadata}>
-                <p><strong>Estimate ID:</strong> {estimate.estimateId}</p>
-                <p><strong>Deterministic:</strong> {estimate.metadata.deterministic ? 'Yes' : 'No'}</p>
-                <p><strong>Hash:</strong> <code>{estimate.metadata.hash.substring(0, 16)}...</code></p>
+                <p>
+                  <strong>Estimate ID:</strong> {estimate.estimateId}
+                </p>
+                <p>
+                  <strong>Deterministic:</strong>{' '}
+                  {estimate.metadata.deterministic ? 'Yes' : 'No'}
+                </p>
+                <p>
+                  <strong>Hash:</strong>{' '}
+                  <code>{estimate.metadata.hash.substring(0, 16)}...</code>
+                </p>
               </div>
             </div>
           ) : (

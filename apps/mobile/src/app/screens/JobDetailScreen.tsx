@@ -223,7 +223,7 @@ const JobDetailScreen = ({ route, navigation }: any) => {
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -268,7 +268,10 @@ const JobDetailScreen = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.content}>
           {/* Customer Information */}
           <View style={styles.section}>
@@ -277,8 +280,15 @@ const JobDetailScreen = ({ route, navigation }: any) => {
               <Text style={styles.serviceType}>
                 {currentJob.serviceType.replace('_', ' ')}
               </Text>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(currentJob.status) }]}>
-                <Text style={styles.statusText}>{getStatusText(currentJob.status)}</Text>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusColor(currentJob.status) },
+                ]}
+              >
+                <Text style={styles.statusText}>
+                  {getStatusText(currentJob.status)}
+                </Text>
               </View>
             </View>
           </View>
@@ -315,8 +325,14 @@ const JobDetailScreen = ({ route, navigation }: any) => {
                 {currentJob.addresses.pickup.address}
               </Text>
               {currentJob.addresses.pickup.specialInstructions && (
-                <Text style={[styles.addressText, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-                  Instructions: {currentJob.addresses.pickup.specialInstructions}
+                <Text
+                  style={[
+                    styles.addressText,
+                    { color: colors.textSecondary, marginTop: spacing.xs },
+                  ]}
+                >
+                  Instructions:{' '}
+                  {currentJob.addresses.pickup.specialInstructions}
                 </Text>
               )}
             </View>
@@ -326,8 +342,14 @@ const JobDetailScreen = ({ route, navigation }: any) => {
                 {currentJob.addresses.delivery.address}
               </Text>
               {currentJob.addresses.delivery.specialInstructions && (
-                <Text style={[styles.addressText, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-                  Instructions: {currentJob.addresses.delivery.specialInstructions}
+                <Text
+                  style={[
+                    styles.addressText,
+                    { color: colors.textSecondary, marginTop: spacing.xs },
+                  ]}
+                >
+                  Instructions:{' '}
+                  {currentJob.addresses.delivery.specialInstructions}
                 </Text>
               )}
             </View>
@@ -364,31 +386,32 @@ const JobDetailScreen = ({ route, navigation }: any) => {
           </View>
 
           {/* Status Actions */}
-          {currentJob.status !== 'completed' && currentJob.status !== 'cancelled' && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Update Status</Text>
-              <View style={styles.statusActions}>
-                {currentJob.status === 'pending' && (
-                  <TouchableOpacity
-                    style={styles.statusActionButton}
-                    onPress={() => handleStatusChange('in_progress')}
-                    disabled={isUpdatingStatus}
-                  >
-                    <Text style={styles.statusActionText}>Start Job</Text>
-                  </TouchableOpacity>
-                )}
-                {currentJob.status === 'in_progress' && (
-                  <TouchableOpacity
-                    style={styles.statusActionButton}
-                    onPress={() => handleStatusChange('completed')}
-                    disabled={isUpdatingStatus}
-                  >
-                    <Text style={styles.statusActionText}>Complete Job</Text>
-                  </TouchableOpacity>
-                )}
+          {currentJob.status !== 'completed' &&
+            currentJob.status !== 'cancelled' && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Update Status</Text>
+                <View style={styles.statusActions}>
+                  {currentJob.status === 'pending' && (
+                    <TouchableOpacity
+                      style={styles.statusActionButton}
+                      onPress={() => handleStatusChange('in_progress')}
+                      disabled={isUpdatingStatus}
+                    >
+                      <Text style={styles.statusActionText}>Start Job</Text>
+                    </TouchableOpacity>
+                  )}
+                  {currentJob.status === 'in_progress' && (
+                    <TouchableOpacity
+                      style={styles.statusActionButton}
+                      onPress={() => handleStatusChange('completed')}
+                      disabled={isUpdatingStatus}
+                    >
+                      <Text style={styles.statusActionText}>Complete Job</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
-            </View>
-          )}
+            )}
 
           {/* Notes */}
           <View style={styles.section}>
@@ -403,7 +426,10 @@ const JobDetailScreen = ({ route, navigation }: any) => {
               textAlignVertical="top"
             />
             <View style={styles.notesButtonContainer}>
-              <TouchableOpacity style={styles.notesButton} onPress={handleNotesUpdate}>
+              <TouchableOpacity
+                style={styles.notesButton}
+                onPress={handleNotesUpdate}
+              >
                 <Text style={styles.notesButtonText}>Save Notes</Text>
               </TouchableOpacity>
             </View>

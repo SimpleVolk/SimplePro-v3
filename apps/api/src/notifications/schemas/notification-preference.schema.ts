@@ -33,13 +33,22 @@ export interface QuietHours {
 
 @Schema({ collection: 'notification_preferences', timestamps: true })
 export class NotificationPreference {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User', unique: true, index: true })
+  @Prop({
+    required: true,
+    type: Types.ObjectId,
+    ref: 'User',
+    unique: true,
+    index: true,
+  })
   userId!: Types.ObjectId;
 
   @Prop({ type: Object, default: {} })
   preferences!: NotificationTypePreferences;
 
-  @Prop({ type: Object, default: { enabled: false, start: '22:00', end: '07:00' } })
+  @Prop({
+    type: Object,
+    default: { enabled: false, start: '22:00', end: '07:00' },
+  })
   quietHours!: QuietHours;
 
   @Prop({ enum: ['immediate', 'hourly', 'daily'], default: 'immediate' })
@@ -52,7 +61,9 @@ export class NotificationPreference {
   vibrationEnabled!: boolean;
 }
 
-export const NotificationPreferenceSchema = SchemaFactory.createForClass(NotificationPreference);
+export const NotificationPreferenceSchema = SchemaFactory.createForClass(
+  NotificationPreference,
+);
 
 // Ensure userId is unique
 NotificationPreferenceSchema.index({ userId: 1 }, { unique: true });

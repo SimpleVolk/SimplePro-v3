@@ -7,7 +7,7 @@ export async function seedJobs(
   JobModel: any,
   customers: any[],
   users: any[],
-  opportunities: any[]
+  opportunities: any[],
 ): Promise<any[]> {
   const jobs: any[] = [];
   const jobCount = faker.number.int({ min: 35, max: 50 });
@@ -57,7 +57,9 @@ export async function seedJobs(
       actualStartTime = new Date(scheduledDate);
       actualStartTime.setHours(8, 0, 0);
       actualEndTime = new Date(actualStartTime);
-      actualEndTime.setHours(actualEndTime.getHours() + faker.number.int({ min: 4, max: 10 }));
+      actualEndTime.setHours(
+        actualEndTime.getHours() + faker.number.int({ min: 4, max: 10 }),
+      );
     } else if (status === 'in_progress') {
       scheduledDate = faker.date.recent({ days: 3 });
       actualStartTime = new Date(scheduledDate);
@@ -76,7 +78,9 @@ export async function seedJobs(
       state: faker.location.state({ abbreviated: true }),
       zipCode: faker.location.zipCode('#####'),
       country: 'USA',
-      accessNotes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined,
+      accessNotes: faker.datatype.boolean()
+        ? faker.lorem.sentence()
+        : undefined,
       contactPerson: faker.person.fullName(),
       contactPhone: faker.phone.number(),
     };
@@ -87,28 +91,43 @@ export async function seedJobs(
       state: faker.location.state({ abbreviated: true }),
       zipCode: faker.location.zipCode('#####'),
       country: 'USA',
-      accessNotes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined,
+      accessNotes: faker.datatype.boolean()
+        ? faker.lorem.sentence()
+        : undefined,
       contactPerson: faker.person.fullName(),
       contactPhone: faker.phone.number(),
     };
 
     // Assign crew (2-5 crew members)
-    const assignedCrewCount = faker.number.int({ min: 2, max: Math.min(5, crewMembers.length) });
-    const assignedCrew = faker.helpers.arrayElements(crewMembers, assignedCrewCount).map((crew) => ({
-      crewMemberId: crew._id.toString(),
-      role: faker.helpers.arrayElement(['driver', 'mover', 'packer', 'lead']),
-      assignedAt: new Date(),
-      confirmedAt: status !== 'scheduled' ? new Date() : undefined,
-    }));
+    const assignedCrewCount = faker.number.int({
+      min: 2,
+      max: Math.min(5, crewMembers.length),
+    });
+    const assignedCrew = faker.helpers
+      .arrayElements(crewMembers, assignedCrewCount)
+      .map((crew) => ({
+        crewMemberId: crew._id.toString(),
+        role: faker.helpers.arrayElement(['driver', 'mover', 'packer', 'lead']),
+        assignedAt: new Date(),
+        confirmedAt: status !== 'scheduled' ? new Date() : undefined,
+      }));
 
-    const leadCrew = assignedCrew.length > 0 ? assignedCrew[0].crewMemberId : undefined;
+    const leadCrew =
+      assignedCrew.length > 0 ? assignedCrew[0].crewMemberId : undefined;
 
     // Generate inventory
     const inventoryCount = faker.number.int({ min: 5, max: 20 });
     const inventory: any[] = [];
     for (let inv = 0; inv < inventoryCount; inv++) {
       inventory.push({
-        name: faker.helpers.arrayElement(['Sofa', 'Bed', 'Dresser', 'Table', 'Chair', 'Box']),
+        name: faker.helpers.arrayElement([
+          'Sofa',
+          'Bed',
+          'Dresser',
+          'Table',
+          'Chair',
+          'Box',
+        ]),
         quantity: faker.number.int({ min: 1, max: 5 }),
         volume: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }),
         weight: faker.number.float({ min: 10, max: 200, fractionDigits: 2 }),
@@ -144,14 +163,18 @@ export async function seedJobs(
         { name: 'Straps', quantity: 4, status: 'assigned' },
         { name: 'Tools', quantity: 1, status: 'assigned' },
       ],
-      { min: 2, max: 4 }
+      { min: 2, max: 4 },
     );
 
     // Calculate pricing
     const estimatedCost = faker.number.int({ min: 600, max: 4500 });
-    const actualCost = status === 'completed'
-      ? faker.number.int({ min: estimatedCost - 200, max: estimatedCost + 300 })
-      : undefined;
+    const actualCost =
+      status === 'completed'
+        ? faker.number.int({
+            min: estimatedCost - 200,
+            max: estimatedCost + 300,
+          })
+        : undefined;
 
     const laborCost = Math.round(estimatedCost * 0.6);
     const materialsCost = Math.round(estimatedCost * 0.2);
@@ -161,7 +184,11 @@ export async function seedJobs(
     const additionalCharges: any[] = [];
     if (faker.datatype.boolean(0.3)) {
       additionalCharges.push({
-        description: faker.helpers.arrayElement(['Extra stairs', 'Long carry', 'Heavy items']),
+        description: faker.helpers.arrayElement([
+          'Extra stairs',
+          'Long carry',
+          'Heavy items',
+        ]),
         amount: faker.number.int({ min: 50, max: 200 }),
         approvedBy: creator._id.toString(),
         approvedAt: new Date(),
@@ -181,9 +208,11 @@ export async function seedJobs(
         {
           name: 'Items Loaded',
           description: 'All items loaded onto truck',
-          completedAt: actualStartTime ? new Date(actualStartTime.getTime() + 2 * 60 * 60 * 1000) : undefined,
+          completedAt: actualStartTime
+            ? new Date(actualStartTime.getTime() + 2 * 60 * 60 * 1000)
+            : undefined,
           completedBy: leadCrew,
-        }
+        },
       );
 
       if (status === 'completed') {
@@ -191,7 +220,9 @@ export async function seedJobs(
           {
             name: 'Items Unloaded',
             description: 'All items unloaded at destination',
-            completedAt: actualEndTime ? new Date(actualEndTime.getTime() - 1 * 60 * 60 * 1000) : undefined,
+            completedAt: actualEndTime
+              ? new Date(actualEndTime.getTime() - 1 * 60 * 60 * 1000)
+              : undefined,
             completedBy: leadCrew,
           },
           {
@@ -199,20 +230,23 @@ export async function seedJobs(
             description: 'Customer signed off on delivery',
             completedAt: actualEndTime,
             completedBy: leadCrew,
-          }
+          },
         );
       }
     }
 
     // Find related opportunity
     const relatedOpp = opportunities.find(
-      (opp) => opp.customerId === customer._id.toString() && opp.status === 'won'
+      (opp) =>
+        opp.customerId === customer._id.toString() && opp.status === 'won',
     );
 
     const job = await JobModel.create({
       jobNumber,
       title: `${type.replace('_', ' ').toUpperCase()} - ${customer.firstName} ${customer.lastName}`,
-      description: faker.datatype.boolean() ? faker.lorem.paragraph() : undefined,
+      description: faker.datatype.boolean()
+        ? faker.lorem.paragraph()
+        : undefined,
       type,
       status,
       priority,
@@ -231,7 +265,9 @@ export async function seedJobs(
       crewNotes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined,
       inventory,
       services,
-      specialInstructions: faker.datatype.boolean() ? faker.lorem.paragraph() : undefined,
+      specialInstructions: faker.datatype.boolean()
+        ? faker.lorem.paragraph()
+        : undefined,
       equipment,
       estimatedCost,
       actualCost,

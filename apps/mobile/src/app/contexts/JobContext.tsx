@@ -58,18 +58,31 @@ interface JobContextType {
   fetchJobs: () => Promise<void>;
   selectJob: (jobId: string) => void;
   updateJobStatus: (jobId: string, status: Job['status']) => Promise<void>;
-  updateChecklist: (jobId: string, checklistItem: ChecklistItem) => Promise<void>;
-  addSignature: (jobId: string, type: 'pickup' | 'delivery', signature: string) => Promise<void>;
-  addPhoto: (jobId: string, photo: Omit<JobPhoto, 'id' | 'timestamp'>) => Promise<void>;
+  updateChecklist: (
+    jobId: string,
+    checklistItem: ChecklistItem,
+  ) => Promise<void>;
+  addSignature: (
+    jobId: string,
+    type: 'pickup' | 'delivery',
+    signature: string,
+  ) => Promise<void>;
+  addPhoto: (
+    jobId: string,
+    photo: Omit<JobPhoto, 'id' | 'timestamp'>,
+  ) => Promise<void>;
   updateNotes: (jobId: string, notes: string) => Promise<void>;
   syncOfflineData: () => Promise<void>;
 }
 
 const JobContext = createContext<JobContextType | undefined>(undefined);
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const JobProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [currentJob, setCurrentJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +97,7 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const getAuthHeaders = async () => {
     const token = await AsyncStorage.getItem('access_token');
     return {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
   };
@@ -102,8 +115,9 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (response.ok) {
         const data = await response.json();
         const userId = user?.id || '';
-        const crewJobs = data.jobs.filter((job: Job) =>
-          job.assignedCrew?.includes(userId) || job.crewId === user?.crewId
+        const crewJobs = data.jobs.filter(
+          (job: Job) =>
+            job.assignedCrew?.includes(userId) || job.crewId === user?.crewId,
         );
         setJobs(crewJobs);
 
@@ -127,7 +141,7 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const selectJob = (jobId: string) => {
-    const job = jobs.find(j => j.id === jobId);
+    const job = jobs.find((j) => j.id === jobId);
     setCurrentJob(job || null);
   };
 
@@ -142,11 +156,13 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (response.ok) {
         const updatedJob = await response.json();
-        setJobs(prev => prev.map(job =>
-          job.id === jobId ? { ...job, ...updatedJob } : job
-        ));
+        setJobs((prev) =>
+          prev.map((job) =>
+            job.id === jobId ? { ...job, ...updatedJob } : job,
+          ),
+        );
         if (currentJob?.id === jobId) {
-          setCurrentJob(prev => prev ? { ...prev, ...updatedJob } : null);
+          setCurrentJob((prev) => (prev ? { ...prev, ...updatedJob } : null));
         }
       }
     } catch (error) {
@@ -156,7 +172,10 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const updateChecklist = async (jobId: string, checklistItem: ChecklistItem) => {
+  const updateChecklist = async (
+    jobId: string,
+    checklistItem: ChecklistItem,
+  ) => {
     try {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/checklist`, {
@@ -166,23 +185,29 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
 
       if (response.ok) {
-        setJobs(prev => prev.map(job =>
-          job.id === jobId
-            ? {
-                ...job,
-                checklist: job.checklist.map(item =>
-                  item.id === checklistItem.id ? checklistItem : item
-                )
-              }
-            : job
-        ));
+        setJobs((prev) =>
+          prev.map((job) =>
+            job.id === jobId
+              ? {
+                  ...job,
+                  checklist: job.checklist.map((item) =>
+                    item.id === checklistItem.id ? checklistItem : item,
+                  ),
+                }
+              : job,
+          ),
+        );
         if (currentJob?.id === jobId) {
-          setCurrentJob(prev => prev ? {
-            ...prev,
-            checklist: prev.checklist.map(item =>
-              item.id === checklistItem.id ? checklistItem : item
-            )
-          } : null);
+          setCurrentJob((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  checklist: prev.checklist.map((item) =>
+                    item.id === checklistItem.id ? checklistItem : item,
+                  ),
+                }
+              : null,
+          );
         }
       }
     } catch (error) {
@@ -191,7 +216,11 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addSignature = async (jobId: string, type: 'pickup' | 'delivery', signature: string) => {
+  const addSignature = async (
+    jobId: string,
+    type: 'pickup' | 'delivery',
+    signature: string,
+  ) => {
     try {
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/signature`, {
@@ -201,19 +230,25 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
 
       if (response.ok) {
-        setJobs(prev => prev.map(job =>
-          job.id === jobId
-            ? {
-                ...job,
-                signatures: { ...job.signatures, [type]: signature }
-              }
-            : job
-        ));
+        setJobs((prev) =>
+          prev.map((job) =>
+            job.id === jobId
+              ? {
+                  ...job,
+                  signatures: { ...job.signatures, [type]: signature },
+                }
+              : job,
+          ),
+        );
         if (currentJob?.id === jobId) {
-          setCurrentJob(prev => prev ? {
-            ...prev,
-            signatures: { ...prev.signatures, [type]: signature }
-          } : null);
+          setCurrentJob((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  signatures: { ...prev.signatures, [type]: signature },
+                }
+              : null,
+          );
         }
       }
     } catch (error) {
@@ -222,7 +257,10 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addPhoto = async (jobId: string, photo: Omit<JobPhoto, 'id' | 'timestamp'>) => {
+  const addPhoto = async (
+    jobId: string,
+    photo: Omit<JobPhoto, 'id' | 'timestamp'>,
+  ) => {
     const newPhoto: JobPhoto = {
       ...photo,
       id: `photo_${Date.now()}`,
@@ -238,16 +276,22 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
 
       if (response.ok) {
-        setJobs(prev => prev.map(job =>
-          job.id === jobId
-            ? { ...job, photos: [...job.photos, newPhoto] }
-            : job
-        ));
+        setJobs((prev) =>
+          prev.map((job) =>
+            job.id === jobId
+              ? { ...job, photos: [...job.photos, newPhoto] }
+              : job,
+          ),
+        );
         if (currentJob?.id === jobId) {
-          setCurrentJob(prev => prev ? {
-            ...prev,
-            photos: [...prev.photos, newPhoto]
-          } : null);
+          setCurrentJob((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  photos: [...prev.photos, newPhoto],
+                }
+              : null,
+          );
         }
       }
     } catch (error) {
@@ -266,11 +310,11 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
 
       if (response.ok) {
-        setJobs(prev => prev.map(job =>
-          job.id === jobId ? { ...job, notes } : job
-        ));
+        setJobs((prev) =>
+          prev.map((job) => (job.id === jobId ? { ...job, notes } : job)),
+        );
         if (currentJob?.id === jobId) {
-          setCurrentJob(prev => prev ? { ...prev, notes } : null);
+          setCurrentJob((prev) => (prev ? { ...prev, notes } : null));
         }
       }
     } catch (error) {
@@ -281,7 +325,8 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const storeOfflineUpdate = async (jobId: string, update: any) => {
     try {
-      const offlineUpdates = await AsyncStorage.getItem('offline_updates') || '[]';
+      const offlineUpdates =
+        (await AsyncStorage.getItem('offline_updates')) || '[]';
       const updates = JSON.parse(offlineUpdates);
       updates.push({
         jobId,
@@ -338,11 +383,7 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     syncOfflineData,
   };
 
-  return (
-    <JobContext.Provider value={value}>
-      {children}
-    </JobContext.Provider>
-  );
+  return <JobContext.Provider value={value}>{children}</JobContext.Provider>;
 };
 
 export const useJobs = (): JobContextType => {

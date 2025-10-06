@@ -10,38 +10,38 @@ Use this reference when developing new features or reviewing code.
 
 ### Minimum Contrast Ratios
 
-| Text Size | Minimum Ratio | Use Case |
-|-----------|--------------|----------|
-| **Normal text** (< 24px) | **4.5:1** | Body text, labels, buttons |
-| **Large text** (≥ 24px or ≥ 19px bold) | **3:1** | Headings, large buttons |
-| **UI components** | **3:1** | Borders, icons, form controls |
+| Text Size                              | Minimum Ratio | Use Case                      |
+| -------------------------------------- | ------------- | ----------------------------- |
+| **Normal text** (< 24px)               | **4.5:1**     | Body text, labels, buttons    |
+| **Large text** (≥ 24px or ≥ 19px bold) | **3:1**       | Headings, large buttons       |
+| **UI components**                      | **3:1**       | Borders, icons, form controls |
 
 ### ✅ Approved Text Colors (on dark bg #0f1419)
 
 ```css
 /* Copy these values directly */
---text-primary: #ffffff;      /* 16.5:1 - Use for headings */
---text-secondary: #e2e8f0;    /* 11.2:1 - Use for body text */
---text-tertiary: #cbd5e1;     /* 8.4:1 - Use for descriptions */
---text-muted: #94a3b8;        /* 4.8:1 - Use for hints/placeholders */
---text-disabled: #64748b;     /* 3.1:1 - Large text ONLY */
+--text-primary: #ffffff; /* 16.5:1 - Use for headings */
+--text-secondary: #e2e8f0; /* 11.2:1 - Use for body text */
+--text-tertiary: #cbd5e1; /* 8.4:1 - Use for descriptions */
+--text-muted: #94a3b8; /* 4.8:1 - Use for hints/placeholders */
+--text-disabled: #64748b; /* 3.1:1 - Large text ONLY */
 ```
 
 ### ✅ Approved Link Colors
 
 ```css
---link-primary: #60a5fa;      /* 4.52:1 - Default */
---link-hover: #93c5fd;        /* 6.1:1 - Hover */
---link-visited: #a78bfa;      /* 4.6:1 - Visited */
+--link-primary: #60a5fa; /* 4.52:1 - Default */
+--link-hover: #93c5fd; /* 6.1:1 - Hover */
+--link-visited: #a78bfa; /* 4.6:1 - Visited */
 ```
 
 ### ✅ Approved Status Colors
 
 ```css
---success-color: #4ade80;     /* 6.8:1 */
---error-color: #f87171;       /* 4.1:1 */
---warning-color: #fbbf24;     /* 8.2:1 */
---info-color: #22d3ee;        /* 6.2:1 */
+--success-color: #4ade80; /* 6.8:1 */
+--error-color: #f87171; /* 4.1:1 */
+--warning-color: #fbbf24; /* 8.2:1 */
+--info-color: #22d3ee; /* 6.2:1 */
 ```
 
 ### ❌ Avoid These Colors for Normal Text
@@ -115,11 +115,13 @@ Use this reference when developing new features or reviewing code.
 ### Bad vs Good Examples
 
 ❌ **Bad:**
+
 ```tsx
 <button style={{ color: '#888' }}>Click me</button>
 ```
 
 ✅ **Good:**
+
 ```tsx
 <button className="btn-primary">Click me</button>
 ```
@@ -131,11 +133,13 @@ Use this reference when developing new features or reviewing code.
 ### Always Include Labels
 
 ❌ **Bad:**
+
 ```tsx
 <input type="text" placeholder="Name" />
 ```
 
 ✅ **Good:**
+
 ```tsx
 <label htmlFor="customer-name">Customer Name</label>
 <input id="customer-name" type="text" />
@@ -225,7 +229,7 @@ import FocusTrap from 'focus-trap-react';
   <div role="dialog" aria-modal="true">
     {/* Modal content */}
   </div>
-</FocusTrap>
+</FocusTrap>;
 ```
 
 ---
@@ -289,9 +293,7 @@ import FocusTrap from 'focus-trap-react';
 ### Screen Reader Only Text
 
 ```tsx
-<span className="sr-only">
-  Required field
-</span>
+<span className="sr-only">Required field</span>
 ```
 
 Or use the CSS class:
@@ -341,6 +343,7 @@ Or use the CSS class:
 ```
 
 ### Key Points:
+
 - ✅ Always include `<caption>`
 - ✅ Use `scope="col"` for column headers
 - ✅ Use `scope="row"` for row headers
@@ -386,20 +389,13 @@ Or use the CSS class:
 ### Images with Meaning
 
 ```tsx
-<img
-  src="customer-photo.jpg"
-  alt="Profile photo of John Doe"
-/>
+<img src="customer-photo.jpg" alt="Profile photo of John Doe" />
 ```
 
 ### Decorative Images
 
 ```tsx
-<img
-  src="decorative-pattern.svg"
-  alt=""
-  role="presentation"
-/>
+<img src="decorative-pattern.svg" alt="" role="presentation" />
 ```
 
 ### Icons in Buttons
@@ -447,6 +443,7 @@ Or use the CSS class:
 ```
 
 ### Modal Requirements:
+
 - ✅ `role="dialog"`
 - ✅ `aria-modal="true"`
 - ✅ `aria-labelledby` (points to title)
@@ -462,12 +459,14 @@ Or use the CSS class:
 Before submitting code, verify:
 
 ### Color Contrast
+
 - [ ] All text meets 4.5:1 (or 3:1 for large)
 - [ ] Borders/icons meet 3:1
 - [ ] Focus indicators visible (3:1)
 - [ ] Use approved color variables
 
 ### Keyboard
+
 - [ ] All actions keyboard accessible
 - [ ] Logical tab order
 - [ ] Focus indicators visible
@@ -475,6 +474,7 @@ Before submitting code, verify:
 - [ ] Escape closes modals
 
 ### Screen Readers
+
 - [ ] All images have alt text (or alt="")
 - [ ] Forms have labels
 - [ ] Errors announced (role="alert")
@@ -482,18 +482,21 @@ Before submitting code, verify:
 - [ ] ARIA landmarks present
 
 ### Forms
+
 - [ ] All inputs have labels
 - [ ] Required fields indicated
 - [ ] Error states with aria-invalid
 - [ ] Help text with aria-describedby
 
 ### Interactive Elements
+
 - [ ] Buttons have clear labels
 - [ ] Links are descriptive
 - [ ] Touch targets ≥ 44x44px
 - [ ] Disabled states clear
 
 ### Responsive
+
 - [ ] Readable at 200% zoom
 - [ ] No horizontal scroll at 320px
 - [ ] Touch targets adequate
@@ -503,22 +506,26 @@ Before submitting code, verify:
 ## 🛠️ Testing Tools
 
 ### Browser DevTools
+
 1. **Chrome Lighthouse** - Accessibility audit
 2. **Firefox Accessibility Inspector** - ARIA tree
 3. **Color Contrast Checker** - Built-in
 
 ### Browser Extensions
+
 - [axe DevTools](https://www.deque.com/axe/devtools/) - Find accessibility issues
 - [WAVE](https://wave.webaim.org/) - Visual feedback
 - [Stark](https://www.getstark.co/) - Color contrast
 
 ### Screen Readers
+
 - **NVDA** (Windows) - Free
 - **JAWS** (Windows) - Commercial
 - **VoiceOver** (macOS/iOS) - Built-in
 - **TalkBack** (Android) - Built-in
 
 ### Manual Testing
+
 ```bash
 # Install axe for React
 npm install --save-dev @axe-core/react
@@ -540,12 +547,14 @@ if (process.env.NODE_ENV === 'development') {
 ```tsx
 const [isLoading, setIsLoading] = useState(false);
 
-{isLoading && (
-  <div role="status" aria-live="polite" aria-busy="true">
-    <Spinner aria-hidden="true" />
-    <span className="sr-only">Loading customer data...</span>
-  </div>
-)}
+{
+  isLoading && (
+    <div role="status" aria-live="polite" aria-busy="true">
+      <Spinner aria-hidden="true" />
+      <span className="sr-only">Loading customer data...</span>
+    </div>
+  );
+}
 ```
 
 ### Form Validation
@@ -558,14 +567,16 @@ const [errors, setErrors] = useState<Record<string, string>>({});
   type="email"
   aria-required="true"
   aria-invalid={!!errors.email}
-  aria-describedby={errors.email ? "email-error" : undefined}
-  className={errors.email ? "form-input form-input-error" : "form-input"}
-/>
-{errors.email && (
-  <div id="email-error" role="alert" className="form-error">
-    {errors.email}
-  </div>
-)}
+  aria-describedby={errors.email ? 'email-error' : undefined}
+  className={errors.email ? 'form-input form-input-error' : 'form-input'}
+/>;
+{
+  errors.email && (
+    <div id="email-error" role="alert" className="form-error">
+      {errors.email}
+    </div>
+  );
+}
 ```
 
 ### Search with Live Results
@@ -651,12 +662,14 @@ const [errors, setErrors] = useState<Record<string, string>>({});
 ## 📖 Additional Resources
 
 ### Internal Docs
+
 - **Full Guide**: `docs/guides/ACCESSIBILITY.md`
 - **Color System**: `apps/web/src/styles/accessibility-colors.css`
 - **Button Styles**: `apps/web/src/styles/accessible-buttons.css`
 - **Form Styles**: `apps/web/src/styles/accessible-forms.css`
 
 ### External Resources
+
 - [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
 - [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
 - [WebAIM](https://webaim.org/)

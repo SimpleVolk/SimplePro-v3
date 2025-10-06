@@ -72,7 +72,9 @@ describe('PricingRulesService', () => {
     });
 
     it('should filter by category', async () => {
-      const timingRules = mockPricingRules.filter(r => r.category === 'timing');
+      const timingRules = mockPricingRules.filter(
+        (r) => r.category === 'timing',
+      );
       pricingRuleModel.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
           skip: jest.fn().mockReturnValue({
@@ -86,36 +88,44 @@ describe('PricingRulesService', () => {
 
       await service.getAllRules(ruleFilters.byCategory);
 
-      expect(pricingRuleModel.find).toHaveBeenCalledWith(expect.objectContaining({
-        category: 'timing',
-      }));
+      expect(pricingRuleModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          category: 'timing',
+        }),
+      );
     });
 
     it('should filter by active status', async () => {
       await service.getAllRules(ruleFilters.byActive);
 
-      expect(pricingRuleModel.find).toHaveBeenCalledWith(expect.objectContaining({
-        isActive: true,
-      }));
+      expect(pricingRuleModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isActive: true,
+        }),
+      );
     });
 
     it('should filter by applicable service', async () => {
       await service.getAllRules(ruleFilters.byService);
 
-      expect(pricingRuleModel.find).toHaveBeenCalledWith(expect.objectContaining({
-        applicableServices: 'local',
-      }));
+      expect(pricingRuleModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          applicableServices: 'local',
+        }),
+      );
     });
 
     it('should search rules by text', async () => {
       await service.getAllRules(ruleFilters.bySearch);
 
-      expect(pricingRuleModel.find).toHaveBeenCalledWith(expect.objectContaining({
-        $or: expect.arrayContaining([
-          expect.objectContaining({ name: expect.any(Object) }),
-          expect.objectContaining({ description: expect.any(Object) }),
-        ]),
-      }));
+      expect(pricingRuleModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          $or: expect.arrayContaining([
+            expect.objectContaining({ name: expect.any(Object) }),
+            expect.objectContaining({ description: expect.any(Object) }),
+          ]),
+        }),
+      );
     });
 
     it('should handle pagination parameters', async () => {
@@ -150,9 +160,11 @@ describe('PricingRulesService', () => {
 
       await service.getAllRules({});
 
-      expect(sortMock).toHaveBeenCalledWith(expect.objectContaining({
-        priority: 1,
-      }));
+      expect(sortMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          priority: 1,
+        }),
+      );
     });
 
     it('should handle custom sort order', async () => {
@@ -168,9 +180,11 @@ describe('PricingRulesService', () => {
 
       await service.getAllRules({ sortBy: 'name', sortOrder: 'desc' });
 
-      expect(sortMock).toHaveBeenCalledWith(expect.objectContaining({
-        name: -1,
-      }));
+      expect(sortMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: -1,
+        }),
+      );
     });
   });
 
@@ -210,16 +224,22 @@ describe('PricingRulesService', () => {
     it('should throw conflict error if rule ID exists', async () => {
       pricingRuleModel.findOne.mockResolvedValue(basePricingRule);
 
-      await expect(service.createRule(basePricingRule)).rejects.toThrow(HttpException);
-      await expect(service.createRule(basePricingRule)).rejects.toThrow(expect.objectContaining({
-        status: HttpStatus.CONFLICT,
-      }));
+      await expect(service.createRule(basePricingRule)).rejects.toThrow(
+        HttpException,
+      );
+      await expect(service.createRule(basePricingRule)).rejects.toThrow(
+        expect.objectContaining({
+          status: HttpStatus.CONFLICT,
+        }),
+      );
     });
 
     it('should validate rule structure before creation', async () => {
       pricingRuleModel.findOne.mockResolvedValue(null);
 
-      await expect(service.createRule(invalidRule)).rejects.toThrow(HttpException);
+      await expect(service.createRule(invalidRule)).rejects.toThrow(
+        HttpException,
+      );
     });
 
     it('should log rule creation in history', async () => {
@@ -242,11 +262,19 @@ describe('PricingRulesService', () => {
 
   describe('updateRule', () => {
     it('should update rule successfully', async () => {
-      const mockExisting = { ...basePricingRule, toObject: () => basePricingRule };
+      const mockExisting = {
+        ...basePricingRule,
+        toObject: () => basePricingRule,
+      };
       pricingRuleModel.findOne.mockResolvedValue(mockExisting);
-      pricingRuleModel.findOneAndUpdate.mockResolvedValue({ ...basePricingRule, description: 'Updated description' });
+      pricingRuleModel.findOneAndUpdate.mockResolvedValue({
+        ...basePricingRule,
+        description: 'Updated description',
+      });
 
-      const result = await service.updateRule('rule_weekend_surcharge', { description: 'Updated description' });
+      const result = await service.updateRule('rule_weekend_surcharge', {
+        description: 'Updated description',
+      });
 
       expect(result).toBeDefined();
       expect(result.description).toBe('Updated description');
@@ -255,38 +283,62 @@ describe('PricingRulesService', () => {
     it('should return null when rule not found', async () => {
       pricingRuleModel.findOne.mockResolvedValue(null);
 
-      const result = await service.updateRule('nonexistent', { description: 'Updated' });
+      const result = await service.updateRule('nonexistent', {
+        description: 'Updated',
+      });
 
       expect(result).toBeNull();
     });
 
     it('should validate updated rule structure', async () => {
-      const mockExisting = { ...basePricingRule, toObject: () => basePricingRule };
+      const mockExisting = {
+        ...basePricingRule,
+        toObject: () => basePricingRule,
+      };
       pricingRuleModel.findOne.mockResolvedValue(mockExisting);
 
-      await expect(service.updateRule('rule_weekend_surcharge', { conditions: [] })).rejects.toThrow(HttpException);
+      await expect(
+        service.updateRule('rule_weekend_surcharge', { conditions: [] }),
+      ).rejects.toThrow(HttpException);
     });
 
     it('should increment version number', async () => {
-      const mockExisting = { ...basePricingRule, version: '1.0.0', toObject: () => ({ ...basePricingRule, version: '1.0.0' }) };
+      const mockExisting = {
+        ...basePricingRule,
+        version: '1.0.0',
+        toObject: () => ({ ...basePricingRule, version: '1.0.0' }),
+      };
       pricingRuleModel.findOne.mockResolvedValue(mockExisting);
-      pricingRuleModel.findOneAndUpdate.mockResolvedValue({ ...basePricingRule, version: '1.0.1' });
+      pricingRuleModel.findOneAndUpdate.mockResolvedValue({
+        ...basePricingRule,
+        version: '1.0.1',
+      });
 
-      await service.updateRule('rule_weekend_surcharge', { description: 'Updated' });
+      await service.updateRule('rule_weekend_surcharge', {
+        description: 'Updated',
+      });
 
       expect(pricingRuleModel.findOneAndUpdate).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ version: '1.0.1' }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
     it('should log changes in history', async () => {
-      const mockExisting = { ...basePricingRule, toObject: () => basePricingRule };
+      const mockExisting = {
+        ...basePricingRule,
+        toObject: () => basePricingRule,
+      };
       pricingRuleModel.findOne.mockResolvedValue(mockExisting);
-      pricingRuleModel.findOneAndUpdate.mockResolvedValue({ ...basePricingRule, description: 'Updated' });
+      pricingRuleModel.findOneAndUpdate.mockResolvedValue({
+        ...basePricingRule,
+        description: 'Updated',
+      });
 
-      await service.updateRule('rule_weekend_surcharge', { description: 'Updated' });
+      await service.updateRule('rule_weekend_surcharge', {
+        description: 'Updated',
+      });
 
       expect(ruleHistoryModel).toHaveBeenCalled();
     });
@@ -294,7 +346,10 @@ describe('PricingRulesService', () => {
 
   describe('deleteRule', () => {
     it('should soft delete rule', async () => {
-      pricingRuleModel.findOneAndUpdate.mockResolvedValue({ ...basePricingRule, isActive: false });
+      pricingRuleModel.findOneAndUpdate.mockResolvedValue({
+        ...basePricingRule,
+        isActive: false,
+      });
 
       const result = await service.deleteRule('rule_weekend_surcharge');
 
@@ -302,7 +357,7 @@ describe('PricingRulesService', () => {
       expect(pricingRuleModel.findOneAndUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ id: 'rule_weekend_surcharge' }),
         expect.objectContaining({ isActive: false }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -315,7 +370,10 @@ describe('PricingRulesService', () => {
     });
 
     it('should log deletion in history', async () => {
-      pricingRuleModel.findOneAndUpdate.mockResolvedValue({ ...basePricingRule, isActive: false });
+      pricingRuleModel.findOneAndUpdate.mockResolvedValue({
+        ...basePricingRule,
+        isActive: false,
+      });
 
       await service.deleteRule('rule_weekend_surcharge');
 
@@ -370,7 +428,9 @@ describe('PricingRulesService', () => {
       const result = await service.testRule(testRuleData);
 
       expect(result.conditionsEvaluated).toBeDefined();
-      expect(result.conditionsEvaluated.length).toBe(testRuleData.rule.conditions.length);
+      expect(result.conditionsEvaluated.length).toBe(
+        testRuleData.rule.conditions.length,
+      );
     });
   });
 
@@ -436,9 +496,11 @@ describe('PricingRulesService', () => {
 
       await service.exportRules();
 
-      expect(pricingRuleModel.find).toHaveBeenCalledWith(expect.objectContaining({
-        isActive: true,
-      }));
+      expect(pricingRuleModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isActive: true,
+        }),
+      );
     });
   });
 
@@ -461,10 +523,14 @@ describe('PricingRulesService', () => {
     it('should validate import data structure', async () => {
       const invalidImportData = { version: '1.0.0' };
 
-      await expect(service.importRules(invalidImportData)).rejects.toThrow(HttpException);
-      await expect(service.importRules(invalidImportData)).rejects.toThrow(expect.objectContaining({
-        status: HttpStatus.BAD_REQUEST,
-      }));
+      await expect(service.importRules(invalidImportData)).rejects.toThrow(
+        HttpException,
+      );
+      await expect(service.importRules(invalidImportData)).rejects.toThrow(
+        expect.objectContaining({
+          status: HttpStatus.BAD_REQUEST,
+        }),
+      );
     });
 
     it('should create backup before import', async () => {
@@ -473,9 +539,11 @@ describe('PricingRulesService', () => {
 
       await service.importRules(importData);
 
-      expect(pricingRuleModel.find).toHaveBeenCalledWith(expect.objectContaining({
-        isActive: true,
-      }));
+      expect(pricingRuleModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isActive: true,
+        }),
+      );
     });
 
     it('should deactivate existing rules before import', async () => {
@@ -485,7 +553,7 @@ describe('PricingRulesService', () => {
 
       expect(pricingRuleModel.updateMany).toHaveBeenCalledWith(
         {},
-        expect.objectContaining({ isActive: false })
+        expect.objectContaining({ isActive: false }),
       );
     });
   });
@@ -531,15 +599,19 @@ describe('PricingRulesService', () => {
 
       await service.getRuleHistory('rule_weekend_surcharge');
 
-      expect(sortMock).toHaveBeenCalledWith(expect.objectContaining({
-        timestamp: -1,
-      }));
+      expect(sortMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          timestamp: -1,
+        }),
+      );
     });
   });
 
   describe('createBackup', () => {
     it('should create backup of active rules', async () => {
-      pricingRuleModel.find.mockResolvedValue(mockPricingRules.map(r => ({ toObject: () => r, ...r })));
+      pricingRuleModel.find.mockResolvedValue(
+        mockPricingRules.map((r) => ({ toObject: () => r, ...r })),
+      );
 
       const result = await service.createBackup();
 
@@ -565,7 +637,13 @@ describe('PricingRulesService', () => {
       const existingRule = { ...basePricingRule, priority: 100 };
       pricingRuleModel.findOne.mockResolvedValue(existingRule);
 
-      await expect(service.createRule({ ...weightBasedRule, category: 'timing', priority: 100 })).rejects.toThrow();
+      await expect(
+        service.createRule({
+          ...weightBasedRule,
+          category: 'timing',
+          priority: 100,
+        }),
+      ).rejects.toThrow();
     });
 
     it('should validate condition structure', async () => {
@@ -576,7 +654,9 @@ describe('PricingRulesService', () => {
 
       pricingRuleModel.findOne.mockResolvedValue(null);
 
-      await expect(service.createRule(invalidConditionRule as any)).rejects.toThrow();
+      await expect(
+        service.createRule(invalidConditionRule as any),
+      ).rejects.toThrow();
     });
 
     it('should validate action structure', async () => {
@@ -587,7 +667,9 @@ describe('PricingRulesService', () => {
 
       pricingRuleModel.findOne.mockResolvedValue(null);
 
-      await expect(service.createRule(invalidActionRule as any)).rejects.toThrow();
+      await expect(
+        service.createRule(invalidActionRule as any),
+      ).rejects.toThrow();
     });
   });
 });

@@ -1,5 +1,11 @@
 import React, { createContext, useContext } from 'react';
-import { darkTheme, spacing, borderRadius, fontSize, fontWeight } from '../../theme/colors';
+import {
+  darkTheme,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme/colors';
 
 interface ThemeContextType {
   colors: typeof darkTheme;
@@ -11,7 +17,9 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const theme = {
     colors: darkTheme,
     spacing,
@@ -21,9 +29,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <ThemeContext.Provider value={theme}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
   );
 };
 

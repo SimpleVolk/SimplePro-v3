@@ -14,6 +14,7 @@
 SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive monitoring, Docker configurations, and CI/CD pipelines. However, there are **critical gaps** preventing immediate production deployment.
 
 **Key Findings:**
+
 - ✅ **Excellent** infrastructure-as-code setup with Docker multi-stage builds
 - ✅ **Comprehensive** monitoring stack (Prometheus, Grafana, Loki, AlertManager)
 - ⚠️ **Incomplete** CI/CD automation with placeholder deployment steps
@@ -28,16 +29,16 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
 
 ## Production Readiness Checklist
 
-| Category | Status | Score | Critical Issues |
-|----------|--------|-------|-----------------|
-| **1. Environment Configuration** | ⚠️ PARTIAL | 5/10 | Missing production .env files, incomplete validation |
-| **2. Infrastructure as Code** | ✅ GOOD | 8/10 | Dockerfiles missing, otherwise excellent |
-| **3. CI/CD Pipelines** | ⚠️ PARTIAL | 5/10 | Placeholder deployment, no real automation |
-| **4. Monitoring & Observability** | ✅ EXCELLENT | 9/10 | Comprehensive stack, minor config gaps |
-| **5. Backup & Disaster Recovery** | ⚠️ PARTIAL | 6/10 | Scripts exist but untested, no DR procedures |
-| **6. Security Hardening** | ✅ GOOD | 7/10 | Good foundation, needs production secrets |
-| **7. Scalability Preparation** | ⚠️ LIMITED | 4/10 | Single-instance only, no scaling config |
-| **8. Operational Readiness** | ❌ POOR | 3/10 | No runbooks, minimal documentation |
+| Category                          | Status       | Score | Critical Issues                                      |
+| --------------------------------- | ------------ | ----- | ---------------------------------------------------- |
+| **1. Environment Configuration**  | ⚠️ PARTIAL   | 5/10  | Missing production .env files, incomplete validation |
+| **2. Infrastructure as Code**     | ✅ GOOD      | 8/10  | Dockerfiles missing, otherwise excellent             |
+| **3. CI/CD Pipelines**            | ⚠️ PARTIAL   | 5/10  | Placeholder deployment, no real automation           |
+| **4. Monitoring & Observability** | ✅ EXCELLENT | 9/10  | Comprehensive stack, minor config gaps               |
+| **5. Backup & Disaster Recovery** | ⚠️ PARTIAL   | 6/10  | Scripts exist but untested, no DR procedures         |
+| **6. Security Hardening**         | ✅ GOOD      | 7/10  | Good foundation, needs production secrets            |
+| **7. Scalability Preparation**    | ⚠️ LIMITED   | 4/10  | Single-instance only, no scaling config              |
+| **8. Operational Readiness**      | ❌ POOR      | 3/10  | No runbooks, minimal documentation                   |
 
 ---
 
@@ -46,6 +47,7 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
 ### ✅ PASS - Strengths
 
 #### Infrastructure Foundation (8/10)
+
 - **Excellent Docker Setup**: Multi-stage builds for API and Web
   - Non-root users (nodeuser:1001, nginx-user:1001)
   - Health checks configured (30s intervals)
@@ -72,6 +74,7 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
   - Static asset caching (1 year expiry)
 
 #### Security Configuration (7/10)
+
 - **Good Security Practices**:
   - NoSQL injection protection (QueryFiltersDto)
   - Rate limiting at multiple tiers (5/min login, 10/sec general)
@@ -82,6 +85,7 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
   - Non-root container users
 
 #### Monitoring & Alerting (9/10)
+
 - **Comprehensive Alert Rules** (13 alerts configured):
   - API availability monitoring
   - High error rate detection (>5% over 5min)
@@ -100,6 +104,7 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
   - Alert inhibition rules to prevent alert storms
 
 #### Backup Infrastructure (6/10)
+
 - **Automated Backup Scripts**:
   - MongoDB backup with mongodump + gzip compression
   - SHA256 checksums for verification
@@ -113,7 +118,9 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
 #### Environment Configuration (5/10)
 
 **Issues:**
+
 1. **Missing Production Environment Files**:
+
    ```
    ❌ .env.production - Not found
    ❌ .env.staging - Not found
@@ -132,6 +139,7 @@ SimplePro-v3 demonstrates **good infrastructure foundation** with comprehensive 
    - No validation of secret formats/lengths
 
 **Recommendations:**
+
 ```bash
 # Create production environment templates
 apps/api/.env.production.example
@@ -148,6 +156,7 @@ apps/web/.env.production.example
 **Critical Issues:**
 
 1. **Placeholder Deployment Steps** (.github/workflows/cd.yml):
+
    ```yaml
    # Line 211: Placeholder deployment
    - name: Deploy to staging environment
@@ -172,6 +181,7 @@ apps/web/.env.production.example
      - `PRODUCTION_USER`
 
 3. **Incomplete Health Checks**:
+
    ```yaml
    # Line 160: Health check references non-existent endpoints
    curl -f https://staging-api.simplepro.example.com/api/health
@@ -179,6 +189,7 @@ apps/web/.env.production.example
    ```
 
 4. **No Rollback Implementation**:
+
    ```yaml
    # Line 290: docker-compose rollback not supported
    docker-compose -f docker-compose.prod.yml rollback  ❌
@@ -190,12 +201,14 @@ apps/web/.env.production.example
    - `SNYK_TOKEN` - Optional but recommended
 
 **Test Coverage Gaps:**
+
 - API tests: 58% coverage (93/159 passing)
 - Pricing engine: 100% coverage (38/38 passing) ✅
 - Web tests: Minimal coverage
 - Integration tests: MongoDB Memory Server configured but limited tests
 
 **Recommendations:**
+
 ```yaml
 # Implement actual deployment
 - name: Deploy via docker-compose
@@ -234,6 +247,7 @@ apps/web/.env.production.example
    - No failover procedures
 
 3. **Incomplete Backup Verification**:
+
    ```bash
    # backup-mongodb.sh line 86
    echo "1. Verify backup integrity: ./scripts/backup/verify-backup.sh"
@@ -248,6 +262,7 @@ apps/web/.env.production.example
    ```
 
 **Recommendations:**
+
 1. Create backup verification script
 2. Implement automated backup testing (restore to staging weekly)
 3. Configure S3/Azure Blob remote backup storage
@@ -270,6 +285,7 @@ apps/web/.env.production.example
    - No session persistence configuration
 
 3. **Database Scaling Not Configured**:
+
    ```yaml
    # docker/mongodb/mongod.conf line 51-53
    # Replication (disabled for single instance)
@@ -283,6 +299,7 @@ apps/web/.env.production.example
    - No asset URL rewriting for CDN
 
 **Recommendations:**
+
 1. Configure MongoDB replica set (minimum 3 nodes)
 2. Implement Redis Sentinel or Cluster
 3. Add horizontal pod autoscaling definitions
@@ -331,6 +348,7 @@ apps/web/.env.production.example
 **Impact:** **SECURITY BLOCKER** - Cannot deploy securely without proper secrets.
 
 **Solution:**
+
 1. Use `scripts/production-secrets.sh init` to generate secure secrets
 2. Store in GitHub Secrets / Azure Key Vault / AWS Secrets Manager
 3. Never commit secrets to repository
@@ -341,6 +359,7 @@ apps/web/.env.production.example
 **Issue:** Deployment workflows have placeholder commands, not actual automation.
 
 **Affected Files:**
+
 - `.github/workflows/cd.yml` (lines 134-153, 220-241)
 - `.github/workflows/ci-cd.yml` (lines 209-214, 240-244)
 
@@ -353,6 +372,7 @@ apps/web/.env.production.example
 **Issue:** No documented procedures for common operational tasks.
 
 **Missing Runbooks:**
+
 - Incident response procedures
 - Deployment rollback steps
 - Database migration procedures
@@ -375,6 +395,7 @@ apps/web/.env.production.example
 #### ✅ Strengths
 
 **Multi-Stage Builds** (apps/api/Dockerfile):
+
 ```dockerfile
 # Excellent separation of concerns
 FROM node:20-alpine AS dependencies  # Dependency layer
@@ -384,6 +405,7 @@ FROM node:20-alpine AS production    # Runtime layer
 ```
 
 **Security Best Practices**:
+
 - ✅ Non-root user (nodeuser:1001)
 - ✅ Tini init for signal handling
 - ✅ Health checks configured (30s interval, 60s start period)
@@ -392,6 +414,7 @@ FROM node:20-alpine AS production    # Runtime layer
 - ✅ Layer caching optimization
 
 **Web Application Dockerfile** (apps/web/Dockerfile):
+
 ```dockerfile
 # Innovative static site approach
 FROM nginx:alpine AS production  # Nginx for static serving
@@ -418,6 +441,7 @@ $ find D:/Claude/SimplePro-v3/apps -name "Dockerfile*" -type f
 #### Production Stack (docker-compose.prod.yml)
 
 **Comprehensive Service Configuration:**
+
 - MongoDB with authentication + health checks
 - Redis with password + memory limits
 - API with service dependencies + health checks
@@ -428,6 +452,7 @@ $ find D:/Claude/SimplePro-v3/apps -name "Dockerfile*" -type f
 - Proper networking + volumes
 
 **Resource Limits Applied:**
+
 ```yaml
 deploy:
   resources:
@@ -440,16 +465,18 @@ deploy:
 ```
 
 **Health Checks:**
+
 ```yaml
 healthcheck:
-  test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+  test: ['CMD', 'curl', '-f', 'http://localhost:4000/api/health']
   interval: 30s
   timeout: 10s
   retries: 5
-  start_period: 60s  # Grace period for startup
+  start_period: 60s # Grace period for startup
 ```
 
 **Security:**
+
 - Service isolation via networks
 - Volume persistence configured
 - Secret management via environment variables
@@ -458,6 +485,7 @@ healthcheck:
 #### Monitoring Stack (docker-compose.monitoring.yml)
 
 **Observability Services:**
+
 - Prometheus (9090) - metrics collection
 - Grafana (3033) - visualization
 - Loki (3100) - log aggregation
@@ -473,6 +501,7 @@ healthcheck:
 #### Development Stack (docker-compose.dev.yml)
 
 **Simplified Development Setup:**
+
 - MongoDB exposed on 27017 (host access for local API dev)
 - Redis with password
 - MinIO with console on 9001
@@ -483,17 +512,19 @@ healthcheck:
 ### Volume Management: **8/10** ✅ GOOD
 
 **Persistent Volumes Configured:**
+
 ```yaml
 volumes:
-  mongodb_data:      # Database persistence
-  redis_data:        # Cache persistence
-  minio_data:        # File storage persistence
-  prometheus_data:   # Metrics persistence
-  grafana_data:      # Dashboard persistence
-  nginx_logs:        # Access logs persistence
+  mongodb_data: # Database persistence
+  redis_data: # Cache persistence
+  minio_data: # File storage persistence
+  prometheus_data: # Metrics persistence
+  grafana_data: # Dashboard persistence
+  nginx_logs: # Access logs persistence
 ```
 
 **Missing:**
+
 - Volume backup automation
 - Volume snapshot configuration
 - Volume size limits
@@ -502,6 +533,7 @@ volumes:
 ### Network Configuration: **7/10** ✅ GOOD
 
 **Production Network:**
+
 ```yaml
 networks:
   simplepro-network:
@@ -509,22 +541,25 @@ networks:
 ```
 
 **Issues:**
+
 - Single flat network (no micro-segmentation)
 - No network policies defined
 - No inter-service TLS
 - Monitoring on separate network (coordination issue)
 
 **Recommendation:**
+
 ```yaml
 networks:
-  frontend:     # Web + Nginx
-  backend:      # API + Databases
-  monitoring:   # Observability stack
+  frontend: # Web + Nginx
+  backend: # API + Databases
+  monitoring: # Observability stack
 ```
 
 ### Container Security: **7/10** ✅ GOOD
 
 **Security Measures:**
+
 - ✅ Non-root users in all containers
 - ✅ Read-only root filesystems where possible
 - ✅ No new privileges flag
@@ -533,6 +568,7 @@ networks:
 - ✅ Alpine base images (minimal attack surface)
 
 **Missing:**
+
 - AppArmor/SELinux profiles
 - Seccomp profiles
 - Capabilities dropping
@@ -548,6 +584,7 @@ networks:
 **Strengths:**
 
 1. **Proper Dependency Caching:**
+
    ```yaml
    - uses: actions/cache@v4
      with:
@@ -580,10 +617,11 @@ networks:
    - No E2E tests in CI
 
 2. **Security Checks Continue on Error:**
+
    ```yaml
    - name: Run npm audit
      run: npm audit --audit-level=moderate
-     continue-on-error: true  # ❌ Should fail on high/critical
+     continue-on-error: true # ❌ Should fail on high/critical
    ```
 
 3. **Missing Vulnerability Scanning:**
@@ -596,6 +634,7 @@ networks:
 **Critical Issues:**
 
 1. **Placeholder Deployment (Lines 134-153):**
+
    ```yaml
    - name: Deploy to staging server
      run: |
@@ -605,17 +644,21 @@ networks:
          docker-compose -f docker-compose.staging.yml up -d api web
        ENDSSH
    ```
+
    **Issue:** Assumes docker-compose.staging.yml exists (it doesn't)
 
 2. **Fake Health Checks (Lines 160-164):**
+
    ```yaml
    - name: Run smoke tests
      run: |
        curl -f https://staging-api.simplepro.example.com/api/health
    ```
+
    **Issue:** Endpoints don't exist, will always fail
 
 3. **No Rollback Implementation:**
+
    ```yaml
    - name: Rollback on failure
      run: |
@@ -637,6 +680,7 @@ networks:
 **Recommendations:**
 
 1. **Implement Real Deployment:**
+
    ```yaml
    - name: Deploy to production
      run: |
@@ -661,6 +705,7 @@ networks:
    ```
 
 2. **Implement Proper Rollback:**
+
    ```yaml
    - name: Rollback on failure
      if: failure()
@@ -685,6 +730,7 @@ networks:
 ### Build Automation: **8/10** ✅ GOOD
 
 **Strengths:**
+
 - Multi-platform builds (linux/amd64, linux/arm64)
 - GitHub Container Registry integration
 - Proper image tagging strategy
@@ -692,6 +738,7 @@ networks:
 - Trivy security scanning
 
 **Issues:**
+
 - No build optimization metrics
 - No image size monitoring
 - Trivy scanner doesn't fail on vulnerabilities (exit-code: '0')
@@ -709,12 +756,13 @@ SimplePro-v3 has one of the most comprehensive monitoring setups reviewed. Outst
 **monitoring/prometheus/prometheus.yml:**
 
 **Scrape Targets:**
+
 ```yaml
 scrape_configs:
   - job_name: 'simplepro-api'
     static_configs:
       - targets: ['host.docker.internal:3001']
-    scrape_interval: 10s  # Frequent scraping for real-time metrics
+    scrape_interval: 10s # Frequent scraping for real-time metrics
 
   - job_name: 'mongodb'
     targets: ['mongodb-exporter:9216']
@@ -726,6 +774,7 @@ scrape_configs:
 ```
 
 **Strengths:**
+
 - Comprehensive service coverage (API, DB, Redis, system)
 - Appropriate scrape intervals (10-30s)
 - 30-day retention (storage.tsdb.retention.time=30d)
@@ -733,11 +782,13 @@ scrape_configs:
 - External labels for multi-cluster support
 
 **Minor Issues:**
+
 - API endpoint assumes port 3001 (production uses 4000)
 - No service discovery (static configs only)
 - Missing MongoDB/Redis exporter in dev stack
 
 **Fix:**
+
 ```yaml
 # Update for production
 - targets: ['api:4000']  # Use docker service name
@@ -752,37 +803,35 @@ consul_sd_configs:
 **monitoring/prometheus/rules/alerts.yml:** 13 comprehensive alerts
 
 **Critical Alerts:**
+
 1. ✅ APIDown - API availability (1min threshold)
 2. ✅ DatabaseDisconnected - MongoDB connection (1min)
 3. ✅ HighErrorRate - HTTP errors >5% (5min)
 4. ✅ HighResponseTime - Response >2s (5min)
 
-**System Alerts:**
-5. ✅ HighMemoryUsage - Heap >90% (5min)
-6. ✅ HighSystemCPU - CPU >80% (5min)
-7. ✅ DiskSpaceLow - <10% free (5min)
-8. ✅ ContainerRestarting - Frequent restarts (5min)
+**System Alerts:** 5. ✅ HighMemoryUsage - Heap >90% (5min) 6. ✅ HighSystemCPU - CPU >80% (5min) 7. ✅ DiskSpaceLow - <10% free (5min) 8. ✅ ContainerRestarting - Frequent restarts (5min)
 
-**Business Metrics:**
-9. ✅ NoRecentEstimates - No estimates for 2h (business hours)
-10. ✅ NoRecentJobs - No jobs for 4h (business hours)
+**Business Metrics:** 9. ✅ NoRecentEstimates - No estimates for 2h (business hours) 10. ✅ NoRecentJobs - No jobs for 4h (business hours)
 
 **Strengths:**
+
 - Appropriate thresholds (not too sensitive)
 - Proper alert severity (critical/warning/info)
 - Business metric monitoring (unique!)
 - Clear annotations and descriptions
 
 **Minor Issue:**
+
 ```yaml
 # Line 95-102: Business hours detection not implemented
 alert: NoRecentEstimates
 for: 2h
 annotations:
-  description: "during business hours"  # No actual time check
+  description: 'during business hours' # No actual time check
 ```
 
 **Recommendation:**
+
 ```yaml
 expr: |
   rate(business_estimates_created_total[1h]) == 0
@@ -793,26 +842,30 @@ expr: |
 ### Grafana Setup: **8/10** ✅ GOOD
 
 **Configuration:**
+
 - Datasource provisioning configured
 - Dashboard provisioning configured
 - Custom SimplePro overview dashboard
 - Appropriate security (GF_USERS_ALLOW_SIGN_UP: false)
 
 **Issues:**
+
 ```yaml
 # monitoring/grafana/provisioning/datasources/datasources.yml
 # Hardcoded Prometheus URL
-url: http://prometheus:9090  # ✅ Good for Docker
+url: http://prometheus:9090 # ✅ Good for Docker
 # Missing Loki datasource configuration
 ```
 
 **Missing:**
+
 - Pre-built dashboard JSON incomplete
 - No alerting dashboards
 - No business metrics dashboards
 - Grafana admin password in plain docker-compose
 
 **Recommendation:**
+
 1. Create comprehensive dashboards for:
    - API performance
    - Database metrics
@@ -824,11 +877,13 @@ url: http://prometheus:9090  # ✅ Good for Docker
 ### Loki & Promtail: **7/10** ✅ GOOD
 
 **Log Aggregation:**
+
 - Loki configured for log storage
 - Promtail for log shipping
 - Volume mounts for API/Web logs
 
 **Issues:**
+
 ```yaml
 # monitoring/promtail/promtail-config.yml
 # Volume mounts assume specific log locations
@@ -838,6 +893,7 @@ url: http://prometheus:9090  # ✅ Good for Docker
 ```
 
 **Missing:**
+
 - Log retention policy not defined
 - No log parsing rules
 - No structured logging validation
@@ -846,35 +902,39 @@ url: http://prometheus:9090  # ✅ Good for Docker
 ### AlertManager: **8/10** ✅ GOOD
 
 **Alert Routing:**
+
 ```yaml
 route:
   group_by: ['alertname', 'cluster', 'service']
-  group_wait: 10s       # Wait before sending first alert
-  group_interval: 10s   # Batch interval for grouped alerts
-  repeat_interval: 12h  # Re-send interval
+  group_wait: 10s # Wait before sending first alert
+  group_interval: 10s # Batch interval for grouped alerts
+  repeat_interval: 12h # Re-send interval
 
   routes:
-    - match: {severity: critical}
+    - match: { severity: critical }
       receiver: 'critical'
-    - match: {severity: warning}
+    - match: { severity: warning }
       receiver: 'warning'
 ```
 
 **Receivers:**
+
 - ✅ Slack integration (3 channels: alerts, critical, warnings)
 - ✅ Email for critical alerts
 - ✅ Business metrics channel
 
 **Issues:**
+
 ```yaml
 # monitoring/alertmanager/alertmanager.yml line 3
-slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'  # ❌ Placeholder
+slack_api_url: 'YOUR_SLACK_WEBHOOK_URL' # ❌ Placeholder
 
 # line 40
-auth_password: 'YOUR_EMAIL_PASSWORD'  # ❌ Insecure
+auth_password: 'YOUR_EMAIL_PASSWORD' # ❌ Insecure
 ```
 
 **Critical Fix Needed:**
+
 1. Use GitHub Secrets for Slack webhook
 2. Use App Passwords for email auth
 3. Document alert escalation procedures
@@ -912,12 +972,14 @@ auth_password: 'YOUR_EMAIL_PASSWORD'  # ❌ Insecure
 ### Backup Scripts: **7/10** ✅ GOOD
 
 **Available Scripts:**
+
 1. ✅ `backup-mongodb.sh` - MongoDB backup with mongodump
 2. ✅ `backup-minio.sh` - S3 bucket backup
 3. ✅ `backup-all.sh` - Orchestrates all backups
 4. ✅ `restore-mongodb.sh` - MongoDB restore
 
 **Strengths:**
+
 - Comprehensive backup orchestration
 - SHA256 checksum generation
 - Gzip compression
@@ -926,6 +988,7 @@ auth_password: 'YOUR_EMAIL_PASSWORD'  # ❌ Insecure
 - Error handling and logging
 
 **backup-mongodb.sh Analysis:**
+
 ```bash
 # Line 41: Uses mongodump with gzip
 mongodump --uri="${MONGODB_URI}" --db="${DATABASE_NAME}" --out="${BACKUP_PATH}" --gzip
@@ -941,6 +1004,7 @@ find "${BACKUP_DIR}" -name "*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
 **Issues:**
 
 1. **No Backup Verification:**
+
    ```bash
    # Line 86: References non-existent script
    echo "1. Verify backup integrity: ./scripts/backup/verify-backup.sh"
@@ -948,6 +1012,7 @@ find "${BACKUP_DIR}" -name "*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
    ```
 
 2. **No Remote Storage:**
+
    ```bash
    # backup-all.sh line 166
    if [ -n "${BACKUP_REMOTE_STORAGE:-}" ]; then
@@ -995,20 +1060,21 @@ find "${BACKUP_DIR}" -name "*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
 
 ### Backup Best Practices Assessment:
 
-| Practice | Status | Notes |
-|----------|--------|-------|
-| Automated backups | ✅ GOOD | Scripts configured |
-| Backup retention | ✅ GOOD | 30-day retention |
-| Backup encryption | ❌ FAIL | Not implemented |
-| Off-site storage | ❌ FAIL | Local only |
-| Restore testing | ❌ FAIL | Never tested |
+| Practice               | Status     | Notes                        |
+| ---------------------- | ---------- | ---------------------------- |
+| Automated backups      | ✅ GOOD    | Scripts configured           |
+| Backup retention       | ✅ GOOD    | 30-day retention             |
+| Backup encryption      | ❌ FAIL    | Not implemented              |
+| Off-site storage       | ❌ FAIL    | Local only                   |
+| Restore testing        | ❌ FAIL    | Never tested                 |
 | Point-in-time recovery | ⚠️ PARTIAL | MongoDB oplog not configured |
-| Incremental backups | ❌ FAIL | Full backups only |
-| Backup monitoring | ⚠️ PARTIAL | Logs but no alerts |
+| Incremental backups    | ❌ FAIL    | Full backups only            |
+| Backup monitoring      | ⚠️ PARTIAL | Logs but no alerts           |
 
 ### Critical Recommendations:
 
 1. **Implement Remote Backup Storage (CRITICAL):**
+
    ```bash
    # Add to backup-all.sh
    aws s3 sync "${BACKUP_ROOT}" "s3://simplepro-backups-$(date +%Y%m)/" \
@@ -1017,9 +1083,12 @@ find "${BACKUP_DIR}" -name "*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
    ```
 
 2. **Create Disaster Recovery Runbook:**
+
    ```markdown
    # DR Runbook
+
    ## Scenario 1: Database Corruption
+
    RTO: 1 hour | RPO: 15 minutes
 
    1. Identify corruption scope
@@ -1030,17 +1099,19 @@ find "${BACKUP_DIR}" -name "*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
    6. Resume services
 
    ## Scenario 2: Complete Infrastructure Loss
+
    RTO: 4 hours | RPO: 1 hour
    ...
    ```
 
 3. **Implement Automated Restore Testing:**
+
    ```yaml
    # .github/workflows/backup-test.yml
    name: Weekly Backup Restore Test
    on:
      schedule:
-       - cron: '0 2 * * 0'  # Sunday 2 AM
+       - cron: '0 2 * * 0' # Sunday 2 AM
 
    jobs:
      test-restore:
@@ -1052,6 +1123,7 @@ find "${BACKUP_DIR}" -name "*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
    ```
 
 4. **Configure Point-in-Time Recovery:**
+
    ```yaml
    # MongoDB with oplog for PITR
    replication:
@@ -1089,6 +1161,7 @@ SimplePro-v3 demonstrates solid security practices with room for production hard
    - ✅ Query parameter sanitization
 
 3. **Rate Limiting:**
+
    ```typescript
    // Multi-tier throttling
    - 10 requests/sec (general)
@@ -1105,6 +1178,7 @@ SimplePro-v3 demonstrates solid security practices with room for production hard
 **Issues:**
 
 1. **Development Secrets in Production:**
+
    ```bash
    # .env.example contains insecure defaults
    MONGODB_PASSWORD=simplepro_dev_2024  # ❌ Used in production?
@@ -1114,7 +1188,7 @@ SimplePro-v3 demonstrates solid security practices with room for production hard
 
 2. **Missing Security Headers:**
    - No X-Request-ID for request tracing
-   - No rate limit headers (X-RateLimit-*)
+   - No rate limit headers (X-RateLimit-\*)
    - CORS configuration but no preflight caching
 
 3. **No API Security Testing:**
@@ -1127,6 +1201,7 @@ SimplePro-v3 demonstrates solid security practices with room for production hard
 **Nginx Security Configuration (docker/nginx/prod.conf):**
 
 **Excellent TLS Configuration:**
+
 ```nginx
 # Line 79-86: Modern TLS config
 ssl_protocols TLSv1.2 TLSv1.3;
@@ -1137,6 +1212,7 @@ ssl_stapling on;  # OCSP stapling
 ```
 
 **Comprehensive Security Headers:**
+
 ```nginx
 # Line 93-103: Production-grade headers
 Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
@@ -1147,6 +1223,7 @@ Cross-Origin-Embedder-Policy: require-corp
 ```
 
 **Rate Limiting:**
+
 ```nginx
 # Line 22-24: Multi-zone rate limiting
 limit_req_zone $binary_remote_addr zone=api_limit:10m rate=100r/m;
@@ -1154,6 +1231,7 @@ limit_req_zone $binary_remote_addr zone=write_ops:10m rate=30r/m;
 ```
 
 **Attack Prevention:**
+
 ```nginx
 # Line 149-155: XSS and injection prevention
 if ($request_uri ~* "(\<|%3C).*script.*(\>|%3E)") {
@@ -1167,6 +1245,7 @@ if ($query_string ~* "[;'\x22\x27...]") {
 **Issues:**
 
 1. **Geo-Blocking Not Configured:**
+
    ```nginx
    # Line 31-35: Placeholder only
    geo $blocked_country {
@@ -1188,6 +1267,7 @@ if ($query_string ~* "[;'\x22\x27...]") {
 ### Container Security: **7/10** ✅ GOOD
 
 **Security Measures:**
+
 - ✅ Non-root users (nodeuser:1001, nginx-user:1001)
 - ✅ Alpine base images (minimal attack surface)
 - ✅ Multi-stage builds (reduced image size)
@@ -1195,6 +1275,7 @@ if ($query_string ~* "[;'\x22\x27...]") {
 - ✅ Resource limits defined
 
 **Missing:**
+
 - ❌ No image vulnerability scanning in CI (Trivy doesn't fail)
 - ❌ No AppArmor/SELinux profiles
 - ❌ No seccomp profiles
@@ -1202,6 +1283,7 @@ if ($query_string ~* "[;'\x22\x27...]") {
 - ❌ No capability dropping
 
 **Recommendation:**
+
 ```dockerfile
 # Add security hardening
 FROM node:20-alpine
@@ -1234,17 +1316,18 @@ READ_ONLY=true
 ```yaml
 # docker-compose.prod.yml: Secrets in plain text
 environment:
-  JWT_SECRET: ${JWT_SECRET}           # ❌ From .env file
-  MONGODB_PASSWORD: ${MONGODB_PASSWORD}  # ❌ From .env file
+  JWT_SECRET: ${JWT_SECRET} # ❌ From .env file
+  MONGODB_PASSWORD: ${MONGODB_PASSWORD} # ❌ From .env file
 
 # alertmanager.yml: Hardcoded credentials
-slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'  # ❌ Placeholder
-auth_password: 'YOUR_EMAIL_PASSWORD'     # ❌ Insecure
+slack_api_url: 'YOUR_SLACK_WEBHOOK_URL' # ❌ Placeholder
+auth_password: 'YOUR_EMAIL_PASSWORD' # ❌ Insecure
 ```
 
 **Recommendation:**
 
 1. **Use Docker Secrets:**
+
    ```yaml
    services:
      api:
@@ -1260,6 +1343,7 @@ auth_password: 'YOUR_EMAIL_PASSWORD'     # ❌ Insecure
    ```
 
 2. **Integrate Secrets Manager:**
+
    ```bash
    # Fetch from AWS Secrets Manager
    aws secretsmanager get-secret-value \
@@ -1271,13 +1355,14 @@ auth_password: 'YOUR_EMAIL_PASSWORD'     # ❌ Insecure
    ```yaml
    # Monthly secret rotation
    - name: Rotate JWT secrets
-     schedule: '0 0 1 * *'  # First of month
+     schedule: '0 0 1 * *' # First of month
      run: ./scripts/production-secrets.sh rotate jwt
    ```
 
 ### Dependency Security: **6/10** ⚠️ NEEDS ATTENTION
 
 **Current Vulnerabilities:**
+
 ```bash
 $ npm audit --audit-level=high
 # 5 low severity vulnerabilities
@@ -1286,12 +1371,14 @@ $ npm audit --audit-level=high
 ```
 
 **Issues:**
+
 1. Low-severity vulnerabilities in dev dependencies
 2. No automated vulnerability scanning
 3. No dependency pinning strategy
 4. No supply chain security (no npm package verification)
 
 **Recommendations:**
+
 1. Run `npm audit fix` to resolve known vulnerabilities
 2. Implement Snyk/Dependabot for continuous monitoring
 3. Pin dependency versions in package-lock.json
@@ -1301,6 +1388,7 @@ $ npm audit --audit-level=high
 ### Security Compliance: **5/10** ⚠️ LIMITED
 
 **Missing Compliance Measures:**
+
 - ❌ No PCI-DSS compliance documentation
 - ❌ No SOC 2 controls
 - ❌ No GDPR compliance measures
@@ -1310,6 +1398,7 @@ $ npm audit --audit-level=high
 - ❌ No vulnerability disclosure policy
 
 **Recommendations:**
+
 1. Document data handling procedures
 2. Implement audit logging for sensitive operations
 3. Create security incident response plan
@@ -1329,30 +1418,35 @@ SimplePro-v3 is designed as a **single-tenant internal application** but lacks h
 **Limitations:**
 
 1. **Database: MongoDB**
+
    ```yaml
    # docker/mongodb/mongod.conf line 51-53
    # Replication (disabled for single instance)
    #replication:
    #  replSetName: rs0
    ```
+
    - ❌ Single instance (SPOF - Single Point of Failure)
    - ❌ No replication
    - ❌ No read replicas
    - ❌ No sharding configuration
 
 2. **Cache: Redis**
+
    ```yaml
    # docker-compose.prod.yml: Single Redis instance
    redis:
      image: redis:7-alpine
      command: redis-server --maxmemory 256mb
    ```
+
    - ❌ Single instance (no high availability)
    - ❌ No Redis Sentinel
    - ❌ No Redis Cluster
    - ❌ No persistence configuration (AOF disabled)
 
 3. **Application Tier: API & Web**
+
    ```yaml
    # docker-compose.prod.yml: Single container each
    api:
@@ -1360,6 +1454,7 @@ SimplePro-v3 is designed as a **single-tenant internal application** but lacks h
    web:
      container_name: simplepro-web-prod
    ```
+
    - ⚠️ Can scale with `--scale` but not configured
    - ❌ No load balancer configuration beyond basic proxy
    - ❌ No session persistence (sticky sessions)
@@ -1368,6 +1463,7 @@ SimplePro-v3 is designed as a **single-tenant internal application** but lacks h
 ### Load Balancing: **5/10** ⚠️ BASIC
 
 **Nginx Configuration:**
+
 ```nginx
 # docker/nginx/prod.conf line 5-13
 upstream api_backend {
@@ -1377,11 +1473,13 @@ upstream api_backend {
 ```
 
 **Strengths:**
+
 - ✅ Upstream health checking (max_fails)
 - ✅ Keep-alive connections
 - ✅ Proper proxy headers (X-Real-IP, X-Forwarded-For)
 
 **Limitations:**
+
 - ❌ Single upstream server
 - ❌ No least_conn or ip_hash algorithms
 - ❌ No sticky sessions for stateful connections
@@ -1389,6 +1487,7 @@ upstream api_backend {
 - ❌ No active health checks (requires nginx plus)
 
 **Scaling Configuration Missing:**
+
 ```nginx
 # How it should look for multi-instance:
 upstream api_backend {
@@ -1407,25 +1506,28 @@ upstream api_backend {
 
 **Assessment by Component:**
 
-| Component | Scalability | Blockers |
-|-----------|-------------|----------|
-| **API** | ⚠️ PARTIAL | Session state in Redis (good), but no scaling config |
-| **Web** | ✅ READY | Stateless Next.js, can scale easily |
-| **MongoDB** | ❌ NOT READY | Single instance, no replica set |
-| **Redis** | ❌ NOT READY | Single instance, no sentinel/cluster |
-| **MinIO** | ⚠️ PARTIAL | Can distribute but not configured |
-| **Nginx** | ✅ READY | Can handle multiple upstreams |
+| Component   | Scalability  | Blockers                                             |
+| ----------- | ------------ | ---------------------------------------------------- |
+| **API**     | ⚠️ PARTIAL   | Session state in Redis (good), but no scaling config |
+| **Web**     | ✅ READY     | Stateless Next.js, can scale easily                  |
+| **MongoDB** | ❌ NOT READY | Single instance, no replica set                      |
+| **Redis**   | ❌ NOT READY | Single instance, no sentinel/cluster                 |
+| **MinIO**   | ⚠️ PARTIAL   | Can distribute but not configured                    |
+| **Nginx**   | ✅ READY     | Can handle multiple upstreams                        |
 
 **API Scaling Concerns:**
 
 1. **WebSocket Scaling:**
+
    ```typescript
    // apps/api/src/websocket/websocket.gateway.ts
    // Uses Socket.IO but no Redis adapter configured for multi-instance
    ```
+
    **Issue:** WebSocket connections are stateful. Multiple API instances need shared state.
 
    **Solution:**
+
    ```typescript
    import { RedisIoAdapter } from '@socket.io/redis-adapter';
 
@@ -1482,6 +1584,7 @@ services:
 ```
 
 **Benefits:**
+
 - High availability (automatic failover)
 - Read scaling (secondary reads)
 - Zero-downtime maintenance
@@ -1519,6 +1622,7 @@ services:
 ```
 
 **sentinel.conf:**
+
 ```conf
 sentinel monitor mymaster redis-master 6379 2
 sentinel down-after-milliseconds mymaster 5000
@@ -1529,6 +1633,7 @@ sentinel auth-pass mymaster ${REDIS_PASSWORD}
 ### CDN Integration: **1/10** ❌ NOT CONFIGURED
 
 **Static Asset Serving:**
+
 ```nginx
 # docker/nginx/prod.conf line 221-231
 location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
@@ -1538,12 +1643,14 @@ location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
 ```
 
 **Issues:**
+
 - Static assets served directly by nginx
 - No CDN configuration (CloudFront, Cloudflare)
 - No asset URL rewriting for CDN
 - No geo-distributed edge caching
 
 **Recommendation:**
+
 ```typescript
 // next.config.js
 module.exports = {
@@ -1564,12 +1671,14 @@ location /static/ {
 ### Auto-Scaling Configuration: **1/10** ❌ NOT CONFIGURED
 
 **Missing:**
+
 - ❌ No Kubernetes HPA (Horizontal Pod Autoscaler)
 - ❌ No Docker Swarm autoscaling
 - ❌ No AWS ECS/Fargate autoscaling
 - ❌ No metrics-based scaling policies
 
 **Recommendation (Kubernetes HPA):**
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -1600,6 +1709,7 @@ spec:
 ### Performance Testing: **2/10** ❌ MISSING
 
 **Load Testing:**
+
 ```bash
 # package.json line 36-38: K6 load tests referenced
 "test:load": "k6 run apps/api/test/load/api-endpoints.test.js"
@@ -1609,6 +1719,7 @@ spec:
 **Issue:** Test files do NOT exist in repository.
 
 **Missing:**
+
 - ❌ No load test scenarios
 - ❌ No performance benchmarks
 - ❌ No scalability testing
@@ -1616,6 +1727,7 @@ spec:
 - ❌ No capacity planning data
 
 **Recommendation:**
+
 1. Create k6 load test scenarios
 2. Establish performance baselines
 3. Test scaling behavior under load
@@ -1633,6 +1745,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 ### Runbooks & Documentation: **2/10** ❌ CRITICAL GAP
 
 **Documentation Found:**
+
 - ✅ `docs/guides/DEPLOYMENT.md` - Basic deployment guide
 - ✅ `docs/guides/QUICK_START.md` - Development setup
 - ✅ `docs/guides/health-check-system.md` - Health check docs
@@ -1695,12 +1808,14 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 # Runbook: [Scenario Name]
 
 ## Overview
+
 - **Severity:** P1 (Critical) / P2 (High) / P3 (Medium) / P4 (Low)
 - **RTO:** X hours
 - **Incident Commander:** [Role/Team]
 - **Last Updated:** [Date]
 
 ## Detection
+
 - **Symptoms:**
   1. [Observable symptom 1]
   2. [Observable symptom 2]
@@ -1709,39 +1824,48 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
   - Metric: [Metric name]
 
 ## Diagnosis
+
 1. Check [specific metric/log]
 2. Verify [system state]
 3. Review [dashboard/log file]
 
 ## Response Actions
+
 ### Immediate Actions (0-5 min)
+
 1. [Step 1 with command]
 2. [Step 2 with expected output]
 
 ### Short-term Actions (5-30 min)
+
 1. [Step 1]
 2. [Step 2]
 
 ### Long-term Resolution (30+ min)
+
 1. [Step 1]
 2. [Step 2]
 
 ## Rollback Procedure
+
 1. [Step 1]
 2. [Validation step]
 
 ## Verification
+
 - [ ] Service health checks passing
 - [ ] Database connectivity confirmed
 - [ ] API response times < 200ms
 - [ ] No error spikes in logs
 
 ## Communication
+
 - **Notify:** [Teams/individuals]
 - **Channel:** #incidents Slack channel
 - **Template:** "Investigating [issue] impacting [service]..."
 
 ## Post-Incident
+
 - [ ] Post-mortem scheduled
 - [ ] Root cause documented
 - [ ] Action items created
@@ -1750,6 +1874,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 ### On-Call Setup: **1/10** ❌ NOT CONFIGURED
 
 **Missing:**
+
 - ❌ No on-call rotation defined
 - ❌ No pager duty / PagerDuty integration
 - ❌ No escalation policy
@@ -1761,6 +1886,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 **Recommendation:**
 
 1. **Define Incident Severity:**
+
    ```markdown
    - P1 (Critical): Production down, revenue impact
      Response: 15 minutes, 24/7
@@ -1776,6 +1902,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
    ```
 
 2. **On-Call Rotation:**
+
    ```markdown
    Primary: Week 1 - Engineer A
    Secondary: Week 1 - Engineer B
@@ -1848,12 +1975,14 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 ### Operational Dashboards: **5/10** ⚠️ PARTIAL
 
 **Available:**
+
 - ✅ Grafana with SimplePro overview dashboard
 - ✅ Prometheus metrics collection
 - ✅ System metrics (CPU, memory, disk)
 - ✅ Database metrics (MongoDB exporter)
 
 **Missing:**
+
 - ❌ Business metrics dashboard (customer, jobs, estimates)
 - ❌ SLO dashboard (availability, latency, error rate)
 - ❌ Deployment dashboard (release frequency, failure rate)
@@ -1863,6 +1992,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 ### Training & Knowledge Transfer: **1/10** ❌ INSUFFICIENT
 
 **Issues:**
+
 - ❌ No onboarding documentation for new team members
 - ❌ No architecture decision records (ADRs)
 - ❌ No video walkthroughs of system
@@ -1872,6 +2002,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 - ❌ No deployment training
 
 **Recommendation:**
+
 1. Create onboarding checklist
 2. Record system architecture walkthrough
 3. Document common issues and resolutions
@@ -1884,11 +2015,13 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 ### Priority 1: Immediate Blockers (Cannot Deploy Without)
 
 #### 1. Create Missing Dockerfiles 🔥 CRITICAL
+
 **Status:** ❌ BLOCKER
 **Impact:** Cannot build production images
 **Effort:** 2-4 hours
 
 **Action:**
+
 ```bash
 # Create apps/api/Dockerfile
 # Create apps/web/Dockerfile
@@ -1896,6 +2029,7 @@ Operational readiness is the **weakest area** of SimplePro-v3 deployment prepara
 ```
 
 **Validation:**
+
 ```bash
 docker build -f apps/api/Dockerfile -t simplepro-api:test .
 docker build -f apps/web/Dockerfile -t simplepro-web:test .
@@ -1903,11 +2037,13 @@ docker run --rm simplepro-api:test node --version
 ```
 
 #### 2. Configure Production Environment Files 🔥 CRITICAL
+
 **Status:** ❌ BLOCKER
 **Impact:** Cannot deploy without proper configuration
 **Effort:** 4-6 hours
 
 **Action:**
+
 ```bash
 # Create production environment files:
 1. .env.production
@@ -1922,6 +2058,7 @@ docker run --rm simplepro-api:test node --version
 ```
 
 **Required Secrets:**
+
 - JWT_SECRET (256-bit random)
 - JWT_REFRESH_SECRET (256-bit random)
 - MONGODB_PASSWORD (32+ characters)
@@ -1930,6 +2067,7 @@ docker run --rm simplepro-api:test node --version
 - GRAFANA_ADMIN_PASSWORD (strong password)
 
 #### 3. Implement Real CI/CD Deployment 🔥 CRITICAL
+
 **Status:** ❌ BLOCKER
 **Impact:** Cannot automate deployments
 **Effort:** 8-16 hours
@@ -1953,7 +2091,7 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
 # Line 220-241: Implement production deployment with backup
 - name: Create pre-deployment backup
   run: ssh ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} \
-       "cd /opt/simplepro && ./scripts/backup/backup-all.sh pre-deploy"
+    "cd /opt/simplepro && ./scripts/backup/backup-all.sh pre-deploy"
 
 - name: Deploy to production
   run: |
@@ -1981,6 +2119,7 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
 ```
 
 **Required GitHub Secrets:**
+
 - `STAGING_SSH_KEY` - SSH private key for staging server
 - `STAGING_HOST` - staging.simplepro.example.com
 - `STAGING_USER` - deploy user
@@ -1990,6 +2129,7 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
 - `SLACK_WEBHOOK_URL` - Slack notifications
 
 #### 4. Configure Production Secrets Management 🔥 CRITICAL
+
 **Status:** ❌ BLOCKER
 **Impact:** Security risk, compliance violation
 **Effort:** 6-8 hours
@@ -1997,12 +2137,14 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
 **Action:**
 
 1. **Generate Production Secrets:**
+
    ```bash
    ./scripts/production-secrets.sh init
    # Generates secure random values for all secrets
    ```
 
 2. **Store in GitHub Secrets:**
+
    ```bash
    # Add secrets to GitHub repository settings
    JWT_SECRET=[generated-value]
@@ -2013,6 +2155,7 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
    ```
 
 3. **Update Docker Compose for Secrets:**
+
    ```yaml
    # docker-compose.prod.yml
    services:
@@ -2032,8 +2175,10 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
    ```
 
 4. **Document Secret Rotation:**
+
    ```markdown
    # docs/operations/SECRET_ROTATION.md
+
    - Frequency: Quarterly
    - Process: [detailed steps]
    - Rollback: [if rotation fails]
@@ -2044,6 +2189,7 @@ Replace placeholder deployment steps in `.github/workflows/cd.yml`:
 ### Priority 2: High Priority (Should Fix Before Production)
 
 #### 5. Implement Database Replication ⚠️ HIGH
+
 **Status:** ⚠️ SINGLE POINT OF FAILURE
 **Impact:** No high availability, data loss risk
 **Effort:** 12-16 hours
@@ -2093,7 +2239,7 @@ services:
       - mongodb-primary
       - mongodb-secondary1
       - mongodb-secondary2
-    restart: "no"
+    restart: 'no'
     command: >
       bash -c "
         sleep 10
@@ -2118,12 +2264,14 @@ volumes:
 ```
 
 **Connection String Update:**
+
 ```bash
 # .env.production
 MONGODB_URI=mongodb://admin:${MONGODB_PASSWORD}@mongodb-primary:27017,mongodb-secondary1:27017,mongodb-secondary2:27017/simplepro_prod?authSource=admin&replicaSet=rs0
 ```
 
 #### 6. Configure Redis High Availability ⚠️ HIGH
+
 **Status:** ⚠️ SINGLE POINT OF FAILURE
 **Impact:** Cache unavailability, session loss
 **Effort:** 8-12 hours
@@ -2168,6 +2316,7 @@ services:
 ```
 
 **sentinel.conf:**
+
 ```conf
 port 26379
 sentinel monitor mymaster redis-master 6379 2
@@ -2178,6 +2327,7 @@ sentinel parallel-syncs mymaster 1
 ```
 
 #### 7. Create Operational Runbooks ⚠️ HIGH
+
 **Status:** ❌ MISSING
 **Impact:** Slow incident response, operational risk
 **Effort:** 16-24 hours
@@ -2202,6 +2352,7 @@ docs/runbooks/
 **Template:** (Provided in "Operational Readiness" section above)
 
 **Minimum Runbooks Required:**
+
 1. ✅ Deployment procedure
 2. ✅ Rollback procedure
 3. ✅ Database backup/restore
@@ -2209,6 +2360,7 @@ docs/runbooks/
 5. ✅ Service restart
 
 #### 8. Implement Backup Verification ⚠️ HIGH
+
 **Status:** ⚠️ UNTESTED
 **Impact:** Backup failures undetected, cannot restore
 **Effort:** 8-12 hours
@@ -2216,6 +2368,7 @@ docs/runbooks/
 **Action:**
 
 1. **Create Backup Verification Script:**
+
    ```bash
    #!/bin/bash
    # scripts/backup/verify-backup.sh
@@ -2256,12 +2409,13 @@ docs/runbooks/
    ```
 
 2. **Automate Weekly Restore Testing:**
+
    ```yaml
    # .github/workflows/backup-test.yml
    name: Weekly Backup Restore Test
    on:
      schedule:
-       - cron: '0 2 * * 0'  # Sunday 2 AM
+       - cron: '0 2 * * 0' # Sunday 2 AM
 
    jobs:
      test-restore:
@@ -2282,10 +2436,11 @@ docs/runbooks/
      labels:
        severity: critical
      annotations:
-       summary: "Backup has not succeeded in 24 hours"
+       summary: 'Backup has not succeeded in 24 hours'
    ```
 
 #### 9. Configure Remote Backup Storage ⚠️ HIGH
+
 **Status:** ⚠️ LOCAL ONLY
 **Impact:** Single location risk, no off-site backup
 **Effort:** 4-6 hours
@@ -2293,6 +2448,7 @@ docs/runbooks/
 **Action:**
 
 1. **AWS S3 Backup:**
+
    ```bash
    # scripts/backup/upload-to-s3.sh
    #!/bin/bash
@@ -2313,6 +2469,7 @@ docs/runbooks/
    ```
 
 2. **Backup Lifecycle Policy:**
+
    ```json
    {
      "Rules": [
@@ -2351,30 +2508,35 @@ docs/runbooks/
 ### Priority 3: Medium Priority (Nice to Have)
 
 #### 10. Implement Distributed Tracing ⚠️ MEDIUM
+
 **Effort:** 8-16 hours
 **Benefits:** Better request debugging, performance analysis
 
 **Action:** Integrate Jaeger for distributed tracing
 
 #### 11. Add Load Testing ⚠️ MEDIUM
+
 **Effort:** 12-16 hours
 **Benefits:** Capacity planning, performance validation
 
 **Action:** Create k6 load test scenarios (referenced but missing)
 
 #### 12. Configure CDN ⚠️ MEDIUM
+
 **Effort:** 4-8 hours
 **Benefits:** Faster asset delivery, reduced server load
 
 **Action:** Integrate CloudFront/Cloudflare
 
 #### 13. Implement Error Tracking ⚠️ MEDIUM
+
 **Effort:** 4-6 hours
 **Benefits:** Centralized error visibility, better debugging
 
 **Action:** Integrate Sentry
 
 #### 14. Create Business Metrics Dashboards ⚠️ MEDIUM
+
 **Effort:** 8-12 hours
 **Benefits:** Better business insights, KPI tracking
 
@@ -2386,29 +2548,31 @@ docs/runbooks/
 
 ### Risk Matrix
 
-| Risk | Likelihood | Impact | Severity | Mitigation |
-|------|------------|--------|----------|------------|
-| **Dockerfiles missing** | ✅ CERTAIN | 🔥 CRITICAL | 🔴 BLOCKER | Create Dockerfiles immediately |
-| **Secrets in plain text** | ✅ CERTAIN | 🔥 CRITICAL | 🔴 BLOCKER | Implement secrets management |
-| **CI/CD placeholders** | ✅ CERTAIN | 🔥 CRITICAL | 🔴 BLOCKER | Complete deployment automation |
-| **Single DB instance fails** | 🟡 MEDIUM | 🔥 CRITICAL | 🟠 HIGH | Implement MongoDB replica set |
-| **Single Redis fails** | 🟡 MEDIUM | 🟡 MEDIUM | 🟡 MEDIUM | Implement Redis Sentinel |
-| **Backup corruption undetected** | 🟡 MEDIUM | 🔥 CRITICAL | 🟠 HIGH | Automated backup verification |
-| **No remote backups** | ✅ CERTAIN | 🔥 CRITICAL | 🟠 HIGH | Configure S3 backup storage |
-| **No runbooks** | ✅ CERTAIN | 🟡 MEDIUM | 🟡 MEDIUM | Create operational runbooks |
-| **Untested rollback** | ✅ CERTAIN | 🟡 MEDIUM | 🟡 MEDIUM | Test rollback in staging |
-| **No monitoring alerts** | 🟢 LOW | 🟡 MEDIUM | 🟢 LOW | Already configured ✅ |
-| **Dependency vulnerabilities** | 🟢 LOW | 🟢 LOW | 🟢 LOW | Run npm audit fix |
+| Risk                             | Likelihood | Impact      | Severity   | Mitigation                     |
+| -------------------------------- | ---------- | ----------- | ---------- | ------------------------------ |
+| **Dockerfiles missing**          | ✅ CERTAIN | 🔥 CRITICAL | 🔴 BLOCKER | Create Dockerfiles immediately |
+| **Secrets in plain text**        | ✅ CERTAIN | 🔥 CRITICAL | 🔴 BLOCKER | Implement secrets management   |
+| **CI/CD placeholders**           | ✅ CERTAIN | 🔥 CRITICAL | 🔴 BLOCKER | Complete deployment automation |
+| **Single DB instance fails**     | 🟡 MEDIUM  | 🔥 CRITICAL | 🟠 HIGH    | Implement MongoDB replica set  |
+| **Single Redis fails**           | 🟡 MEDIUM  | 🟡 MEDIUM   | 🟡 MEDIUM  | Implement Redis Sentinel       |
+| **Backup corruption undetected** | 🟡 MEDIUM  | 🔥 CRITICAL | 🟠 HIGH    | Automated backup verification  |
+| **No remote backups**            | ✅ CERTAIN | 🔥 CRITICAL | 🟠 HIGH    | Configure S3 backup storage    |
+| **No runbooks**                  | ✅ CERTAIN | 🟡 MEDIUM   | 🟡 MEDIUM  | Create operational runbooks    |
+| **Untested rollback**            | ✅ CERTAIN | 🟡 MEDIUM   | 🟡 MEDIUM  | Test rollback in staging       |
+| **No monitoring alerts**         | 🟢 LOW     | 🟡 MEDIUM   | 🟢 LOW     | Already configured ✅          |
+| **Dependency vulnerabilities**   | 🟢 LOW     | 🟢 LOW      | 🟢 LOW     | Run npm audit fix              |
 
 ### Risk Categories
 
 **🔴 CRITICAL BLOCKERS (Cannot Deploy):**
+
 1. Missing Dockerfiles
 2. Incomplete CI/CD automation
 3. Missing production environment files
 4. No secrets management
 
 **🟠 HIGH RISKS (Should Not Deploy):**
+
 1. Single database instance (no HA)
 2. Single Redis instance (no HA)
 3. No backup verification
@@ -2416,12 +2580,14 @@ docs/runbooks/
 5. No operational runbooks
 
 **🟡 MEDIUM RISKS (Deploy with Caution):**
+
 1. Limited scalability
 2. No load testing
 3. Untested disaster recovery
 4. Missing observability features
 
 **🟢 LOW RISKS (Acceptable for Initial Production):**
+
 1. Minor security improvements needed
 2. Dependency vulnerabilities (low severity)
 3. Missing advanced features (CDN, tracing)
@@ -2435,12 +2601,14 @@ Use this checklist to track progress toward production readiness.
 ### Phase 1: Critical Blockers (Week 1) 🔴
 
 **Infrastructure:**
+
 - [ ] Create `apps/api/Dockerfile` with multi-stage build
 - [ ] Create `apps/web/Dockerfile` with nginx static serving
 - [ ] Verify Docker builds succeed locally
 - [ ] Push images to container registry (GHCR)
 
 **Configuration:**
+
 - [ ] Create `.env.production` with all required variables
 - [ ] Create `apps/api/.env.production`
 - [ ] Create `apps/web/.env.production`
@@ -2449,6 +2617,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Validate environment with `./scripts/validate-environment.sh production`
 
 **CI/CD:**
+
 - [ ] Replace placeholder deployment in `.github/workflows/cd.yml` (staging)
 - [ ] Replace placeholder deployment in `.github/workflows/cd.yml` (production)
 - [ ] Implement proper rollback procedure
@@ -2459,6 +2628,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Verify rollback works in staging
 
 **Secrets Management:**
+
 - [ ] Configure Docker secrets in docker-compose
 - [ ] Update AlertManager with real Slack webhook
 - [ ] Update email credentials in AlertManager
@@ -2466,6 +2636,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Document secret rotation procedures
 
 **Validation:**
+
 - [ ] Manual deployment to staging succeeds
 - [ ] Automated deployment via GitHub Actions succeeds
 - [ ] Rollback procedure tested and working
@@ -2474,6 +2645,7 @@ Use this checklist to track progress toward production readiness.
 ### Phase 2: High Availability (Week 2) 🟠
 
 **Database:**
+
 - [ ] Configure MongoDB replica set (3 nodes)
 - [ ] Initialize replica set with primary + 2 secondaries
 - [ ] Update connection string for replica set
@@ -2482,6 +2654,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Update backup scripts for replica set
 
 **Cache:**
+
 - [ ] Configure Redis Sentinel (3 sentinels)
 - [ ] Set up Redis master + 2 replicas
 - [ ] Update application to use Sentinel
@@ -2489,6 +2662,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Verify session persistence during failover
 
 **Backup:**
+
 - [ ] Create backup verification script
 - [ ] Test backup restore procedure
 - [ ] Configure S3 remote backup storage
@@ -2497,6 +2671,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Schedule weekly restore testing
 
 **Validation:**
+
 - [ ] Database failover tested successfully
 - [ ] Redis failover tested successfully
 - [ ] Backup restore tested successfully
@@ -2505,6 +2680,7 @@ Use this checklist to track progress toward production readiness.
 ### Phase 3: Operations (Week 3) 🟡
 
 **Runbooks:**
+
 - [ ] Create deployment runbook
 - [ ] Create rollback runbook
 - [ ] Create incident response runbook
@@ -2513,6 +2689,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Create performance troubleshooting runbook
 
 **Monitoring:**
+
 - [ ] Verify all Prometheus alerts configured
 - [ ] Test alert routing to Slack
 - [ ] Test critical alert emails
@@ -2521,6 +2698,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Configure on-call rotation
 
 **Documentation:**
+
 - [ ] Document production architecture
 - [ ] Create onboarding guide for new team members
 - [ ] Document common issues and solutions
@@ -2529,6 +2707,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Document escalation procedures
 
 **Security:**
+
 - [ ] Run security audit (npm audit, Trivy)
 - [ ] Review and fix any high/critical vulnerabilities
 - [ ] Implement SSL certificate auto-renewal
@@ -2537,6 +2716,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Review RBAC permissions
 
 **Validation:**
+
 - [ ] All runbooks reviewed and approved
 - [ ] Monitoring alerts tested
 - [ ] Team trained on runbooks
@@ -2545,6 +2725,7 @@ Use this checklist to track progress toward production readiness.
 ### Phase 4: Pre-Production (Week 4) ⚡
 
 **Load Testing:**
+
 - [ ] Create k6 load test scenarios
 - [ ] Run load tests against staging
 - [ ] Identify performance bottlenecks
@@ -2552,6 +2733,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Document capacity limits
 
 **Disaster Recovery:**
+
 - [ ] Schedule DR drill
 - [ ] Execute complete system restore
 - [ ] Measure actual RTO/RPO
@@ -2559,6 +2741,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Document lessons learned
 
 **Staging Validation:**
+
 - [ ] Deploy to staging with production-like config
 - [ ] Run full smoke test suite
 - [ ] Monitor staging for 48 hours
@@ -2567,6 +2750,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Security testing passes
 
 **Production Preparation:**
+
 - [ ] Provision production servers
 - [ ] Configure production DNS
 - [ ] Set up SSL certificates
@@ -2575,6 +2759,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Configure backup schedules
 
 **Go/No-Go Meeting:**
+
 - [ ] Review deployment checklist (100% complete)
 - [ ] Review critical risks (all mitigated)
 - [ ] Review rollback plan (tested and ready)
@@ -2585,6 +2770,7 @@ Use this checklist to track progress toward production readiness.
 ### Phase 5: Production Deployment 🚀
 
 **Pre-Deployment:**
+
 - [ ] Create production backup
 - [ ] Verify all secrets configured
 - [ ] Run pre-deployment health checks
@@ -2592,6 +2778,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Prepare rollback plan
 
 **Deployment:**
+
 - [ ] Execute deployment via GitHub Actions
 - [ ] Monitor deployment progress
 - [ ] Verify all services start successfully
@@ -2599,6 +2786,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Execute smoke tests
 
 **Post-Deployment:**
+
 - [ ] Verify health check endpoints
 - [ ] Check application logs for errors
 - [ ] Monitor Grafana dashboards (30 minutes)
@@ -2607,6 +2795,7 @@ Use this checklist to track progress toward production readiness.
 - [ ] Update status page
 
 **Communication:**
+
 - [ ] Notify stakeholders of successful deployment
 - [ ] Post deployment summary to Slack
 - [ ] Update documentation with deployment notes
@@ -2703,6 +2892,7 @@ If deployment fails, follow these steps:
 ### Automatic Rollback (GitHub Actions)
 
 GitHub Actions CD pipeline includes automatic rollback on failure:
+
 ```yaml
 - name: Rollback on failure
   if: failure()
@@ -2837,12 +3027,14 @@ docker-compose -f docker-compose.prod.yml up -d
 SimplePro-v3 has **excellent infrastructure foundation** with comprehensive monitoring, Docker configurations, and security practices. However, there are **critical gaps** preventing immediate production deployment:
 
 **Strengths:**
+
 - ✅ Production-grade monitoring (9/10)
 - ✅ Excellent Docker configuration (8/10)
 - ✅ Comprehensive security headers (8/10)
 - ✅ Good backup scripts (7/10)
 
 **Critical Blockers:**
+
 - ❌ Missing Dockerfiles (cannot build)
 - ❌ Incomplete CI/CD automation (cannot deploy)
 - ❌ No production environment files (cannot configure)
@@ -2852,10 +3044,12 @@ SimplePro-v3 has **excellent infrastructure foundation** with comprehensive moni
 **Recommendation:** **DO NOT DEPLOY TO PRODUCTION** until critical blockers are resolved.
 
 **Timeline to Production:**
+
 - **With focused effort:** 2-3 weeks
 - **With part-time effort:** 4-6 weeks
 
 **Next Steps:**
+
 1. Prioritize critical blockers (Priority 1)
 2. Create Dockerfiles immediately
 3. Configure production secrets

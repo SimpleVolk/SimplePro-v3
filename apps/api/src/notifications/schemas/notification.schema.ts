@@ -108,7 +108,9 @@ NotificationSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const recipientExists = await User.exists({ _id: this.recipientId });
       if (!recipientExists) {
-        throw new Error(`Referenced User (recipientId) not found: ${this.recipientId}`);
+        throw new Error(
+          `Referenced User (recipientId) not found: ${this.recipientId}`,
+        );
       }
     }
 
@@ -138,7 +140,9 @@ NotificationSchema.pre('save', async function (next) {
       const Model = mongoose.model(modelName);
       const entityExists = await Model.exists({ _id: this.relatedEntityId });
       if (!entityExists) {
-        throw new Error(`Referenced ${modelName} not found: ${this.relatedEntityId}`);
+        throw new Error(
+          `Referenced ${modelName} not found: ${this.relatedEntityId}`,
+        );
       }
     }
 

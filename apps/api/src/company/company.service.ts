@@ -1,7 +1,15 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CompanySettings, CompanySettingsDocument } from './schemas/company-settings.schema';
+import {
+  CompanySettings,
+  CompanySettingsDocument,
+} from './schemas/company-settings.schema';
 import { UpdateCompanySettingsDto } from './dto/update-company-settings.dto';
 
 @Injectable()
@@ -189,7 +197,15 @@ export class CompanyService {
    * Validate business hours logic
    */
   private validateBusinessHours(businessHours: any): void {
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const days = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
 
     for (const day of days) {
       const hours = businessHours[day];
@@ -209,8 +225,10 @@ export class CompanyService {
         const openParts = hours.openTime.split(':');
         const closeParts = hours.closeTime.split(':');
 
-        const openMinutes = parseInt(openParts[0]) * 60 + parseInt(openParts[1]);
-        const closeMinutes = parseInt(closeParts[0]) * 60 + parseInt(closeParts[1]);
+        const openMinutes =
+          parseInt(openParts[0]) * 60 + parseInt(openParts[1]);
+        const closeMinutes =
+          parseInt(closeParts[0]) * 60 + parseInt(closeParts[1]);
 
         if (openMinutes >= closeMinutes) {
           throw new BadRequestException(

@@ -19,31 +19,39 @@ export default function DebugPage() {
       const envTest = {
         NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
         NODE_ENV: process.env.NODE_ENV,
-        windowDefined: typeof window !== 'undefined'
+        windowDefined: typeof window !== 'undefined',
       };
 
-      setTestResult(prev => prev + `1. Environment Variables:\n${JSON.stringify(envTest, null, 2)}\n\n`);
+      setTestResult(
+        (prev) =>
+          prev +
+          `1. Environment Variables:\n${JSON.stringify(envTest, null, 2)}\n\n`,
+      );
 
       // Test 2: URL construction
       const apiUrl = getApiUrl('auth/login');
-      setTestResult(prev => prev + `2. Constructed URL: ${apiUrl}\n\n`);
+      setTestResult((prev) => prev + `2. Constructed URL: ${apiUrl}\n\n`);
 
       // Test 3: Simple GET to health endpoint
-      setTestResult(prev => prev + `3. Testing GET /api/health...\n`);
+      setTestResult((prev) => prev + `3. Testing GET /api/health...\n`);
 
       const healthResponse = await fetch(getApiUrl('health'), {
         method: 'GET',
       });
 
-      setTestResult(prev => prev + `Health check result: ${healthResponse.status} ${healthResponse.statusText}\n`);
+      setTestResult(
+        (prev) =>
+          prev +
+          `Health check result: ${healthResponse.status} ${healthResponse.statusText}\n`,
+      );
 
       if (healthResponse.ok) {
         const healthData = await healthResponse.text();
-        setTestResult(prev => prev + `Health response: ${healthData}\n\n`);
+        setTestResult((prev) => prev + `Health response: ${healthData}\n\n`);
       }
 
       // Test 4: Login POST request
-      setTestResult(prev => prev + `4. Testing POST /api/auth/login...\n`);
+      setTestResult((prev) => prev + `4. Testing POST /api/auth/login...\n`);
 
       const loginPayload = { username: 'admin', password: 'admin123' };
       const fetchOptions = {
@@ -55,29 +63,41 @@ export default function DebugPage() {
         credentials: 'include' as RequestCredentials,
       };
 
-      setTestResult(prev => prev + `Request options: ${JSON.stringify(fetchOptions, null, 2)}\n\n`);
+      setTestResult(
+        (prev) =>
+          prev +
+          `Request options: ${JSON.stringify(fetchOptions, null, 2)}\n\n`,
+      );
 
       const loginResponse = await fetch(apiUrl, fetchOptions);
 
-      setTestResult(prev => prev + `Login response status: ${loginResponse.status}\n`);
-      setTestResult(prev => prev + `Login response headers: ${loginResponse.headers.get('content-type') || 'No content-type header'}\n`);
+      setTestResult(
+        (prev) => prev + `Login response status: ${loginResponse.status}\n`,
+      );
+      setTestResult(
+        (prev) =>
+          prev +
+          `Login response headers: ${loginResponse.headers.get('content-type') || 'No content-type header'}\n`,
+      );
 
       if (loginResponse.ok) {
         const loginData = await loginResponse.json();
-        setTestResult(prev => prev + `✅ Login successful!\n`);
-        setTestResult(prev => prev + `Response data: ${JSON.stringify(loginData, null, 2)}\n`);
+        setTestResult((prev) => prev + `✅ Login successful!\n`);
+        setTestResult(
+          (prev) =>
+            prev + `Response data: ${JSON.stringify(loginData, null, 2)}\n`,
+        );
       } else {
         const errorText = await loginResponse.text();
-        setTestResult(prev => prev + `❌ Login failed: ${errorText}\n`);
+        setTestResult((prev) => prev + `❌ Login failed: ${errorText}\n`);
       }
-
     } catch (error) {
-      setTestResult(prev => prev + `💥 Exception caught: ${error}\n`);
+      setTestResult((prev) => prev + `💥 Exception caught: ${error}\n`);
 
       if (error instanceof TypeError) {
-        setTestResult(prev => prev + `Error type: ${error.name}\n`);
-        setTestResult(prev => prev + `Error message: ${error.message}\n`);
-        setTestResult(prev => prev + `Error stack: ${error.stack}\n`);
+        setTestResult((prev) => prev + `Error type: ${error.name}\n`);
+        setTestResult((prev) => prev + `Error message: ${error.message}\n`);
+        setTestResult((prev) => prev + `Error stack: ${error.stack}\n`);
       }
     } finally {
       setIsLoading(false);
@@ -98,21 +118,23 @@ export default function DebugPage() {
           color: 'white',
           border: 'none',
           borderRadius: '4px',
-          cursor: isLoading ? 'not-allowed' : 'pointer'
+          cursor: isLoading ? 'not-allowed' : 'pointer',
         }}
       >
         {isLoading ? 'Testing...' : 'Test API Connection'}
       </button>
 
-      <pre style={{
-        backgroundColor: '#f8f9fa',
-        border: '1px solid #dee2e6',
-        borderRadius: '4px',
-        padding: '15px',
-        whiteSpace: 'pre-wrap',
-        maxHeight: '600px',
-        overflow: 'auto'
-      }}>
+      <pre
+        style={{
+          backgroundColor: '#f8f9fa',
+          border: '1px solid #dee2e6',
+          borderRadius: '4px',
+          padding: '15px',
+          whiteSpace: 'pre-wrap',
+          maxHeight: '600px',
+          overflow: 'auto',
+        }}
+      >
         {testResult}
       </pre>
     </div>

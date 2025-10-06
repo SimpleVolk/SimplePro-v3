@@ -8,7 +8,14 @@ import styles from './NotificationCenter.module.css';
 interface Notification {
   id: string;
   userId: string;
-  type: 'job_assigned' | 'shift_reminder' | 'customer_inquiry' | 'quote_request' | 'job_completed' | 'payment_received' | 'system_alert';
+  type:
+    | 'job_assigned'
+    | 'shift_reminder'
+    | 'customer_inquiry'
+    | 'quote_request'
+    | 'job_completed'
+    | 'payment_received'
+    | 'system_alert';
   priority: 'low' | 'normal' | 'high' | 'urgent';
   title: string;
   message: string;
@@ -19,7 +26,12 @@ interface Notification {
   readAt?: string;
 }
 
-type FilterType = 'all' | 'unread' | 'job_updates' | 'customer_inquiries' | 'system';
+type FilterType =
+  | 'all'
+  | 'unread'
+  | 'job_updates'
+  | 'customer_inquiries'
+  | 'system';
 
 const NOTIFICATION_TYPE_ICONS: Record<Notification['type'], string> = {
   job_assigned: '📋',
@@ -54,66 +66,76 @@ export function NotificationCenter() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Fetch notifications
-  const fetchNotifications = useCallback(async (pageNum: number, resetList = false) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchNotifications = useCallback(
+    async (pageNum: number, resetList = false) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        setError('Not authenticated');
-        return;
-      }
-
-      const params = new URLSearchParams({
-        page: pageNum.toString(),
-        limit: '20',
-      });
-
-      if (filter !== 'all') {
-        if (filter === 'unread') {
-          params.append('read', 'false');
-        } else if (filter === 'job_updates') {
-          params.append('type', 'job_assigned,shift_reminder,job_completed');
-        } else if (filter === 'customer_inquiries') {
-          params.append('type', 'customer_inquiry,quote_request');
-        } else if (filter === 'system') {
-          params.append('type', 'system_alert');
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          setError('Not authenticated');
+          return;
         }
+
+        const params = new URLSearchParams({
+          page: pageNum.toString(),
+          limit: '20',
+        });
+
+        if (filter !== 'all') {
+          if (filter === 'unread') {
+            params.append('read', 'false');
+          } else if (filter === 'job_updates') {
+            params.append('type', 'job_assigned,shift_reminder,job_completed');
+          } else if (filter === 'customer_inquiries') {
+            params.append('type', 'customer_inquiry,quote_request');
+          } else if (filter === 'system') {
+            params.append('type', 'system_alert');
+          }
+        }
+
+        const response = await fetch(
+          getApiUrl(`notifications?${params.toString()}`),
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch notifications');
+        }
+
+        const result = await response.json();
+        const newNotifications = result.data.notifications || [];
+
+        setNotifications((prev) =>
+          resetList ? newNotifications : [...prev, ...newNotifications],
+        );
+        setHasMore(result.data.hasMore || false);
+
+        // Update stats
+        const unreadCount = result.data.unreadCount || 0;
+        const todayCount = newNotifications.filter((n: Notification) => {
+          const today = new Date();
+          const notifDate = new Date(n.createdAt);
+          return notifDate.toDateString() === today.toDateString();
+        }).length;
+
+        setStats({ unread: unreadCount, today: todayCount });
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to load notifications',
+        );
+        console.error('Error fetching notifications:', err);
+      } finally {
+        setLoading(false);
       }
-
-      const response = await fetch(getApiUrl(`notifications?${params.toString()}`), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch notifications');
-      }
-
-      const result = await response.json();
-      const newNotifications = result.data.notifications || [];
-
-      setNotifications(prev => resetList ? newNotifications : [...prev, ...newNotifications]);
-      setHasMore(result.data.hasMore || false);
-
-      // Update stats
-      const unreadCount = result.data.unreadCount || 0;
-      const todayCount = newNotifications.filter((n: Notification) => {
-        const today = new Date();
-        const notifDate = new Date(n.createdAt);
-        return notifDate.toDateString() === today.toDateString();
-      }).length;
-
-      setStats({ unread: unreadCount, today: todayCount });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load notifications');
-      console.error('Error fetching notifications:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [filter]);
+    },
+    [filter],
+  );
 
   // Initial load
   useEffect(() => {
@@ -127,16 +149,18 @@ export function NotificationCenter() {
     if (!socket || !isConnected) return;
 
     const handleNotificationCreated = (notification: Notification) => {
-      setNotifications(prev => [notification, ...prev]);
-      setStats(prev => ({ ...prev, unread: prev.unread + 1 }));
+      setNotifications((prev) => [notification, ...prev]);
+      setStats((prev) => ({ ...prev, unread: prev.unread + 1 }));
     };
 
     const handleNotificationUpdated = (updatedNotification: Notification) => {
-      setNotifications(prev =>
-        prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === updatedNotification.id ? updatedNotification : n,
+        ),
       );
       if (updatedNotification.read) {
-        setStats(prev => ({ ...prev, unread: Math.max(0, prev.unread - 1) }));
+        setStats((prev) => ({ ...prev, unread: Math.max(0, prev.unread - 1) }));
       }
     };
 
@@ -158,14 +182,14 @@ export function NotificationCenter() {
     }
 
     observerRef.current = new IntersectionObserver(
-      entries => {
+      (entries) => {
         if (entries[0].isIntersecting) {
           const nextPage = page + 1;
           setPage(nextPage);
           fetchNotifications(nextPage);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (loadMoreRef.current) {
@@ -180,27 +204,37 @@ export function NotificationCenter() {
   }, [loading, hasMore, page, fetchNotifications]);
 
   // Mark notification as read/unread
-  const toggleRead = async (notificationId: string, currentReadState: boolean) => {
+  const toggleRead = async (
+    notificationId: string,
+    currentReadState: boolean,
+  ) => {
     try {
       const token = localStorage.getItem('access_token');
       if (!token) return;
 
-      const response = await fetch(getApiUrl(`notifications/${notificationId}/read`), {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`notifications/${notificationId}/read`),
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ read: !currentReadState }),
         },
-        body: JSON.stringify({ read: !currentReadState }),
-      });
+      );
 
       if (response.ok) {
-        setNotifications(prev =>
-          prev.map(n => n.id === notificationId ? { ...n, read: !currentReadState } : n)
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notificationId ? { ...n, read: !currentReadState } : n,
+          ),
         );
-        setStats(prev => ({
+        setStats((prev) => ({
           ...prev,
-          unread: currentReadState ? prev.unread + 1 : Math.max(0, prev.unread - 1),
+          unread: currentReadState
+            ? prev.unread + 1
+            : Math.max(0, prev.unread - 1),
         }));
       }
     } catch (err) {
@@ -214,18 +248,24 @@ export function NotificationCenter() {
       const token = localStorage.getItem('access_token');
       if (!token) return;
 
-      const response = await fetch(getApiUrl(`notifications/${notificationId}`), {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`notifications/${notificationId}`),
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
-        const notification = notifications.find(n => n.id === notificationId);
-        setNotifications(prev => prev.filter(n => n.id !== notificationId));
+        const notification = notifications.find((n) => n.id === notificationId);
+        setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
         if (notification && !notification.read) {
-          setStats(prev => ({ ...prev, unread: Math.max(0, prev.unread - 1) }));
+          setStats((prev) => ({
+            ...prev,
+            unread: Math.max(0, prev.unread - 1),
+          }));
         }
       }
     } catch (err) {
@@ -242,13 +282,13 @@ export function NotificationCenter() {
       const response = await fetch(getApiUrl('notifications/read-all'), {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-        setStats(prev => ({ ...prev, unread: 0 }));
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+        setStats((prev) => ({ ...prev, unread: 0 }));
       }
     } catch (err) {
       console.error('Error marking all as read:', err);
@@ -257,7 +297,7 @@ export function NotificationCenter() {
 
   // Delete all read notifications
   const deleteAllRead = async () => {
-    const readNotifications = notifications.filter(n => n.read);
+    const readNotifications = notifications.filter((n) => n.read);
     for (const notification of readNotifications) {
       await deleteNotification(notification.id);
     }
@@ -287,12 +327,8 @@ export function NotificationCenter() {
       <div className={styles.header}>
         <h1 className={styles.title}>Notifications</h1>
         <div className={styles.stats}>
-          <span className={styles.statBadge}>
-            {stats.unread} Unread
-          </span>
-          <span className={styles.statBadge}>
-            {stats.today} Today
-          </span>
+          <span className={styles.statBadge}>{stats.unread} Unread</span>
+          <span className={styles.statBadge}>{stats.today} Today</span>
         </div>
       </div>
 
@@ -346,21 +382,17 @@ export function NotificationCenter() {
         <button
           className={styles.bulkActionButton}
           onClick={deleteAllRead}
-          disabled={notifications.filter(n => n.read).length === 0}
+          disabled={notifications.filter((n) => n.read).length === 0}
           type="button"
         >
           Delete All Read
         </button>
       </div>
 
-      {error && (
-        <div className={styles.error}>
-          {error}
-        </div>
-      )}
+      {error && <div className={styles.error}>{error}</div>}
 
       <div className={styles.notificationList}>
-        {filteredNotifications.map(notification => (
+        {filteredNotifications.map((notification) => (
           <div
             key={notification.id}
             className={`${styles.notificationCard} ${!notification.read ? styles.unread : ''} ${styles[`priority-${notification.priority}`]}`}
@@ -370,19 +402,28 @@ export function NotificationCenter() {
             </div>
             <div className={styles.notificationContent}>
               <div className={styles.notificationHeader}>
-                <h3 className={styles.notificationTitle}>{notification.title}</h3>
+                <h3 className={styles.notificationTitle}>
+                  {notification.title}
+                </h3>
                 <span className={styles.notificationType}>
                   {NOTIFICATION_TYPE_LABELS[notification.type]}
                 </span>
               </div>
-              <p className={styles.notificationMessage}>{notification.message}</p>
+              <p className={styles.notificationMessage}>
+                {notification.message}
+              </p>
               <div className={styles.notificationFooter}>
-                <span className={styles.timestamp}>{formatTimestamp(notification.createdAt)}</span>
-                {notification.priority !== 'normal' && notification.priority !== 'low' && (
-                  <span className={`${styles.priorityBadge} ${styles[`priority-${notification.priority}`]}`}>
-                    {notification.priority.toUpperCase()}
-                  </span>
-                )}
+                <span className={styles.timestamp}>
+                  {formatTimestamp(notification.createdAt)}
+                </span>
+                {notification.priority !== 'normal' &&
+                  notification.priority !== 'low' && (
+                    <span
+                      className={`${styles.priorityBadge} ${styles[`priority-${notification.priority}`]}`}
+                    >
+                      {notification.priority.toUpperCase()}
+                    </span>
+                  )}
               </div>
             </div>
             <div className={styles.notificationActions}>

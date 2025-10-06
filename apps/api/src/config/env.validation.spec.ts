@@ -49,7 +49,8 @@ describe('Environment Validation', () => {
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
       };
 
       expect(() => validateEnvironment(env)).toThrow('64 characters');
@@ -61,12 +62,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'http://api.example.com', // HTTP not HTTPS
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
       };
 
       expect(() => validateEnvironment(env)).toThrow('HTTPS');
@@ -78,11 +82,14 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
         // ALLOWED_ORIGINS missing
       };
 
@@ -95,12 +102,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: '*', // Wildcard not allowed
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
       };
 
       expect(() => validateEnvironment(env)).toThrow('wildcards');
@@ -112,12 +122,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
         DEBUG_MODE: 'true', // Should be false
       };
 
@@ -130,12 +143,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
         SEED_DATA: 'true', // Should be false
       };
 
@@ -143,7 +159,8 @@ describe('Environment Validation', () => {
     });
 
     it('should reject identical JWT secrets', () => {
-      const secret = '1234567890123456789012345678901234567890123456789012345678901234';
+      const secret =
+        '1234567890123456789012345678901234567890123456789012345678901234';
       const env = {
         NODE_ENV: 'production',
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
@@ -154,7 +171,8 @@ describe('Environment Validation', () => {
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
       };
 
       expect(() => validateEnvironment(env)).toThrow('different');
@@ -166,12 +184,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: 'dev_secret_1234567890123456789012345678901234567890123456789012',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          'dev_secret_1234567890123456789012345678901234567890123456789012',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
       };
 
       expect(() => validateEnvironment(env)).toThrow('dev');
@@ -183,12 +204,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
         SESSION_COOKIE_SECURE: 'false', // Should be true
       };
 
@@ -201,12 +225,15 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://prod:password@host:27017/db',
         REDIS_HOST: 'redis.prod.com',
         REDIS_PASSWORD: 'strong_random_password_32_chars_long',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
         API_BASE_URL: 'https://api.example.com',
         WEB_APP_URL: 'https://app.example.com',
         ALLOWED_ORIGINS: 'https://app.example.com',
-        SESSION_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
+        SESSION_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
         STORAGE_USE_SSL: 'false', // Should be true
       };
 
@@ -243,8 +270,10 @@ describe('Environment Validation', () => {
         MONGODB_URI: 'mongodb://staging:password@host:27017/db',
         REDIS_HOST: 'redis.staging.com',
         REDIS_PASSWORD: 'staging_password_12345678',
-        JWT_SECRET: '1234567890123456789012345678901234567890123456789012345678901234',
-        JWT_REFRESH_SECRET: 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        JWT_SECRET:
+          '1234567890123456789012345678901234567890123456789012345678901234',
+        JWT_REFRESH_SECRET:
+          'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
       };
 
       expect(() => validateEnvironment(env)).not.toThrow();

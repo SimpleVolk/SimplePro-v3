@@ -51,7 +51,10 @@ export class NotificationConfigService implements OnModuleInit {
   private loadConfiguration(): NotificationConfig {
     return {
       email: {
-        enabled: !!process.env.SMTP_HOST && !!process.env.SMTP_USER && !!process.env.SMTP_PASS,
+        enabled:
+          !!process.env.SMTP_HOST &&
+          !!process.env.SMTP_USER &&
+          !!process.env.SMTP_PASS,
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
         secure: process.env.SMTP_SECURE === 'true',
@@ -60,13 +63,19 @@ export class NotificationConfigService implements OnModuleInit {
         from: process.env.SMTP_FROM || 'SimplePro <noreply@simplepro.com>',
       },
       sms: {
-        enabled: !!process.env.TWILIO_ACCOUNT_SID && !!process.env.TWILIO_AUTH_TOKEN && !!process.env.TWILIO_PHONE_NUMBER,
+        enabled:
+          !!process.env.TWILIO_ACCOUNT_SID &&
+          !!process.env.TWILIO_AUTH_TOKEN &&
+          !!process.env.TWILIO_PHONE_NUMBER,
         accountSid: process.env.TWILIO_ACCOUNT_SID,
         authToken: process.env.TWILIO_AUTH_TOKEN,
         phoneNumber: process.env.TWILIO_PHONE_NUMBER,
       },
       push: {
-        enabled: !!process.env.FIREBASE_PROJECT_ID && !!process.env.FIREBASE_PRIVATE_KEY && !!process.env.FIREBASE_CLIENT_EMAIL,
+        enabled:
+          !!process.env.FIREBASE_PROJECT_ID &&
+          !!process.env.FIREBASE_PRIVATE_KEY &&
+          !!process.env.FIREBASE_CLIENT_EMAIL,
         projectId: process.env.FIREBASE_PROJECT_ID,
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
@@ -79,26 +88,38 @@ export class NotificationConfigService implements OnModuleInit {
    */
   private validateConfiguration(): void {
     if (!this.config.email.enabled) {
-      this.logger.warn('Email notifications are disabled. Missing SMTP credentials (SMTP_HOST, SMTP_USER, SMTP_PASS).');
+      this.logger.warn(
+        'Email notifications are disabled. Missing SMTP credentials (SMTP_HOST, SMTP_USER, SMTP_PASS).',
+      );
     } else {
       this.logger.log('Email notifications enabled via SMTP');
     }
 
     if (!this.config.sms.enabled) {
-      this.logger.warn('SMS notifications are disabled. Missing Twilio credentials (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER).');
+      this.logger.warn(
+        'SMS notifications are disabled. Missing Twilio credentials (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER).',
+      );
     } else {
       this.logger.log('SMS notifications enabled via Twilio');
     }
 
     if (!this.config.push.enabled) {
-      this.logger.warn('Push notifications are disabled. Missing Firebase credentials (FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL).');
+      this.logger.warn(
+        'Push notifications are disabled. Missing Firebase credentials (FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL).',
+      );
     } else {
       this.logger.log('Push notifications enabled via Firebase FCM');
     }
 
     // Log warning if all channels are disabled
-    if (!this.config.email.enabled && !this.config.sms.enabled && !this.config.push.enabled) {
-      this.logger.warn('All external notification channels are disabled. Only in-app notifications will work.');
+    if (
+      !this.config.email.enabled &&
+      !this.config.sms.enabled &&
+      !this.config.push.enabled
+    ) {
+      this.logger.warn(
+        'All external notification channels are disabled. Only in-app notifications will work.',
+      );
     }
   }
 
@@ -121,10 +142,16 @@ export class NotificationConfigService implements OnModuleInit {
 
         // Verify SMTP connection
         await this.emailTransporter.verify();
-        this.logger.log('Email transporter initialized and verified successfully');
+        this.logger.log(
+          'Email transporter initialized and verified successfully',
+        );
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        this.logger.error('Failed to initialize email transporter:', errorMessage);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        this.logger.error(
+          'Failed to initialize email transporter:',
+          errorMessage,
+        );
         this.config.email.enabled = false;
         this.emailTransporter = null;
       }
@@ -133,10 +160,14 @@ export class NotificationConfigService implements OnModuleInit {
     // Initialize Twilio client
     if (this.config.sms.enabled) {
       try {
-        this.twilioClient = twilio(this.config.sms.accountSid!, this.config.sms.authToken!);
+        this.twilioClient = twilio(
+          this.config.sms.accountSid!,
+          this.config.sms.authToken!,
+        );
         this.logger.log('Twilio client initialized successfully');
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         this.logger.error('Failed to initialize Twilio client:', errorMessage);
         this.config.sms.enabled = false;
         this.twilioClient = null;
@@ -162,8 +193,12 @@ export class NotificationConfigService implements OnModuleInit {
           this.logger.log('Firebase Admin SDK already initialized');
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        this.logger.error('Failed to initialize Firebase Admin SDK:', errorMessage);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        this.logger.error(
+          'Failed to initialize Firebase Admin SDK:',
+          errorMessage,
+        );
         this.config.push.enabled = false;
         this.firebaseInitialized = false;
       }

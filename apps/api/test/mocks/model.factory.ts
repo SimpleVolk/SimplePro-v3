@@ -48,7 +48,9 @@ export function createMockDocument<T = any>(data: Partial<T>): MockDocument<T> {
 /**
  * Creates a mock Mongoose model with standard static methods
  */
-export function createMockModel<T = any>(defaultData?: Partial<T>): MockModel<T> {
+export function createMockModel<T = any>(
+  defaultData?: Partial<T>,
+): MockModel<T> {
   const mockConstructor: any = jest.fn().mockImplementation((data: any) => {
     return createMockDocument({ ...defaultData, ...data });
   });
@@ -125,7 +127,7 @@ export function createMockTransactionService() {
         startTransaction: jest.fn(),
         commitTransaction: jest.fn(),
         abortTransaction: jest.fn(),
-        endSession: jest.fn()
+        endSession: jest.fn(),
       };
       return callback(mockSession);
     }),

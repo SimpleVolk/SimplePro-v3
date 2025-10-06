@@ -34,7 +34,9 @@ export function CrewWorkload() {
   const [error, setError] = useState<string | null>(null);
   const [filterRole, setFilterRole] = useState<string>('all');
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
 
@@ -48,18 +50,23 @@ export function CrewWorkload() {
       const token = localStorage.getItem('access_token');
 
       const response = await fetch(
-        getApiUrl(`crew-schedule/workload?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`),
+        getApiUrl(
+          `crew-schedule/workload?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
+        ),
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
         const data = await response.json();
         setWorkloads(data.workloads || generateMockData());
-        setMetrics(data.metrics || calculateMetrics(data.workloads || generateMockData()));
+        setMetrics(
+          data.metrics ||
+            calculateMetrics(data.workloads || generateMockData()),
+        );
       } else {
         // Use mock data on error
         const mockData = generateMockData();
@@ -145,14 +152,17 @@ export function CrewWorkload() {
   const calculateMetrics = (data: CrewWorkload[]): WorkloadMetrics => {
     const totalJobs = data.reduce((sum, w) => sum + w.totalJobs, 0);
     const averageJobs = data.length > 0 ? totalJobs / data.length : 0;
-    const sortedByUtil = [...data].sort((a, b) => b.utilizationRate - a.utilizationRate);
+    const sortedByUtil = [...data].sort(
+      (a, b) => b.utilizationRate - a.utilizationRate,
+    );
 
     return {
       totalCrew: data.length,
       averageJobsPerCrew: parseFloat(averageJobs.toFixed(1)),
       mostUtilized: sortedByUtil[0]?.crewMemberName || 'N/A',
-      leastUtilized: sortedByUtil[sortedByUtil.length - 1]?.crewMemberName || 'N/A',
-      overloadedCount: data.filter(w => w.isOverloaded).length,
+      leastUtilized:
+        sortedByUtil[sortedByUtil.length - 1]?.crewMemberName || 'N/A',
+      overloadedCount: data.filter((w) => w.isOverloaded).length,
     };
   };
 
@@ -169,7 +179,7 @@ export function CrewWorkload() {
       'Overloaded',
     ];
 
-    const rows = filteredWorkloads.map(w => [
+    const rows = filteredWorkloads.map((w) => [
       w.crewMemberName,
       w.role,
       w.totalJobs,
@@ -183,7 +193,7 @@ export function CrewWorkload() {
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.join(',')),
+      ...rows.map((row) => row.join(',')),
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -212,11 +222,11 @@ export function CrewWorkload() {
     return icons[role] || '👷';
   };
 
-  const filteredWorkloads = workloads.filter(w =>
-    filterRole === 'all' || w.role === filterRole
+  const filteredWorkloads = workloads.filter(
+    (w) => filterRole === 'all' || w.role === filterRole,
   );
 
-  const maxJobs = Math.max(...workloads.map(w => w.totalJobs), 1);
+  const maxJobs = Math.max(...workloads.map((w) => w.totalJobs), 1);
 
   if (loading) {
     return (
@@ -232,7 +242,9 @@ export function CrewWorkload() {
       <div className={styles.header}>
         <div>
           <h2>Crew Workload</h2>
-          <p className={styles.subtitle}>Monitor workload distribution and prevent crew burnout</p>
+          <p className={styles.subtitle}>
+            Monitor workload distribution and prevent crew burnout
+          </p>
         </div>
 
         <button onClick={exportToCSV} className={styles.exportButton}>
@@ -255,7 +267,9 @@ export function CrewWorkload() {
           </div>
           <div className={styles.metricCard}>
             <div className={styles.metricLabel}>Avg Jobs/Crew</div>
-            <div className={styles.metricValue}>{metrics.averageJobsPerCrew}</div>
+            <div className={styles.metricValue}>
+              {metrics.averageJobsPerCrew}
+            </div>
           </div>
           <div className={styles.metricCard}>
             <div className={styles.metricLabel}>Most Utilized</div>
@@ -272,7 +286,9 @@ export function CrewWorkload() {
           {metrics.overloadedCount > 0 && (
             <div className={`${styles.metricCard} ${styles.warning}`}>
               <div className={styles.metricLabel}>⚠️ Overloaded</div>
-              <div className={styles.metricValue}>{metrics.overloadedCount}</div>
+              <div className={styles.metricValue}>
+                {metrics.overloadedCount}
+              </div>
             </div>
           )}
         </div>
@@ -284,14 +300,18 @@ export function CrewWorkload() {
           <input
             type="date"
             value={dateRange.startDate}
-            onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+            onChange={(e) =>
+              setDateRange({ ...dateRange, startDate: e.target.value })
+            }
             className={styles.dateInput}
           />
           <label>To:</label>
           <input
             type="date"
             value={dateRange.endDate}
-            onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+            onChange={(e) =>
+              setDateRange({ ...dateRange, endDate: e.target.value })
+            }
             className={styles.dateInput}
           />
         </div>
@@ -318,7 +338,9 @@ export function CrewWorkload() {
                 <span className={styles.crewName}>
                   {getRoleIcon(workload.role)} {workload.crewMemberName}
                 </span>
-                <span className={styles.jobCount}>{workload.totalJobs} jobs</span>
+                <span className={styles.jobCount}>
+                  {workload.totalJobs} jobs
+                </span>
               </div>
               <div className={styles.barContainer}>
                 <div
@@ -364,9 +386,15 @@ export function CrewWorkload() {
               <div className={styles.colJobs}>
                 <span className={styles.badge}>{workload.totalJobs}</span>
               </div>
-              <div className={styles.colScheduled}>{workload.scheduledJobs}</div>
-              <div className={styles.colProgress}>{workload.inProgressJobs}</div>
-              <div className={styles.colCompleted}>{workload.completedJobs}</div>
+              <div className={styles.colScheduled}>
+                {workload.scheduledJobs}
+              </div>
+              <div className={styles.colProgress}>
+                {workload.inProgressJobs}
+              </div>
+              <div className={styles.colCompleted}>
+                {workload.completedJobs}
+              </div>
               <div className={styles.colHours}>{workload.hoursWorked}h</div>
               <div className={styles.colUtilization}>
                 <div className={styles.utilizationBar}>
@@ -380,7 +408,9 @@ export function CrewWorkload() {
                 </div>
                 <span
                   className={styles.utilizationValue}
-                  style={{ color: getUtilizationColor(workload.utilizationRate) }}
+                  style={{
+                    color: getUtilizationColor(workload.utilizationRate),
+                  }}
                 >
                   {workload.utilizationRate}%
                 </span>

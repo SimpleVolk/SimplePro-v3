@@ -9,8 +9,8 @@ groups:
           severity: critical
           service: api
         annotations:
-          summary: "SimplePro API is down"
-          description: "SimplePro API has been down for more than 1 minute"
+          summary: 'SimplePro API is down'
+          description: 'SimplePro API has been down for more than 1 minute'
 
       - alert: SimplePro_API_High_Response_Time
         expr: http_request_duration_seconds_bucket{job="simplepro-api",le="1"} / http_request_duration_seconds_count{job="simplepro-api"} < 0.95
@@ -19,8 +19,8 @@ groups:
           severity: warning
           service: api
         annotations:
-          summary: "SimplePro API high response time"
-          description: "SimplePro API response time is above 1 second for {{ $value }}% of requests"
+          summary: 'SimplePro API high response time'
+          description: 'SimplePro API response time is above 1 second for {{ $value }}% of requests'
 
       - alert: SimplePro_API_High_Error_Rate
         expr: rate(http_requests_total{job="simplepro-api",status=~"5.."}[5m]) / rate(http_requests_total{job="simplepro-api"}[5m]) * 100 > 5
@@ -29,8 +29,8 @@ groups:
           severity: critical
           service: api
         annotations:
-          summary: "SimplePro API high error rate"
-          description: "SimplePro API error rate is {{ $value }}% over the last 5 minutes"
+          summary: 'SimplePro API high error rate'
+          description: 'SimplePro API error rate is {{ $value }}% over the last 5 minutes'
 
       # Web Application Alerts
       - alert: SimplePro_Web_Down
@@ -40,8 +40,8 @@ groups:
           severity: critical
           service: web
         annotations:
-          summary: "SimplePro Web application is down"
-          description: "SimplePro Web application has been down for more than 1 minute"
+          summary: 'SimplePro Web application is down'
+          description: 'SimplePro Web application has been down for more than 1 minute'
 
       # Nginx Alerts
       - alert: Nginx_Down
@@ -51,8 +51,8 @@ groups:
           severity: critical
           service: nginx
         annotations:
-          summary: "Nginx is down"
-          description: "Nginx reverse proxy has been down for more than 1 minute"
+          summary: 'Nginx is down'
+          description: 'Nginx reverse proxy has been down for more than 1 minute'
 
   - name: simplepro-infrastructure
     rules:
@@ -64,8 +64,8 @@ groups:
           severity: critical
           service: mongodb
         annotations:
-          summary: "MongoDB is down"
-          description: "MongoDB database has been down for more than 1 minute"
+          summary: 'MongoDB is down'
+          description: 'MongoDB database has been down for more than 1 minute'
 
       - alert: MongoDB_High_Connections
         expr: mongodb_connections{state="current"} / mongodb_connections{state="available"} * 100 > 80
@@ -74,8 +74,8 @@ groups:
           severity: warning
           service: mongodb
         annotations:
-          summary: "MongoDB high connection usage"
-          description: "MongoDB connection usage is {{ $value }}%"
+          summary: 'MongoDB high connection usage'
+          description: 'MongoDB connection usage is {{ $value }}%'
 
       - alert: MongoDB_Slow_Queries
         expr: rate(mongodb_op_counters_total{type="query"}[5m]) > 1000
@@ -84,8 +84,8 @@ groups:
           severity: warning
           service: mongodb
         annotations:
-          summary: "MongoDB slow queries detected"
-          description: "MongoDB is experiencing {{ $value }} queries per second"
+          summary: 'MongoDB slow queries detected'
+          description: 'MongoDB is experiencing {{ $value }} queries per second'
 
       # Redis Alerts
       - alert: Redis_Down
@@ -95,8 +95,8 @@ groups:
           severity: critical
           service: redis
         annotations:
-          summary: "Redis is down"
-          description: "Redis cache has been down for more than 1 minute"
+          summary: 'Redis is down'
+          description: 'Redis cache has been down for more than 1 minute'
 
       - alert: Redis_High_Memory_Usage
         expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 90
@@ -105,8 +105,8 @@ groups:
           severity: warning
           service: redis
         annotations:
-          summary: "Redis high memory usage"
-          description: "Redis memory usage is {{ $value }}%"
+          summary: 'Redis high memory usage'
+          description: 'Redis memory usage is {{ $value }}%'
 
       - alert: Redis_High_Client_Connections
         expr: redis_connected_clients > 100
@@ -115,8 +115,8 @@ groups:
           severity: warning
           service: redis
         annotations:
-          summary: "Redis high client connections"
-          description: "Redis has {{ $value }} client connections"
+          summary: 'Redis high client connections'
+          description: 'Redis has {{ $value }} client connections'
 
   - name: simplepro-system
     rules:
@@ -128,8 +128,8 @@ groups:
           severity: warning
           service: system
         annotations:
-          summary: "High CPU usage detected"
-          description: "CPU usage is {{ $value }}% for more than 5 minutes"
+          summary: 'High CPU usage detected'
+          description: 'CPU usage is {{ $value }}% for more than 5 minutes'
 
       - alert: High_Memory_Usage
         expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
@@ -138,8 +138,8 @@ groups:
           severity: warning
           service: system
         annotations:
-          summary: "High memory usage detected"
-          description: "Memory usage is {{ $value }}% for more than 5 minutes"
+          summary: 'High memory usage detected'
+          description: 'Memory usage is {{ $value }}% for more than 5 minutes'
 
       - alert: Low_Disk_Space
         expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 85
@@ -148,8 +148,8 @@ groups:
           severity: warning
           service: system
         annotations:
-          summary: "Low disk space detected"
-          description: "Disk usage is {{ $value }}% on {{ $labels.device }}"
+          summary: 'Low disk space detected'
+          description: 'Disk usage is {{ $value }}% on {{ $labels.device }}'
 
       - alert: Service_Restart_High_Frequency
         expr: increase(container_last_seen[1h]) > 5
@@ -158,5 +158,5 @@ groups:
           severity: warning
           service: docker
         annotations:
-          summary: "Container restarting frequently"
-          description: "Container {{ $labels.name }} has restarted {{ $value }} times in the last hour"
+          summary: 'Container restarting frequently'
+          description: 'Container {{ $labels.name }} has restarted {{ $value }} times in the last hour'

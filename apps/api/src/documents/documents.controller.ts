@@ -126,7 +126,8 @@ export class DocumentsController {
    */
   @Get(':id/download')
   async downloadDocument(@Param('id') id: string, @Res() res: Response) {
-    const { buffer, document } = await this.documentsService.downloadDocument(id);
+    const { buffer, document } =
+      await this.documentsService.downloadDocument(id);
 
     // Set response headers
     res.setHeader('Content-Type', document.mimeType);

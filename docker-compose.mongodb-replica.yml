@@ -12,7 +12,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-password123}
       MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-simplepro}
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongodb_primary_data:/data/db
       - mongodb_primary_config:/data/configdb
@@ -46,7 +46,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-password123}
     ports:
-      - "27018:27017"
+      - '27018:27017'
     volumes:
       - mongodb_secondary1_data:/data/db
       - mongodb_secondary1_config:/data/configdb
@@ -74,7 +74,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-password123}
     ports:
-      - "27019:27017"
+      - '27019:27017'
     volumes:
       - mongodb_secondary2_data:/data/db
       - mongodb_secondary2_config:/data/configdb
@@ -100,7 +100,7 @@ services:
     environment:
       MONGODB_URI: mongodb://${MONGODB_USERNAME:-admin}:${MONGODB_PASSWORD:-password123}@mongodb-primary:27017/?authSource=admin
     ports:
-      - "9216:9216"
+      - '9216:9216'
     networks:
       - storage-network
     depends_on:

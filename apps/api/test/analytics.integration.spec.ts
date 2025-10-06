@@ -49,7 +49,12 @@ describe('Analytics and Reporting Integration Tests', () => {
     adminAuth = await createAuthenticatedTestUser({
       email: 'admin@example.com',
       role: 'admin',
-      permissions: ['read:all', 'write:all', 'manage:analytics', 'view:reports'],
+      permissions: [
+        'read:all',
+        'write:all',
+        'manage:analytics',
+        'view:reports',
+      ],
     });
 
     dispatcherAuth = await createAuthenticatedTestUser({
@@ -100,8 +105,12 @@ describe('Analytics and Reporting Integration Tests', () => {
           status: customerType.status,
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-          .send(customerData);
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        ).send(customerData);
         testCustomers.push(response.body.data);
       }
     }
@@ -128,18 +137,27 @@ describe('Analytics and Reporting Integration Tests', () => {
           type: jobConfig.type,
           status: jobConfig.status,
           estimatedCost: jobConfig.cost,
-          actualCost: jobConfig.status === 'completed' ? jobConfig.cost + (Math.random() * 200 - 100) : null,
+          actualCost:
+            jobConfig.status === 'completed'
+              ? jobConfig.cost + (Math.random() * 200 - 100)
+              : null,
           completedAt: jobConfig.status === 'completed' ? new Date() : null,
-          scheduledDate: new Date(Date.now() + (i * 24 * 60 * 60 * 1000)), // Spread over days
+          scheduledDate: new Date(Date.now() + i * 24 * 60 * 60 * 1000), // Spread over days
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-          .send(jobData);
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          adminAuth.accessToken,
+        ).send(jobData);
         testJobs.push(response.body.data);
       }
     }
 
-    console.log(`✅ Created test dataset: ${testCustomers.length} customers, ${testJobs.length} jobs`);
+    console.log(
+      `✅ Created test dataset: ${testCustomers.length} customers, ${testJobs.length} jobs`,
+    );
   }
 
   describe('Dashboard Analytics', () => {
@@ -149,7 +167,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/dashboard/overview',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -177,7 +195,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/dashboard/overview',
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -190,7 +208,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/dashboard/overview',
-          crewAuth.accessToken
+          crewAuth.accessToken,
         ).expect(403);
 
         ResponseAssertions.assertErrorResponse(response, 403);
@@ -198,13 +216,15 @@ describe('Analytics and Reporting Integration Tests', () => {
 
       it('should filter metrics by date range', async () => {
         const endDate = new Date();
-        const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
+        const startDate = new Date(
+          endDate.getTime() - 30 * 24 * 60 * 60 * 1000,
+        ); // 30 days ago
 
         const response = await authenticatedRequest(
           app,
           'get',
           `/analytics/dashboard/overview?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -222,7 +242,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/dashboard/revenue-breakdown',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -242,7 +262,10 @@ describe('Analytics and Reporting Integration Tests', () => {
         });
 
         // Verify percentages add up to 100
-        const totalPercentage = breakdown.reduce((sum: number, item: any) => sum + item.percentage, 0);
+        const totalPercentage = breakdown.reduce(
+          (sum: number, item: any) => sum + item.percentage,
+          0,
+        );
         expect(Math.abs(totalPercentage - 100)).toBeLessThan(0.1); // Allow for rounding
       });
 
@@ -251,7 +274,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/dashboard/revenue-breakdown',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         const breakdown = response.body.data;
@@ -269,7 +292,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/dashboard/job-status-distribution',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -286,7 +309,10 @@ describe('Analytics and Reporting Integration Tests', () => {
         });
 
         // Verify total count matches test data
-        const totalJobs = distribution.reduce((sum: number, item: any) => sum + item.count, 0);
+        const totalJobs = distribution.reduce(
+          (sum: number, item: any) => sum + item.count,
+          0,
+        );
         expect(totalJobs).toBe(testJobs.length);
       });
     });
@@ -299,7 +325,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/revenue/trends?period=daily&days=30',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -325,7 +351,7 @@ describe('Analytics and Reporting Integration Tests', () => {
             app,
             'get',
             `/analytics/revenue/trends?period=${period}`,
-            adminAuth.accessToken
+            adminAuth.accessToken,
           ).expect(200);
 
           ResponseAssertions.assertSuccessResponse(response);
@@ -341,7 +367,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           `/analytics/revenue/trends?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -355,7 +381,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/revenue/by-service-type',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -385,7 +411,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/performance/crew-productivity',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -408,7 +434,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/performance/job-completion-rate',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -432,7 +458,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/customers/acquisition',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -455,7 +481,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/customers/retention',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -477,7 +503,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/customers/segmentation',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -520,7 +546,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'post',
           '/analytics/reports/generate',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(reportConfig)
           .expect(200);
@@ -558,7 +584,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'post',
           '/analytics/reports/generate',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(reportConfig)
           .expect(200);
@@ -584,7 +610,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'post',
           '/analytics/reports/generate',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(invalidConfig)
           .expect(400);
@@ -605,7 +631,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'post',
           '/analytics/reports/generate',
-          crewAuth.accessToken
+          crewAuth.accessToken,
         )
           .send(reportConfig)
           .expect(403);
@@ -630,9 +656,8 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'post',
           '/analytics/reports/generate',
-          adminAuth.accessToken
-        )
-          .send(reportConfig);
+          adminAuth.accessToken,
+        ).send(reportConfig);
 
         const reportId = generateResponse.body.data.reportId;
 
@@ -641,7 +666,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           `/analytics/reports/${reportId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -658,7 +683,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           `/analytics/reports/${nonExistentId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(404);
 
         ResponseAssertions.assertErrorResponse(response, 404);
@@ -678,7 +703,7 @@ describe('Analytics and Reporting Integration Tests', () => {
             app,
             'post',
             '/analytics/reports/generate',
-            adminAuth.accessToken
+            adminAuth.accessToken,
           ).send({
             ...config,
             dateRange: {
@@ -692,7 +717,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/reports',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
@@ -715,11 +740,13 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/export/revenue?format=csv',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         expect(response.headers['content-type']).toMatch(/text\/csv/);
-        expect(response.headers['content-disposition']).toMatch(/attachment.*csv/);
+        expect(response.headers['content-disposition']).toMatch(
+          /attachment.*csv/,
+        );
         expect(typeof response.text).toBe('string');
         expect(response.text).toContain('Service Type'); // CSV header
       });
@@ -729,11 +756,13 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/export/revenue?format=excel',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         expect(response.headers['content-type']).toMatch(/spreadsheet/);
-        expect(response.headers['content-disposition']).toMatch(/attachment.*xlsx/);
+        expect(response.headers['content-disposition']).toMatch(
+          /attachment.*xlsx/,
+        );
       });
 
       it('should validate export format', async () => {
@@ -741,7 +770,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/export/revenue?format=invalid',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(400);
 
         ResponseAssertions.assertErrorResponse(response, 400, /format/i);
@@ -752,7 +781,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/export/revenue?format=csv',
-          crewAuth.accessToken
+          crewAuth.accessToken,
         ).expect(403);
 
         ResponseAssertions.assertErrorResponse(response, 403);
@@ -767,7 +796,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/realtime/metrics',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -787,7 +816,7 @@ describe('Analytics and Reporting Integration Tests', () => {
           app,
           'get',
           '/analytics/realtime/metrics',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         );
 
         const initialActiveJobs = initialResponse.body.data.activeJobs;
@@ -796,21 +825,32 @@ describe('Analytics and Reporting Integration Tests', () => {
         const customerData = TestDataFactories.createCustomerData({
           email: 'realtime-test@example.com',
         });
-        const customerResponse = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-          .send(customerData);
+        const customerResponse = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        ).send(customerData);
 
-        const jobData = TestDataFactories.createJobData(customerResponse.body.data.id, {
-          status: 'in_progress',
-        });
-        await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-          .send(jobData);
+        const jobData = TestDataFactories.createJobData(
+          customerResponse.body.data.id,
+          {
+            status: 'in_progress',
+          },
+        );
+        await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          adminAuth.accessToken,
+        ).send(jobData);
 
         // Get updated metrics
         const updatedResponse = await authenticatedRequest(
           app,
           'get',
           '/analytics/realtime/metrics',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         );
 
         const updatedActiveJobs = updatedResponse.body.data.activeJobs;
@@ -829,14 +869,14 @@ describe('Analytics and Reporting Integration Tests', () => {
         '/analytics/dashboard/revenue-breakdown',
       ];
 
-      const requests = endpoints.map(endpoint =>
-        authenticatedRequest(app, 'get', endpoint, adminAuth.accessToken)
+      const requests = endpoints.map((endpoint) =>
+        authenticatedRequest(app, 'get', endpoint, adminAuth.accessToken),
       );
 
       const responses = await Promise.all(requests);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
         ResponseAssertions.assertSuccessResponse(response);
       });
@@ -849,7 +889,7 @@ describe('Analytics and Reporting Integration Tests', () => {
         app,
         'get',
         '/analytics/revenue/trends?period=daily&days=365',
-        adminAuth.accessToken
+        adminAuth.accessToken,
       ).expect(200);
 
       const endTime = Date.now();
@@ -874,7 +914,12 @@ describe('Analytics and Reporting Integration Tests', () => {
         });
 
         additionalJobs.push(
-          authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken).send(jobData)
+          authenticatedRequest(
+            app,
+            'post',
+            '/jobs',
+            adminAuth.accessToken,
+          ).send(jobData),
         );
       }
 
@@ -886,7 +931,7 @@ describe('Analytics and Reporting Integration Tests', () => {
         app,
         'get',
         '/analytics/dashboard/overview',
-        adminAuth.accessToken
+        adminAuth.accessToken,
       ).expect(200);
 
       const endTime = Date.now();
@@ -902,14 +947,19 @@ describe('Analytics and Reporting Integration Tests', () => {
   describe('Data Accuracy and Integrity', () => {
     it('should calculate revenue metrics accurately', async () => {
       // Get completed jobs from test data
-      const completedJobs = testJobs.filter(job => job.status === 'completed');
-      const expectedRevenue = completedJobs.reduce((sum, job) => sum + (job.actualCost || job.estimatedCost), 0);
+      const completedJobs = testJobs.filter(
+        (job) => job.status === 'completed',
+      );
+      const expectedRevenue = completedJobs.reduce(
+        (sum, job) => sum + (job.actualCost || job.estimatedCost),
+        0,
+      );
 
       const response = await authenticatedRequest(
         app,
         'get',
         '/analytics/dashboard/overview',
-        adminAuth.accessToken
+        adminAuth.accessToken,
       ).expect(200);
 
       const actualRevenue = response.body.data.totalRevenue;
@@ -919,7 +969,9 @@ describe('Analytics and Reporting Integration Tests', () => {
     });
 
     it('should calculate customer conversion rates accurately', async () => {
-      const activeCustomers = testCustomers.filter(c => c.status === 'active').length;
+      const activeCustomers = testCustomers.filter(
+        (c) => c.status === 'active',
+      ).length;
       const totalCustomers = testCustomers.length;
       const expectedConversionRate = (activeCustomers / totalCustomers) * 100;
 
@@ -927,13 +979,15 @@ describe('Analytics and Reporting Integration Tests', () => {
         app,
         'get',
         '/analytics/customers/acquisition',
-        adminAuth.accessToken
+        adminAuth.accessToken,
       ).expect(200);
 
       const actualConversionRate = response.body.data.conversionRate;
 
       // Allow for minor rounding differences
-      expect(Math.abs(actualConversionRate - expectedConversionRate)).toBeLessThan(1);
+      expect(
+        Math.abs(actualConversionRate - expectedConversionRate),
+      ).toBeLessThan(1);
     });
 
     it('should maintain consistency across related metrics', async () => {
@@ -941,24 +995,26 @@ describe('Analytics and Reporting Integration Tests', () => {
         app,
         'get',
         '/analytics/dashboard/overview',
-        adminAuth.accessToken
+        adminAuth.accessToken,
       );
 
       const revenueResponse = await authenticatedRequest(
         app,
         'get',
         '/analytics/revenue/by-service-type',
-        adminAuth.accessToken
+        adminAuth.accessToken,
       );
 
       const overviewRevenue = overviewResponse.body.data.totalRevenue;
       const revenueBreakdownTotal = revenueResponse.body.data.reduce(
         (sum: number, item: any) => sum + item.totalRevenue,
-        0
+        0,
       );
 
       // Revenue should be consistent across different endpoints
-      expect(Math.abs(overviewRevenue - revenueBreakdownTotal)).toBeLessThan(0.01);
+      expect(Math.abs(overviewRevenue - revenueBreakdownTotal)).toBeLessThan(
+        0.01,
+      );
     });
   });
 });

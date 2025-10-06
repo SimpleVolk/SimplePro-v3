@@ -1,8 +1,14 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MessageThread, MessageThreadSchema } from './schemas/message-thread.schema';
+import {
+  MessageThread,
+  MessageThreadSchema,
+} from './schemas/message-thread.schema';
 import { Message, MessageSchema } from './schemas/message.schema';
-import { TypingIndicator, TypingIndicatorSchema } from './schemas/typing-indicator.schema';
+import {
+  TypingIndicator,
+  TypingIndicatorSchema,
+} from './schemas/typing-indicator.schema';
 import { MessagesController } from './messages.controller';
 import { MessagesService } from './messages.service';
 import { TypingService } from './typing.service';
@@ -19,11 +25,7 @@ import { AuthModule } from '../auth/auth.module';
     forwardRef(() => AuthModule),
   ],
   controllers: [MessagesController],
-  providers: [
-    MessagesService,
-    TypingService,
-    MessageNotificationService,
-  ],
+  providers: [MessagesService, TypingService, MessageNotificationService],
   exports: [MessagesService, TypingService],
 })
 export class MessagesModule {}

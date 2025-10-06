@@ -79,11 +79,14 @@ export function CrewSchedule() {
       const token = localStorage.getItem('access_token');
       const startDate = getWeekStart(currentDate);
 
-      const response = await fetch(getApiUrl(`crew-schedule/weekly/${formatDate(startDate)}`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`crew-schedule/weekly/${formatDate(startDate)}`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -104,11 +107,41 @@ export function CrewSchedule() {
       // Mock data for now - replace with actual API call
       // const token = localStorage.getItem('access_token');
       setCrewMembers([
-        { id: '1', name: 'John Smith', role: 'lead', status: 'available', rating: 4.8 },
-        { id: '2', name: 'Mike Johnson', role: 'mover', status: 'available', rating: 4.5 },
-        { id: '3', name: 'Tom Wilson', role: 'driver', status: 'busy', rating: 4.9 },
-        { id: '4', name: 'Sarah Davis', role: 'specialist', status: 'available', rating: 4.7 },
-        { id: '5', name: 'Chris Brown', role: 'mover', status: 'time_off', rating: 4.6 },
+        {
+          id: '1',
+          name: 'John Smith',
+          role: 'lead',
+          status: 'available',
+          rating: 4.8,
+        },
+        {
+          id: '2',
+          name: 'Mike Johnson',
+          role: 'mover',
+          status: 'available',
+          rating: 4.5,
+        },
+        {
+          id: '3',
+          name: 'Tom Wilson',
+          role: 'driver',
+          status: 'busy',
+          rating: 4.9,
+        },
+        {
+          id: '4',
+          name: 'Sarah Davis',
+          role: 'specialist',
+          status: 'available',
+          rating: 4.7,
+        },
+        {
+          id: '5',
+          name: 'Chris Brown',
+          role: 'mover',
+          status: 'time_off',
+          rating: 4.6,
+        },
       ]);
     } catch (err) {
       console.error('Error fetching crew members:', err);
@@ -119,17 +152,22 @@ export function CrewSchedule() {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(getApiUrl(`crew-schedule/auto-assign/${jobId}`), {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`crew-schedule/auto-assign/${jobId}`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const result = await response.json();
-        alert(`Successfully assigned: ${result.assignments.map((a: any) => a.crewMemberName).join(', ')}`);
+        alert(
+          `Successfully assigned: ${result.assignments.map((a: any) => a.crewMemberName).join(', ')}`,
+        );
         fetchCrewSchedule();
       } else {
         const errorData = await response.json();
@@ -158,17 +196,26 @@ export function CrewSchedule() {
       const token = localStorage.getItem('access_token');
 
       // Check for conflicts first
-      const conflictResponse = await fetch(getApiUrl(`crew-schedule/conflicts/${draggedJob.id}`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const conflictResponse = await fetch(
+        getApiUrl(`crew-schedule/conflicts/${draggedJob.id}`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (conflictResponse.ok) {
         const conflicts = await conflictResponse.json();
 
-        if (conflicts.length > 0 && conflicts.some((c: ScheduleConflict) => c.severity === 'error')) {
-          alert('Cannot assign: ' + conflicts.map((c: ScheduleConflict) => c.message).join(', '));
+        if (
+          conflicts.length > 0 &&
+          conflicts.some((c: ScheduleConflict) => c.severity === 'error')
+        ) {
+          alert(
+            'Cannot assign: ' +
+              conflicts.map((c: ScheduleConflict) => c.message).join(', '),
+          );
           setDraggedJob(null);
           return;
         }
@@ -255,21 +302,33 @@ export function CrewSchedule() {
     return icons[role] || '👷';
   };
 
-  const filteredSchedule = weeklySchedule.filter(schedule => {
-    if (filterCrew !== 'all' && schedule.crewMemberId !== filterCrew) return false;
+  const filteredSchedule = weeklySchedule.filter((schedule) => {
+    if (filterCrew !== 'all' && schedule.crewMemberId !== filterCrew)
+      return false;
 
     if (filterStatus !== 'all') {
-      return schedule.jobs.some(job => job.status === filterStatus);
+      return schedule.jobs.some((job) => job.status === filterStatus);
     }
 
     return true;
   });
 
   const totalCrew = crewMembers.length;
-  const activeJobs = weeklySchedule.reduce((sum, s) => sum + s.jobs.filter(j => j.status === 'scheduled' || j.status === 'in_progress').length, 0);
-  const avgUtilization = weeklySchedule.length > 0
-    ? (weeklySchedule.reduce((sum, s) => sum + s.utilization, 0) / weeklySchedule.length).toFixed(1)
-    : '0';
+  const activeJobs = weeklySchedule.reduce(
+    (sum, s) =>
+      sum +
+      s.jobs.filter(
+        (j) => j.status === 'scheduled' || j.status === 'in_progress',
+      ).length,
+    0,
+  );
+  const avgUtilization =
+    weeklySchedule.length > 0
+      ? (
+          weeklySchedule.reduce((sum, s) => sum + s.utilization, 0) /
+          weeklySchedule.length
+        ).toFixed(1)
+      : '0';
 
   if (loading) {
     return (
@@ -285,7 +344,9 @@ export function CrewSchedule() {
       <div className={styles.header}>
         <div>
           <h2>Crew Schedule</h2>
-          <p className={styles.subtitle}>Manage crew assignments and scheduling</p>
+          <p className={styles.subtitle}>
+            Manage crew assignments and scheduling
+          </p>
         </div>
 
         <div className={styles.headerActions}>
@@ -338,7 +399,7 @@ export function CrewSchedule() {
           className={styles.filterSelect}
         >
           <option value="all">All Crew Members</option>
-          {crewMembers.map(crew => (
+          {crewMembers.map((crew) => (
             <option key={crew.id} value={crew.id}>
               {getRoleIcon(crew.role)} {crew.name}
             </option>
@@ -359,13 +420,19 @@ export function CrewSchedule() {
       </div>
 
       <div className={styles.navigation}>
-        <button onClick={() => navigateWeek('prev')} className={styles.navButton}>
+        <button
+          onClick={() => navigateWeek('prev')}
+          className={styles.navButton}
+        >
           ← Previous Week
         </button>
         <h3 className={styles.weekTitle}>
           Week of {formatDate(getWeekStart(currentDate))}
         </h3>
-        <button onClick={() => navigateWeek('next')} className={styles.navButton}>
+        <button
+          onClick={() => navigateWeek('next')}
+          className={styles.navButton}
+        >
           Next Week →
         </button>
       </div>
@@ -383,7 +450,10 @@ export function CrewSchedule() {
                   {date.toLocaleDateString('en-US', { weekday: 'short' })}
                 </div>
                 <div className={styles.dayDate}>
-                  {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </div>
               </div>
             </div>
@@ -391,7 +461,9 @@ export function CrewSchedule() {
         </div>
 
         {filteredSchedule.map((schedule) => {
-          const crewMember = crewMembers.find(c => c.id === schedule.crewMemberId);
+          const crewMember = crewMembers.find(
+            (c) => c.id === schedule.crewMemberId,
+          );
 
           return (
             <div
@@ -402,7 +474,8 @@ export function CrewSchedule() {
             >
               <div className={styles.crewInfo}>
                 <div className={styles.crewName}>
-                  {getRoleIcon(crewMember?.role || 'mover')} {schedule.crewMemberName}
+                  {getRoleIcon(crewMember?.role || 'mover')}{' '}
+                  {schedule.crewMemberName}
                 </div>
                 <div className={styles.crewStats}>
                   <span className={styles.utilization}>
@@ -410,24 +483,29 @@ export function CrewSchedule() {
                   </span>
                   {schedule.conflicts.length > 0 && (
                     <span className={styles.conflictBadge}>
-                      ⚠️ {schedule.conflicts.length} conflict{schedule.conflicts.length > 1 ? 's' : ''}
+                      ⚠️ {schedule.conflicts.length} conflict
+                      {schedule.conflicts.length > 1 ? 's' : ''}
                     </span>
                   )}
                 </div>
               </div>
 
               {getWeekDates().map((date, dayIndex) => {
-                const dayJobs = schedule.jobs.filter(job =>
-                  new Date(job.scheduledDate).toDateString() === date.toDateString()
+                const dayJobs = schedule.jobs.filter(
+                  (job) =>
+                    new Date(job.scheduledDate).toDateString() ===
+                    date.toDateString(),
                 );
 
                 return (
                   <div key={dayIndex} className={styles.dayCell}>
-                    {dayJobs.map(job => (
+                    {dayJobs.map((job) => (
                       <div
                         key={job.id}
                         className={styles.jobCard}
-                        style={{ borderLeft: `4px solid ${getStatusColor(job.status)}` }}
+                        style={{
+                          borderLeft: `4px solid ${getStatusColor(job.status)}`,
+                        }}
                         draggable
                         onDragStart={() => handleDragStart(job)}
                         onClick={() => setSelectedJob(job)}
@@ -444,9 +522,7 @@ export function CrewSchedule() {
                     ))}
 
                     {dayJobs.length === 0 && (
-                      <div className={styles.emptyCell}>
-                        Drop job here
-                      </div>
+                      <div className={styles.emptyCell}>Drop job here</div>
                     )}
                   </div>
                 );
@@ -458,14 +534,19 @@ export function CrewSchedule() {
         {filteredSchedule.length === 0 && (
           <div className={styles.emptyState}>
             <p>No crew schedule data available</p>
-            <p className={styles.emptyHint}>Try adjusting your filters or check back later</p>
+            <p className={styles.emptyHint}>
+              Try adjusting your filters or check back later
+            </p>
           </div>
         )}
       </div>
 
       {selectedJob && (
         <div className={styles.modal} onClick={() => setSelectedJob(null)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h3>Job Details - {selectedJob.jobNumber}</h3>
               <button onClick={() => setSelectedJob(null)}>×</button>
@@ -488,16 +569,21 @@ export function CrewSchedule() {
                 </span>
               </div>
               <div className={styles.jobDetail}>
-                <strong>Schedule:</strong> {selectedJob.scheduledDate} | {selectedJob.scheduledStartTime} - {selectedJob.scheduledEndTime}
+                <strong>Schedule:</strong> {selectedJob.scheduledDate} |{' '}
+                {selectedJob.scheduledStartTime} -{' '}
+                {selectedJob.scheduledEndTime}
               </div>
               <div className={styles.jobDetail}>
-                <strong>Pickup:</strong> {selectedJob.pickupAddress.city}, {selectedJob.pickupAddress.state}
+                <strong>Pickup:</strong> {selectedJob.pickupAddress.city},{' '}
+                {selectedJob.pickupAddress.state}
               </div>
               <div className={styles.jobDetail}>
-                <strong>Delivery:</strong> {selectedJob.deliveryAddress.city}, {selectedJob.deliveryAddress.state}
+                <strong>Delivery:</strong> {selectedJob.deliveryAddress.city},{' '}
+                {selectedJob.deliveryAddress.state}
               </div>
               <div className={styles.jobDetail}>
-                <strong>Estimated Cost:</strong> ${selectedJob.estimatedCost.toFixed(2)}
+                <strong>Estimated Cost:</strong> $
+                {selectedJob.estimatedCost.toFixed(2)}
               </div>
               <div className={styles.jobDetail}>
                 <strong>Assigned Crew:</strong>

@@ -8,12 +8,12 @@ import { PartnersModule } from '../partners/partners.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Referral.name, schema: ReferralSchema }
+      { name: Referral.name, schema: ReferralSchema },
     ]),
-    PartnersModule
+    PartnersModule,
   ],
   controllers: [ReferralsController],
   providers: [ReferralsService],
-  exports: [ReferralsService]
+  exports: [ReferralsService],
 })
 export class ReferralsModule {}

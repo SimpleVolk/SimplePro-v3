@@ -8,9 +8,18 @@ import { NotificationPreferenceService } from './services/notification-preferenc
 import { NotificationTemplateService } from './services/notification-template.service';
 import { NotificationConfigService } from './config/notification-config.service';
 import { NotificationEventListener } from './listeners/notification-event.listener';
-import { Notification, NotificationSchema } from './schemas/notification.schema';
-import { NotificationPreference, NotificationPreferenceSchema } from './schemas/notification-preference.schema';
-import { NotificationTemplate, NotificationTemplateSchema } from './schemas/notification-template.schema';
+import {
+  Notification,
+  NotificationSchema,
+} from './schemas/notification.schema';
+import {
+  NotificationPreference,
+  NotificationPreferenceSchema,
+} from './schemas/notification-preference.schema';
+import {
+  NotificationTemplate,
+  NotificationTemplateSchema,
+} from './schemas/notification-template.schema';
 import { AuthModule } from '../auth/auth.module';
 import { WebSocketModule } from '../websocket/websocket.module';
 
@@ -18,7 +27,10 @@ import { WebSocketModule } from '../websocket/websocket.module';
   imports: [
     MongooseModule.forFeature([
       { name: Notification.name, schema: NotificationSchema },
-      { name: NotificationPreference.name, schema: NotificationPreferenceSchema },
+      {
+        name: NotificationPreference.name,
+        schema: NotificationPreferenceSchema,
+      },
       { name: NotificationTemplate.name, schema: NotificationTemplateSchema },
     ]),
     forwardRef(() => AuthModule),

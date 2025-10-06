@@ -2,12 +2,15 @@ import { Injectable, Scope } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import DataLoader from 'dataloader';
-import { Customer, CustomerDocument } from '../../customers/schemas/customer.schema';
+import {
+  Customer,
+  CustomerDocument,
+} from '../../customers/schemas/customer.schema';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CustomerDataLoader {
   constructor(
-    @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>
+    @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
   ) {}
 
   private readonly batchCustomers = new DataLoader<string, Customer | null>(
@@ -21,12 +24,15 @@ export class CustomerDataLoader {
       // Create a map for quick lookup
       const customerMap = new Map<string, Customer>();
       customers.forEach((customer: any) => {
-        customerMap.set(customer._id.toString(), this.convertCustomerDocument(customer));
+        customerMap.set(
+          customer._id.toString(),
+          this.convertCustomerDocument(customer),
+        );
       });
 
       // Return customers in the same order as requested IDs
-      return customerIds.map(id => customerMap.get(id) || null);
-    }
+      return customerIds.map((id) => customerMap.get(id) || null);
+    },
   );
 
   async load(customerId: string): Promise<Customer | null> {
@@ -34,7 +40,9 @@ export class CustomerDataLoader {
   }
 
   async loadMany(customerIds: string[]): Promise<(Customer | null)[]> {
-    return this.batchCustomers.loadMany(customerIds) as Promise<(Customer | null)[]>;
+    return this.batchCustomers.loadMany(customerIds) as Promise<
+      (Customer | null)[]
+    >;
   }
 
   private convertCustomerDocument(doc: any): Customer {

@@ -28,7 +28,7 @@ export class Customer {
     required: true,
     type: String,
     enum: ['residential', 'commercial'],
-    index: true
+    index: true,
   })
   type!: 'residential' | 'commercial';
 
@@ -37,17 +37,30 @@ export class Customer {
     type: String,
     enum: ['lead', 'prospect', 'active', 'inactive'],
     default: 'lead',
-    index: true
+    index: true,
   })
   status!: 'lead' | 'prospect' | 'active' | 'inactive';
 
   @Prop({
     required: true,
     type: String,
-    enum: ['website', 'referral', 'advertising', 'social_media', 'partner', 'other'],
-    index: true
+    enum: [
+      'website',
+      'referral',
+      'advertising',
+      'social_media',
+      'partner',
+      'other',
+    ],
+    index: true,
   })
-  source!: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source!:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
 
   @Prop()
   companyName?: string;
@@ -59,7 +72,7 @@ export class Customer {
     required: true,
     type: String,
     enum: ['email', 'phone', 'text'],
-    default: 'email'
+    default: 'email',
   })
   preferredContactMethod!: 'email' | 'phone' | 'text';
 
@@ -128,18 +141,24 @@ export class Customer {
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
 
 // Document size monitoring middleware (prevent 16MB limit issues)
-CustomerSchema.pre('save', createSizeMonitoringMiddleware({
-  maxSizeMB: 5,
-  warnThresholdPercent: 70,
-  logWarnings: true,
-  throwOnExceed: true,
-}));
+CustomerSchema.pre(
+  'save',
+  createSizeMonitoringMiddleware({
+    maxSizeMB: 5,
+    warnThresholdPercent: 70,
+    logWarnings: true,
+    throwOnExceed: true,
+  }),
+);
 
 // Array size monitoring middleware
-CustomerSchema.pre('save', createArraySizeMonitoringMiddleware(
-  ['estimates', 'jobs', 'tags'],
-  1000 // Maximum 1000 items per array
-));
+CustomerSchema.pre(
+  'save',
+  createArraySizeMonitoringMiddleware(
+    ['estimates', 'jobs', 'tags'],
+    1000, // Maximum 1000 items per array
+  ),
+);
 
 // Optimize indexes for performance (OPTIMIZED - removed redundant indexes)
 CustomerSchema.index({ email: 1 }, { unique: true }); // Unique email lookup
@@ -162,31 +181,34 @@ CustomerSchema.index({ source: 1, createdAt: -1 }); // PERFORMANCE: Referral sou
 CustomerSchema.index({ status: 1, createdAt: -1 }); // PERFORMANCE: Lead pipeline reports
 
 // Text search index for comprehensive search
-CustomerSchema.index({
-  firstName: 'text',
-  lastName: 'text',
-  email: 'text',
-  phone: 'text',
-  companyName: 'text',
-  notes: 'text'
-}, {
-  weights: {
-    firstName: 10,
-    lastName: 10,
-    email: 8,
-    phone: 5,
-    companyName: 3,
-    notes: 1
+CustomerSchema.index(
+  {
+    firstName: 'text',
+    lastName: 'text',
+    email: 'text',
+    phone: 'text',
+    companyName: 'text',
+    notes: 'text',
   },
-  name: 'customer_text_search'
-});
+  {
+    weights: {
+      firstName: 10,
+      lastName: 10,
+      email: 8,
+      phone: 5,
+      companyName: 3,
+      notes: 1,
+    },
+    name: 'customer_text_search',
+  },
+);
 
 // Sparse indexes for optional fields
 CustomerSchema.index({ preferredMoveDate: 1 }, { sparse: true });
 CustomerSchema.index({ estimatedBudget: -1 }, { sparse: true });
 
 // Virtual for full name
-CustomerSchema.virtual('fullName').get(function(this: CustomerDocument) {
+CustomerSchema.virtual('fullName').get(function (this: CustomerDocument) {
   return `${this.firstName} ${this.lastName}`;
 });
 

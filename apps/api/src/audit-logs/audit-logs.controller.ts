@@ -97,13 +97,14 @@ export class AuditLogsController {
   async create(
     @Body() createAuditLogDto: CreateAuditLogDto,
     @CurrentUser() user: User,
-    @Req() req: any
+    @Req() req: any,
   ) {
     // Override user information from token if not provided
     const auditLogData: CreateAuditLogDto = {
       ...createAuditLogDto,
       userId: createAuditLogDto.userId || user.id,
-      userName: createAuditLogDto.userName || `${user.firstName} ${user.lastName}`,
+      userName:
+        createAuditLogDto.userName || `${user.firstName} ${user.lastName}`,
       ipAddress: createAuditLogDto.ipAddress || req.ip || 'unknown',
       userAgent: createAuditLogDto.userAgent || req.headers['user-agent'],
     };
@@ -130,7 +131,7 @@ export class AuditLogsController {
   async export(
     @Query() query: QueryAuditLogDto,
     @Param('format') format: ExportFormat,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
     // Validate format
     if (format !== 'json' && format !== 'csv') {
@@ -223,11 +224,11 @@ export class AuditLogsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getUserLogs(
     @Param('userId') userId: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
   ) {
     const logs = await this.auditLogsService.findByUserId(
       userId,
-      limit ? parseInt(limit) : 100
+      limit ? parseInt(limit) : 100,
     );
 
     return {
@@ -250,12 +251,12 @@ export class AuditLogsController {
   async getResourceLogs(
     @Param('resource') resource: string,
     @Param('resourceId') resourceId: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
   ) {
     const logs = await this.auditLogsService.findByResource(
       resource,
       resourceId,
-      limit ? parseInt(limit) : 100
+      limit ? parseInt(limit) : 100,
     );
 
     return {

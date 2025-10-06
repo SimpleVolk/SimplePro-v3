@@ -30,14 +30,15 @@ interface ReportType {
   description: string;
 }
 
-
 export function ReportsManagement() {
   const { user } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'list' | 'create' | 'generate'>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'create' | 'generate'>(
+    'list',
+  );
 
   // Form state
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ export function ReportsManagement() {
     startDate: '',
     endDate: '',
     visibility: 'private',
-    fileFormat: 'json'
+    fileFormat: 'json',
   });
 
   useEffect(() => {
@@ -85,12 +86,15 @@ export function ReportsManagement() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No authentication token');
 
-      const response = await fetch(getApiUrl('analytics/metadata/report-types'), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl('analytics/metadata/report-types'),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) throw new Error('Failed to fetch report types');
 
@@ -126,7 +130,7 @@ export function ReportsManagement() {
       if (!response.ok) throw new Error('Failed to create report');
 
       const newReport = await response.json();
-      setReports(prev => [newReport, ...prev]);
+      setReports((prev) => [newReport, ...prev]);
       setActiveTab('list');
 
       // Reset form
@@ -138,9 +142,8 @@ export function ReportsManagement() {
         startDate: '',
         endDate: '',
         visibility: 'private',
-        fileFormat: 'json'
+        fileFormat: 'json',
       });
-
     } catch (err) {
       console.error('Create report error:', err);
       setError(err instanceof Error ? err.message : 'Failed to create report');
@@ -176,19 +179,26 @@ export function ReportsManagement() {
       // For now, we'll just show the data in console
       // In production, this would likely trigger a download or display
       alert(`${type} report generated successfully! Check console for data.`);
-
     } catch (err) {
       console.error(`Generate ${type} report error:`, err);
-      setError(err instanceof Error ? err.message : `Failed to generate ${type} report`);
+      setError(
+        err instanceof Error
+          ? err.message
+          : `Failed to generate ${type} report`,
+      );
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#22c55e';
-      case 'generating': return '#f59e0b';
-      case 'failed': return '#ef4444';
-      default: return '#6b7280';
+      case 'completed':
+        return '#22c55e';
+      case 'generating':
+        return '#f59e0b';
+      case 'failed':
+        return '#ef4444';
+      default:
+        return '#6b7280';
     }
   };
 
@@ -242,8 +252,13 @@ export function ReportsManagement() {
           {reports.length === 0 ? (
             <div className={styles.emptyState}>
               <h3>No Reports Yet</h3>
-              <p>Create your first report to get started with analytics insights.</p>
-              <button onClick={() => setActiveTab('create')} className={styles.primaryButton}>
+              <p>
+                Create your first report to get started with analytics insights.
+              </p>
+              <button
+                onClick={() => setActiveTab('create')}
+                className={styles.primaryButton}
+              >
                 Create Report
               </button>
             </div>
@@ -267,19 +282,23 @@ export function ReportsManagement() {
                   <div className={styles.reportDetails}>
                     <div className={styles.reportMeta}>
                       <span>Type: {report.type}</span>
-                      <span>Period: {formatDate(report.startDate)} - {formatDate(report.endDate)}</span>
+                      <span>
+                        Period: {formatDate(report.startDate)} -{' '}
+                        {formatDate(report.endDate)}
+                      </span>
                       <span>Created: {formatDate(report.createdAt)}</span>
                     </div>
 
-                    {report.status === 'generating' && report.progress !== undefined && (
-                      <div className={styles.progressBar}>
-                        <div
-                          className={styles.progressFill}
-                          style={{ width: `${report.progress}%` }}
-                        ></div>
-                        <span>{report.progress}%</span>
-                      </div>
-                    )}
+                    {report.status === 'generating' &&
+                      report.progress !== undefined && (
+                        <div className={styles.progressBar}>
+                          <div
+                            className={styles.progressFill}
+                            style={{ width: `${report.progress}%` }}
+                          ></div>
+                          <span>{report.progress}%</span>
+                        </div>
+                      )}
 
                     {report.status === 'failed' && report.error && (
                       <div className={styles.errorMessage}>
@@ -289,7 +308,12 @@ export function ReportsManagement() {
 
                     {report.status === 'completed' && (
                       <div className={styles.reportActions}>
-                        <span>Generated: {report.lastGenerated ? formatDate(report.lastGenerated) : 'N/A'}</span>
+                        <span>
+                          Generated:{' '}
+                          {report.lastGenerated
+                            ? formatDate(report.lastGenerated)
+                            : 'N/A'}
+                        </span>
                         {report.fileUrl && (
                           <button className={styles.downloadButton}>
                             Download {report.fileFormat?.toUpperCase()}
@@ -317,7 +341,9 @@ export function ReportsManagement() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    }
                     required
                     placeholder="Monthly Revenue Analysis"
                   />
@@ -327,7 +353,12 @@ export function ReportsManagement() {
                   <label>Description</label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     placeholder="Detailed analysis of revenue trends and performance metrics"
                     rows={3}
                   />
@@ -337,7 +368,9 @@ export function ReportsManagement() {
                   <label>Report Type</label>
                   <select
                     value={formData.type}
-                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, type: e.target.value }))
+                    }
                   >
                     {reportTypes.map((type) => (
                       <option key={type.id} value={type.id}>
@@ -351,7 +384,12 @@ export function ReportsManagement() {
                   <label>Period</label>
                   <select
                     value={formData.period}
-                    onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        period: e.target.value,
+                      }))
+                    }
                   >
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
@@ -367,7 +405,12 @@ export function ReportsManagement() {
                   <input
                     type="date"
                     value={formData.startDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        startDate: e.target.value,
+                      }))
+                    }
                     required
                   />
                 </div>
@@ -377,7 +420,12 @@ export function ReportsManagement() {
                   <input
                     type="date"
                     value={formData.endDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        endDate: e.target.value,
+                      }))
+                    }
                     required
                   />
                 </div>
@@ -386,7 +434,12 @@ export function ReportsManagement() {
                   <label>Visibility</label>
                   <select
                     value={formData.visibility}
-                    onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        visibility: e.target.value,
+                      }))
+                    }
                   >
                     <option value="private">Private</option>
                     <option value="team">Team</option>
@@ -398,7 +451,12 @@ export function ReportsManagement() {
                   <label>File Format</label>
                   <select
                     value={formData.fileFormat}
-                    onChange={(e) => setFormData(prev => ({ ...prev, fileFormat: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        fileFormat: e.target.value,
+                      }))
+                    }
                   >
                     <option value="json">JSON</option>
                     <option value="pdf">PDF</option>
@@ -409,7 +467,11 @@ export function ReportsManagement() {
               </div>
 
               <div className={styles.formActions}>
-                <button type="button" onClick={() => setActiveTab('list')} className={styles.secondaryButton}>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('list')}
+                  className={styles.secondaryButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.primaryButton}>
@@ -431,7 +493,10 @@ export function ReportsManagement() {
             <div className={styles.quickReports}>
               <div className={styles.quickReportCard}>
                 <h4>Revenue Report</h4>
-                <p>Financial performance, revenue trends, and profitability analysis</p>
+                <p>
+                  Financial performance, revenue trends, and profitability
+                  analysis
+                </p>
                 <button
                   onClick={() => generateQuickReport('revenue')}
                   className={styles.primaryButton}
@@ -442,7 +507,10 @@ export function ReportsManagement() {
 
               <div className={styles.quickReportCard}>
                 <h4>Performance Report</h4>
-                <p>Operational efficiency, job completion rates, and crew performance</p>
+                <p>
+                  Operational efficiency, job completion rates, and crew
+                  performance
+                </p>
                 <button
                   onClick={() => generateQuickReport('performance')}
                   className={styles.primaryButton}

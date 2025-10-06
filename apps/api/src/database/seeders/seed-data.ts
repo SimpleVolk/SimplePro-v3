@@ -42,39 +42,62 @@ import { seedNotifications } from './seeders/notifications.seeder';
  */
 async function main() {
   const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URL;
-  const shouldClear = process.argv.includes('--clear') || process.argv.includes('-c');
+  const shouldClear =
+    process.argv.includes('--clear') || process.argv.includes('-c');
 
   if (!mongoUri) {
-    console.error('❌ Error: MONGODB_URI or DATABASE_URL environment variable is required');
+    console.error(
+      '❌ Error: MONGODB_URI or DATABASE_URL environment variable is required',
+    );
     console.error('');
     console.error('Usage:');
-    console.error('  MONGODB_URI=mongodb://localhost:27017/simplepro npm run seed:dev');
+    console.error(
+      '  MONGODB_URI=mongodb://localhost:27017/simplepro npm run seed:dev',
+    );
     process.exit(1);
   }
 
   console.log('');
-  console.log('╔════════════════════════════════════════════════════════════════════╗');
-  console.log('║           SimplePro - Development Database Seeder                 ║');
-  console.log('╚════════════════════════════════════════════════════════════════════╝');
+  console.log(
+    '╔════════════════════════════════════════════════════════════════════╗',
+  );
+  console.log(
+    '║           SimplePro - Development Database Seeder                 ║',
+  );
+  console.log(
+    '╚════════════════════════════════════════════════════════════════════╝',
+  );
   console.log('');
 
   try {
     // Connect to MongoDB
     console.log('🔌 Connecting to MongoDB...');
-    console.log(`   URI: ${mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`);
+    console.log(
+      `   URI: ${mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`,
+    );
     await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB');
     console.log('');
 
     // Register models
-    const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);
-    const CustomerModel = mongoose.models.Customer || mongoose.model('Customer', CustomerSchema);
+    const UserModel =
+      mongoose.models.User || mongoose.model('User', UserSchema);
+    const CustomerModel =
+      mongoose.models.Customer || mongoose.model('Customer', CustomerSchema);
     const JobModel = mongoose.models.Job || mongoose.model('Job', JobSchema);
-    const OpportunityModel = mongoose.models.Opportunity || mongoose.model('Opportunity', OpportunitySchema);
-    const PartnerModel = mongoose.models.Partner || mongoose.model('Partner', PartnerSchema);
-    const MessageModel = mongoose.models.Message || mongoose.model('Message', MessageSchema);
-    const MessageThreadModel = mongoose.models.MessageThread || mongoose.model('MessageThread', MessageThreadSchema);
-    const NotificationModel = mongoose.models.Notification || mongoose.model('Notification', NotificationSchema);
+    const OpportunityModel =
+      mongoose.models.Opportunity ||
+      mongoose.model('Opportunity', OpportunitySchema);
+    const PartnerModel =
+      mongoose.models.Partner || mongoose.model('Partner', PartnerSchema);
+    const MessageModel =
+      mongoose.models.Message || mongoose.model('Message', MessageSchema);
+    const MessageThreadModel =
+      mongoose.models.MessageThread ||
+      mongoose.model('MessageThread', MessageThreadSchema);
+    const NotificationModel =
+      mongoose.models.Notification ||
+      mongoose.model('Notification', NotificationSchema);
 
     // Clear existing data if requested
     if (shouldClear) {
@@ -90,7 +113,9 @@ async function main() {
       await MessageThreadModel.deleteMany({});
       await NotificationModel.deleteMany({});
 
-      console.log('✅ Existing data cleared (admin user and tariff settings preserved)');
+      console.log(
+        '✅ Existing data cleared (admin user and tariff settings preserved)',
+      );
       console.log('');
     }
 
@@ -101,7 +126,9 @@ async function main() {
 
     if (userCount > 1 || customerCount > 0 || jobCount > 0) {
       console.log('⚠️  Warning: Database already contains data');
-      console.log(`   Users: ${userCount}, Customers: ${customerCount}, Jobs: ${jobCount}`);
+      console.log(
+        `   Users: ${userCount}, Customers: ${customerCount}, Jobs: ${jobCount}`,
+      );
       console.log('');
       console.log('   Run with --clear flag to remove existing data:');
       console.log('   npm run seed:dev -- --clear');
@@ -147,7 +174,11 @@ async function main() {
 
     // 4. Seed Opportunities (40-60 estimates)
     console.log('💼 Seeding opportunities...');
-    const opportunities = await seedOpportunities(OpportunityModel, customers, users);
+    const opportunities = await seedOpportunities(
+      OpportunityModel,
+      customers,
+      users,
+    );
     stats.opportunities = opportunities.length;
     console.log(`✅ Created ${opportunities.length} opportunities`);
     console.log('');
@@ -161,32 +192,60 @@ async function main() {
 
     // 6. Seed Messages (sample message threads)
     console.log('💬 Seeding messages...');
-    const messageCount = await seedMessages(MessageModel, MessageThreadModel, users);
+    const messageCount = await seedMessages(
+      MessageModel,
+      MessageThreadModel,
+      users,
+    );
     stats.messages = messageCount;
     console.log(`✅ Created ${messageCount} messages in threads`);
     console.log('');
 
     // 7. Seed Notifications (sample notifications)
     console.log('🔔 Seeding notifications...');
-    const notificationCount = await seedNotifications(NotificationModel, users, jobs);
+    const notificationCount = await seedNotifications(
+      NotificationModel,
+      users,
+      jobs,
+    );
     stats.notifications = notificationCount;
     console.log(`✅ Created ${notificationCount} notifications`);
     console.log('');
 
     // Summary
-    console.log('╔════════════════════════════════════════════════════════════════════╗');
-    console.log('║                    Seeding Completed Successfully                  ║');
-    console.log('╚════════════════════════════════════════════════════════════════════╝');
+    console.log(
+      '╔════════════════════════════════════════════════════════════════════╗',
+    );
+    console.log(
+      '║                    Seeding Completed Successfully                  ║',
+    );
+    console.log(
+      '╚════════════════════════════════════════════════════════════════════╝',
+    );
     console.log('');
     console.log('📊 Summary Statistics:');
     console.log('');
-    console.log(`   👥 Users:          ${stats.users.toString().padStart(3)} (admin + test users)`);
-    console.log(`   🤝 Partners:       ${stats.partners.toString().padStart(3)} referral partners`);
-    console.log(`   👤 Customers:      ${stats.customers.toString().padStart(3)} residential & commercial`);
-    console.log(`   💼 Opportunities:  ${stats.opportunities.toString().padStart(3)} estimates/quotes`);
-    console.log(`   📋 Jobs:           ${stats.jobs.toString().padStart(3)} across all statuses`);
-    console.log(`   💬 Messages:       ${stats.messages.toString().padStart(3)} in conversation threads`);
-    console.log(`   🔔 Notifications:  ${stats.notifications.toString().padStart(3)} various types`);
+    console.log(
+      `   👥 Users:          ${stats.users.toString().padStart(3)} (admin + test users)`,
+    );
+    console.log(
+      `   🤝 Partners:       ${stats.partners.toString().padStart(3)} referral partners`,
+    );
+    console.log(
+      `   👤 Customers:      ${stats.customers.toString().padStart(3)} residential & commercial`,
+    );
+    console.log(
+      `   💼 Opportunities:  ${stats.opportunities.toString().padStart(3)} estimates/quotes`,
+    );
+    console.log(
+      `   📋 Jobs:           ${stats.jobs.toString().padStart(3)} across all statuses`,
+    );
+    console.log(
+      `   💬 Messages:       ${stats.messages.toString().padStart(3)} in conversation threads`,
+    );
+    console.log(
+      `   🔔 Notifications:  ${stats.notifications.toString().padStart(3)} various types`,
+    );
     console.log('');
     console.log('🎯 Next Steps:');
     console.log('  1. Start the API server: npm run dev:api');
@@ -209,9 +268,15 @@ async function main() {
     process.exit(0);
   } catch (error) {
     console.error('');
-    console.error('╔════════════════════════════════════════════════════════════════════╗');
-    console.error('║                       Seeding Failed                               ║');
-    console.error('╚════════════════════════════════════════════════════════════════════╝');
+    console.error(
+      '╔════════════════════════════════════════════════════════════════════╗',
+    );
+    console.error(
+      '║                       Seeding Failed                               ║',
+    );
+    console.error(
+      '╚════════════════════════════════════════════════════════════════════╝',
+    );
     console.error('');
     console.error('Error Details:');
     console.error(error);

@@ -15,7 +15,9 @@ jest.mock('../src/app/contexts/AuthContext', () => ({
     login: jest.fn(),
     logout: jest.fn(),
   }),
-  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // Mock fetch for API calls
@@ -27,7 +29,10 @@ describe('NewOpportunity Component - Integration Tests', () => {
     localStorage.clear();
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ customers: [], customer: { id: 'new-customer-123' } }),
+      json: async () => ({
+        customers: [],
+        customer: { id: 'new-customer-123' },
+      }),
     });
   });
 
@@ -72,7 +77,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
       fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        expect(screen.getByText(/Please correct the highlighted errors/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Please correct the highlighted errors/),
+        ).toBeInTheDocument();
       });
     });
 
@@ -92,7 +99,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
         target: { value: '(555) 123-4567' },
       });
 
-      const firstNameInput = screen.getByLabelText('First Name *') as HTMLInputElement;
+      const firstNameInput = screen.getByLabelText(
+        'First Name *',
+      ) as HTMLInputElement;
       expect(firstNameInput.value).toBe('John');
     });
 
@@ -135,9 +144,14 @@ describe('NewOpportunity Component - Integration Tests', () => {
 
       fireEvent.blur(screen.getByLabelText('Email *'));
 
-      await waitFor(() => {
-        expect(screen.getByText(/customer with this email already exists/)).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText(/customer with this email already exists/),
+          ).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
 
     it('should proceed to step 2 with valid data', async () => {
@@ -202,12 +216,16 @@ describe('NewOpportunity Component - Integration Tests', () => {
       fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        expect(screen.getByText('Pickup address is required')).toBeInTheDocument();
+        expect(
+          screen.getByText('Pickup address is required'),
+        ).toBeInTheDocument();
       });
     });
 
     it('should validate delivery address', async () => {
-      const pickupAddressInput = screen.getByPlaceholderText('123 Main St, City, State ZIP');
+      const pickupAddressInput = screen.getByPlaceholderText(
+        '123 Main St, City, State ZIP',
+      );
       fireEvent.change(pickupAddressInput, {
         target: { value: '123 Main St' },
       });
@@ -215,13 +233,19 @@ describe('NewOpportunity Component - Integration Tests', () => {
       fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        expect(screen.getByText('Delivery address is required')).toBeInTheDocument();
+        expect(
+          screen.getByText('Delivery address is required'),
+        ).toBeInTheDocument();
       });
     });
 
     it('should fill move details correctly', () => {
-      const pickupInputs = screen.getAllByPlaceholderText('123 Main St, City, State ZIP');
-      const deliveryInputs = screen.getAllByPlaceholderText('456 Oak Ave, City, State ZIP');
+      const pickupInputs = screen.getAllByPlaceholderText(
+        '123 Main St, City, State ZIP',
+      );
+      const deliveryInputs = screen.getAllByPlaceholderText(
+        '456 Oak Ave, City, State ZIP',
+      );
 
       fireEvent.change(pickupInputs[0], {
         target: { value: '123 Main St, Boston, MA 02101' },
@@ -244,7 +268,8 @@ describe('NewOpportunity Component - Integration Tests', () => {
     });
 
     it('should allow elevator access checkbox', () => {
-      const elevatorCheckbox = screen.getAllByText('Elevator Access')[0]
+      const elevatorCheckbox = screen
+        .getAllByText('Elevator Access')[0]
         .closest('label')
         ?.querySelector('input[type="checkbox"]') as HTMLInputElement;
 
@@ -254,8 +279,12 @@ describe('NewOpportunity Component - Integration Tests', () => {
     });
 
     it('should proceed to step 3 with valid data', async () => {
-      const pickupInputs = screen.getAllByPlaceholderText('123 Main St, City, State ZIP');
-      const deliveryInputs = screen.getAllByPlaceholderText('456 Oak Ave, City, State ZIP');
+      const pickupInputs = screen.getAllByPlaceholderText(
+        '123 Main St, City, State ZIP',
+      );
+      const deliveryInputs = screen.getAllByPlaceholderText(
+        '456 Oak Ave, City, State ZIP',
+      );
 
       fireEvent.change(pickupInputs[0], {
         target: { value: '123 Main St' },
@@ -306,8 +335,12 @@ describe('NewOpportunity Component - Integration Tests', () => {
       });
 
       // Step 2
-      const pickupInputs = screen.getAllByPlaceholderText('123 Main St, City, State ZIP');
-      const deliveryInputs = screen.getAllByPlaceholderText('456 Oak Ave, City, State ZIP');
+      const pickupInputs = screen.getAllByPlaceholderText(
+        '123 Main St, City, State ZIP',
+      );
+      const deliveryInputs = screen.getAllByPlaceholderText(
+        '456 Oak Ave, City, State ZIP',
+      );
       fireEvent.change(pickupInputs[0], {
         target: { value: '123 Main St' },
       });
@@ -322,48 +355,74 @@ describe('NewOpportunity Component - Integration Tests', () => {
     });
 
     it('should display move size dropdown', () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       expect(moveSizeSelect).toBeInTheDocument();
     });
 
     it('should display predefined move sizes', () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       const options = moveSizeSelect.querySelectorAll('option');
 
       expect(options.length).toBeGreaterThan(15); // Should have multiple move sizes
-      expect(Array.from(options).some(opt => opt.textContent?.includes('2 Bedroom Apartment'))).toBe(true);
+      expect(
+        Array.from(options).some((opt) =>
+          opt.textContent?.includes('2 Bedroom Apartment'),
+        ),
+      ).toBe(true);
     });
 
     it('should auto-populate weight and volume when move size is selected', () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
 
       // Select "2 Bedroom Apartment"
       fireEvent.change(moveSizeSelect, { target: { value: '4' } }); // ID 4 is 2BR Apt
 
-      const weightInput = screen.getByLabelText('Total Weight (lbs) *') as HTMLInputElement;
-      const volumeInput = screen.getByLabelText('Total Volume (cu ft) *') as HTMLInputElement;
+      const weightInput = screen.getByLabelText(
+        'Total Weight (lbs) *',
+      ) as HTMLInputElement;
+      const volumeInput = screen.getByLabelText(
+        'Total Volume (cu ft) *',
+      ) as HTMLInputElement;
 
       expect(weightInput.value).toBe('5886'); // Weight for 2BR Apt
       expect(volumeInput.value).toBe('654'); // Volume for 2BR Apt
     });
 
     it('should disable weight/volume inputs when move size is selected', () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: '4' } });
 
-      const weightInput = screen.getByLabelText('Total Weight (lbs) *') as HTMLInputElement;
-      const volumeInput = screen.getByLabelText('Total Volume (cu ft) *') as HTMLInputElement;
+      const weightInput = screen.getByLabelText(
+        'Total Weight (lbs) *',
+      ) as HTMLInputElement;
+      const volumeInput = screen.getByLabelText(
+        'Total Volume (cu ft) *',
+      ) as HTMLInputElement;
 
       expect(weightInput).toBeDisabled();
       expect(volumeInput).toBeDisabled();
     });
 
     it('should enable manual entry when selected', () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: 'manual' } });
 
-      const weightInput = screen.getByLabelText('Total Weight (lbs) *') as HTMLInputElement;
-      const volumeInput = screen.getByLabelText('Total Volume (cu ft) *') as HTMLInputElement;
+      const weightInput = screen.getByLabelText(
+        'Total Weight (lbs) *',
+      ) as HTMLInputElement;
+      const volumeInput = screen.getByLabelText(
+        'Total Volume (cu ft) *',
+      ) as HTMLInputElement;
 
       expect(weightInput).not.toBeDisabled();
       expect(volumeInput).not.toBeDisabled();
@@ -383,7 +442,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
     });
 
     it('should validate weight is greater than 0', async () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: 'manual' } });
 
       const weightInput = screen.getByLabelText('Total Weight (lbs) *');
@@ -392,12 +453,16 @@ describe('NewOpportunity Component - Integration Tests', () => {
       fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        expect(screen.getByText('Total weight must be greater than 0')).toBeInTheDocument();
+        expect(
+          screen.getByText('Total weight must be greater than 0'),
+        ).toBeInTheDocument();
       });
     });
 
     it('should proceed to step 4 with valid data', async () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: '4' } }); // Select 2BR Apt
 
       fireEvent.click(screen.getByText('Next'));
@@ -433,8 +498,12 @@ describe('NewOpportunity Component - Integration Tests', () => {
       });
 
       // Step 2
-      const pickupInputs = screen.getAllByPlaceholderText('123 Main St, City, State ZIP');
-      const deliveryInputs = screen.getAllByPlaceholderText('456 Oak Ave, City, State ZIP');
+      const pickupInputs = screen.getAllByPlaceholderText(
+        '123 Main St, City, State ZIP',
+      );
+      const deliveryInputs = screen.getAllByPlaceholderText(
+        '456 Oak Ave, City, State ZIP',
+      );
       fireEvent.change(pickupInputs[0], {
         target: { value: '123 Main St, Boston, MA' },
       });
@@ -448,7 +517,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
       });
 
       // Step 3
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: '4' } });
       fireEvent.click(screen.getByText('Next'));
 
@@ -465,7 +536,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
 
     it('should display move details summary', () => {
       expect(screen.getByText('123 Main St, Boston, MA')).toBeInTheDocument();
-      expect(screen.getByText('456 Oak Ave, Cambridge, MA')).toBeInTheDocument();
+      expect(
+        screen.getByText('456 Oak Ave, Cambridge, MA'),
+      ).toBeInTheDocument();
     });
 
     it('should display inventory summary', () => {
@@ -486,7 +559,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
       fireEvent.click(screen.getByText('Create Opportunity'));
 
       await waitFor(() => {
-        expect(screen.getByText(/Opportunity created successfully/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Opportunity created successfully/),
+        ).toBeInTheDocument();
       });
     });
 
@@ -499,7 +574,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
       fireEvent.click(screen.getByText('Create Opportunity'));
 
       await waitFor(() => {
-        expect(screen.getByText(/Failed to create customer/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Failed to create customer/),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -527,8 +604,12 @@ describe('NewOpportunity Component - Integration Tests', () => {
         expect(screen.getByText('Move Details')).toBeInTheDocument();
       });
 
-      const pickupInputs = screen.getAllByPlaceholderText('123 Main St, City, State ZIP');
-      const deliveryInputs = screen.getAllByPlaceholderText('456 Oak Ave, City, State ZIP');
+      const pickupInputs = screen.getAllByPlaceholderText(
+        '123 Main St, City, State ZIP',
+      );
+      const deliveryInputs = screen.getAllByPlaceholderText(
+        '456 Oak Ave, City, State ZIP',
+      );
       fireEvent.change(pickupInputs[0], {
         target: { value: '123 Main St' },
       });
@@ -547,29 +628,43 @@ describe('NewOpportunity Component - Integration Tests', () => {
     });
 
     it('should show calculating message before estimate is ready', () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: '4' } });
 
       // Should briefly show calculating
-      expect(screen.getByText(/complete the form|calculating/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/complete the form|calculating/i),
+      ).toBeInTheDocument();
     });
 
     it('should display estimated total when available', async () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: '4' } });
 
-      await waitFor(() => {
-        expect(screen.getByText('Estimated Total')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Estimated Total')).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
     });
 
     it('should display price breakdown', async () => {
-      const moveSizeSelect = screen.getByLabelText('Select Move Size (or choose manual entry)');
+      const moveSizeSelect = screen.getByLabelText(
+        'Select Move Size (or choose manual entry)',
+      );
       fireEvent.change(moveSizeSelect, { target: { value: '4' } });
 
-      await waitFor(() => {
-        expect(screen.getByText('Price Breakdown')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('Price Breakdown')).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
     });
   });
 
@@ -584,16 +679,19 @@ describe('NewOpportunity Component - Integration Tests', () => {
         target: { value: 'Smith' },
       });
 
-      await waitFor(() => {
-        const draft = localStorage.getItem('newOpportunityDraft');
-        expect(draft).toBeTruthy();
+      await waitFor(
+        () => {
+          const draft = localStorage.getItem('newOpportunityDraft');
+          expect(draft).toBeTruthy();
 
-        if (draft) {
-          const parsedDraft = JSON.parse(draft);
-          expect(parsedDraft.customer.firstName).toBe('Jane');
-          expect(parsedDraft.customer.lastName).toBe('Smith');
-        }
-      }, { timeout: 500 });
+          if (draft) {
+            const parsedDraft = JSON.parse(draft);
+            expect(parsedDraft.customer.firstName).toBe('Jane');
+            expect(parsedDraft.customer.lastName).toBe('Smith');
+          }
+        },
+        { timeout: 500 },
+      );
     });
 
     it('should load draft from localStorage on mount', () => {
@@ -621,7 +719,9 @@ describe('NewOpportunity Component - Integration Tests', () => {
 
       render(<NewOpportunity />);
 
-      const firstNameInput = screen.getByLabelText('First Name *') as HTMLInputElement;
+      const firstNameInput = screen.getByLabelText(
+        'First Name *',
+      ) as HTMLInputElement;
       expect(firstNameInput.value).toBe('Saved');
     });
   });

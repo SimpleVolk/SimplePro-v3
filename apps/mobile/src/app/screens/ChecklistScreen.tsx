@@ -186,7 +186,7 @@ const ChecklistScreen = ({ route }: any) => {
   const handleChecklistToggle = async (item: any) => {
     if (updatingItems.has(item.id)) return;
 
-    setUpdatingItems(prev => new Set(prev).add(item.id));
+    setUpdatingItems((prev) => new Set(prev).add(item.id));
 
     const updatedItem = {
       ...item,
@@ -199,7 +199,7 @@ const ChecklistScreen = ({ route }: any) => {
     } catch (error) {
       Alert.alert('Error', 'Failed to update checklist item');
     } finally {
-      setUpdatingItems(prev => {
+      setUpdatingItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(item.id);
         return newSet;
@@ -208,7 +208,9 @@ const ChecklistScreen = ({ route }: any) => {
   };
 
   const getCompletionStats = () => {
-    const completed = currentJob.checklist.filter(item => item.completed).length;
+    const completed = currentJob.checklist.filter(
+      (item) => item.completed,
+    ).length;
     const total = currentJob.checklist.length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { completed, total, percentage };
@@ -228,17 +230,17 @@ const ChecklistScreen = ({ route }: any) => {
         disabled={isUpdating}
       >
         <View style={styles.checkboxContainer}>
-          <View style={[
-            styles.checkbox,
-            item.completed && styles.checkedBox,
-            isUpdating && styles.updatingBox,
-          ]}>
+          <View
+            style={[
+              styles.checkbox,
+              item.completed && styles.checkedBox,
+              isUpdating && styles.updatingBox,
+            ]}
+          >
             {item.completed && !isUpdating && (
               <Text style={styles.checkmark}>✓</Text>
             )}
-            {isUpdating && (
-              <Text style={styles.updating}>⟳</Text>
-            )}
+            {isUpdating && <Text style={styles.updating}>⟳</Text>}
           </View>
           {item.required && (
             <View style={styles.requiredBadge}>
@@ -248,10 +250,12 @@ const ChecklistScreen = ({ route }: any) => {
         </View>
 
         <View style={styles.itemContent}>
-          <Text style={[
-            styles.itemDescription,
-            item.completed && styles.completedText,
-          ]}>
+          <Text
+            style={[
+              styles.itemDescription,
+              item.completed && styles.completedText,
+            ]}
+          >
             {item.description}
           </Text>
           {item.timestamp && (
@@ -276,15 +280,10 @@ const ChecklistScreen = ({ route }: any) => {
           </Text>
           <View style={styles.progressBar}>
             <View
-              style={[
-                styles.progressFill,
-                { width: `${stats.percentage}%` }
-              ]}
+              style={[styles.progressFill, { width: `${stats.percentage}%` }]}
             />
           </View>
-          <Text style={styles.progressPercentage}>
-            {stats.percentage}%
-          </Text>
+          <Text style={styles.progressPercentage}>{stats.percentage}%</Text>
         </View>
       </View>
 

@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { getWebSocketUrl } from '../../lib/config';
@@ -13,7 +19,9 @@ interface WebSocketContextType {
   lastUpdate: number;
 }
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
+const WebSocketContext = createContext<WebSocketContextType | undefined>(
+  undefined,
+);
 
 interface WebSocketProviderProps {
   children: ReactNode;
@@ -66,7 +74,9 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       setLastUpdate(Date.now());
 
       // Dispatch custom event for components to listen to
-      window.dispatchEvent(new CustomEvent('analyticsUpdate', { detail: data }));
+      window.dispatchEvent(
+        new CustomEvent('analyticsUpdate', { detail: data }),
+      );
     });
 
     newSocket.on('metricsUpdate', (data) => {
@@ -108,7 +118,9 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       setLastUpdate(Date.now());
 
       // Dispatch custom event for components to listen to
-      window.dispatchEvent(new CustomEvent('notificationCreated', { detail: data }));
+      window.dispatchEvent(
+        new CustomEvent('notificationCreated', { detail: data }),
+      );
     });
 
     newSocket.on('notification.updated', (data) => {
@@ -116,7 +128,9 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       setLastUpdate(Date.now());
 
       // Dispatch custom event for components to listen to
-      window.dispatchEvent(new CustomEvent('notificationUpdated', { detail: data }));
+      window.dispatchEvent(
+        new CustomEvent('notificationUpdated', { detail: data }),
+      );
     });
 
     // Message event handlers (for real-time messaging)

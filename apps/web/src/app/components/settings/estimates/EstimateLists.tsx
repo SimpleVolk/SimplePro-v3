@@ -15,7 +15,7 @@ export default function EstimateLists() {
       icon: '🚚',
       path: '/settings/estimates/lists/service-types',
       count: 5,
-      color: '#3B82F6'
+      color: '#3B82F6',
     },
     {
       title: 'Property Types',
@@ -23,7 +23,7 @@ export default function EstimateLists() {
       icon: '🏠',
       path: '/settings/estimates/lists/property-types',
       count: 7,
-      color: '#8B5CF6'
+      color: '#8B5CF6',
     },
     {
       title: 'Inventory Items',
@@ -31,7 +31,7 @@ export default function EstimateLists() {
       icon: '📦',
       path: '/settings/estimates/lists/inventory-items',
       count: 150,
-      color: '#10B981'
+      color: '#10B981',
     },
     {
       title: 'Parking Options',
@@ -39,7 +39,7 @@ export default function EstimateLists() {
       icon: '🅿️',
       path: '/settings/estimates/lists/parking-options',
       count: 6,
-      color: '#F59E0B'
+      color: '#F59E0B',
     },
     {
       title: 'Regions',
@@ -47,7 +47,7 @@ export default function EstimateLists() {
       icon: '🗺️',
       path: '/settings/estimates/lists/regions',
       count: 12,
-      color: '#EF4444'
+      color: '#EF4444',
     },
     {
       title: 'Cancellation Reasons',
@@ -55,7 +55,7 @@ export default function EstimateLists() {
       icon: '❌',
       path: '/settings/estimates/lists/cancellation-reasons',
       count: 8,
-      color: '#6B7280'
+      color: '#6B7280',
     },
     {
       title: 'Tags Management',
@@ -63,13 +63,14 @@ export default function EstimateLists() {
       icon: '🏷️',
       path: '/settings/estimates/lists/tags',
       count: 15,
-      color: '#EC4899'
-    }
+      color: '#EC4899',
+    },
   ];
 
-  const filteredPages = listPages.filter(page =>
-    page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPages = listPages.filter(
+    (page) =>
+      page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totalItems = listPages.reduce((sum, page) => sum + page.count, 0);
@@ -116,7 +117,10 @@ export default function EstimateLists() {
           className={styles.searchInput}
         />
         {searchTerm && (
-          <button onClick={() => setSearchTerm('')} className={styles.clearButton}>
+          <button
+            onClick={() => setSearchTerm('')}
+            className={styles.clearButton}
+          >
             Clear
           </button>
         )}
@@ -131,24 +135,31 @@ export default function EstimateLists() {
             style={{ borderLeftColor: page.color }}
           >
             <div className={styles.cardHeader}>
-              <div className={styles.cardIcon} style={{ backgroundColor: page.color + '20', color: page.color }}>
+              <div
+                className={styles.cardIcon}
+                style={{
+                  backgroundColor: page.color + '20',
+                  color: page.color,
+                }}
+              >
                 {page.icon}
               </div>
               <span className={styles.itemCount}>{page.count} items</span>
             </div>
             <h4>{page.title}</h4>
             <p>{page.description}</p>
-            <button className={styles.cardButton}>
-              Manage List →
-            </button>
+            <button className={styles.cardButton}>Manage List →</button>
           </div>
         ))}
       </div>
 
       {filteredPages.length === 0 && (
         <div className={styles.emptyState}>
-          <p>No lists found matching &quot;{searchTerm}&quot;</p>
-          <button onClick={() => setSearchTerm('')} className={styles.clearButton}>
+          <p>No lists found matching "{searchTerm}"</p>
+          <button
+            onClick={() => setSearchTerm('')}
+            className={styles.clearButton}
+          >
             Clear Search
           </button>
         </div>
@@ -157,18 +168,10 @@ export default function EstimateLists() {
       <div className={styles.bulkActions}>
         <h4>Bulk Operations</h4>
         <div className={styles.actionsGrid}>
-          <button className={styles.actionButton}>
-            📤 Export All Lists
-          </button>
-          <button className={styles.actionButton}>
-            📥 Import from File
-          </button>
-          <button className={styles.actionButton}>
-            🔄 Reset to Defaults
-          </button>
-          <button className={styles.actionButton}>
-            📊 View Reports
-          </button>
+          <button className={styles.actionButton}>📤 Export All Lists</button>
+          <button className={styles.actionButton}>📥 Import from File</button>
+          <button className={styles.actionButton}>🔄 Reset to Defaults</button>
+          <button className={styles.actionButton}>📊 View Reports</button>
         </div>
       </div>
     </div>

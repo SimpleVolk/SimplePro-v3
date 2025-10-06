@@ -38,5 +38,14 @@
       "@/*": ["apps/web/src/*"]
     }
   },
-  "exclude": ["node_modules", "tmp", "dist", ".next", "out", "**/*.spec.ts", "**/*.test.ts", "**/test/**"]
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist",
+    ".next",
+    "out",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/test/**"
+  ]
 }

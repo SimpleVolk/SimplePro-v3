@@ -6,10 +6,11 @@ import {
   createArraySizeMonitoringMiddleware,
 } from '../../database/document-size-monitoring.middleware';
 
-export type OpportunityDocument = Opportunity & Document & {
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type OpportunityDocument = Opportunity &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
 
 @Schema({ timestamps: true })
 export class Opportunity {
@@ -35,13 +36,20 @@ export class Opportunity {
     companyName?: string;
   };
 
-  @Prop({ type: String, enum: ['local', 'long_distance', 'storage', 'packing_only'], required: true })
+  @Prop({
+    type: String,
+    enum: ['local', 'long_distance', 'storage', 'packing_only'],
+    required: true,
+  })
   service!: string;
 
   @Prop({ required: true })
   moveDate!: Date;
 
-  @Prop({ type: String, enum: ['studio', '1br', '2br', '3br', '4br', '5br', 'custom'] })
+  @Prop({
+    type: String,
+    enum: ['studio', '1br', '2br', '3br', '4br', '5br', 'custom'],
+  })
   moveSize!: string;
 
   @Prop({ type: String, enum: ['exact', 'week', 'month'], default: 'exact' })
@@ -113,7 +121,11 @@ export class Opportunity {
     cleaning: boolean;
   };
 
-  @Prop({ type: String, enum: ['website', 'phone', 'referral', 'partner', 'walkin', 'other'], default: 'website' })
+  @Prop({
+    type: String,
+    enum: ['website', 'phone', 'referral', 'partner', 'walkin', 'other'],
+    default: 'website',
+  })
   leadSource!: string;
 
   @Prop({ index: true })
@@ -125,7 +137,11 @@ export class Opportunity {
   @Prop()
   assignedSalesRep?: string;
 
-  @Prop({ type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' })
+  @Prop({
+    type: String,
+    enum: ['low', 'medium', 'high', 'urgent'],
+    default: 'medium',
+  })
   priority!: string;
 
   @Prop()
@@ -149,7 +165,11 @@ export class Opportunity {
   @Prop({ default: false })
   isHoliday!: boolean;
 
-  @Prop({ type: String, enum: ['peak', 'standard', 'off_peak'], default: 'standard' })
+  @Prop({
+    type: String,
+    enum: ['peak', 'standard', 'off_peak'],
+    default: 'standard',
+  })
   seasonalPeriod!: string;
 
   @Prop()
@@ -158,7 +178,19 @@ export class Opportunity {
   @Prop()
   estimatedPrice?: number;
 
-  @Prop({ type: String, enum: ['open', 'contacted', 'quoted', 'negotiating', 'won', 'lost', 'cancelled'], default: 'open' })
+  @Prop({
+    type: String,
+    enum: [
+      'open',
+      'contacted',
+      'quoted',
+      'negotiating',
+      'won',
+      'lost',
+      'cancelled',
+    ],
+    default: 'open',
+  })
   status!: string;
 
   @Prop({ required: true })
@@ -171,18 +203,24 @@ export class Opportunity {
 export const OpportunitySchema = SchemaFactory.createForClass(Opportunity);
 
 // Document size monitoring middleware (prevent 16MB limit issues)
-OpportunitySchema.pre('save', createSizeMonitoringMiddleware({
-  maxSizeMB: 5,
-  warnThresholdPercent: 70,
-  logWarnings: true,
-  throwOnExceed: true,
-}));
+OpportunitySchema.pre(
+  'save',
+  createSizeMonitoringMiddleware({
+    maxSizeMB: 5,
+    warnThresholdPercent: 70,
+    logWarnings: true,
+    throwOnExceed: true,
+  }),
+);
 
 // Array size monitoring middleware
-OpportunitySchema.pre('save', createArraySizeMonitoringMiddleware(
-  ['rooms'],
-  100 // Maximum 100 rooms per opportunity
-));
+OpportunitySchema.pre(
+  'save',
+  createArraySizeMonitoringMiddleware(
+    ['rooms'],
+    100, // Maximum 100 rooms per opportunity
+  ),
+);
 
 // Foreign key validation middleware
 OpportunitySchema.pre('save', async function (next) {
@@ -219,7 +257,9 @@ OpportunitySchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const userExists = await User.exists({ _id: this.assignedSalesRep });
       if (!userExists) {
-        throw new Error(`Referenced User (assignedSalesRep) not found: ${this.assignedSalesRep}`);
+        throw new Error(
+          `Referenced User (assignedSalesRep) not found: ${this.assignedSalesRep}`,
+        );
       }
     }
 
@@ -228,7 +268,9 @@ OpportunitySchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const creatorExists = await User.exists({ _id: this.createdBy });
       if (!creatorExists) {
-        throw new Error(`Referenced User (createdBy) not found: ${this.createdBy}`);
+        throw new Error(
+          `Referenced User (createdBy) not found: ${this.createdBy}`,
+        );
       }
     }
 
@@ -237,7 +279,9 @@ OpportunitySchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const updaterExists = await User.exists({ _id: this.updatedBy });
       if (!updaterExists) {
-        throw new Error(`Referenced User (updatedBy) not found: ${this.updatedBy}`);
+        throw new Error(
+          `Referenced User (updatedBy) not found: ${this.updatedBy}`,
+        );
       }
     }
 

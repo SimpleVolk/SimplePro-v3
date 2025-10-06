@@ -38,7 +38,7 @@ export default function PaymentGateway() {
     webhookUrl: '',
     testMode: true,
     transactionFeePercentage: 2.9,
-    transactionFeeFixed: 0.30,
+    transactionFeeFixed: 0.3,
     supportedMethods: {
       creditCard: true,
       debitCard: true,
@@ -63,9 +63,9 @@ export default function PaymentGateway() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('company/payment-gateway'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -100,7 +100,10 @@ export default function PaymentGateway() {
       return;
     }
 
-    if (formData.requireDeposit && (formData.depositPercentage < 0 || formData.depositPercentage > 100)) {
+    if (
+      formData.requireDeposit &&
+      (formData.depositPercentage < 0 || formData.depositPercentage > 100)
+    ) {
       setError('Deposit percentage must be between 0 and 100');
       setSaving(false);
       return;
@@ -112,7 +115,7 @@ export default function PaymentGateway() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -130,7 +133,9 @@ export default function PaymentGateway() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving payment gateway settings:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -147,12 +152,12 @@ export default function PaymentGateway() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           provider: formData.provider,
           apiKey: formData.apiKey,
-          testMode: formData.testMode
+          testMode: formData.testMode,
         }),
       });
 
@@ -175,7 +180,7 @@ export default function PaymentGateway() {
   };
 
   const updateFormData = (path: string[], value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = { ...prev };
       let current = updated as any;
 
@@ -211,9 +216,17 @@ export default function PaymentGateway() {
       )}
 
       {loading ? (
-        <div className={styles.loading}>Loading payment gateway settings...</div>
+        <div className={styles.loading}>
+          Loading payment gateway settings...
+        </div>
       ) : (
-        <form className={styles.form} onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+        <form
+          className={styles.form}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
           {/* Provider Selection */}
           <div className={styles.section}>
             <h3>Payment Provider</h3>
@@ -237,7 +250,9 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.testMode}
-                  onChange={(e) => updateFormData(['testMode'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['testMode'], e.target.checked)
+                  }
                 />
                 Test Mode (Use sandbox credentials)
               </label>
@@ -272,7 +287,9 @@ export default function PaymentGateway() {
                     id="apiSecret"
                     type="password"
                     value={formData.apiSecret}
-                    onChange={(e) => updateFormData(['apiSecret'], e.target.value)}
+                    onChange={(e) =>
+                      updateFormData(['apiSecret'], e.target.value)
+                    }
                     className={styles.input}
                     placeholder="Enter API secret"
                   />
@@ -284,7 +301,9 @@ export default function PaymentGateway() {
                     id="webhookUrl"
                     type="url"
                     value={formData.webhookUrl}
-                    onChange={(e) => updateFormData(['webhookUrl'], e.target.value)}
+                    onChange={(e) =>
+                      updateFormData(['webhookUrl'], e.target.value)
+                    }
                     className={styles.input}
                     placeholder="https://your-domain.com/webhook"
                   />
@@ -297,7 +316,9 @@ export default function PaymentGateway() {
                 disabled={testingConnection || !formData.apiKey}
                 className={styles.testButton}
               >
-                {testingConnection ? 'Testing Connection...' : 'Test Connection'}
+                {testingConnection
+                  ? 'Testing Connection...'
+                  : 'Test Connection'}
               </button>
             </div>
           )}
@@ -307,7 +328,9 @@ export default function PaymentGateway() {
             <h3>Transaction Fees</h3>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label htmlFor="transactionFeePercentage">Percentage Fee (%)</label>
+                <label htmlFor="transactionFeePercentage">
+                  Percentage Fee (%)
+                </label>
                 <input
                   id="transactionFeePercentage"
                   type="number"
@@ -315,7 +338,12 @@ export default function PaymentGateway() {
                   min="0"
                   max="100"
                   value={formData.transactionFeePercentage}
-                  onChange={(e) => updateFormData(['transactionFeePercentage'], parseFloat(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['transactionFeePercentage'],
+                      parseFloat(e.target.value),
+                    )
+                  }
                   className={styles.input}
                 />
               </div>
@@ -328,7 +356,12 @@ export default function PaymentGateway() {
                   step="0.01"
                   min="0"
                   value={formData.transactionFeeFixed}
-                  onChange={(e) => updateFormData(['transactionFeeFixed'], parseFloat(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['transactionFeeFixed'],
+                      parseFloat(e.target.value),
+                    )
+                  }
                   className={styles.input}
                 />
               </div>
@@ -343,7 +376,12 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.supportedMethods.creditCard}
-                  onChange={(e) => updateFormData(['supportedMethods', 'creditCard'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['supportedMethods', 'creditCard'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Credit Card
               </label>
@@ -351,7 +389,12 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.supportedMethods.debitCard}
-                  onChange={(e) => updateFormData(['supportedMethods', 'debitCard'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['supportedMethods', 'debitCard'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Debit Card
               </label>
@@ -359,7 +402,12 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.supportedMethods.ach}
-                  onChange={(e) => updateFormData(['supportedMethods', 'ach'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['supportedMethods', 'ach'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 ACH / Bank Transfer
               </label>
@@ -367,7 +415,12 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.supportedMethods.check}
-                  onChange={(e) => updateFormData(['supportedMethods', 'check'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['supportedMethods', 'check'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Check
               </label>
@@ -375,7 +428,12 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.supportedMethods.cash}
-                  onChange={(e) => updateFormData(['supportedMethods', 'cash'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['supportedMethods', 'cash'],
+                      e.target.checked,
+                    )
+                  }
                 />
                 Cash
               </label>
@@ -391,14 +449,18 @@ export default function PaymentGateway() {
                 <select
                   id="defaultPaymentTerms"
                   value={formData.defaultPaymentTerms}
-                  onChange={(e) => updateFormData(['defaultPaymentTerms'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['defaultPaymentTerms'], e.target.value)
+                  }
                   className={styles.select}
                 >
                   <option value="Due on completion">Due on Completion</option>
                   <option value="Net 15">Net 15</option>
                   <option value="Net 30">Net 30</option>
                   <option value="Net 60">Net 60</option>
-                  <option value="50% upfront, 50% on completion">50% Upfront, 50% on Completion</option>
+                  <option value="50% upfront, 50% on completion">
+                    50% Upfront, 50% on Completion
+                  </option>
                 </select>
               </div>
             </div>
@@ -408,7 +470,9 @@ export default function PaymentGateway() {
                 <input
                   type="checkbox"
                   checked={formData.requireDeposit}
-                  onChange={(e) => updateFormData(['requireDeposit'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['requireDeposit'], e.target.checked)
+                  }
                 />
                 Require Deposit
               </label>
@@ -416,14 +480,21 @@ export default function PaymentGateway() {
 
             {formData.requireDeposit && (
               <div className={styles.formGroup}>
-                <label htmlFor="depositPercentage">Deposit Percentage (%)</label>
+                <label htmlFor="depositPercentage">
+                  Deposit Percentage (%)
+                </label>
                 <input
                   id="depositPercentage"
                   type="number"
                   min="0"
                   max="100"
                   value={formData.depositPercentage}
-                  onChange={(e) => updateFormData(['depositPercentage'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['depositPercentage'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                 />
               </div>
@@ -431,7 +502,11 @@ export default function PaymentGateway() {
           </div>
 
           <div className={styles.formActions}>
-            <button type="submit" className={styles.saveButton} disabled={saving}>
+            <button
+              type="submit"
+              className={styles.saveButton}
+              disabled={saving}
+            >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>

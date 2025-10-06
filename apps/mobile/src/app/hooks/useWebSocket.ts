@@ -34,7 +34,13 @@ export interface ChatMessage {
 }
 
 export interface EmergencyAlert {
-  type: 'accident' | 'injury' | 'property_damage' | 'security' | 'weather' | 'other';
+  type:
+    | 'accident'
+    | 'injury'
+    | 'property_damage'
+    | 'security'
+    | 'weather'
+    | 'other';
   message: string;
   location?: {
     latitude: number;
@@ -52,7 +58,8 @@ export const useWebSocket = () => {
   const [messages, setMessages] = useState<WebSocketMessage[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
 
-  const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
+  const API_BASE_URL =
+    process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
 
   // Connect to WebSocket
   const connect = useCallback(async () => {
@@ -119,11 +126,11 @@ export const useWebSocket = () => {
           data,
           timestamp: data.timestamp,
         };
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
       });
 
       socket.on('notification', (data) => {
-        setNotifications(prev => [...prev, data]);
+        setNotifications((prev) => [...prev, data]);
       });
 
       socket.on('jobUpdate', (data) => {
@@ -133,7 +140,7 @@ export const useWebSocket = () => {
           data,
           timestamp: data.timestamp,
         };
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
       });
 
       socket.on('jobStatusChanged', (data) => {
@@ -143,7 +150,7 @@ export const useWebSocket = () => {
           data,
           timestamp: data.timestamp,
         };
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
       });
 
       socket.on('jobAssigned', (data) => {
@@ -153,16 +160,19 @@ export const useWebSocket = () => {
           data,
           timestamp: data.timestamp,
         };
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
 
         // Show notification for job assignment
-        setNotifications(prev => [...prev, {
-          id: `assignment_${Date.now()}`,
-          type: 'success',
-          title: 'New Job Assigned',
-          message: `You have been assigned to job ${data.jobId}`,
-          priority: 'high',
-        }]);
+        setNotifications((prev) => [
+          ...prev,
+          {
+            id: `assignment_${Date.now()}`,
+            type: 'success',
+            title: 'New Job Assigned',
+            message: `You have been assigned to job ${data.jobId}`,
+            priority: 'high',
+          },
+        ]);
       });
 
       socket.on('emergencyAlert', (data) => {
@@ -172,17 +182,20 @@ export const useWebSocket = () => {
           data,
           timestamp: data.timestamp,
         };
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
 
         // Show urgent notification for emergency
-        setNotifications(prev => [...prev, {
-          id: `emergency_${Date.now()}`,
-          type: 'error',
-          title: 'EMERGENCY ALERT',
-          message: data.message,
-          priority: 'urgent',
-          persistent: true,
-        }]);
+        setNotifications((prev) => [
+          ...prev,
+          {
+            id: `emergency_${Date.now()}`,
+            type: 'error',
+            title: 'EMERGENCY ALERT',
+            message: data.message,
+            priority: 'urgent',
+            persistent: true,
+          },
+        ]);
       });
 
       socket.on('crewStatusUpdate', (data) => {
@@ -192,14 +205,13 @@ export const useWebSocket = () => {
           data,
           timestamp: data.timestamp,
         };
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
       });
 
       socket.on('error', (error) => {
         console.error('WebSocket error:', error);
         setConnectionError(error.message);
       });
-
     } catch (error) {
       console.error('Failed to connect to WebSocket:', error);
       setConnectionError('Failed to connect');
@@ -216,46 +228,64 @@ export const useWebSocket = () => {
   }, []);
 
   // Subscribe to job updates
-  const subscribeToJob = useCallback((jobId: string) => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('subscribeToJob', { jobId });
-    }
-  }, [isConnected]);
+  const subscribeToJob = useCallback(
+    (jobId: string) => {
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('subscribeToJob', { jobId });
+      }
+    },
+    [isConnected],
+  );
 
   // Unsubscribe from job updates
-  const unsubscribeFromJob = useCallback((jobId: string) => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('unsubscribeFromJob', { jobId });
-    }
-  }, [isConnected]);
+  const unsubscribeFromJob = useCallback(
+    (jobId: string) => {
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('unsubscribeFromJob', { jobId });
+      }
+    },
+    [isConnected],
+  );
 
   // Send location update
-  const sendLocationUpdate = useCallback((location: LocationUpdate) => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('locationUpdate', location);
-    }
-  }, [isConnected]);
+  const sendLocationUpdate = useCallback(
+    (location: LocationUpdate) => {
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('locationUpdate', location);
+      }
+    },
+    [isConnected],
+  );
 
   // Send status update
-  const sendStatusUpdate = useCallback((status: StatusUpdate) => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('statusUpdate', status);
-    }
-  }, [isConnected]);
+  const sendStatusUpdate = useCallback(
+    (status: StatusUpdate) => {
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('statusUpdate', status);
+      }
+    },
+    [isConnected],
+  );
 
   // Send chat message
-  const sendMessage = useCallback((message: ChatMessage) => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('sendMessage', message);
-    }
-  }, [isConnected]);
+  const sendMessage = useCallback(
+    (message: ChatMessage) => {
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('sendMessage', message);
+      }
+    },
+    [isConnected],
+  );
 
   // Send emergency alert
-  const sendEmergencyAlert = useCallback((alert: EmergencyAlert) => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('emergencyAlert', alert);
-    }
-  }, [isConnected]);
+  const sendEmergencyAlert = useCallback(
+    (alert: EmergencyAlert) => {
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('emergencyAlert', alert);
+      }
+    },
+    [isConnected],
+  );
 
   // Clear messages
   const clearMessages = useCallback(() => {
@@ -269,7 +299,7 @@ export const useWebSocket = () => {
 
   // Remove specific notification
   const removeNotification = useCallback((notificationId: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
   }, []);
 
   // Auto-connect/disconnect based on auth and network status
@@ -316,12 +346,14 @@ export const useWebSocket = () => {
 
     // Helpers
     getLatestMessages: (type?: string, limit = 10) => {
-      const filtered = type ? messages.filter(m => m.type === type) : messages;
+      const filtered = type
+        ? messages.filter((m) => m.type === type)
+        : messages;
       return filtered.slice(-limit);
     },
 
     getUnreadNotifications: () => {
-      return notifications.filter(n => !n.read);
+      return notifications.filter((n) => !n.read);
     },
   };
 };

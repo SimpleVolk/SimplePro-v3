@@ -1,14 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { TypingIndicator, TypingIndicatorDocument } from './schemas/typing-indicator.schema';
+import {
+  TypingIndicator,
+  TypingIndicatorDocument,
+} from './schemas/typing-indicator.schema';
 
 @Injectable()
 export class TypingService {
   private readonly logger = new Logger(TypingService.name);
 
   constructor(
-    @InjectModel(TypingIndicator.name) private typingIndicatorModel: Model<TypingIndicatorDocument>
+    @InjectModel(TypingIndicator.name)
+    private typingIndicatorModel: Model<TypingIndicatorDocument>,
   ) {}
 
   async startTyping(threadId: string, userId: string): Promise<void> {
@@ -27,12 +31,13 @@ export class TypingService {
             expiresAt: expiresAt,
           },
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
 
       this.logger.debug(`User ${userId} started typing in thread ${threadId}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to start typing indicator: ${errorMessage}`);
       throw error;
@@ -54,10 +59,13 @@ export class TypingService {
           threadId: new Types.ObjectId(threadId),
           userId: new Types.ObjectId(userId),
         });
-        this.logger.debug(`User ${userId} stopped typing in thread ${threadId}`);
+        this.logger.debug(
+          `User ${userId} stopped typing in thread ${threadId}`,
+        );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to stop typing indicator: ${errorMessage}`);
       throw error;
@@ -72,9 +80,10 @@ export class TypingService {
         expiresAt: { $gt: now },
       });
 
-      return typingIndicators.map(indicator => indicator.userId.toString());
+      return typingIndicators.map((indicator) => indicator.userId.toString());
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Failed to get typing users: ${errorMessage}`);
       throw error;
@@ -88,12 +97,17 @@ export class TypingService {
       });
 
       if (result.deletedCount > 0) {
-        this.logger.debug(`Cleaned up ${result.deletedCount} expired typing indicators`);
+        this.logger.debug(
+          `Cleaned up ${result.deletedCount} expired typing indicators`,
+        );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
-      this.logger.error(`Failed to cleanup expired indicators: ${errorMessage}`);
+      this.logger.error(
+        `Failed to cleanup expired indicators: ${errorMessage}`,
+      );
     }
   }
 }

@@ -84,23 +84,25 @@ docker-compose -f docker-compose.staging.yml up -d --build api
 
 ## Access URLs
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| **Web App (HTTPS)** | https://localhost | admin / Admin123! |
-| **Web App (HTTP)** | http://localhost:3009 | admin / Admin123! |
-| **API** | http://localhost:3001 | - |
-| **API Docs** | http://localhost:3001/api/docs | - |
-| **MinIO Console** | http://localhost:9001 | See `.secrets/staging/.env` |
-| **Grafana** | http://localhost:3000 | admin / (see secrets) |
-| **Prometheus** | http://localhost:9090 | - |
+| Service             | URL                            | Credentials                 |
+| ------------------- | ------------------------------ | --------------------------- |
+| **Web App (HTTPS)** | https://localhost              | admin / Admin123!           |
+| **Web App (HTTP)**  | http://localhost:3009          | admin / Admin123!           |
+| **API**             | http://localhost:3001          | -                           |
+| **API Docs**        | http://localhost:3001/api/docs | -                           |
+| **MinIO Console**   | http://localhost:9001          | See `.secrets/staging/.env` |
+| **Grafana**         | http://localhost:3000          | admin / (see secrets)       |
+| **Prometheus**      | http://localhost:9090          | -                           |
 
 ## Default Credentials
 
 ### Application
+
 - **Username:** `admin`
 - **Password:** `Admin123!`
 
 ### Infrastructure
+
 - **MongoDB:** `admin` / (see `.secrets/staging/mongodb_password`)
 - **Redis:** (see `.secrets/staging/redis_password`)
 - **MinIO:** `staging-admin` / (see `.secrets/staging/minio_root_password`)
@@ -305,22 +307,26 @@ docker stats --no-stream > staging-metrics.txt
 ## File Locations
 
 ### Configuration Files
+
 - Docker Compose: `docker-compose.staging.yml`
 - Nginx Config: `docker/nginx/staging.conf`
 - Secrets: `.secrets/staging/`
 - SSL Certs: `docker/ssl/`
 
 ### Scripts
+
 - Setup: `scripts/setup-staging.sh`
 - Smoke Tests: `scripts/smoke-test-staging.sh`
 - Cleanup: `scripts/cleanup-staging.sh`
 
 ### Documentation
+
 - Test Plan: `docs/deployment/STAGING_DEPLOYMENT_TEST_PLAN.md`
 - Test Report: `docs/deployment/STAGING_DEPLOYMENT_TEST_REPORT.md`
 - Quick Reference: `docs/deployment/STAGING_QUICK_REFERENCE.md`
 
 ### Logs
+
 - Test Reports: `logs/staging/smoke-test-*.txt`
 - Container Logs: Use `docker-compose logs`
 
@@ -329,6 +335,7 @@ docker stats --no-stream > staging-metrics.txt
 ### Run Specific Test Suite
 
 The smoke test script runs 10 test suites:
+
 1. Infrastructure Health (10 tests)
 2. API Health (8 tests)
 3. Authentication (6 tests)
@@ -343,6 +350,7 @@ The smoke test script runs 10 test suites:
 Total: 60+ automated tests
 
 ### Expected Results
+
 - Pass Rate: > 95%
 - Duration: 15-20 minutes
 - Failed Tests: < 3
@@ -395,12 +403,15 @@ export LOG_LEVEL=debug
 ## Network Information
 
 ### Network Details
+
 - **Name:** simplepro-staging-network
 - **Type:** Bridge
 - **Subnet:** 172.25.0.0/16
 
 ### Service Communication
+
 All services communicate using service names:
+
 - `mongodb:27017`
 - `redis:6379`
 - `minio:9000`
@@ -425,6 +436,7 @@ docker network inspect simplepro-staging-network | jq '.[0].Containers'
 ### Volumes
 
 All data persists in Docker volumes:
+
 ```bash
 # List staging volumes
 docker volume ls | grep staging
@@ -461,6 +473,7 @@ docker exec simplepro-minio-staging mc mirror \
 ## Support Contacts
 
 For issues or questions:
+
 - **Documentation:** `docs/deployment/`
 - **Test Reports:** `logs/staging/`
 - **Issue Tracker:** GitHub Issues
@@ -469,6 +482,7 @@ For issues or questions:
 ## Next Steps
 
 After successful staging deployment:
+
 1. Review test results
 2. Fix any identified issues
 3. Update documentation

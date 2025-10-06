@@ -104,7 +104,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const errorResponse = this.createErrorResponse(
       errorInfo,
       request,
-      securityContext
+      securityContext,
     );
 
     // Log the error appropriately
@@ -221,7 +221,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     // Handle Validation Pipe Errors
-    if (exception.name === 'BadRequestException' && exception.response?.message) {
+    if (
+      exception.name === 'BadRequestException' &&
+      exception.response?.message
+    ) {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: Array.isArray(exception.response.message)
@@ -266,7 +269,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     // MongoDB connection errors
-    if (exception.name === 'MongoNetworkError' || exception.name === 'MongoTimeoutError') {
+    if (
+      exception.name === 'MongoNetworkError' ||
+      exception.name === 'MongoTimeoutError'
+    ) {
       return {
         statusCode: HttpStatus.SERVICE_UNAVAILABLE,
         message: 'Database temporarily unavailable',
@@ -301,15 +307,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private createErrorResponse(
     errorInfo: any,
     request: Request,
-    securityContext: SecurityContext
+    securityContext: SecurityContext,
   ): ErrorResponse {
     const isProduction = process.env.NODE_ENV === 'production';
-    const includeDetails = !isProduction || this.shouldIncludeDetails(errorInfo);
+    const includeDetails =
+      !isProduction || this.shouldIncludeDetails(errorInfo);
 
     // Use safe error message in production for security
-    const message = isProduction && this.isSensitiveError(errorInfo.message)
-      ? (this.safeErrorMessages as any)[errorInfo.statusCode] || 'An error occurred'
-      : errorInfo.message;
+    const message =
+      isProduction && this.isSensitiveError(errorInfo.message)
+        ? (this.safeErrorMessages as any)[errorInfo.statusCode] ||
+          'An error occurred'
+        : errorInfo.message;
 
     const errorResponse: ErrorResponse = {
       statusCode: errorInfo.statusCode,
@@ -323,12 +332,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Include validation details for client-side handling
     if (errorInfo.errorType === 'ValidationError' && errorInfo.originalError) {
-      errorResponse.validation = this.extractValidationErrors(errorInfo.originalError);
+      errorResponse.validation = this.extractValidationErrors(
+        errorInfo.originalError,
+      );
     }
 
     // Include additional details in development
     if (includeDetails) {
-      errorResponse.details = this.sanitizeErrorDetails(errorInfo.originalError);
+      errorResponse.details = this.sanitizeErrorDetails(
+        errorInfo.originalError,
+      );
     }
 
     // Include stack trace only in development
@@ -344,7 +357,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     errorInfo: any,
     securityContext: SecurityContext,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _errorResponse: ErrorResponse
+    _errorResponse: ErrorResponse,
   ): void {
     const logContext = {
       ...securityContext,
@@ -355,24 +368,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     };
 
     if (errorInfo.statusCode >= 500) {
-      this.logger.error(
-        `Server Error: ${errorInfo.message}`,
-        {
-          ...logContext,
-          stack: exception?.stack,
-          originalError: this.sanitizeErrorDetails(exception),
-        }
-      );
+      this.logger.error(`Server Error: ${errorInfo.message}`, {
+        ...logContext,
+        stack: exception?.stack,
+        originalError: this.sanitizeErrorDetails(exception),
+      });
     } else if (errorInfo.statusCode >= 400) {
-      this.logger.warn(
-        `Client Error: ${errorInfo.message}`,
-        logContext
-      );
+      this.logger.warn(`Client Error: ${errorInfo.message}`, logContext);
     } else {
-      this.logger.log(
-        `Handled Exception: ${errorInfo.message}`,
-        logContext
-      );
+      this.logger.log(`Handled Exception: ${errorInfo.message}`, logContext);
     }
   }
 
@@ -380,7 +384,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _exception: any,
     errorInfo: any,
-    securityContext: SecurityContext
+    securityContext: SecurityContext,
   ): void {
     const securityEvent = {
       type: 'security_error',
@@ -393,7 +397,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       potentialThreat: this.assessSecurityThreat(errorInfo, securityContext),
     };
 
-    this.securityLogger.warn(`Security Event: ${errorInfo.statusCode} - ${errorInfo.message}`, securityEvent);
+    this.securityLogger.warn(
+      `Security Event: ${errorInfo.statusCode} - ${errorInfo.message}`,
+      securityEvent,
+    );
 
     // Alert on multiple security errors from same IP
     this.checkForSecurityPatterns(securityContext);
@@ -405,10 +412,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     errorInfo: any,
     securityContext: SecurityContext,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _errorResponse: ErrorResponse
+    _errorResponse: ErrorResponse,
   ): void {
     // Only audit errors for sensitive operations
-    const shouldAudit = this.shouldAuditError(securityContext.path, errorInfo.statusCode);
+    const shouldAudit = this.shouldAuditError(
+      securityContext.path,
+      errorInfo.statusCode,
+    );
 
     if (shouldAudit) {
       const auditEvent = {
@@ -426,11 +436,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
       };
 
-      this.auditLogger.log(`Audit Error: ${errorInfo.statusCode} - ${securityContext.path}`, auditEvent);
+      this.auditLogger.log(
+        `Audit Error: ${errorInfo.statusCode} - ${securityContext.path}`,
+        auditEvent,
+      );
     }
   }
 
-  private sendErrorResponse(response: Response, errorResponse: ErrorResponse, errorInfo: any): void {
+  private sendErrorResponse(
+    response: Response,
+    errorResponse: ErrorResponse,
+    errorInfo: any,
+  ): void {
     // Security headers for error responses
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('X-Frame-Options', 'DENY');
@@ -495,7 +512,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Remove sensitive information from error details
     const sanitized = { ...error };
-    const sensitiveKeys = ['password', 'token', 'secret', 'key', 'credential', 'connection'];
+    const sensitiveKeys = [
+      'password',
+      'token',
+      'secret',
+      'key',
+      'credential',
+      'connection',
+    ];
 
     for (const key of sensitiveKeys) {
       if (sanitized[key]) {
@@ -512,7 +536,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   }
 
   private isSensitiveError(message: string): boolean {
-    return this.sensitiveErrorPatterns.some(pattern => pattern.test(message));
+    return this.sensitiveErrorPatterns.some((pattern) => pattern.test(message));
   }
 
   private isSecurityError(statusCode: number): boolean {
@@ -521,15 +545,24 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   private shouldIncludeDetails(errorInfo: any): boolean {
     // Include details for operational errors but not for security errors
-    return errorInfo.isOperational && !this.isSecurityError(errorInfo.statusCode);
+    return (
+      errorInfo.isOperational && !this.isSecurityError(errorInfo.statusCode)
+    );
   }
 
   private shouldAuditError(path: string, statusCode: number): boolean {
-    const auditPaths = ['/api/auth', '/api/users', '/api/customers', '/api/jobs'];
+    const auditPaths = [
+      '/api/auth',
+      '/api/users',
+      '/api/customers',
+      '/api/jobs',
+    ];
     const auditCodes = [401, 403, 409, 500];
 
-    return auditPaths.some(auditPath => path.startsWith(auditPath)) ||
-           auditCodes.includes(statusCode);
+    return (
+      auditPaths.some((auditPath) => path.startsWith(auditPath)) ||
+      auditCodes.includes(statusCode)
+    );
   }
 
   private getDataAccessTypes(path: string): string[] {
@@ -544,7 +577,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     return dataTypes;
   }
 
-  private getSecuritySeverity(statusCode: number): 'low' | 'medium' | 'high' | 'critical' {
+  private getSecuritySeverity(
+    statusCode: number,
+  ): 'low' | 'medium' | 'high' | 'critical' {
     if (statusCode === 429) return 'high'; // Rate limiting
     if (statusCode === 403) return 'medium'; // Forbidden
     if (statusCode === 401) return 'medium'; // Unauthorized
@@ -552,11 +587,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     return 'low';
   }
 
-  private assessSecurityThreat(errorInfo: any, securityContext: SecurityContext): 'low' | 'medium' | 'high' {
+  private assessSecurityThreat(
+    errorInfo: any,
+    securityContext: SecurityContext,
+  ): 'low' | 'medium' | 'high' {
     // Assess threat level based on error type and context
     if (errorInfo.statusCode === 429) return 'high'; // Rate limit abuse
-    if (errorInfo.statusCode === 403 && securityContext.path.includes('/admin')) return 'high';
-    if (errorInfo.statusCode === 401 && securityContext.path.includes('/auth')) return 'medium';
+    if (errorInfo.statusCode === 403 && securityContext.path.includes('/admin'))
+      return 'high';
+    if (errorInfo.statusCode === 401 && securityContext.path.includes('/auth'))
+      return 'medium';
     if (errorInfo.statusCode >= 500) return 'high'; // Potential system compromise
     return 'low';
   }
@@ -566,7 +606,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     // For now, just log repeated errors from the same IP
     // In a real implementation, this would use Redis or similar
     // to track error patterns across multiple instances
-    this.logger.debug(`Security pattern check for IP: ${securityContext.clientIp}`);
+    this.logger.debug(
+      `Security pattern check for IP: ${securityContext.clientIp}`,
+    );
   }
 
   private generateId(prefix: string): string {

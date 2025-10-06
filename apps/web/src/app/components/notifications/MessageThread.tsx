@@ -48,7 +48,11 @@ const QUICK_REPLIES = [
   'Will update shortly',
 ];
 
-export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) {
+export function MessageThread({
+  threadId,
+  jobId,
+  onClose,
+}: MessageThreadProps) {
   const [thread, setThread] = useState<MessageThread | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -81,7 +85,7 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
 
       const response = await fetch(getApiUrl(endpoint), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -112,7 +116,7 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
       const response = await fetch(getApiUrl('messages/threads'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -146,7 +150,7 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
 
     const handleNewMessage = (message: Message) => {
       if (message.threadId === thread.id) {
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
         scrollToBottom();
 
         // Mark as read
@@ -156,13 +160,17 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
       }
     };
 
-    const handleTyping = (data: { userId: string; userName: string; threadId: string }) => {
+    const handleTyping = (data: {
+      userId: string;
+      userName: string;
+      threadId: string;
+    }) => {
       if (data.threadId === thread.id && data.userId !== user?.id) {
-        setTypingUsers(prev => new Set(prev).add(data.userName));
+        setTypingUsers((prev) => new Set(prev).add(data.userName));
 
         // Clear typing indicator after 3 seconds
         setTimeout(() => {
-          setTypingUsers(prev => {
+          setTypingUsers((prev) => {
             const newSet = new Set(prev);
             newSet.delete(data.userName);
             return newSet;
@@ -223,14 +231,17 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
         return;
       }
 
-      const response = await fetch(getApiUrl(`messages/threads/${thread.id}/messages`), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`messages/threads/${thread.id}/messages`),
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
         },
-        body: JSON.stringify({ content }),
-      });
+      );
 
       if (response.ok) {
         setNewMessage('');
@@ -254,7 +265,7 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
       await fetch(getApiUrl(`messages/${messageId}/read`), {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
     } catch (err) {
@@ -283,20 +294,35 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
     if (diffMins < 60) return `${diffMins}m ago`;
 
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const messageDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
 
     if (messageDate.getTime() === today.getTime()) {
-      return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+      });
     }
 
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
     if (messageDate.getTime() === yesterday.getTime()) {
-      return 'Yesterday ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return (
+        'Yesterday ' +
+        date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      );
     }
 
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   };
 
   if (loading) {
@@ -325,7 +351,11 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
           )}
         </div>
         {onClose && (
-          <button className={styles.closeButton} onClick={onClose} type="button">
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            type="button"
+          >
             ✕
           </button>
         )}
@@ -335,11 +365,13 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
         {messages.length === 0 && (
           <div className={styles.empty}>
             <span className={styles.emptyIcon}>💬</span>
-            <p className={styles.emptyText}>No messages yet. Start the conversation!</p>
+            <p className={styles.emptyText}>
+              No messages yet. Start the conversation!
+            </p>
           </div>
         )}
 
-        {messages.map(message => {
+        {messages.map((message) => {
           const isOwnMessage = message.senderId === user?.id;
 
           return (
@@ -349,12 +381,18 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
             >
               <div className={styles.messageBubble}>
                 <div className={styles.messageHeader}>
-                  <span className={styles.senderName}>{message.senderName}</span>
-                  <span className={styles.senderRole}>{message.senderRole}</span>
+                  <span className={styles.senderName}>
+                    {message.senderName}
+                  </span>
+                  <span className={styles.senderRole}>
+                    {message.senderRole}
+                  </span>
                 </div>
                 <div className={styles.messageContent}>{message.content}</div>
                 <div className={styles.messageFooter}>
-                  <span className={styles.timestamp}>{formatTimestamp(message.createdAt)}</span>
+                  <span className={styles.timestamp}>
+                    {formatTimestamp(message.createdAt)}
+                  </span>
                   {isOwnMessage && message.readBy.length > 1 && (
                     <span className={styles.readReceipt}>✓✓</span>
                   )}
@@ -372,7 +410,8 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
               <span></span>
             </span>
             <span className={styles.typingText}>
-              {Array.from(typingUsers).join(', ')} {typingUsers.size === 1 ? 'is' : 'are'} typing...
+              {Array.from(typingUsers).join(', ')}{' '}
+              {typingUsers.size === 1 ? 'is' : 'are'} typing...
             </span>
           </div>
         )}
@@ -381,7 +420,7 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
       </div>
 
       <div className={styles.quickReplies}>
-        {QUICK_REPLIES.map(reply => (
+        {QUICK_REPLIES.map((reply) => (
           <button
             key={reply}
             className={styles.quickReplyButton}

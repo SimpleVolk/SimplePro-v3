@@ -6,7 +6,7 @@ import { faker } from '@faker-js/faker';
 export async function seedNotifications(
   NotificationModel: any,
   users: any[],
-  jobs: any[]
+  jobs: any[],
 ): Promise<number> {
   let totalNotifications = 0;
 
@@ -42,9 +42,14 @@ export async function seedNotifications(
       let relatedEntityType: string | undefined;
       let relatedEntityId: any | undefined;
 
-      if (type.includes('job') || type === 'shift_reminder' || type === 'schedule_change') {
+      if (
+        type.includes('job') ||
+        type === 'shift_reminder' ||
+        type === 'schedule_change'
+      ) {
         relatedEntityType = 'job';
-        relatedEntityId = jobs.length > 0 ? faker.helpers.arrayElement(jobs)._id : undefined;
+        relatedEntityId =
+          jobs.length > 0 ? faker.helpers.arrayElement(jobs)._id : undefined;
       } else if (type.includes('customer')) {
         relatedEntityType = 'customer';
       } else if (type === 'message_received') {
@@ -116,7 +121,8 @@ export async function seedNotifications(
       // Determine delivery channels based on priority and type
       const deliveryChannels = {
         inApp: true,
-        email: priority === 'high' || priority === 'urgent' || type.includes('job'),
+        email:
+          priority === 'high' || priority === 'urgent' || type.includes('job'),
         sms: priority === 'urgent' || type === 'shift_reminder',
         push: priority !== 'low',
       };
@@ -136,7 +142,9 @@ export async function seedNotifications(
         deliveryStatus.email = {
           sent: faker.datatype.boolean(0.9),
           sentAt: faker.datatype.boolean(0.9) ? notificationDate : undefined,
-          error: faker.datatype.boolean(0.1) ? 'SMTP connection failed' : undefined,
+          error: faker.datatype.boolean(0.1)
+            ? 'SMTP connection failed'
+            : undefined,
         };
       }
 
@@ -144,7 +152,9 @@ export async function seedNotifications(
         deliveryStatus.sms = {
           sent: faker.datatype.boolean(0.85),
           sentAt: faker.datatype.boolean(0.85) ? notificationDate : undefined,
-          error: faker.datatype.boolean(0.15) ? 'Invalid phone number' : undefined,
+          error: faker.datatype.boolean(0.15)
+            ? 'Invalid phone number'
+            : undefined,
         };
       }
 
@@ -159,7 +169,10 @@ export async function seedNotifications(
       // Determine if notification has been read
       const isRead = faker.datatype.boolean(0.6);
       const readAt = isRead
-        ? new Date(notificationDate.getTime() + faker.number.int({ min: 300000, max: 86400000 }))
+        ? new Date(
+            notificationDate.getTime() +
+              faker.number.int({ min: 300000, max: 86400000 }),
+          )
         : undefined;
 
       await NotificationModel.create({
@@ -181,7 +194,9 @@ export async function seedNotifications(
         isRead,
         readAt,
         isArchived: faker.datatype.boolean(0.2),
-        archivedAt: faker.datatype.boolean(0.2) ? faker.date.recent({ days: 7 }) : undefined,
+        archivedAt: faker.datatype.boolean(0.2)
+          ? faker.date.recent({ days: 7 })
+          : undefined,
         metadata: {},
       });
 

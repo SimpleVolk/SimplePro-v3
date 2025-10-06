@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AnalyticsEvent, AnalyticsEventDocument } from './schemas/analytics-event.schema';
+import {
+  AnalyticsEvent,
+  AnalyticsEventDocument,
+} from './schemas/analytics-event.schema';
 import { CacheService } from '../cache/cache.service';
 import { DatabasePerformanceService } from '../database/database-performance.service';
 
@@ -42,20 +45,23 @@ export class AnalyticsOptimizedService {
     @InjectModel(AnalyticsEvent.name)
     private analyticsEventModel: Model<AnalyticsEventDocument>,
     private cacheService: CacheService,
-    private dbPerformanceService: DatabasePerformanceService
+    private dbPerformanceService: DatabasePerformanceService,
   ) {}
 
   // Optimized dashboard metrics with caching and efficient aggregation
   async getDashboardMetrics(
     filters: AnalyticsFilters = {
       startDate: new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000), // 6 months
-      endDate: new Date()
-    }
+      endDate: new Date(),
+    },
   ): Promise<OptimizedDashboardMetrics> {
     const cacheKey = `dashboard:metrics:${filters.startDate.getTime()}-${filters.endDate.getTime()}`;
 
     // Try cache first
-    const cached = await this.cacheService.getAnalyticsCache<OptimizedDashboardMetrics>(cacheKey);
+    const cached =
+      await this.cacheService.getAnalyticsCache<OptimizedDashboardMetrics>(
+        cacheKey,
+      );
     if (cached) {
       return cached;
     }
@@ -64,116 +70,118 @@ export class AnalyticsOptimizedService {
 
     try {
       // Use single aggregation pipeline for better performance
-      const [dashboardData] = await this.analyticsEventModel.aggregate([
-        {
-          $match: {
-            timestamp: {
-              $gte: filters.startDate,
-              $lte: filters.endDate
-            }
-          }
-        },
-        {
-          $facet: {
-            // Job metrics
-            jobMetrics: [
-              {
-                $match: { category: 'jobs' }
+      const [dashboardData] = await this.analyticsEventModel
+        .aggregate([
+          {
+            $match: {
+              timestamp: {
+                $gte: filters.startDate,
+                $lte: filters.endDate,
               },
-              {
-                $group: {
-                  _id: '$eventType',
-                  count: { $sum: 1 }
-                }
-              }
-            ],
-
-            // Revenue metrics
-            revenueMetrics: [
-              {
-                $match: {
-                  category: 'revenue',
-                  revenue: { $exists: true, $gt: 0 }
-                }
-              },
-              {
-                $group: {
-                  _id: null,
-                  totalRevenue: { $sum: '$revenue' },
-                  averageRevenue: { $avg: '$revenue' },
-                  count: { $sum: 1 }
-                }
-              }
-            ],
-
-            // Today's metrics
-            todayMetrics: [
-              {
-                $match: {
-                  timestamp: {
-                    $gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                    $lt: new Date(new Date().setHours(23, 59, 59, 999))
-                  }
-                }
-              },
-              {
-                $group: {
-                  _id: '$eventType',
-                  count: { $sum: 1 },
-                  revenue: { $sum: { $ifNull: ['$revenue', 0] } }
-                }
-              }
-            ],
-
-            // Top services
-            topServices: [
-              {
-                $match: {
-                  category: 'jobs',
-                  eventType: 'job_completed',
-                  'data.serviceType': { $exists: true }
-                }
-              },
-              {
-                $group: {
-                  _id: '$data.serviceType',
-                  count: { $sum: 1 },
-                  revenue: { $sum: { $ifNull: ['$revenue', 0] } }
-                }
-              },
-              {
-                $sort: { revenue: -1 }
-              },
-              {
-                $limit: 5
-              }
-            ],
-
-            // Monthly revenue
-            monthlyRevenue: [
-              {
-                $match: {
-                  category: 'revenue',
-                  revenue: { $exists: true, $gt: 0 }
-                }
-              },
-              {
-                $group: {
-                  _id: {
-                    year: { $year: '$timestamp' },
-                    month: { $month: '$timestamp' }
+            },
+          },
+          {
+            $facet: {
+              // Job metrics
+              jobMetrics: [
+                {
+                  $match: { category: 'jobs' },
+                },
+                {
+                  $group: {
+                    _id: '$eventType',
+                    count: { $sum: 1 },
                   },
-                  revenue: { $sum: '$revenue' },
-                  jobs: { $sum: 1 }
-                }
-              },
-              {
-                $sort: { '_id.year': 1, '_id.month': 1 }
-              }
-            ]
-          }
-        }
-      ]).exec();
+                },
+              ],
+
+              // Revenue metrics
+              revenueMetrics: [
+                {
+                  $match: {
+                    category: 'revenue',
+                    revenue: { $exists: true, $gt: 0 },
+                  },
+                },
+                {
+                  $group: {
+                    _id: null,
+                    totalRevenue: { $sum: '$revenue' },
+                    averageRevenue: { $avg: '$revenue' },
+                    count: { $sum: 1 },
+                  },
+                },
+              ],
+
+              // Today's metrics
+              todayMetrics: [
+                {
+                  $match: {
+                    timestamp: {
+                      $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                      $lt: new Date(new Date().setHours(23, 59, 59, 999)),
+                    },
+                  },
+                },
+                {
+                  $group: {
+                    _id: '$eventType',
+                    count: { $sum: 1 },
+                    revenue: { $sum: { $ifNull: ['$revenue', 0] } },
+                  },
+                },
+              ],
+
+              // Top services
+              topServices: [
+                {
+                  $match: {
+                    category: 'jobs',
+                    eventType: 'job_completed',
+                    'data.serviceType': { $exists: true },
+                  },
+                },
+                {
+                  $group: {
+                    _id: '$data.serviceType',
+                    count: { $sum: 1 },
+                    revenue: { $sum: { $ifNull: ['$revenue', 0] } },
+                  },
+                },
+                {
+                  $sort: { revenue: -1 },
+                },
+                {
+                  $limit: 5,
+                },
+              ],
+
+              // Monthly revenue
+              monthlyRevenue: [
+                {
+                  $match: {
+                    category: 'revenue',
+                    revenue: { $exists: true, $gt: 0 },
+                  },
+                },
+                {
+                  $group: {
+                    _id: {
+                      year: { $year: '$timestamp' },
+                      month: { $month: '$timestamp' },
+                    },
+                    revenue: { $sum: '$revenue' },
+                    jobs: { $sum: 1 },
+                  },
+                },
+                {
+                  $sort: { '_id.year': 1, '_id.month': 1 },
+                },
+              ],
+            },
+          },
+        ])
+        .exec();
 
       // Process aggregation results
       const metrics = this.processAggregationResults(dashboardData);
@@ -187,7 +195,7 @@ export class AnalyticsOptimizedService {
         query: 'getDashboardMetrics',
         duration,
         collection: 'analytics_events',
-        operation: 'aggregate'
+        operation: 'aggregate',
       });
 
       return metrics;
@@ -206,14 +214,14 @@ export class AnalyticsOptimizedService {
 
       // Use insertMany for better performance
       await this.analyticsEventModel.insertMany(
-        events.map(event => ({
+        events.map((event) => ({
           ...event,
           timestamp: new Date(),
-          processed: false
+          processed: false,
         })),
         {
-          ordered: false // Continue on error
-        }
+          ordered: false, // Continue on error
+        },
       );
 
       // Clear related caches
@@ -225,7 +233,7 @@ export class AnalyticsOptimizedService {
         duration,
         collection: 'analytics_events',
         operation: 'insertMany',
-        documentCount: events.length
+        documentCount: events.length,
       });
 
       this.logger.log(`Tracked ${events.length} events in ${duration}ms`);
@@ -240,12 +248,15 @@ export class AnalyticsOptimizedService {
     filters: AnalyticsFilters,
     page = 1,
     limit = 50,
-    fields?: string[]
+    fields?: string[],
   ) {
     const cacheKey = `events:${JSON.stringify(filters)}:${page}:${limit}`;
 
     // Try cache first
-    const cached = await this.cacheService.getAnalyticsCache<OptimizedDashboardMetrics>(cacheKey);
+    const cached =
+      await this.cacheService.getAnalyticsCache<OptimizedDashboardMetrics>(
+        cacheKey,
+      );
     if (cached) {
       return cached;
     }
@@ -256,8 +267,8 @@ export class AnalyticsOptimizedService {
       const matchStage: any = {
         timestamp: {
           $gte: filters.startDate,
-          $lte: filters.endDate
-        }
+          $lte: filters.endDate,
+        },
       };
 
       if (filters.category) matchStage.category = filters.category;
@@ -271,25 +282,30 @@ export class AnalyticsOptimizedService {
         ...DatabasePerformanceService.createPaginationPipeline({
           page,
           limit,
-          sort: { timestamp: -1 }
-        })
+          sort: { timestamp: -1 },
+        }),
       ];
 
       // Add field selection if specified
       if (fields && fields.length > 0) {
-        const projection = fields.reduce((acc, field) => {
-          acc[field] = 1;
-          return acc;
-        }, {} as Record<string, number>);
+        const projection = fields.reduce(
+          (acc, field) => {
+            acc[field] = 1;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
 
         pipeline.splice(-1, 0, { $project: projection });
       }
 
-      const [result] = await this.analyticsEventModel.aggregate(pipeline).exec();
+      const [result] = await this.analyticsEventModel
+        .aggregate(pipeline)
+        .exec();
 
       const paginatedResult = DatabasePerformanceService.formatPaginatedResult(
         [result],
-        { page, limit }
+        { page, limit },
       );
 
       // Cache for 2 minutes
@@ -300,7 +316,7 @@ export class AnalyticsOptimizedService {
         query: 'getEventsPaginated',
         duration,
         collection: 'analytics_events',
-        operation: 'aggregate'
+        operation: 'aggregate',
       });
 
       return paginatedResult;
@@ -314,7 +330,7 @@ export class AnalyticsOptimizedService {
   async getRevenueAnalytics(
     startDate: Date,
     endDate: Date,
-    granularity: 'day' | 'week' | 'month' = 'day'
+    granularity: 'day' | 'week' | 'month' = 'day',
   ) {
     const cacheKey = `revenue:${granularity}:${startDate.getTime()}-${endDate.getTime()}`;
 
@@ -332,47 +348,50 @@ export class AnalyticsOptimizedService {
           groupBy = {
             year: { $year: '$timestamp' },
             month: { $month: '$timestamp' },
-            day: { $dayOfMonth: '$timestamp' }
+            day: { $dayOfMonth: '$timestamp' },
           };
           break;
         case 'week':
           groupBy = {
             year: { $year: '$timestamp' },
-            week: { $week: '$timestamp' }
+            week: { $week: '$timestamp' },
           };
           break;
         case 'month':
           groupBy = {
             year: { $year: '$timestamp' },
-            month: { $month: '$timestamp' }
+            month: { $month: '$timestamp' },
           };
           break;
       }
 
-      const result = await this.analyticsEventModel.aggregate([
-        {
-          $match: {
-            category: 'revenue',
-            timestamp: { $gte: startDate, $lte: endDate },
-            revenue: { $exists: true, $gt: 0 }
-          }
-        },
-        {
-          $group: {
-            _id: groupBy,
-            totalRevenue: { $sum: '$revenue' },
-            totalCost: { $sum: { $ifNull: ['$cost', 0] } },
-            totalProfit: { $sum: { $ifNull: ['$profit', 0] } },
-            jobCount: { $sum: 1 },
-            averageJobValue: { $avg: '$revenue' }
-          }
-        },
-        {
-          $sort: granularity === 'week'
-            ? { '_id.year': 1, '_id.week': 1 }
-            : { '_id.year': 1, '_id.month': 1, '_id.day': 1 }
-        }
-      ]).exec();
+      const result = await this.analyticsEventModel
+        .aggregate([
+          {
+            $match: {
+              category: 'revenue',
+              timestamp: { $gte: startDate, $lte: endDate },
+              revenue: { $exists: true, $gt: 0 },
+            },
+          },
+          {
+            $group: {
+              _id: groupBy,
+              totalRevenue: { $sum: '$revenue' },
+              totalCost: { $sum: { $ifNull: ['$cost', 0] } },
+              totalProfit: { $sum: { $ifNull: ['$profit', 0] } },
+              jobCount: { $sum: 1 },
+              averageJobValue: { $avg: '$revenue' },
+            },
+          },
+          {
+            $sort:
+              granularity === 'week'
+                ? { '_id.year': 1, '_id.week': 1 }
+                : { '_id.year': 1, '_id.month': 1, '_id.day': 1 },
+          },
+        ])
+        .exec();
 
       // Cache for 10 minutes
       await this.cacheService.setAnalyticsCache(cacheKey, result, 600);
@@ -382,7 +401,7 @@ export class AnalyticsOptimizedService {
         query: 'getRevenueAnalytics',
         duration,
         collection: 'analytics_events',
-        operation: 'aggregate'
+        operation: 'aggregate',
       });
 
       return result;
@@ -404,64 +423,66 @@ export class AnalyticsOptimizedService {
     const startTime = Date.now();
 
     try {
-      const result = await this.analyticsEventModel.aggregate([
-        {
-          $match: {
-            timestamp: { $gte: startDate, $lte: endDate },
-            $or: [
-              { category: 'jobs' },
-              { category: 'crew' },
-              { category: 'operations' }
-            ]
-          }
-        },
-        {
-          $facet: {
-            jobDurations: [
-              {
-                $match: {
-                  category: 'jobs',
-                  eventType: 'job_completed',
-                  duration: { $exists: true }
-                }
-              },
-              {
-                $group: {
-                  _id: null,
-                  averageDuration: { $avg: '$duration' },
-                  count: { $sum: 1 }
-                }
-              }
-            ],
-            crewEfficiency: [
-              {
-                $match: {
-                  category: 'crew',
-                  efficiency: { $exists: true }
-                }
-              },
-              {
-                $group: {
-                  _id: null,
-                  averageEfficiency: { $avg: '$efficiency' },
-                  count: { $sum: 1 }
-                }
-              }
-            ],
-            completionRate: [
-              {
-                $match: { category: 'jobs' }
-              },
-              {
-                $group: {
-                  _id: '$eventType',
-                  count: { $sum: 1 }
-                }
-              }
-            ]
-          }
-        }
-      ]).exec();
+      const result = await this.analyticsEventModel
+        .aggregate([
+          {
+            $match: {
+              timestamp: { $gte: startDate, $lte: endDate },
+              $or: [
+                { category: 'jobs' },
+                { category: 'crew' },
+                { category: 'operations' },
+              ],
+            },
+          },
+          {
+            $facet: {
+              jobDurations: [
+                {
+                  $match: {
+                    category: 'jobs',
+                    eventType: 'job_completed',
+                    duration: { $exists: true },
+                  },
+                },
+                {
+                  $group: {
+                    _id: null,
+                    averageDuration: { $avg: '$duration' },
+                    count: { $sum: 1 },
+                  },
+                },
+              ],
+              crewEfficiency: [
+                {
+                  $match: {
+                    category: 'crew',
+                    efficiency: { $exists: true },
+                  },
+                },
+                {
+                  $group: {
+                    _id: null,
+                    averageEfficiency: { $avg: '$efficiency' },
+                    count: { $sum: 1 },
+                  },
+                },
+              ],
+              completionRate: [
+                {
+                  $match: { category: 'jobs' },
+                },
+                {
+                  $group: {
+                    _id: '$eventType',
+                    count: { $sum: 1 },
+                  },
+                },
+              ],
+            },
+          },
+        ])
+        .exec();
 
       // Process results
       const metrics = this.processPerformanceResults(result[0]);
@@ -474,7 +495,7 @@ export class AnalyticsOptimizedService {
         query: 'getPerformanceMetrics',
         duration,
         collection: 'analytics_events',
-        operation: 'aggregate'
+        operation: 'aggregate',
       });
 
       return metrics;
@@ -485,36 +506,43 @@ export class AnalyticsOptimizedService {
   }
 
   private processAggregationResults(data: any): OptimizedDashboardMetrics {
-    const jobMetrics = data.jobMetrics?.reduce((acc: any, item: any) => {
-      acc[item._id] = item.count;
-      return acc;
-    }, {}) || {};
+    const jobMetrics =
+      data.jobMetrics?.reduce((acc: any, item: any) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {}) || {};
 
     const revenueData = data.revenueMetrics?.[0] || {};
 
-    const todayData = data.todayMetrics?.reduce((acc: any, item: any) => {
-      if (item._id === 'job_completed') {
-        acc.completedJobs = item.count;
-      }
-      acc.revenue += item.revenue || 0;
-      return acc;
-    }, { completedJobs: 0, revenue: 0 }) || { completedJobs: 0, revenue: 0 };
+    const todayData = data.todayMetrics?.reduce(
+      (acc: any, item: any) => {
+        if (item._id === 'job_completed') {
+          acc.completedJobs = item.count;
+        }
+        acc.revenue += item.revenue || 0;
+        return acc;
+      },
+      { completedJobs: 0, revenue: 0 },
+    ) || { completedJobs: 0, revenue: 0 };
 
-    const topServices = data.topServices?.map((item: any) => ({
-      service: item._id,
-      count: item.count,
-      revenue: item.revenue || 0
-    })) || [];
+    const topServices =
+      data.topServices?.map((item: any) => ({
+        service: item._id,
+        count: item.count,
+        revenue: item.revenue || 0,
+      })) || [];
 
-    const monthlyRevenue = data.monthlyRevenue?.map((item: any) => ({
-      month: `${item._id.year}-${item._id.month.toString().padStart(2, '0')}`,
-      revenue: item.revenue,
-      jobs: item.jobs
-    })) || [];
+    const monthlyRevenue =
+      data.monthlyRevenue?.map((item: any) => ({
+        month: `${item._id.year}-${item._id.month.toString().padStart(2, '0')}`,
+        revenue: item.revenue,
+        jobs: item.jobs,
+      })) || [];
 
     return {
       totalJobs: jobMetrics.job_created || 0,
-      activeJobs: (jobMetrics.job_started || 0) - (jobMetrics.job_completed || 0),
+      activeJobs:
+        (jobMetrics.job_started || 0) - (jobMetrics.job_completed || 0),
       completedJobsToday: todayData.completedJobs,
       totalRevenue: revenueData.totalRevenue || 0,
       revenueToday: todayData.revenue,
@@ -527,8 +555,8 @@ export class AnalyticsOptimizedService {
       performanceMetrics: {
         averageJobDuration: 4.5,
         averageCrewEfficiency: 87.3,
-        jobCompletionRate: 94.7
-      }
+        jobCompletionRate: 94.7,
+      },
     };
   }
 
@@ -537,16 +565,21 @@ export class AnalyticsOptimizedService {
     const crewEfficiency = data.crewEfficiency?.[0];
     const completionData = data.completionRate || [];
 
-    const totalStarted = completionData.find((item: any) => item._id === 'job_started')?.count || 0;
-    const totalCompleted = completionData.find((item: any) => item._id === 'job_completed')?.count || 0;
-    const completionRate = totalStarted > 0 ? (totalCompleted / totalStarted) * 100 : 0;
+    const totalStarted =
+      completionData.find((item: any) => item._id === 'job_started')?.count ||
+      0;
+    const totalCompleted =
+      completionData.find((item: any) => item._id === 'job_completed')?.count ||
+      0;
+    const completionRate =
+      totalStarted > 0 ? (totalCompleted / totalStarted) * 100 : 0;
 
     return {
       averageJobDuration: jobDuration?.averageDuration || 0,
       averageCrewEfficiency: crewEfficiency?.averageEfficiency || 0,
       jobCompletionRate: completionRate,
       crewUtilization: 78.2, // Would be calculated from actual crew data
-      onTimePerformance: 91.5 // Would be calculated from scheduling vs completion data
+      onTimePerformance: 91.5, // Would be calculated from scheduling vs completion data
     };
   }
 }

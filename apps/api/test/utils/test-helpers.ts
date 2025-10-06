@@ -28,9 +28,7 @@ export function createMockUser(overrides: any = {}) {
       id: 'role_admin',
       name: 'admin',
       displayName: 'Administrator',
-      permissions: [
-        { id: 'perm_all', resource: 'all', action: 'all' }
-      ]
+      permissions: [{ id: 'perm_all', resource: 'all', action: 'all' }],
     },
     isActive: true,
     createdAt: new Date(),
@@ -61,21 +59,20 @@ export function waitForPromises(): Promise<void> {
 export async function expectToThrowAsync(
   fn: () => Promise<any>,
   errorClass: any,
-  message?: string
+  message?: string,
 ): Promise<void> {
   try {
     await fn();
     throw new Error('Expected function to throw, but it did not');
   } catch (error) {
     if (!(error instanceof errorClass)) {
-      const errorName = error instanceof Error ? error.constructor.name : String(error);
-      throw new Error(
-        `Expected ${errorClass.name} but got ${errorName}`
-      );
+      const errorName =
+        error instanceof Error ? error.constructor.name : String(error);
+      throw new Error(`Expected ${errorClass.name} but got ${errorName}`);
     }
     if (message && error instanceof Error && !error.message.includes(message)) {
       throw new Error(
-        `Expected error message to include "${message}" but got "${error.message}"`
+        `Expected error message to include "${message}" but got "${error.message}"`,
       );
     }
   }
@@ -156,7 +153,9 @@ export function sleep(ms: number): Promise<void> {
  * Generates random string
  */
 export function randomString(length = 10): string {
-  return Math.random().toString(36).substring(2, 2 + length);
+  return Math.random()
+    .toString(36)
+    .substring(2, 2 + length);
 }
 
 /**

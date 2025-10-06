@@ -39,6 +39,9 @@ export class CrewWorkload {
 export const CrewWorkloadSchema = SchemaFactory.createForClass(CrewWorkload);
 
 // Indexes
-CrewWorkloadSchema.index({ crewMemberId: 1, weekStartDate: 1 }, { unique: true });
+CrewWorkloadSchema.index(
+  { crewMemberId: 1, weekStartDate: 1 },
+  { unique: true },
+);
 CrewWorkloadSchema.index({ weekStartDate: 1 });
 CrewWorkloadSchema.index({ isOverloaded: 1 });

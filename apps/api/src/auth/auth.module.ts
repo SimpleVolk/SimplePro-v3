@@ -9,8 +9,14 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { User as UserSchema, UserSchema as UserSchemaDefinition } from './schemas/user.schema';
-import { UserSession as UserSessionSchema, UserSessionSchema as UserSessionSchemaDefinition } from './schemas/user-session.schema';
+import {
+  User as UserSchema,
+  UserSchema as UserSchemaDefinition,
+} from './schemas/user.schema';
+import {
+  UserSession as UserSessionSchema,
+  UserSessionSchema as UserSessionSchemaDefinition,
+} from './schemas/user-session.schema';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 // Dynamic import to handle missing secrets.config gracefully
@@ -43,14 +49,14 @@ try {
         if (!secret) {
           throw new Error(
             'JWT_SECRET configuration failed. ' +
-            'For production: ensure secrets are configured via production-secrets.sh script. ' +
-            'For development: set JWT_SECRET environment variable.'
+              'For production: ensure secrets are configured via production-secrets.sh script. ' +
+              'For development: set JWT_SECRET environment variable.',
           );
         }
         if (secret.length < 32) {
           throw new Error(
             'JWT_SECRET must be at least 32 characters long for security. ' +
-            'Please use a strong, randomly generated secret key.'
+              'Please use a strong, randomly generated secret key.',
           );
         }
         return secret;

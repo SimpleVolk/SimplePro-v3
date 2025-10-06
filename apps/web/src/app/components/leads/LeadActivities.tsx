@@ -15,7 +15,13 @@ export interface LeadActivity {
   customerName?: string;
   subject: string;
   description?: string;
-  outcome?: 'successful' | 'no_answer' | 'voicemail' | 'scheduled' | 'not_interested' | 'callback_requested';
+  outcome?:
+    | 'successful'
+    | 'no_answer'
+    | 'voicemail'
+    | 'scheduled'
+    | 'not_interested'
+    | 'callback_requested';
   scheduledDate?: string;
   completedDate?: string;
   dueDate?: string;
@@ -59,7 +65,9 @@ export function LeadActivities() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<LeadActivity | null>(null);
+  const [editingActivity, setEditingActivity] = useState<LeadActivity | null>(
+    null,
+  );
 
   // Filters
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -75,7 +83,14 @@ export function LeadActivities() {
     completedThisWeek: 0,
     upcomingCount: 0,
     byType: { call: 0, email: 0, meeting: 0, quote_sent: 0, follow_up: 0 },
-    byOutcome: { successful: 0, no_answer: 0, voicemail: 0, scheduled: 0, not_interested: 0, callback_requested: 0 }
+    byOutcome: {
+      successful: 0,
+      no_answer: 0,
+      voicemail: 0,
+      scheduled: 0,
+      not_interested: 0,
+      callback_requested: 0,
+    },
   });
 
   useEffect(() => {
@@ -90,7 +105,7 @@ export function LeadActivities() {
       const token = localStorage.getItem('accessToken');
       const response = await fetch(`${getApiUrl()}/api/lead-activities`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -115,32 +130,37 @@ export function LeadActivities() {
 
     const newStats: ActivityStats = {
       total: activities.length,
-      overdue: activities.filter(a => a.status === 'overdue').length,
-      completedThisWeek: activities.filter(a =>
-        a.status === 'completed' &&
-        a.completedDate &&
-        new Date(a.completedDate) >= weekAgo
+      overdue: activities.filter((a) => a.status === 'overdue').length,
+      completedThisWeek: activities.filter(
+        (a) =>
+          a.status === 'completed' &&
+          a.completedDate &&
+          new Date(a.completedDate) >= weekAgo,
       ).length,
-      upcomingCount: activities.filter(a =>
-        a.status === 'scheduled' &&
-        a.scheduledDate &&
-        new Date(a.scheduledDate) > now
+      upcomingCount: activities.filter(
+        (a) =>
+          a.status === 'scheduled' &&
+          a.scheduledDate &&
+          new Date(a.scheduledDate) > now,
       ).length,
       byType: {
-        call: activities.filter(a => a.type === 'call').length,
-        email: activities.filter(a => a.type === 'email').length,
-        meeting: activities.filter(a => a.type === 'meeting').length,
-        quote_sent: activities.filter(a => a.type === 'quote_sent').length,
-        follow_up: activities.filter(a => a.type === 'follow_up').length,
+        call: activities.filter((a) => a.type === 'call').length,
+        email: activities.filter((a) => a.type === 'email').length,
+        meeting: activities.filter((a) => a.type === 'meeting').length,
+        quote_sent: activities.filter((a) => a.type === 'quote_sent').length,
+        follow_up: activities.filter((a) => a.type === 'follow_up').length,
       },
       byOutcome: {
-        successful: activities.filter(a => a.outcome === 'successful').length,
-        no_answer: activities.filter(a => a.outcome === 'no_answer').length,
-        voicemail: activities.filter(a => a.outcome === 'voicemail').length,
-        scheduled: activities.filter(a => a.outcome === 'scheduled').length,
-        not_interested: activities.filter(a => a.outcome === 'not_interested').length,
-        callback_requested: activities.filter(a => a.outcome === 'callback_requested').length,
-      }
+        successful: activities.filter((a) => a.outcome === 'successful').length,
+        no_answer: activities.filter((a) => a.outcome === 'no_answer').length,
+        voicemail: activities.filter((a) => a.outcome === 'voicemail').length,
+        scheduled: activities.filter((a) => a.outcome === 'scheduled').length,
+        not_interested: activities.filter((a) => a.outcome === 'not_interested')
+          .length,
+        callback_requested: activities.filter(
+          (a) => a.outcome === 'callback_requested',
+        ).length,
+      },
     };
 
     setStats(newStats);
@@ -173,12 +193,15 @@ export function LeadActivities() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/lead-activities/${activityId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        `${getApiUrl()}/api/lead-activities/${activityId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to delete activity');
@@ -186,25 +209,33 @@ export function LeadActivities() {
 
       await fetchActivities();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete activity');
+      setError(
+        err instanceof Error ? err.message : 'Failed to delete activity',
+      );
     }
   };
 
-  const handleCompleteActivity = async (activityId: string, outcome: string) => {
+  const handleCompleteActivity = async (
+    activityId: string,
+    outcome: string,
+  ) => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/lead-activities/${activityId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${getApiUrl()}/api/lead-activities/${activityId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: 'completed',
+            outcome,
+            completedDate: new Date().toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          status: 'completed',
-          outcome,
-          completedDate: new Date().toISOString(),
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to complete activity');
@@ -212,45 +243,64 @@ export function LeadActivities() {
 
       await fetchActivities();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to complete activity');
+      setError(
+        err instanceof Error ? err.message : 'Failed to complete activity',
+      );
     }
   };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'call': return '📞';
-      case 'email': return '✉️';
-      case 'meeting': return '🤝';
-      case 'quote_sent': return '📋';
-      case 'follow_up': return '🔔';
-      default: return '📌';
+      case 'call':
+        return '📞';
+      case 'email':
+        return '✉️';
+      case 'meeting':
+        return '🤝';
+      case 'quote_sent':
+        return '📋';
+      case 'follow_up':
+        return '🔔';
+      default:
+        return '📌';
     }
   };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'overdue': return styles.statusOverdue;
-      case 'scheduled': return styles.statusScheduled;
-      case 'completed': return styles.statusCompleted;
-      case 'cancelled': return styles.statusCancelled;
-      default: return '';
+      case 'overdue':
+        return styles.statusOverdue;
+      case 'scheduled':
+        return styles.statusScheduled;
+      case 'completed':
+        return styles.statusCompleted;
+      case 'cancelled':
+        return styles.statusCancelled;
+      default:
+        return '';
     }
   };
 
   const getOutcomeBadgeClass = (outcome: string | undefined) => {
     if (!outcome) return '';
     switch (outcome) {
-      case 'successful': return styles.outcomeSuccess;
-      case 'not_interested': return styles.outcomeFailure;
-      case 'callback_requested': return styles.outcomeWarning;
-      default: return styles.outcomeNeutral;
+      case 'successful':
+        return styles.outcomeSuccess;
+      case 'not_interested':
+        return styles.outcomeFailure;
+      case 'callback_requested':
+        return styles.outcomeWarning;
+      default:
+        return styles.outcomeNeutral;
     }
   };
 
-  const filteredActivities = activities.filter(activity => {
+  const filteredActivities = activities.filter((activity) => {
     if (typeFilter !== 'all' && activity.type !== typeFilter) return false;
-    if (outcomeFilter !== 'all' && activity.outcome !== outcomeFilter) return false;
-    if (statusFilter !== 'all' && activity.status !== statusFilter) return false;
+    if (outcomeFilter !== 'all' && activity.outcome !== outcomeFilter)
+      return false;
+    if (statusFilter !== 'all' && activity.status !== statusFilter)
+      return false;
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -262,20 +312,20 @@ export function LeadActivities() {
     }
 
     if (dateRangeFilter !== 'all') {
-      const activityDate = new Date(activity.scheduledDate || activity.createdAt);
+      const activityDate = new Date(
+        activity.scheduledDate || activity.createdAt,
+      );
       const now = new Date();
 
       switch (dateRangeFilter) {
         case 'today':
           return activityDate.toDateString() === now.toDateString();
-        case 'week': {
+        case 'week':
           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           return activityDate >= weekAgo;
-        }
-        case 'month': {
+        case 'month':
           const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
           return activityDate >= monthAgo;
-        }
       }
     }
 
@@ -298,7 +348,10 @@ export function LeadActivities() {
       <div className={styles.header}>
         <h2>Lead Activities</h2>
         <div className={styles.headerActions}>
-          <button onClick={handleCreateActivity} className={styles.primaryButton}>
+          <button
+            onClick={handleCreateActivity}
+            className={styles.primaryButton}
+          >
             + New Activity
           </button>
         </div>
@@ -345,13 +398,31 @@ export function LeadActivities() {
 
       {/* Quick Actions */}
       <div className={styles.quickActions}>
-        <button onClick={() => { setTypeFilter('call'); handleCreateActivity(); }} className={styles.quickActionButton}>
+        <button
+          onClick={() => {
+            setTypeFilter('call');
+            handleCreateActivity();
+          }}
+          className={styles.quickActionButton}
+        >
           📞 Log Call
         </button>
-        <button onClick={() => { setTypeFilter('email'); handleCreateActivity(); }} className={styles.quickActionButton}>
+        <button
+          onClick={() => {
+            setTypeFilter('email');
+            handleCreateActivity();
+          }}
+          className={styles.quickActionButton}
+        >
           ✉️ Send Email
         </button>
-        <button onClick={() => { setTypeFilter('follow_up'); handleCreateActivity(); }} className={styles.quickActionButton}>
+        <button
+          onClick={() => {
+            setTypeFilter('follow_up');
+            handleCreateActivity();
+          }}
+          className={styles.quickActionButton}
+        >
           🔔 Schedule Follow-up
         </button>
       </div>
@@ -421,7 +492,10 @@ export function LeadActivities() {
         {filteredActivities.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No activities found</p>
-            <button onClick={handleCreateActivity} className={styles.primaryButton}>
+            <button
+              onClick={handleCreateActivity}
+              className={styles.primaryButton}
+            >
               Create Your First Activity
             </button>
           </div>
@@ -430,15 +504,23 @@ export function LeadActivities() {
             <div key={activity.id} className={styles.activityCard}>
               <div className={styles.activityHeader}>
                 <div className={styles.activityType}>
-                  <span className={styles.activityIcon}>{getActivityIcon(activity.type)}</span>
-                  <span className={styles.activityTypeLabel}>{activity.type.replace('_', ' ')}</span>
+                  <span className={styles.activityIcon}>
+                    {getActivityIcon(activity.type)}
+                  </span>
+                  <span className={styles.activityTypeLabel}>
+                    {activity.type.replace('_', ' ')}
+                  </span>
                 </div>
                 <div className={styles.activityBadges}>
-                  <span className={`${styles.statusBadge} ${getStatusBadgeClass(activity.status)}`}>
+                  <span
+                    className={`${styles.statusBadge} ${getStatusBadgeClass(activity.status)}`}
+                  >
                     {activity.status}
                   </span>
                   {activity.outcome && (
-                    <span className={`${styles.outcomeBadge} ${getOutcomeBadgeClass(activity.outcome)}`}>
+                    <span
+                      className={`${styles.outcomeBadge} ${getOutcomeBadgeClass(activity.outcome)}`}
+                    >
                       {activity.outcome.replace('_', ' ')}
                     </span>
                   )}
@@ -448,10 +530,14 @@ export function LeadActivities() {
               <div className={styles.activityContent}>
                 <h3 className={styles.activitySubject}>{activity.subject}</h3>
                 {activity.customerName && (
-                  <p className={styles.activityCustomer}>Customer: {activity.customerName}</p>
+                  <p className={styles.activityCustomer}>
+                    Customer: {activity.customerName}
+                  </p>
                 )}
                 {activity.description && (
-                  <p className={styles.activityDescription}>{activity.description}</p>
+                  <p className={styles.activityDescription}>
+                    {activity.description}
+                  </p>
                 )}
                 {activity.notes && (
                   <div className={styles.activityNotes}>
@@ -463,19 +549,33 @@ export function LeadActivities() {
               <div className={styles.activityMeta}>
                 <div className={styles.activityDates}>
                   {activity.scheduledDate && (
-                    <span>Scheduled: {new Date(activity.scheduledDate).toLocaleString()}</span>
+                    <span>
+                      Scheduled:{' '}
+                      {new Date(activity.scheduledDate).toLocaleString()}
+                    </span>
                   )}
                   {activity.completedDate && (
-                    <span>Completed: {new Date(activity.completedDate).toLocaleString()}</span>
+                    <span>
+                      Completed:{' '}
+                      {new Date(activity.completedDate).toLocaleString()}
+                    </span>
                   )}
                   {activity.dueDate && !activity.completedDate && (
-                    <span className={activity.status === 'overdue' ? styles.dueDateOverdue : ''}>
+                    <span
+                      className={
+                        activity.status === 'overdue'
+                          ? styles.dueDateOverdue
+                          : ''
+                      }
+                    >
                       Due: {new Date(activity.dueDate).toLocaleString()}
                     </span>
                   )}
                 </div>
                 {activity.assignedToName && (
-                  <span className={styles.activityAssignee}>Assigned to: {activity.assignedToName}</span>
+                  <span className={styles.activityAssignee}>
+                    Assigned to: {activity.assignedToName}
+                  </span>
                 )}
               </div>
 
@@ -483,7 +583,9 @@ export function LeadActivities() {
                 {activity.status === 'scheduled' && (
                   <>
                     <button
-                      onClick={() => handleCompleteActivity(activity.id, 'successful')}
+                      onClick={() =>
+                        handleCompleteActivity(activity.id, 'successful')
+                      }
                       className={styles.completeButton}
                     >
                       ✓ Complete

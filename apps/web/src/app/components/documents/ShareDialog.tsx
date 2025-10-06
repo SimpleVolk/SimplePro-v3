@@ -19,7 +19,7 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
   const [usePassword, setUsePassword] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareHistory, setShareHistory] = useState<ShareLink[]>(
-    document.shareLinks || []
+    document.shareLinks || [],
   );
 
   const handleGenerateLink = async () => {
@@ -42,14 +42,17 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
         requestBody.password = password;
       }
 
-      const response = await fetch(getApiUrl(`documents/${document.id}/share`), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`documents/${document.id}/share`),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
         },
-        body: JSON.stringify(requestBody),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -61,7 +64,9 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
       setShareHistory([data, ...shareHistory]);
     } catch (err) {
       console.error('Share link generation error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to generate share link');
+      setError(
+        err instanceof Error ? err.message : 'Failed to generate share link',
+      );
     } finally {
       setLoading(false);
     }
@@ -83,7 +88,9 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
   const handleShareViaEmail = () => {
     if (!shareLink) return;
 
-    const subject = encodeURIComponent(`Shared Document: ${document.originalName}`);
+    const subject = encodeURIComponent(
+      `Shared Document: ${document.originalName}`,
+    );
     const body = encodeURIComponent(
       `I've shared a document with you.\n\nDocument: ${document.originalName}\nLink: ${shareLink.url}\n\n${
         shareLink.expiresAt
@@ -93,7 +100,7 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
         shareLink.isPasswordProtected
           ? 'This link is password protected. Please contact me for the password.'
           : ''
-      }`
+      }`,
     );
 
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
@@ -118,7 +125,10 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
 
   return (
     <div className={styles.dialogOverlay} onClick={onClose}>
-      <div className={styles.dialogContainer} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.dialogContainer}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.dialogHeader}>
           <div>
             <h3>Share Document</h3>
@@ -229,7 +239,10 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
                 </div>
               </div>
 
-              <button onClick={handleShareViaEmail} className={styles.emailButton}>
+              <button
+                onClick={handleShareViaEmail}
+                className={styles.emailButton}
+              >
                 📧 Share via Email
               </button>
             </div>
@@ -249,9 +262,7 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
                         {link.expiresAt && (
                           <>
                             <span>•</span>
-                            <span>
-                              Expires: {formatDate(link.expiresAt)}
-                            </span>
+                            <span>Expires: {formatDate(link.expiresAt)}</span>
                           </>
                         )}
                         <span>•</span>
@@ -281,7 +292,9 @@ export function ShareDialog({ document, onClose }: ShareDialogProps) {
             <ul>
               <li>Set an expiration date for sensitive documents</li>
               <li>Use password protection for confidential information</li>
-              <li>Share links only through secure channels (email, messaging)</li>
+              <li>
+                Share links only through secure channels (email, messaging)
+              </li>
               <li>Monitor access counts in share history</li>
             </ul>
           </div>

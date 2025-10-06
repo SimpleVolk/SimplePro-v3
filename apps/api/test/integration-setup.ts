@@ -100,7 +100,7 @@ export const TestDataFactories = {
       zipCode: '62703',
       country: 'USA',
     },
-    estimatedCost: 750.00,
+    estimatedCost: 750.0,
     actualCost: null,
     crewSize: 3,
     truckSize: 'medium',
@@ -142,8 +142,20 @@ export const TestDataFactories = {
       isWeekend: false,
     },
     inventory: [
-      { name: 'Sofa', category: 'Furniture', weight: 150, volume: 80, specialHandling: false },
-      { name: 'Refrigerator', category: 'Appliances', weight: 300, volume: 60, specialHandling: true },
+      {
+        name: 'Sofa',
+        category: 'Furniture',
+        weight: 150,
+        volume: 80,
+        specialHandling: false,
+      },
+      {
+        name: 'Refrigerator',
+        category: 'Appliances',
+        weight: 300,
+        volume: 60,
+        specialHandling: true,
+      },
     ],
     additionalServices: ['packing'],
     ...overrides,
@@ -197,7 +209,9 @@ export async function teardownTestApp(): Promise<void> {
 /**
  * Create a test user in the database
  */
-export async function createTestUser(userData: Partial<any> = {}): Promise<User> {
+export async function createTestUser(
+  userData: Partial<any> = {},
+): Promise<User> {
   const authService = moduleFixture.get<AuthService>(AuthService);
   const testUserData = TestDataFactories.createUserData(userData);
 
@@ -210,7 +224,7 @@ export async function createTestUser(userData: Partial<any> = {}): Promise<User>
  */
 export async function loginTestUser(
   email = 'test@example.com',
-  password = 'Test123!@#'
+  password = 'Test123!@#',
 ): Promise<TestAuthData> {
   const response = await request(app.getHttpServer())
     .post('/auth/login')
@@ -228,7 +242,9 @@ export async function loginTestUser(
 /**
  * Create authenticated test user and return auth data
  */
-export async function createAuthenticatedTestUser(userData: Partial<any> = {}): Promise<TestAuthData> {
+export async function createAuthenticatedTestUser(
+  userData: Partial<any> = {},
+): Promise<TestAuthData> {
   const testUserData = TestDataFactories.createUserData(userData);
   await createTestUser(testUserData);
   return loginTestUser(testUserData.email, testUserData.password);
@@ -237,7 +253,9 @@ export async function createAuthenticatedTestUser(userData: Partial<any> = {}): 
 /**
  * Create multiple test users with different roles
  */
-export async function createTestUsers(): Promise<{ [role: string]: TestAuthData }> {
+export async function createTestUsers(): Promise<{
+  [role: string]: TestAuthData;
+}> {
   const users = {
     admin: await createAuthenticatedTestUser({
       email: 'admin@example.com',
@@ -247,7 +265,12 @@ export async function createTestUsers(): Promise<{ [role: string]: TestAuthData 
     dispatcher: await createAuthenticatedTestUser({
       email: 'dispatcher@example.com',
       role: 'dispatcher',
-      permissions: ['read:jobs', 'write:jobs', 'read:customers', 'write:customers'],
+      permissions: [
+        'read:jobs',
+        'write:jobs',
+        'read:customers',
+        'write:customers',
+      ],
     }),
     crew: await createAuthenticatedTestUser({
       email: 'crew@example.com',
@@ -266,7 +289,7 @@ export function authenticatedRequest(
   app: INestApplication,
   method: 'get' | 'post' | 'patch' | 'delete',
   url: string,
-  token: string
+  token: string,
 ) {
   return request(app.getHttpServer())
     [method](url)
@@ -302,7 +325,7 @@ export async function cleanupDatabase(): Promise<void> {
 export async function waitForCondition(
   condition: () => Promise<boolean> | boolean,
   timeout = 5000,
-  interval = 100
+  interval = 100,
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -310,7 +333,7 @@ export async function waitForCondition(
     if (await condition()) {
       return;
     }
-    await new Promise(resolve => setTimeout(resolve, interval));
+    await new Promise((resolve) => setTimeout(resolve, interval));
   }
 
   throw new Error(`Condition not met within ${timeout}ms`);
@@ -334,7 +357,11 @@ export const ResponseAssertions = {
   /**
    * Assert error response structure
    */
-  assertErrorResponse: (response: any, expectedStatus: number, expectedMessage?: string) => {
+  assertErrorResponse: (
+    response: any,
+    expectedStatus: number,
+    expectedMessage?: string,
+  ) => {
     expect(response.status).toBe(expectedStatus);
     expect(response.body).toHaveProperty('success', false);
     expect(response.body).toHaveProperty('message');

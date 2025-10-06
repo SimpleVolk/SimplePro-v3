@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Logger } from '@nestjs/common';
-import { AnalyticsService, AnalyticsEventInput, DashboardMetrics, PeriodFilter } from './analytics.service';
+import {
+  AnalyticsService,
+  AnalyticsEventInput,
+  DashboardMetrics,
+  PeriodFilter,
+} from './analytics.service';
 import { AnalyticsEvent } from './schemas/analytics-event.schema';
 
 describe('AnalyticsService', () => {
@@ -24,18 +29,18 @@ describe('AnalyticsService', () => {
       city: 'Springfield',
       state: 'IL',
       zipCode: '62701',
-      coordinates: { latitude: 39.7817, longitude: -89.6501 }
+      coordinates: { latitude: 39.7817, longitude: -89.6501 },
     },
     duration: 480, // 8 hours in minutes
     efficiency: 87.5,
     metadata: { source: 'web_app' },
     processed: false,
-    save: jest.fn()
+    save: jest.fn(),
   };
 
   const mockEventModel: any = jest.fn().mockImplementation(() => ({
     ...mockAnalyticsEvent,
-    save: jest.fn().mockResolvedValue(mockAnalyticsEvent)
+    save: jest.fn().mockResolvedValue(mockAnalyticsEvent),
   }));
 
   mockEventModel.find = jest.fn();
@@ -47,7 +52,7 @@ describe('AnalyticsService', () => {
         AnalyticsService,
         {
           provide: getModelToken(AnalyticsEvent.name),
-          useValue: mockEventModel
+          useValue: mockEventModel,
         },
         {
           provide: getModelToken('Customer'),
@@ -56,8 +61,8 @@ describe('AnalyticsService', () => {
             findOne: jest.fn(),
             findById: jest.fn(),
             aggregate: jest.fn(),
-            countDocuments: jest.fn()
-          }
+            countDocuments: jest.fn(),
+          },
         },
         {
           provide: getModelToken('Job'),
@@ -66,8 +71,8 @@ describe('AnalyticsService', () => {
             findOne: jest.fn(),
             findById: jest.fn(),
             aggregate: jest.fn(),
-            countDocuments: jest.fn()
-          }
+            countDocuments: jest.fn(),
+          },
         },
         {
           provide: getModelToken('User'),
@@ -76,9 +81,9 @@ describe('AnalyticsService', () => {
             findOne: jest.fn(),
             findById: jest.fn(),
             aggregate: jest.fn(),
-            countDocuments: jest.fn()
-          }
-        }
+            countDocuments: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -113,16 +118,16 @@ describe('AnalyticsService', () => {
       location: {
         city: 'Chicago',
         state: 'IL',
-        zipCode: '60601'
+        zipCode: '60601',
       },
       duration: 360,
-      efficiency: 92.3
+      efficiency: 92.3,
     };
 
     it('should track event successfully', async () => {
       const mockSavedEvent = { ...mockAnalyticsEvent, ...eventInput };
       const mockInstance = {
-        save: jest.fn().mockResolvedValue(mockSavedEvent)
+        save: jest.fn().mockResolvedValue(mockSavedEvent),
       };
       mockEventModel.mockReturnValue(mockInstance);
 
@@ -131,7 +136,7 @@ describe('AnalyticsService', () => {
       expect(mockEventModel).toHaveBeenCalledWith({
         ...eventInput,
         timestamp: expect.any(Date),
-        processed: false
+        processed: false,
       });
       expect(result).toEqual(mockSavedEvent);
     });
@@ -139,7 +144,7 @@ describe('AnalyticsService', () => {
     it('should handle tracking errors and throw', async () => {
       const error = new Error('Database connection failed');
       const mockInstance = {
-        save: jest.fn().mockRejectedValue(error)
+        save: jest.fn().mockRejectedValue(error),
       };
       mockEventModel.mockReturnValue(mockInstance);
 
@@ -149,14 +154,14 @@ describe('AnalyticsService', () => {
     it('should log successful event tracking', async () => {
       const loggerSpy = jest.spyOn((service as any).logger, 'log');
       const mockInstance = {
-        save: jest.fn().mockResolvedValue(mockAnalyticsEvent)
+        save: jest.fn().mockResolvedValue(mockAnalyticsEvent),
       };
       mockEventModel.mockReturnValue(mockInstance);
 
       await service.trackEvent(eventInput);
 
       expect(loggerSpy).toHaveBeenCalledWith(
-        'Tracked event: job_completed for user user123'
+        'Tracked event: job_completed for user user123',
       );
     });
 
@@ -164,14 +169,14 @@ describe('AnalyticsService', () => {
       const error = new Error('Database error');
       const loggerSpy = jest.spyOn((service as any).logger, 'error');
       const mockInstance = {
-        save: jest.fn().mockRejectedValue(error)
+        save: jest.fn().mockRejectedValue(error),
       };
       mockEventModel.mockReturnValue(mockInstance);
 
       await expect(service.trackEvent(eventInput)).rejects.toThrow();
       expect(loggerSpy).toHaveBeenCalledWith(
         'Failed to track event: Database error',
-        error.stack
+        error.stack,
       );
     });
   });
@@ -179,7 +184,7 @@ describe('AnalyticsService', () => {
   describe('getDashboardMetrics', () => {
     const mockPeriod: PeriodFilter = {
       startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-01-31')
+      endDate: new Date('2024-01-31'),
     };
 
     beforeEach(() => {
@@ -187,28 +192,28 @@ describe('AnalyticsService', () => {
       jest.spyOn(service as any, 'getJobMetrics').mockResolvedValue({
         total: 25,
         active: 3,
-        completed: 20
+        completed: 20,
       });
 
       jest.spyOn(service as any, 'getRevenueMetrics').mockResolvedValue({
         totalRevenue: 50000,
         averageRevenue: 2000,
-        count: 25
+        count: 25,
       });
 
       jest.spyOn(service as any, 'getTodayMetrics').mockResolvedValue({
         completedJobs: 2,
-        revenue: 3500
+        revenue: 3500,
       });
 
       jest.spyOn(service as any, 'getTopServices').mockResolvedValue([
         { service: 'local', count: 15, revenue: 30000 },
-        { service: 'long_distance', count: 8, revenue: 18000 }
+        { service: 'long_distance', count: 8, revenue: 18000 },
       ]);
 
       jest.spyOn(service as any, 'getMonthlyRevenue').mockResolvedValue([
         { month: '2024-01', revenue: 25000, jobs: 12 },
-        { month: '2024-02', revenue: 30000, jobs: 15 }
+        { month: '2024-02', revenue: 30000, jobs: 15 },
       ]);
 
       jest.spyOn(service as any, 'getPerformanceMetrics').mockResolvedValue({
@@ -216,7 +221,7 @@ describe('AnalyticsService', () => {
         averageCrewEfficiency: 87.3,
         jobCompletionRate: 94.7,
         crewUtilization: 78.2,
-        onTimePerformance: 91.5
+        onTimePerformance: 91.5,
       });
     });
 
@@ -235,17 +240,17 @@ describe('AnalyticsService', () => {
         onTimePerformance: 91.5,
         topServices: [
           { service: 'local', count: 15, revenue: 30000 },
-          { service: 'long_distance', count: 8, revenue: 18000 }
+          { service: 'long_distance', count: 8, revenue: 18000 },
         ],
         revenueByMonth: [
           { month: '2024-01', revenue: 25000, jobs: 12 },
-          { month: '2024-02', revenue: 30000, jobs: 15 }
+          { month: '2024-02', revenue: 30000, jobs: 15 },
         ],
         performanceMetrics: {
           averageJobDuration: 4.5,
           averageCrewEfficiency: 87.3,
-          jobCompletionRate: 94.7
-        }
+          jobCompletionRate: 94.7,
+        },
       };
 
       expect(result).toEqual(expectedMetrics);
@@ -263,7 +268,9 @@ describe('AnalyticsService', () => {
       const error = new Error('Aggregation failed');
       jest.spyOn(service as any, 'getJobMetrics').mockRejectedValue(error);
 
-      await expect(service.getDashboardMetrics(mockPeriod)).rejects.toThrow(error);
+      await expect(service.getDashboardMetrics(mockPeriod)).rejects.toThrow(
+        error,
+      );
     });
 
     it('should log errors during metrics calculation', async () => {
@@ -274,7 +281,7 @@ describe('AnalyticsService', () => {
       await expect(service.getDashboardMetrics(mockPeriod)).rejects.toThrow();
       expect(loggerSpy).toHaveBeenCalledWith(
         'Failed to get dashboard metrics: Database error',
-        error.stack
+        error.stack,
       );
     });
   });
@@ -282,7 +289,7 @@ describe('AnalyticsService', () => {
   describe('getEventsByType', () => {
     const period: PeriodFilter = {
       startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-01-31')
+      endDate: new Date('2024-01-31'),
     };
 
     it('should return events by type within period', async () => {
@@ -290,7 +297,7 @@ describe('AnalyticsService', () => {
       const mockQuery = {
         sort: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(mockEvents)
+        exec: jest.fn().mockResolvedValue(mockEvents),
       };
 
       mockAnalyticsEventModel.find.mockReturnValue(mockQuery);
@@ -301,8 +308,8 @@ describe('AnalyticsService', () => {
         eventType: 'job_completed',
         timestamp: {
           $gte: period.startDate,
-          $lte: period.endDate
-        }
+          $lte: period.endDate,
+        },
       });
       expect(mockQuery.sort).toHaveBeenCalledWith({ timestamp: -1 });
       expect(mockQuery.limit).toHaveBeenCalledWith(100);
@@ -313,7 +320,7 @@ describe('AnalyticsService', () => {
       const mockQuery = {
         sort: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([])
+        exec: jest.fn().mockResolvedValue([]),
       };
 
       mockAnalyticsEventModel.find.mockReturnValue(mockQuery);
@@ -327,7 +334,7 @@ describe('AnalyticsService', () => {
   describe('getEventsByCategory', () => {
     const period: PeriodFilter = {
       startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-01-31')
+      endDate: new Date('2024-01-31'),
     };
 
     it('should return events by category within period', async () => {
@@ -335,7 +342,7 @@ describe('AnalyticsService', () => {
       const mockQuery = {
         sort: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(mockEvents)
+        exec: jest.fn().mockResolvedValue(mockEvents),
       };
 
       mockAnalyticsEventModel.find.mockReturnValue(mockQuery);
@@ -346,8 +353,8 @@ describe('AnalyticsService', () => {
         category: 'jobs',
         timestamp: {
           $gte: period.startDate,
-          $lte: period.endDate
-        }
+          $lte: period.endDate,
+        },
       });
       expect(result).toEqual(mockEvents);
     });
@@ -356,7 +363,7 @@ describe('AnalyticsService', () => {
   describe('getRevenueAnalytics', () => {
     const period: PeriodFilter = {
       startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-01-31')
+      endDate: new Date('2024-01-31'),
     };
 
     it('should return revenue analytics aggregation', async () => {
@@ -367,11 +374,13 @@ describe('AnalyticsService', () => {
           totalCost: 3000,
           totalProfit: 2000,
           jobCount: 3,
-          averageJobValue: 1666.67
-        }
+          averageJobValue: 1666.67,
+        },
       ];
 
-      mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+      mockAnalyticsEventModel.aggregate.mockResolvedValue(
+        mockAggregationResult,
+      );
 
       const result = await service.getRevenueAnalytics(period);
 
@@ -381,28 +390,28 @@ describe('AnalyticsService', () => {
             category: 'revenue',
             timestamp: {
               $gte: period.startDate,
-              $lte: period.endDate
+              $lte: period.endDate,
             },
-            revenue: { $exists: true, $gt: 0 }
-          }
+            revenue: { $exists: true, $gt: 0 },
+          },
         },
         {
           $group: {
             _id: {
               year: { $year: '$timestamp' },
               month: { $month: '$timestamp' },
-              day: { $dayOfMonth: '$timestamp' }
+              day: { $dayOfMonth: '$timestamp' },
             },
             totalRevenue: { $sum: '$revenue' },
             totalCost: { $sum: '$cost' },
             totalProfit: { $sum: '$profit' },
             jobCount: { $sum: 1 },
-            averageJobValue: { $avg: '$revenue' }
-          }
+            averageJobValue: { $avg: '$revenue' },
+          },
         },
         {
-          $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } as any
-        }
+          $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } as any,
+        },
       ]);
       expect(result).toEqual(mockAggregationResult);
     });
@@ -411,7 +420,7 @@ describe('AnalyticsService', () => {
   describe('getGeographicAnalytics', () => {
     const period: PeriodFilter = {
       startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-01-31')
+      endDate: new Date('2024-01-31'),
     };
 
     it('should return geographic analytics aggregation', async () => {
@@ -420,17 +429,19 @@ describe('AnalyticsService', () => {
           _id: { state: 'IL', city: 'Springfield' },
           jobCount: 5,
           totalRevenue: 8000,
-          averageRevenue: 1600
+          averageRevenue: 1600,
         },
         {
           _id: { state: 'IL', city: 'Chicago' },
           jobCount: 3,
           totalRevenue: 6000,
-          averageRevenue: 2000
-        }
+          averageRevenue: 2000,
+        },
       ];
 
-      mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+      mockAnalyticsEventModel.aggregate.mockResolvedValue(
+        mockAggregationResult,
+      );
 
       const result = await service.getGeographicAnalytics(period);
 
@@ -439,25 +450,25 @@ describe('AnalyticsService', () => {
           $match: {
             timestamp: {
               $gte: period.startDate,
-              $lte: period.endDate
+              $lte: period.endDate,
             },
-            'location.state': { $exists: true }
-          }
+            'location.state': { $exists: true },
+          },
         },
         {
           $group: {
             _id: {
               state: '$location.state',
-              city: '$location.city'
+              city: '$location.city',
             },
             jobCount: { $sum: 1 },
             totalRevenue: { $sum: '$revenue' },
-            averageRevenue: { $avg: '$revenue' }
-          }
+            averageRevenue: { $avg: '$revenue' },
+          },
         },
         {
-          $sort: { jobCount: -1 } as any
-        }
+          $sort: { jobCount: -1 } as any,
+        },
       ]);
       expect(result).toEqual(mockAggregationResult);
     });
@@ -469,14 +480,16 @@ describe('AnalyticsService', () => {
         const mockAggregationResult = [
           { _id: 'job_created', count: 25 },
           { _id: 'job_started', count: 23 },
-          { _id: 'job_completed', count: 20 }
+          { _id: 'job_completed', count: 20 },
         ];
 
-        mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+        mockAnalyticsEventModel.aggregate.mockResolvedValue(
+          mockAggregationResult,
+        );
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getJobMetrics(period);
@@ -484,7 +497,7 @@ describe('AnalyticsService', () => {
         expect(result).toEqual({
           total: 25,
           active: 3, // started - completed
-          completed: 20
+          completed: 20,
         });
       });
 
@@ -493,7 +506,7 @@ describe('AnalyticsService', () => {
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getJobMetrics(period);
@@ -501,7 +514,7 @@ describe('AnalyticsService', () => {
         expect(result).toEqual({
           total: 0,
           active: 0,
-          completed: 0
+          completed: 0,
         });
       });
     });
@@ -513,15 +526,17 @@ describe('AnalyticsService', () => {
             _id: null,
             totalRevenue: 50000,
             averageRevenue: 2000,
-            count: 25
-          }
+            count: 25,
+          },
         ];
 
-        mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+        mockAnalyticsEventModel.aggregate.mockResolvedValue(
+          mockAggregationResult,
+        );
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getRevenueMetrics(period);
@@ -529,7 +544,7 @@ describe('AnalyticsService', () => {
         expect(result).toEqual({
           totalRevenue: 50000,
           averageRevenue: 2000,
-          count: 25
+          count: 25,
         });
       });
 
@@ -538,7 +553,7 @@ describe('AnalyticsService', () => {
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getRevenueMetrics(period);
@@ -546,7 +561,7 @@ describe('AnalyticsService', () => {
         expect(result).toEqual({
           totalRevenue: 0,
           averageRevenue: 0,
-          count: 0
+          count: 0,
         });
       });
     });
@@ -555,10 +570,12 @@ describe('AnalyticsService', () => {
       it('should calculate today metrics correctly', async () => {
         const mockAggregationResult = [
           { _id: 'job_completed', count: 2, revenue: 3000 },
-          { _id: 'job_created', count: 1, revenue: 500 }
+          { _id: 'job_created', count: 1, revenue: 500 },
         ];
 
-        mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+        mockAnalyticsEventModel.aggregate.mockResolvedValue(
+          mockAggregationResult,
+        );
 
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
@@ -567,7 +584,7 @@ describe('AnalyticsService', () => {
 
         expect(result).toEqual({
           completedJobs: 2,
-          revenue: 3500
+          revenue: 3500,
         });
       });
     });
@@ -577,14 +594,16 @@ describe('AnalyticsService', () => {
         const mockAggregationResult = [
           { _id: 'local', count: 15, revenue: 30000 },
           { _id: 'long_distance', count: 8, revenue: 18000 },
-          { _id: 'storage', count: 5, revenue: 5000 }
+          { _id: 'storage', count: 5, revenue: 5000 },
         ];
 
-        mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+        mockAnalyticsEventModel.aggregate.mockResolvedValue(
+          mockAggregationResult,
+        );
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getTopServices(period);
@@ -592,28 +611,30 @@ describe('AnalyticsService', () => {
         expect(result).toEqual([
           { service: 'local', count: 15, revenue: 30000 },
           { service: 'long_distance', count: 8, revenue: 18000 },
-          { service: 'storage', count: 5, revenue: 5000 }
+          { service: 'storage', count: 5, revenue: 5000 },
         ]);
       });
 
       it('should handle null revenue values', async () => {
         const mockAggregationResult = [
           { _id: 'local', count: 15, revenue: null },
-          { _id: 'storage', count: 5, revenue: 5000 }
+          { _id: 'storage', count: 5, revenue: 5000 },
         ];
 
-        mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+        mockAnalyticsEventModel.aggregate.mockResolvedValue(
+          mockAggregationResult,
+        );
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getTopServices(period);
 
         expect(result).toEqual([
           { service: 'local', count: 15, revenue: 0 },
-          { service: 'storage', count: 5, revenue: 5000 }
+          { service: 'storage', count: 5, revenue: 5000 },
         ]);
       });
     });
@@ -622,21 +643,23 @@ describe('AnalyticsService', () => {
       it('should return monthly revenue data', async () => {
         const mockAggregationResult = [
           { _id: { year: 2024, month: 1 }, revenue: 25000, jobs: 12 },
-          { _id: { year: 2024, month: 2 }, revenue: 30000, jobs: 15 }
+          { _id: { year: 2024, month: 2 }, revenue: 30000, jobs: 15 },
         ];
 
-        mockAnalyticsEventModel.aggregate.mockResolvedValue(mockAggregationResult);
+        mockAnalyticsEventModel.aggregate.mockResolvedValue(
+          mockAggregationResult,
+        );
 
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-02-29')
+          endDate: new Date('2024-02-29'),
         };
 
         const result = await (service as any).getMonthlyRevenue(period);
 
         expect(result).toEqual([
           { month: '2024-01', revenue: 25000, jobs: 12 },
-          { month: '2024-02', revenue: 30000, jobs: 15 }
+          { month: '2024-02', revenue: 30000, jobs: 15 },
         ]);
       });
     });
@@ -645,7 +668,7 @@ describe('AnalyticsService', () => {
       it('should return mock performance metrics', async () => {
         const period: PeriodFilter = {
           startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-01-31')
+          endDate: new Date('2024-01-31'),
         };
 
         const result = await (service as any).getPerformanceMetrics(period);
@@ -655,7 +678,7 @@ describe('AnalyticsService', () => {
           averageCrewEfficiency: 87.3,
           jobCompletionRate: 94.7,
           crewUtilization: 78.2,
-          onTimePerformance: 91.5
+          onTimePerformance: 91.5,
         });
       });
     });
@@ -665,7 +688,7 @@ describe('AnalyticsService', () => {
     it('should use correct aggregation pipeline for revenue analytics', async () => {
       const period: PeriodFilter = {
         startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-01-31')
+        endDate: new Date('2024-01-31'),
       };
 
       mockAnalyticsEventModel.aggregate.mockResolvedValue([]);
@@ -679,30 +702,30 @@ describe('AnalyticsService', () => {
         category: 'revenue',
         timestamp: {
           $gte: period.startDate,
-          $lte: period.endDate
+          $lte: period.endDate,
         },
-        revenue: { $exists: true, $gt: 0 }
+        revenue: { $exists: true, $gt: 0 },
       });
 
       // Verify group stage
       expect(calledPipeline[1].$group._id).toEqual({
         year: { $year: '$timestamp' },
         month: { $month: '$timestamp' },
-        day: { $dayOfMonth: '$timestamp' }
+        day: { $dayOfMonth: '$timestamp' },
       });
 
       // Verify sort stage
       expect(calledPipeline[2].$sort).toEqual({
         '_id.year': 1,
         '_id.month': 1,
-        '_id.day': 1
+        '_id.day': 1,
       });
     });
 
     it('should use correct aggregation pipeline for geographic analytics', async () => {
       const period: PeriodFilter = {
         startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-01-31')
+        endDate: new Date('2024-01-31'),
       };
 
       mockAnalyticsEventModel.aggregate.mockResolvedValue([]);
@@ -715,15 +738,15 @@ describe('AnalyticsService', () => {
       expect(calledPipeline[0].$match).toEqual({
         timestamp: {
           $gte: period.startDate,
-          $lte: period.endDate
+          $lte: period.endDate,
         },
-        'location.state': { $exists: true }
+        'location.state': { $exists: true },
       });
 
       // Verify group stage groups by state and city
       expect(calledPipeline[1].$group._id).toEqual({
         state: '$location.state',
-        city: '$location.city'
+        city: '$location.city',
       });
     });
   });
@@ -735,7 +758,7 @@ describe('AnalyticsService', () => {
 
       const period: PeriodFilter = {
         startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-01-31')
+        endDate: new Date('2024-01-31'),
       };
 
       await expect(service.getRevenueAnalytics(period)).rejects.toThrow(error);
@@ -746,17 +769,19 @@ describe('AnalyticsService', () => {
       const mockQuery = {
         sort: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockRejectedValue(error)
+        exec: jest.fn().mockRejectedValue(error),
       };
 
       mockAnalyticsEventModel.find.mockReturnValue(mockQuery);
 
       const period: PeriodFilter = {
         startDate: new Date('2024-01-01'),
-        endDate: new Date('2024-01-31')
+        endDate: new Date('2024-01-31'),
       };
 
-      await expect(service.getEventsByType('job_created', period)).rejects.toThrow(error);
+      await expect(
+        service.getEventsByType('job_created', period),
+      ).rejects.toThrow(error);
     });
 
     it('should handle events with missing optional fields', async () => {
@@ -764,12 +789,12 @@ describe('AnalyticsService', () => {
         eventType: 'customer_created',
         category: 'customers',
         data: { customerType: 'residential' },
-        userId: 'user123'
+        userId: 'user123',
       };
 
       mockEventModel.constructor().save.mockResolvedValue({
         ...mockAnalyticsEvent,
-        ...minimalEvent
+        ...minimalEvent,
       });
 
       const result = await service.trackEvent(minimalEvent);
@@ -778,7 +803,7 @@ describe('AnalyticsService', () => {
       expect(mockEventModel.constructor).toHaveBeenCalledWith({
         ...minimalEvent,
         timestamp: expect.any(Date),
-        processed: false
+        processed: false,
       });
     });
   });

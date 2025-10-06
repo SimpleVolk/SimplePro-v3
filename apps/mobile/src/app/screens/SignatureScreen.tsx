@@ -17,7 +17,9 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
   const { jobId } = route.params;
   const { currentJob, addSignature } = useJobs();
   const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
-  const [signatureType, setSignatureType] = useState<'pickup' | 'delivery'>('pickup');
+  const [signatureType, setSignatureType] = useState<'pickup' | 'delivery'>(
+    'pickup',
+  );
   const [isSaving, setIsSaving] = useState(false);
   const signatureRef = useRef<any>(null);
 
@@ -166,7 +168,7 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
             text: 'OK',
             onPress: () => navigation.goBack(),
           },
-        ]
+        ],
       );
     } catch (error) {
       Alert.alert('Error', 'Failed to save signature');
@@ -189,7 +191,7 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
           text: 'Save',
           onPress: () => signatureRef.current?.readSignature(),
         },
-      ]
+      ],
     );
   };
 
@@ -227,10 +229,12 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
             ]}
             onPress={() => setSignatureType('pickup')}
           >
-            <Text style={[
-              styles.typeButtonText,
-              signatureType === 'pickup' && styles.activeTypeButtonText,
-            ]}>
+            <Text
+              style={[
+                styles.typeButtonText,
+                signatureType === 'pickup' && styles.activeTypeButtonText,
+              ]}
+            >
               Pickup
             </Text>
           </TouchableOpacity>
@@ -241,10 +245,12 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
             ]}
             onPress={() => setSignatureType('delivery')}
           >
-            <Text style={[
-              styles.typeButtonText,
-              signatureType === 'delivery' && styles.activeTypeButtonText,
-            ]}>
+            <Text
+              style={[
+                styles.typeButtonText,
+                signatureType === 'delivery' && styles.activeTypeButtonText,
+              ]}
+            >
               Delivery
             </Text>
           </TouchableOpacity>
@@ -256,22 +262,27 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
         <View style={styles.statusContainer}>
           <View style={styles.statusItem}>
             <Text style={styles.statusLabel}>Pickup Signature</Text>
-            <View style={[
-              styles.statusIndicator,
-              currentJob.signatures?.pickup && styles.statusComplete,
-            ]} />
+            <View
+              style={[
+                styles.statusIndicator,
+                currentJob.signatures?.pickup && styles.statusComplete,
+              ]}
+            />
           </View>
           <View style={styles.statusItem}>
             <Text style={styles.statusLabel}>Delivery Signature</Text>
-            <View style={[
-              styles.statusIndicator,
-              currentJob.signatures?.delivery && styles.statusComplete,
-            ]} />
+            <View
+              style={[
+                styles.statusIndicator,
+                currentJob.signatures?.delivery && styles.statusComplete,
+              ]}
+            />
           </View>
         </View>
 
         <Text style={styles.instructionText}>
-          Please sign below to confirm {signatureType === 'pickup' ? 'pickup' : 'delivery'} completion
+          Please sign below to confirm{' '}
+          {signatureType === 'pickup' ? 'pickup' : 'delivery'} completion
         </Text>
 
         <View style={styles.signatureContainer}>

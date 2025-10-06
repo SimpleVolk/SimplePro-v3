@@ -15,7 +15,7 @@ export class ForeignKeyValidationService {
    */
   async validateReference(
     modelName: string,
-    id: string | mongoose.Types.ObjectId
+    id: string | mongoose.Types.ObjectId,
   ): Promise<boolean> {
     try {
       const model = mongoose.model(modelName);
@@ -33,14 +33,18 @@ export class ForeignKeyValidationService {
    * @returns Promise<boolean> True if all exist, throws BadRequestException otherwise
    */
   async validateReferences(
-    references: Array<{ modelName: string; id: string | mongoose.Types.ObjectId; fieldName: string }>
+    references: Array<{
+      modelName: string;
+      id: string | mongoose.Types.ObjectId;
+      fieldName: string;
+    }>,
   ): Promise<boolean> {
     for (const ref of references) {
       if (ref.id) {
         const exists = await this.validateReference(ref.modelName, ref.id);
         if (!exists) {
           throw new BadRequestException(
-            `Referenced ${ref.modelName} (${ref.fieldName}) not found: ${ref.id}`
+            `Referenced ${ref.modelName} (${ref.fieldName}) not found: ${ref.id}`,
           );
         }
       }
@@ -58,9 +62,9 @@ export class ForeignKeyValidationService {
   createSingleReferenceValidator(
     refField: string,
     refModel: string,
-    required = false
+    required = false,
   ) {
-    return async function (this: any, next: any) {
+    return async function (this: any, next: Function) {
       try {
         const refValue = this[refField];
 
@@ -76,7 +80,7 @@ export class ForeignKeyValidationService {
 
         if (!exists) {
           throw new BadRequestException(
-            `Referenced ${refModel} not found for field ${refField}: ${refValue}`
+            `Referenced ${refModel} not found for field ${refField}: ${refValue}`,
           );
         }
 
@@ -93,9 +97,9 @@ export class ForeignKeyValidationService {
    * @returns Middleware function
    */
   createMultiReferenceValidator(
-    references: Array<{ field: string; model: string; required?: boolean }>
+    references: Array<{ field: string; model: string; required?: boolean }>,
   ) {
-    return async function (this: any, next: any) {
+    return async function (this: any, next: Function) {
       try {
         for (const ref of references) {
           const refValue = this[ref.field];
@@ -112,7 +116,7 @@ export class ForeignKeyValidationService {
 
           if (!exists) {
             throw new BadRequestException(
-              `Referenced ${ref.model} not found for field ${ref.field}: ${refValue}`
+              `Referenced ${ref.model} not found for field ${ref.field}: ${refValue}`,
             );
           }
         }
@@ -134,13 +138,17 @@ export class ForeignKeyValidationService {
   createArrayReferenceValidator(
     arrayField: string,
     refField: string,
-    refModel: string
+    refModel: string,
   ) {
-    return async function (this: any, next: any) {
+    return async function (this: any, next: Function) {
       try {
         const arrayValue = this[arrayField];
 
-        if (!arrayValue || !Array.isArray(arrayValue) || arrayValue.length === 0) {
+        if (
+          !arrayValue ||
+          !Array.isArray(arrayValue) ||
+          arrayValue.length === 0
+        ) {
           return next();
         }
 
@@ -152,7 +160,7 @@ export class ForeignKeyValidationService {
             const exists = await model.exists({ _id: refId });
             if (!exists) {
               throw new BadRequestException(
-                `Referenced ${refModel} not found in ${arrayField}.${refField}: ${refId}`
+                `Referenced ${refModel} not found in ${arrayField}.${refField}: ${refId}`,
               );
             }
           }

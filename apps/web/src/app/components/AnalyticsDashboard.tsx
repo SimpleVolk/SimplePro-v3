@@ -5,11 +5,21 @@ import { LoadingSkeleton } from './LoadingSkeleton';
 import styles from './AnalyticsDashboard.module.css';
 
 // Dynamic imports for chart-heavy components
-const AnalyticsOverview = lazy(() => import('./AnalyticsOverview').then(mod => ({ default: mod.AnalyticsOverview })));
-const ReportsManagement = lazy(() => import('./ReportsManagement').then(mod => ({ default: mod.ReportsManagement })));
+const AnalyticsOverview = lazy(() =>
+  import('./AnalyticsOverview').then((mod) => ({
+    default: mod.AnalyticsOverview,
+  })),
+);
+const ReportsManagement = lazy(() =>
+  import('./ReportsManagement').then((mod) => ({
+    default: mod.ReportsManagement,
+  })),
+);
 
 export const AnalyticsDashboard = memo(function AnalyticsDashboard() {
-  const [activeSection, setActiveSection] = useState<'overview' | 'reports'>('overview');
+  const [activeSection, setActiveSection] = useState<'overview' | 'reports'>(
+    'overview',
+  );
 
   return (
     <div className={styles.analyticsDashboard}>
@@ -28,7 +38,9 @@ export const AnalyticsDashboard = memo(function AnalyticsDashboard() {
           <div className={styles.sectionIcon}>📊</div>
           <div className={styles.sectionInfo}>
             <div className={styles.sectionTitle}>Dashboard Overview</div>
-            <div className={styles.sectionDescription}>Real-time metrics and KPIs</div>
+            <div className={styles.sectionDescription}>
+              Real-time metrics and KPIs
+            </div>
           </div>
         </button>
 
@@ -41,7 +53,9 @@ export const AnalyticsDashboard = memo(function AnalyticsDashboard() {
           <div className={styles.sectionIcon}>📋</div>
           <div className={styles.sectionInfo}>
             <div className={styles.sectionTitle}>Reports Management</div>
-            <div className={styles.sectionDescription}>Create and manage custom reports</div>
+            <div className={styles.sectionDescription}>
+              Create and manage custom reports
+            </div>
           </div>
         </button>
       </div>

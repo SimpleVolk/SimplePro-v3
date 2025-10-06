@@ -9,6 +9,7 @@ Successfully implemented a complete GraphQL API system for SimplePro-v3 as an al
 ### 1. Package Installation ✅
 
 Installed the following packages:
+
 - `@nestjs/graphql@^12.0.0` - NestJS GraphQL module
 - `@nestjs/apollo@^12.0.0` - Apollo Server integration
 - `@apollo/server@^4.9.0` - Apollo GraphQL server
@@ -22,6 +23,7 @@ Installed the following packages:
 Complete schema definition with:
 
 #### Types
+
 - **Job** - Full job entity with all relationships
 - **JobWithDetails** - Enhanced job type with resolved relationships
 - **Customer** - Customer entity with jobs relationship
@@ -31,6 +33,7 @@ Complete schema definition with:
 - **Address, CrewAssignment, InventoryItem, JobMilestone, etc.** - Supporting types
 
 #### Queries
+
 - `job(id)` - Single job by ID
 - `jobByNumber(jobNumber)` - Job by job number
 - `jobs(filters, sortBy, first, after)` - Paginated job list with cursor-based pagination
@@ -47,6 +50,7 @@ Complete schema definition with:
 - `revenueMetrics(startDate, endDate)` - Revenue metrics
 
 #### Mutations
+
 - `createJob(input)` - Create new job
 - `updateJob(id, input)` - Update job
 - `updateJobStatus(id, status)` - Update job status
@@ -57,6 +61,7 @@ Complete schema definition with:
 - `updateMilestone(jobId, milestoneId, status)` - Update milestone
 
 #### Subscriptions (defined, not implemented)
+
 - `jobUpdated(jobId)` - Real-time job updates
 - `jobStatusChanged(jobId)` - Job status changes
 - `crewAssigned(crewMemberId)` - Crew assignments
@@ -64,18 +69,21 @@ Complete schema definition with:
 ### 3. DataLoaders (N+1 Optimization) ✅
 
 #### Customer DataLoader (`dataloaders/customer.dataloader.ts`)
+
 - Batches customer queries by ID
 - Prevents N+1 queries when loading customers for multiple jobs
 - Uses MongoDB `$in` operator for batch fetching
 - REQUEST scoped for per-request caching
 
 #### Crew DataLoader (`dataloaders/crew.dataloader.ts`)
+
 - Batches crew member queries from User collection
 - Filters by crew roles (crew, crew_lead, driver)
 - Includes `loadAvailableCrew(date)` helper
 - Converts User schema to CrewMember type
 
 #### Estimate DataLoader (`dataloaders/estimate.dataloader.ts`)
+
 - **Placeholder implementation** - estimates currently calculated on-demand
 - Ready for future Estimate schema integration
 - Includes TODO comments for implementation
@@ -83,7 +91,9 @@ Complete schema definition with:
 ### 4. Resolvers ✅
 
 #### Jobs Resolver (`resolvers/jobs.resolver.ts`)
+
 **Queries:**
+
 - `getJob(id)` - Single job
 - `getJobByNumber(jobNumber)` - Job by number
 - `getJobs(filters, sortBy, first, after)` - Paginated jobs with Connection pattern
@@ -91,6 +101,7 @@ Complete schema definition with:
 - `getJobsByDate(date)` - Daily jobs
 
 **Mutations:**
+
 - `createJob(input)` - Create with user context
 - `updateJob(id, input)` - Update with user context
 - `updateJobStatus(id, status)` - Status update
@@ -101,34 +112,43 @@ Complete schema definition with:
 - `updateMilestone(jobId, milestoneId, status)` - Update milestone
 
 **Field Resolvers:**
+
 - `customer` - Loads customer via DataLoader
 - `estimate` - Loads estimate via DataLoader
 - `assignedCrew` - Enriches crew data with names
 - `leadCrew` - Loads lead crew member
 
 #### Customers Resolver (`resolvers/customers.resolver.ts`)
+
 **Queries:**
+
 - `getCustomer(id)` - Single customer
 - `getCustomerByEmail(email)` - Customer by email
 - `getCustomers(filters, sortBy, first, after)` - Paginated customers
 
 **Field Resolvers:**
+
 - `fullName` - Computed field
 - `jobs` - Loads customer's jobs
 
 #### Analytics Resolver (`resolvers/analytics.resolver.ts`)
+
 **Queries:**
+
 - `getAnalytics(startDate, endDate)` - Complete analytics
 - `getJobStats()` - Job statistics
 - `getRevenueMetrics(startDate, endDate)` - Revenue metrics
 
 **Features:**
+
 - Integrates with existing AnalyticsService
 - Fallback calculations when service unavailable
 - Role-based access control with `@Roles()` decorator
 
 #### Crew Resolver (`resolvers/analytics.resolver.ts`)
+
 **Queries:**
+
 - `getCrewMember(id)` - Single crew member
 - `getCrewMembers(filters)` - Crew member list
 - `getAvailableCrew(date)` - Available crew
@@ -136,6 +156,7 @@ Complete schema definition with:
 ### 5. GraphQL Module (`graphql.module.ts`) ✅
 
 **Configuration:**
+
 - Apollo Server with schema-first approach
 - GraphQL Playground enabled in development
 - Introspection enabled for tooling
@@ -143,11 +164,13 @@ Complete schema definition with:
 - Custom error formatting with timestamps
 
 **Module Imports:**
+
 - MongooseModule for Customer and User schemas
 - JobsModule, CustomersModule, AnalyticsModule, AuthModule
 - All resolvers and DataLoaders registered
 
 **Features:**
+
 - Automatic schema generation to `graphql.schema.ts`
 - REQUEST scoped DataLoaders for proper batching
 - Context includes request for auth guards
@@ -155,6 +178,7 @@ Complete schema definition with:
 ### 6. App Module Integration ✅
 
 Updated `apps/api/src/app.module.ts`:
+
 - Imported `GraphQLModule`
 - Added to module imports array
 - GraphQL endpoint available at `/graphql`
@@ -162,12 +186,14 @@ Updated `apps/api/src/app.module.ts`:
 ## Architecture Highlights
 
 ### Authentication & Authorization
+
 - All resolvers protected with `@UseGuards(JwtAuthGuard)`
 - Uses existing JWT authentication system
 - Role-based access with `@Roles()` decorator
 - User context available via `@Request()` decorator
 
 ### DataLoader Pattern
+
 ```typescript
 // Before (N+1 problem):
 for (const job of jobs) {
@@ -175,11 +201,12 @@ for (const job of jobs) {
 }
 
 // After (batched):
-const customerIds = jobs.map(j => j.customerId);
+const customerIds = jobs.map((j) => j.customerId);
 const customers = await customerDataLoader.loadMany(customerIds); // 1 query
 ```
 
 ### Cursor-Based Pagination
+
 ```typescript
 {
   edges: [{ node: Job, cursor: string }],
@@ -194,6 +221,7 @@ const customers = await customerDataLoader.loadMany(customerIds); // 1 query
 ```
 
 ### Service Integration
+
 - Reuses all existing NestJS services (JobsService, CustomersService, etc.)
 - Maintains business logic consistency between REST and GraphQL
 - Single source of truth for data operations
@@ -203,6 +231,7 @@ const customers = await customerDataLoader.loadMany(customerIds); // 1 query
 **URL**: `http://localhost:3001/graphql`
 
 **Headers**:
+
 ```
 Authorization: Bearer <jwt-token>
 Content-Type: application/json
@@ -213,6 +242,7 @@ Content-Type: application/json
 ## Example Queries
 
 ### Get Jobs with Customers
+
 ```graphql
 query {
   jobs(filters: { status: scheduled }, first: 10) {
@@ -232,6 +262,7 @@ query {
 ```
 
 ### Create Job
+
 ```graphql
 mutation CreateJob($input: CreateJobInput!) {
   createJob(input: $input) {
@@ -243,6 +274,7 @@ mutation CreateJob($input: CreateJobInput!) {
 ```
 
 ### Get Analytics
+
 ```graphql
 query {
   analytics {
@@ -283,6 +315,7 @@ apps/api/src/graphql/
 ### Manual Testing with GraphQL Playground
 
 1. Start API server:
+
    ```bash
    npm run dev:api
    ```
@@ -290,6 +323,7 @@ apps/api/src/graphql/
 2. Navigate to: `http://localhost:3001/graphql`
 
 3. Set authentication header:
+
    ```json
    {
      "Authorization": "Bearer <token>"
@@ -335,6 +369,7 @@ curl -X POST http://localhost:3001/graphql \
 ### Future Enhancements
 
 1. **Implement Estimate Schema & DataLoader**
+
    ```typescript
    @Schema({ collection: 'estimates' })
    export class Estimate {
@@ -346,6 +381,7 @@ curl -X POST http://localhost:3001/graphql \
    ```
 
 2. **Enable GraphQL Subscriptions**
+
    ```typescript
    @Subscription('jobUpdated')
    jobUpdated(@Args('jobId') jobId: string) {
@@ -371,16 +407,19 @@ curl -X POST http://localhost:3001/graphql \
 ## Performance Considerations
 
 ### DataLoader Batching
+
 - **Before**: N+1 queries (1 query per relationship)
 - **After**: 1 batched query per entity type
 - **Savings**: 10 jobs with customers = 1 query instead of 11
 
 ### Request Scoping
+
 - DataLoaders reset per request
 - Prevents stale cache across requests
 - Automatic memory cleanup
 
 ### Pagination
+
 - Cursor-based for efficient large datasets
 - Default limit of 20 items
 - Prevents unbounded result sets
@@ -388,16 +427,19 @@ curl -X POST http://localhost:3001/graphql \
 ## Security
 
 ### Authentication
+
 - JWT token required for all endpoints
 - Token validated via existing JwtAuthGuard
 - User context populated in resolvers
 
 ### Authorization
+
 - Role-based access with `@Roles()` decorator
 - Analytics queries restricted to admin/dispatcher
 - User can only access permitted data
 
 ### Error Handling
+
 - Custom error formatting
 - Sensitive data redacted
 - Timestamp for debugging
@@ -405,18 +447,21 @@ curl -X POST http://localhost:3001/graphql \
 ## Integration with REST API
 
 ### Coexistence
+
 - Both REST and GraphQL available simultaneously
 - Same underlying services and business logic
 - Consistent authentication system
 - Client can choose based on use case
 
 ### When to Use GraphQL
+
 - Complex queries with multiple relationships
 - Flexible client requirements
 - Mobile apps needing specific data
 - Reducing over-fetching/under-fetching
 
 ### When to Use REST
+
 - Simple CRUD operations
 - File uploads
 - Legacy client compatibility
@@ -425,11 +470,13 @@ curl -X POST http://localhost:3001/graphql \
 ## Documentation
 
 ### GraphQL Schema Documentation
+
 - Schema file serves as API documentation
 - GraphQL Playground provides interactive docs
 - Type definitions include descriptions
 
 ### Developer Resources
+
 - `apps/api/src/graphql/README.md` - Comprehensive guide
 - Example queries and mutations
 - Common use cases and patterns
@@ -438,12 +485,14 @@ curl -X POST http://localhost:3001/graphql \
 ## Deployment Notes
 
 ### Development
+
 - GraphQL Playground enabled
 - Introspection enabled
 - Detailed error messages
 - Auto-reload on schema changes
 
 ### Production
+
 - Disable Playground: `playground: process.env.NODE_ENV !== 'production'`
 - Consider disabling introspection for security
 - Sanitize error messages
@@ -453,6 +502,7 @@ curl -X POST http://localhost:3001/graphql \
 ## Success Metrics
 
 ✅ **Complete Implementation**
+
 - Schema with 40+ types defined
 - 20+ queries implemented
 - 8+ mutations implemented
@@ -461,6 +511,7 @@ curl -X POST http://localhost:3001/graphql \
 - Comprehensive documentation
 
 ✅ **Architecture Quality**
+
 - Follows NestJS best practices
 - DataLoader pattern correctly implemented
 - Cursor-based pagination
@@ -468,6 +519,7 @@ curl -X POST http://localhost:3001/graphql \
 - Modular, maintainable code structure
 
 ✅ **Integration Success**
+
 - Leverages existing services
 - Consistent with REST API
 - Proper error handling
@@ -476,6 +528,7 @@ curl -X POST http://localhost:3001/graphql \
 ## Next Steps
 
 1. **Test in Development**
+
    ```bash
    npm run dev:api
    # Visit http://localhost:3001/graphql

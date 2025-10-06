@@ -14,12 +14,14 @@ WebSocket connections in SimplePro-v3 were not properly cleaned up on disconnect
 ### 1. Room Tracking System
 
 **Added:**
+
 - `socketRooms` Map: `Map<socketId, Set<roomNames>>` - Tracks all rooms per socket
 - `trackRoom(socketId, roomName)` - Helper to track room joins
 - `clearRoomTracking(socketId)` - Helper to remove all tracking for a socket
 
 **Updated:**
 All room joins now tracked:
+
 ```typescript
 const roleRoom = `role:${user.role.name}`;
 await client.join(roleRoom);
@@ -27,6 +29,7 @@ this.trackRoom(client.id, roleRoom); // NEW
 ```
 
 **Rooms tracked:**
+
 - `role:${roleName}` - Role-based rooms (admin, dispatcher, crew)
 - `crew:${crewId}` - Crew-specific rooms
 - `user:${userId}` - User-specific rooms
@@ -38,11 +41,13 @@ this.trackRoom(client.id, roleRoom); // NEW
 ### 2. Typing Timer Management
 
 **Added:**
+
 - `typingTimers` Map: `Map<'socketId:threadId', NodeJS.Timeout>` - Tracks typing timers per socket/thread
 - `TYPING_TIMEOUT = 5000ms` - Auto-clear typing after 5 seconds
 - `clearTypingTimers(socketId)` - Clears all typing timers for a socket
 
 **Updated `handleTypingStart`:**
+
 ```typescript
 // Clear existing timer for same socket/thread
 const timerKey = `${client.id}:${payload.threadId}`;
@@ -61,6 +66,7 @@ this.typingTimers.set(timerKey, timer);
 ```
 
 **Updated `handleTypingStop`:**
+
 ```typescript
 // Clear the typing timer
 const timerKey = `${client.id}:${payload.threadId}`;
@@ -74,6 +80,7 @@ if (timer) {
 ### 3. Comprehensive `handleDisconnect` Cleanup
 
 **Complete cleanup sequence:**
+
 ```typescript
 handleDisconnect(client: AuthenticatedSocket) {
   // 1. Clear connection timeout timer
@@ -127,6 +134,7 @@ async handleJobUnsubscription(client, data) {
 ```
 
 Applied to:
+
 - `unsubscribeFromJob`
 - `unsubscribeFromAnalytics`
 - `thread.unsubscribe`
@@ -134,6 +142,7 @@ Applied to:
 ### 5. Enhanced Memory Monitoring
 
 **Updated `getMemoryStats`:**
+
 ```typescript
 getMemoryStats() {
   return {
@@ -150,10 +159,13 @@ getMemoryStats() {
 ```
 
 **Updated `logConnectionStats` with warnings:**
+
 ```typescript
 // Alert if typing timers are accumulating
 if (stats.typingTimers > 100) {
-  this.logger.warn(`High typing timer count: ${stats.typingTimers} - potential memory leak`);
+  this.logger.warn(
+    `High typing timer count: ${stats.typingTimers} - potential memory leak`,
+  );
 }
 
 // Alert if room tracking is accumulating
@@ -165,6 +177,7 @@ if (stats.trackedRooms > stats.totalConnections * 2) {
 ### 6. Module Destroy Cleanup
 
 **Updated `onModuleDestroy`:**
+
 ```typescript
 async onModuleDestroy() {
   // Clear heartbeat interval
@@ -197,6 +210,7 @@ async onModuleDestroy() {
 ### 7. TypingService Wildcard Support
 
 **Updated `typing.service.ts`:**
+
 ```typescript
 async stopTyping(threadId: string, userId: string): Promise<void> {
   // Support wildcard threadId for cleanup on disconnect
@@ -220,6 +234,7 @@ async stopTyping(threadId: string, userId: string): Promise<void> {
 Created comprehensive test suite: `websocket.gateway.spec.ts`
 
 **Test coverage:**
+
 - ✅ Room cleanup on disconnect
 - ✅ Typing timer creation and cleanup
 - ✅ Auto-clear typing after timeout
@@ -232,6 +247,7 @@ Created comprehensive test suite: `websocket.gateway.spec.ts`
 - ✅ Unsubscribe room cleanup for all subscription types
 
 **Test results:**
+
 - Most tests passing
 - 2 tests needed adjustments for async/promise handling
 
@@ -254,10 +270,12 @@ Created comprehensive test suite: `websocket.gateway.spec.ts`
 ## Memory Leak Prevention Checklist
 
 ✅ **All timers cleared on disconnect**
+
 - Connection timeout timers
 - Typing indicator timers
 
 ✅ **All rooms explicitly left on disconnect**
+
 - Role rooms
 - Crew rooms
 - User rooms
@@ -266,6 +284,7 @@ Created comprehensive test suite: `websocket.gateway.spec.ts`
 - Analytics subscription rooms
 
 ✅ **All Map entries removed on disconnect**
+
 - `connectedClients`
 - `userSockets`
 - `crewRooms`
@@ -274,19 +293,23 @@ Created comprehensive test suite: `websocket.gateway.spec.ts`
 - `typingTimers`
 
 ✅ **Database cleanup on disconnect**
+
 - Typing indicators removed via wildcard
 
 ✅ **Unsubscribe handlers cleanup tracking**
+
 - Job unsubscribe removes room tracking
 - Thread unsubscribe removes room tracking
 - Analytics unsubscribe removes room tracking
 
 ✅ **Memory monitoring**
+
 - Active connection count logged
 - High timer count warnings
 - High room tracking warnings
 
 ✅ **Graceful shutdown**
+
 - Module destroy clears all resources
 - Force cleanup method available
 
@@ -311,17 +334,20 @@ Created comprehensive test suite: `websocket.gateway.spec.ts`
 ## Performance Impact
 
 **Positive:**
+
 - Reduced memory consumption over time
 - Prevents server crashes from memory exhaustion
 - Auto-cleanup reduces manual intervention
 
 **Negligible:**
+
 - Slight overhead from room tracking (minimal - Set operations are O(1))
 - Typing timer management (already existed, now properly cleaned up)
 
 ## Monitoring Recommendations
 
 Watch for these log messages:
+
 - `High connection count detected: ${count}` - Normal warning at 1000+ connections
 - `High typing timer count detected: ${count}` - Investigate if >100
 - `Room tracking exceeds expected ratio` - Investigate potential cleanup failures

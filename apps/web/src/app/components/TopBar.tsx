@@ -9,7 +9,10 @@ export function TopBar() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const getUserRoleDisplayName = (role?: { name: string; displayName: string }) => {
+  const getUserRoleDisplayName = (role?: {
+    name: string;
+    displayName: string;
+  }) => {
     return role?.displayName || role?.name || 'Unknown Role';
   };
 
@@ -25,15 +28,22 @@ export function TopBar() {
 
           <div className={styles.userInfo}>
             <div className={styles.userDetails}>
-              <span className={styles.userName} aria-label={`Current user: ${user?.firstName} ${user?.lastName}`}>
+              <span
+                className={styles.userName}
+                aria-label={`Current user: ${user?.firstName} ${user?.lastName}`}
+              >
                 {user?.firstName} {user?.lastName}
               </span>
-              <span className={styles.userRole} aria-label={`User role: ${getUserRoleDisplayName(user?.role)}`}>
+              <span
+                className={styles.userRole}
+                aria-label={`User role: ${getUserRoleDisplayName(user?.role)}`}
+              >
                 {getUserRoleDisplayName(user?.role)}
               </span>
             </div>
             <div className={styles.userAvatar}>
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
             </div>
           </div>
 
@@ -43,7 +53,9 @@ export function TopBar() {
             aria-label="Sign out of SimplePro Dashboard"
             type="button"
           >
-            <span className={styles.logoutIcon} aria-hidden="true">📤</span>
+            <span className={styles.logoutIcon} aria-hidden="true">
+              📤
+            </span>
             <span className={styles.logoutText}>Sign Out</span>
           </button>
         </div>

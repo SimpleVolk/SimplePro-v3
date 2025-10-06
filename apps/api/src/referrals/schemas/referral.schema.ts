@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type ReferralDocument = Referral & Document & {
-  daysSinceReferral: number;
-  customerFullName: string;
-};
+export type ReferralDocument = Referral &
+  Document & {
+    daysSinceReferral: number;
+    customerFullName: string;
+  };
 
 @Schema({ collection: 'referrals', timestamps: true })
 export class Referral {
@@ -26,9 +27,17 @@ export class Referral {
   @Prop({
     required: true,
     type: String,
-    enum: ['received', 'contacted', 'qualified', 'quoted', 'won', 'lost', 'cancelled'],
+    enum: [
+      'received',
+      'contacted',
+      'qualified',
+      'quoted',
+      'won',
+      'lost',
+      'cancelled',
+    ],
     default: 'received',
-    index: true
+    index: true,
   })
   status!: string;
 
@@ -37,13 +46,13 @@ export class Referral {
     type: String,
     enum: ['hot', 'warm', 'cold'],
     default: 'warm',
-    index: true
+    index: true,
   })
   leadQuality!: string;
 
   @Prop({
     required: true,
-    type: Object
+    type: Object,
   })
   customerInfo!: {
     firstName: string;
@@ -55,7 +64,7 @@ export class Referral {
 
   @Prop({
     required: true,
-    type: Object
+    type: Object,
   })
   moveDetails!: {
     moveDate?: Date;
@@ -71,8 +80,8 @@ export class Referral {
       commissionRate: 0,
       commissionAmount: 0,
       finalJobValue: 0,
-      isPaid: false
-    }
+      isPaid: false,
+    },
   })
   commissionDetails!: {
     commissionRate: number;
@@ -86,7 +95,7 @@ export class Referral {
 
   @Prop({
     type: Object,
-    default: {}
+    default: {},
   })
   conversionData!: {
     daysToContact?: number;
@@ -129,36 +138,43 @@ ReferralSchema.index({ status: 1, 'commissionDetails.isPaid': 1 });
 ReferralSchema.index({ partnerId: 1, 'commissionDetails.isPaid': 1 });
 
 // Text search index for customer information
-ReferralSchema.index({
-  'customerInfo.firstName': 'text',
-  'customerInfo.lastName': 'text',
-  'customerInfo.email': 'text',
-  'customerInfo.phone': 'text',
-  notes: 'text'
-}, {
-  weights: {
-    'customerInfo.firstName': 10,
-    'customerInfo.lastName': 10,
-    'customerInfo.email': 8,
-    'customerInfo.phone': 5,
-    notes: 1
+ReferralSchema.index(
+  {
+    'customerInfo.firstName': 'text',
+    'customerInfo.lastName': 'text',
+    'customerInfo.email': 'text',
+    'customerInfo.phone': 'text',
+    notes: 'text',
   },
-  name: 'referral_text_search'
-});
+  {
+    weights: {
+      'customerInfo.firstName': 10,
+      'customerInfo.lastName': 10,
+      'customerInfo.email': 8,
+      'customerInfo.phone': 5,
+      notes: 1,
+    },
+    name: 'referral_text_search',
+  },
+);
 
 // Sparse indexes for optional fields
 ReferralSchema.index({ 'moveDetails.moveDate': 1 }, { sparse: true });
 ReferralSchema.index({ 'commissionDetails.paidDate': -1 }, { sparse: true });
 
 // Virtual for days since referral
-ReferralSchema.virtual('daysSinceReferral').get(function(this: ReferralDocument) {
+ReferralSchema.virtual('daysSinceReferral').get(function (
+  this: ReferralDocument,
+) {
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - this.referralDate.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 });
 
 // Virtual for full customer name
-ReferralSchema.virtual('customerFullName').get(function(this: ReferralDocument) {
+ReferralSchema.virtual('customerFullName').get(function (
+  this: ReferralDocument,
+) {
   return `${this.customerInfo.firstName} ${this.customerInfo.lastName}`;
 });
 

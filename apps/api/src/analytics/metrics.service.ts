@@ -50,23 +50,27 @@ export class MetricsService {
         data: {
           metricName: metric.name,
           value: metric.value,
-          tags: metric.tags || {}
+          tags: metric.tags || {},
         },
         userId: metric.userId,
         metadata: {
           source: 'metrics_service',
-          tags: metric.tags
-        }
+          tags: metric.tags,
+        },
       };
 
       await this.analyticsService.trackEvent(event);
       this.logger.debug(`Tracked metric: ${metric.name} = ${metric.value}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Failed to track metric ${metric.name}: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Failed to track metric ${metric.name}: ${errorMessage}`,
+        errorStack,
+      );
     }
   }
 
@@ -85,7 +89,8 @@ export class MetricsService {
   }): Promise<void> {
     try {
       const profit = jobData.revenue - jobData.cost;
-      const profitMargin = jobData.revenue > 0 ? (profit / jobData.revenue) * 100 : 0;
+      const profitMargin =
+        jobData.revenue > 0 ? (profit / jobData.revenue) * 100 : 0;
 
       // Track multiple job-related events
       const events: AnalyticsEventInput[] = [
@@ -98,7 +103,7 @@ export class MetricsService {
             crewSize: jobData.crewSize,
             duration: jobData.duration,
             onTime: jobData.isOnTime,
-            customerRating: jobData.customerRating
+            customerRating: jobData.customerRating,
           },
           userId: jobData.userId,
           jobId: jobData.jobId,
@@ -107,7 +112,7 @@ export class MetricsService {
           cost: jobData.cost,
           profit: profit,
           duration: jobData.duration * 60, // convert to minutes
-          efficiency: this.calculateJobEfficiency(jobData)
+          efficiency: this.calculateJobEfficiency(jobData),
         },
 
         // Revenue event
@@ -117,15 +122,15 @@ export class MetricsService {
           data: {
             source: 'job_completion',
             serviceType: jobData.serviceType,
-            profitMargin: profitMargin
+            profitMargin: profitMargin,
           },
           userId: jobData.userId,
           jobId: jobData.jobId,
           customerId: jobData.customerId,
           revenue: jobData.revenue,
           cost: jobData.cost,
-          profit: profit
-        }
+          profit: profit,
+        },
       ];
 
       // Track customer satisfaction if rating provided
@@ -135,11 +140,11 @@ export class MetricsService {
           category: 'customer',
           data: {
             rating: jobData.customerRating,
-            serviceType: jobData.serviceType
+            serviceType: jobData.serviceType,
           },
           userId: jobData.userId,
           jobId: jobData.jobId,
-          customerId: jobData.customerId
+          customerId: jobData.customerId,
         });
       }
 
@@ -149,23 +154,29 @@ export class MetricsService {
         category: 'performance',
         data: {
           serviceType: jobData.serviceType,
-          duration: jobData.duration
+          duration: jobData.duration,
         },
         userId: jobData.userId,
         jobId: jobData.jobId,
-        customerId: jobData.customerId
+        customerId: jobData.customerId,
       });
 
       // Save all events
-      await Promise.all(events.map(event => this.analyticsService.trackEvent(event)));
+      await Promise.all(
+        events.map((event) => this.analyticsService.trackEvent(event)),
+      );
 
       this.logger.log(`Tracked job metrics for job ${jobData.jobId}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Failed to track job metrics: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Failed to track job metrics: ${errorMessage}`,
+        errorStack,
+      );
     }
   }
 
@@ -186,23 +197,27 @@ export class MetricsService {
         data: {
           hoursWorked: crewData.hoursWorked,
           efficiency: crewData.efficiency,
-          rating: crewData.rating
+          rating: crewData.rating,
         },
         userId: crewData.userId,
         jobId: crewData.jobId,
         crewId: crewData.crewId,
         duration: crewData.hoursWorked * 60, // convert to minutes
-        efficiency: crewData.efficiency
+        efficiency: crewData.efficiency,
       };
 
       await this.analyticsService.trackEvent(event);
       this.logger.debug(`Tracked crew metrics for crew ${crewData.crewId}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Failed to track crew metrics: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Failed to track crew metrics: ${errorMessage}`,
+        errorStack,
+      );
     }
   }
 
@@ -219,20 +234,26 @@ export class MetricsService {
         category: 'customer',
         data: {
           source: customerData.source,
-          estimatedValue: customerData.estimatedValue
+          estimatedValue: customerData.estimatedValue,
         },
         userId: customerData.userId,
-        customerId: customerData.customerId
+        customerId: customerData.customerId,
       };
 
       await this.analyticsService.trackEvent(event);
-      this.logger.log(`Tracked customer acquisition: ${customerData.customerId}`);
+      this.logger.log(
+        `Tracked customer acquisition: ${customerData.customerId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Failed to track customer acquisition: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Failed to track customer acquisition: ${errorMessage}`,
+        errorStack,
+      );
     }
   }
 
@@ -256,12 +277,12 @@ export class MetricsService {
           data: {
             serviceType: estimateData.serviceType,
             estimatedValue: estimateData.estimatedValue,
-            wasAccepted: estimateData.wasAccepted
+            wasAccepted: estimateData.wasAccepted,
           },
           userId: estimateData.userId,
           estimateId: estimateData.estimateId,
-          customerId: estimateData.customerId
-        }
+          customerId: estimateData.customerId,
+        },
       ];
 
       // Track estimate acceptance/rejection
@@ -271,19 +292,19 @@ export class MetricsService {
           category: 'estimates',
           data: {
             serviceType: estimateData.serviceType,
-            conversionTime: estimateData.conversionTime
+            conversionTime: estimateData.conversionTime,
           },
           userId: estimateData.userId,
           estimateId: estimateData.estimateId,
           customerId: estimateData.customerId,
-          revenue: estimateData.actualValue || estimateData.estimatedValue
+          revenue: estimateData.actualValue || estimateData.estimatedValue,
         });
 
         // Track estimate accuracy if actual value available
         if (estimateData.actualValue) {
           const accuracy = this.calculateEstimateAccuracy(
             estimateData.estimatedValue,
-            estimateData.actualValue
+            estimateData.actualValue,
           );
 
           events.push({
@@ -293,12 +314,12 @@ export class MetricsService {
               estimatedValue: estimateData.estimatedValue,
               actualValue: estimateData.actualValue,
               accuracy: accuracy,
-              serviceType: estimateData.serviceType
+              serviceType: estimateData.serviceType,
             },
             userId: estimateData.userId,
             estimateId: estimateData.estimateId,
             customerId: estimateData.customerId,
-            efficiency: accuracy
+            efficiency: accuracy,
           });
         }
       } else {
@@ -307,46 +328,60 @@ export class MetricsService {
           category: 'estimates',
           data: {
             serviceType: estimateData.serviceType,
-            estimatedValue: estimateData.estimatedValue
+            estimatedValue: estimateData.estimatedValue,
           },
           userId: estimateData.userId,
           estimateId: estimateData.estimateId,
-          customerId: estimateData.customerId
+          customerId: estimateData.customerId,
         });
       }
 
-      await Promise.all(events.map(event => this.analyticsService.trackEvent(event)));
-      this.logger.log(`Tracked estimate metrics for estimate ${estimateData.estimateId}`);
+      await Promise.all(
+        events.map((event) => this.analyticsService.trackEvent(event)),
+      );
+      this.logger.log(
+        `Tracked estimate metrics for estimate ${estimateData.estimateId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Failed to track estimate metrics: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Failed to track estimate metrics: ${errorMessage}`,
+        errorStack,
+      );
     }
   }
 
   // Get current business metrics summary
-  async getBusinessMetrics(period?: { startDate: Date; endDate: Date }): Promise<BusinessMetrics> {
+  async getBusinessMetrics(period?: {
+    startDate: Date;
+    endDate: Date;
+  }): Promise<BusinessMetrics> {
     try {
       const defaultPeriod = period || {
         startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
-        endDate: new Date()
+        endDate: new Date(),
       };
 
-      const dashboardMetrics = await this.analyticsService.getDashboardMetrics(defaultPeriod);
+      const dashboardMetrics =
+        await this.analyticsService.getDashboardMetrics(defaultPeriod);
 
       // Calculate business metrics from dashboard data
       return {
         // Revenue metrics
         totalRevenue: dashboardMetrics.totalRevenue,
-        monthlyRecurringRevenue: dashboardMetrics.totalRevenue / 30 * 30, // Approximate MRR
+        monthlyRecurringRevenue: (dashboardMetrics.totalRevenue / 30) * 30, // Approximate MRR
         averageJobValue: dashboardMetrics.averageJobValue,
         revenueGrowthRate: 15.2, // Mock data - would be calculated from historical comparison
 
         // Operational metrics
-        jobCompletionRate: dashboardMetrics.performanceMetrics.jobCompletionRate,
-        averageJobDuration: dashboardMetrics.performanceMetrics.averageJobDuration,
+        jobCompletionRate:
+          dashboardMetrics.performanceMetrics.jobCompletionRate,
+        averageJobDuration:
+          dashboardMetrics.performanceMetrics.averageJobDuration,
         crewUtilization: dashboardMetrics.crewUtilization,
         onTimeDeliveryRate: dashboardMetrics.onTimePerformance,
 
@@ -358,16 +393,21 @@ export class MetricsService {
 
         // Efficiency metrics
         estimateAccuracy: 92.8, // Mock data
-        crewProductivity: dashboardMetrics.performanceMetrics.averageCrewEfficiency,
+        crewProductivity:
+          dashboardMetrics.performanceMetrics.averageCrewEfficiency,
         equipmentUtilization: 78.5, // Mock data
-        costPerJob: dashboardMetrics.averageJobValue * 0.65 // Mock cost ratio
+        costPerJob: dashboardMetrics.averageJobValue * 0.65, // Mock cost ratio
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       const errorStack = error instanceof Error ? error.stack : undefined;
 
-      this.logger.error(`Failed to get business metrics: ${errorMessage}`, errorStack);
+      this.logger.error(
+        `Failed to get business metrics: ${errorMessage}`,
+        errorStack,
+      );
       throw error;
     }
   }
@@ -380,14 +420,20 @@ export class MetricsService {
   }): number {
     // Mock efficiency calculation based on expected vs actual duration
     const expectedDurations = {
-      'local': 4.0,
-      'long_distance': 8.0,
-      'storage': 2.0,
-      'packing_only': 3.0
+      local: 4.0,
+      long_distance: 8.0,
+      storage: 2.0,
+      packing_only: 3.0,
     };
 
-    const expected = expectedDurations[jobData.serviceType as keyof typeof expectedDurations] || 4.0;
-    const efficiency = Math.max(0, Math.min(100, (expected / jobData.duration) * 100));
+    const expected =
+      expectedDurations[
+        jobData.serviceType as keyof typeof expectedDurations
+      ] || 4.0;
+    const efficiency = Math.max(
+      0,
+      Math.min(100, (expected / jobData.duration) * 100),
+    );
 
     return Math.round(efficiency * 10) / 10; // Round to 1 decimal place
   }

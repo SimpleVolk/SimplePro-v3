@@ -61,7 +61,8 @@ export class TariffSettingsService {
 
       if (query) {
         if (query.isActive !== undefined) {
-          filter.isActive = query.isActive === 'true' || query.isActive === true;
+          filter.isActive =
+            query.isActive === 'true' || query.isActive === true;
         }
         if (query.status) {
           filter.status = query.status;
@@ -71,7 +72,10 @@ export class TariffSettingsService {
         }
       }
 
-      return await this.tariffSettingsModel.find(filter).sort({ createdAt: -1 }).exec();
+      return await this.tariffSettingsModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .exec();
     } catch (error) {
       this.logger.error('Error finding tariff settings', error);
       throw error;
@@ -150,7 +154,9 @@ export class TariffSettingsService {
       });
 
       const saved = await tariffSettings.save();
-      this.logger.log(`Created new tariff settings: ${saved.name} (${saved.id})`);
+      this.logger.log(
+        `Created new tariff settings: ${saved.name} (${saved.id})`,
+      );
 
       // Invalidate cache
       this.invalidateCache();
@@ -213,7 +219,10 @@ export class TariffSettingsService {
 
       return updated;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ConflictException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      ) {
         throw error;
       }
       this.logger.error(`Error updating tariff settings ${id}`, error);
@@ -275,7 +284,10 @@ export class TariffSettingsService {
       // Invalidate cache
       this.invalidateCache();
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       this.logger.error(`Error deleting tariff settings ${id}`, error);
@@ -305,7 +317,9 @@ export class TariffSettingsService {
       });
 
       const saved = await cloned.save();
-      this.logger.log(`Cloned tariff settings: ${saved.name} (${saved.id}) from ${id}`);
+      this.logger.log(
+        `Cloned tariff settings: ${saved.name} (${saved.id}) from ${id}`,
+      );
 
       return saved;
     } catch (error) {
@@ -398,12 +412,17 @@ export class TariffSettingsService {
         throw new NotFoundException(`Tariff settings with ID ${id} not found`);
       }
 
-      this.logger.log(`Added hourly rate for crew size ${rate.crewSize} to tariff ${id}`);
+      this.logger.log(
+        `Added hourly rate for crew size ${rate.crewSize} to tariff ${id}`,
+      );
       this.invalidateCache();
 
       return updated.hourlyRates;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ConflictException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      ) {
         throw error;
       }
       this.logger.error(`Error adding hourly rate to ${id}`, error);
@@ -452,7 +471,9 @@ export class TariffSettingsService {
         throw new NotFoundException(`Tariff settings with ID ${id} not found`);
       }
 
-      this.logger.log(`Updated hourly rate for crew size ${crewSize} in tariff ${id}`);
+      this.logger.log(
+        `Updated hourly rate for crew size ${crewSize} in tariff ${id}`,
+      );
       this.invalidateCache();
 
       return updated.hourlyRates;
@@ -493,7 +514,9 @@ export class TariffSettingsService {
         throw new NotFoundException(`Tariff settings with ID ${id} not found`);
       }
 
-      this.logger.log(`Deleted hourly rate for crew size ${crewSize} from tariff ${id}`);
+      this.logger.log(
+        `Deleted hourly rate for crew size ${crewSize} from tariff ${id}`,
+      );
       this.invalidateCache();
 
       return updated.hourlyRates;
@@ -607,7 +630,9 @@ export class TariffSettingsService {
         materials = materials.filter((m) => m.category === query.category);
       }
       if (query.isActive !== undefined) {
-        materials = materials.filter((m) => m.isActive === (query.isActive === 'true'));
+        materials = materials.filter(
+          (m) => m.isActive === (query.isActive === 'true'),
+        );
       }
       if (query.search) {
         const searchLower = query.search.toLowerCase();
@@ -687,7 +712,9 @@ export class TariffSettingsService {
     try {
       const settings = await this.findById(id);
 
-      const materialIndex = settings.materials.findIndex((m) => m.id === materialId);
+      const materialIndex = settings.materials.findIndex(
+        (m) => m.id === materialId,
+      );
 
       if (materialIndex === -1) {
         throw new NotFoundException(`Material with ID ${materialId} not found`);
@@ -727,7 +754,11 @@ export class TariffSettingsService {
     }
   }
 
-  async deleteMaterial(id: string, materialId: string, userId: string): Promise<void> {
+  async deleteMaterial(
+    id: string,
+    materialId: string,
+    userId: string,
+  ): Promise<void> {
     try {
       const updated = await this.tariffSettingsModel
         .findByIdAndUpdate(
@@ -768,7 +799,8 @@ export class TariffSettingsService {
         await this.addMaterial(id, materialDto, userId);
         result.added++;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         result.failed++;
         result.errors.push(
           `Failed to add material "${materialDto.name}": ${errorMessage}`,
@@ -792,7 +824,9 @@ export class TariffSettingsService {
     let moveSizes = settings.moveSizes;
 
     if (query?.isActive !== undefined) {
-      moveSizes = moveSizes.filter((ms) => ms.isActive === (query.isActive === 'true'));
+      moveSizes = moveSizes.filter(
+        (ms) => ms.isActive === (query.isActive === 'true'),
+      );
     }
 
     return moveSizes;
@@ -859,10 +893,14 @@ export class TariffSettingsService {
     try {
       const settings = await this.findById(id);
 
-      const moveSizeIndex = settings.moveSizes.findIndex((ms) => ms.id === moveSizeId);
+      const moveSizeIndex = settings.moveSizes.findIndex(
+        (ms) => ms.id === moveSizeId,
+      );
 
       if (moveSizeIndex === -1) {
-        throw new NotFoundException(`Move size with ID ${moveSizeId} not found`);
+        throw new NotFoundException(
+          `Move size with ID ${moveSizeId} not found`,
+        );
       }
 
       settings.moveSizes[moveSizeIndex] = {
@@ -899,7 +937,11 @@ export class TariffSettingsService {
     }
   }
 
-  async deleteMoveSize(id: string, moveSizeId: string, userId: string): Promise<void> {
+  async deleteMoveSize(
+    id: string,
+    moveSizeId: string,
+    userId: string,
+  ): Promise<void> {
     try {
       const updated = await this.tariffSettingsModel
         .findByIdAndUpdate(
@@ -937,7 +979,9 @@ export class TariffSettingsService {
     let roomSizes = settings.roomSizes;
 
     if (query?.isActive !== undefined) {
-      roomSizes = roomSizes.filter((rs) => rs.isActive === (query.isActive === 'true'));
+      roomSizes = roomSizes.filter(
+        (rs) => rs.isActive === (query.isActive === 'true'),
+      );
     }
 
     return roomSizes;
@@ -1005,10 +1049,14 @@ export class TariffSettingsService {
     try {
       const settings = await this.findById(id);
 
-      const roomSizeIndex = settings.roomSizes.findIndex((rs) => rs.id === roomSizeId);
+      const roomSizeIndex = settings.roomSizes.findIndex(
+        (rs) => rs.id === roomSizeId,
+      );
 
       if (roomSizeIndex === -1) {
-        throw new NotFoundException(`Room size with ID ${roomSizeId} not found`);
+        throw new NotFoundException(
+          `Room size with ID ${roomSizeId} not found`,
+        );
       }
 
       settings.roomSizes[roomSizeIndex] = {
@@ -1045,7 +1093,11 @@ export class TariffSettingsService {
     }
   }
 
-  async deleteRoomSize(id: string, roomSizeId: string, userId: string): Promise<void> {
+  async deleteRoomSize(
+    id: string,
+    roomSizeId: string,
+    userId: string,
+  ): Promise<void> {
     try {
       const updated = await this.tariffSettingsModel
         .findByIdAndUpdate(
@@ -1087,7 +1139,9 @@ export class TariffSettingsService {
         handicaps = handicaps.filter((h) => h.category === query.category);
       }
       if (query.isActive !== undefined) {
-        handicaps = handicaps.filter((h) => h.isActive === (query.isActive === 'true'));
+        handicaps = handicaps.filter(
+          (h) => h.isActive === (query.isActive === 'true'),
+        );
       }
     }
 
@@ -1155,7 +1209,9 @@ export class TariffSettingsService {
     try {
       const settings = await this.findById(id);
 
-      const handicapIndex = settings.handicaps.findIndex((h) => h.id === handicapId);
+      const handicapIndex = settings.handicaps.findIndex(
+        (h) => h.id === handicapId,
+      );
 
       if (handicapIndex === -1) {
         throw new NotFoundException(`Handicap with ID ${handicapId} not found`);
@@ -1195,7 +1251,11 @@ export class TariffSettingsService {
     }
   }
 
-  async deleteHandicap(id: string, handicapId: string, userId: string): Promise<void> {
+  async deleteHandicap(
+    id: string,
+    handicapId: string,
+    userId: string,
+  ): Promise<void> {
     try {
       const updated = await this.tariffSettingsModel
         .findByIdAndUpdate(
@@ -1233,18 +1293,27 @@ export class TariffSettingsService {
     let distanceRates = settings.distanceRates;
 
     if (query?.isActive !== undefined) {
-      distanceRates = distanceRates.filter((dr) => dr.isActive === (query.isActive === 'true'));
+      distanceRates = distanceRates.filter(
+        (dr) => dr.isActive === (query.isActive === 'true'),
+      );
     }
 
     return distanceRates;
   }
 
-  async getDistanceRate(id: string, distanceRateId: string): Promise<IDistanceRate> {
+  async getDistanceRate(
+    id: string,
+    distanceRateId: string,
+  ): Promise<IDistanceRate> {
     const settings = await this.findById(id);
-    const distanceRate = settings.distanceRates.find((dr) => dr.id === distanceRateId);
+    const distanceRate = settings.distanceRates.find(
+      (dr) => dr.id === distanceRateId,
+    );
 
     if (!distanceRate) {
-      throw new NotFoundException(`Distance rate with ID ${distanceRateId} not found`);
+      throw new NotFoundException(
+        `Distance rate with ID ${distanceRateId} not found`,
+      );
     }
 
     return distanceRate;
@@ -1278,7 +1347,9 @@ export class TariffSettingsService {
         throw new NotFoundException(`Tariff settings with ID ${id} not found`);
       }
 
-      this.logger.log(`Added distance rate "${newDistanceRate.name}" to tariff ${id}`);
+      this.logger.log(
+        `Added distance rate "${newDistanceRate.name}" to tariff ${id}`,
+      );
       this.invalidateCache();
 
       return newDistanceRate;
@@ -1300,10 +1371,14 @@ export class TariffSettingsService {
     try {
       const settings = await this.findById(id);
 
-      const distanceRateIndex = settings.distanceRates.findIndex((dr) => dr.id === distanceRateId);
+      const distanceRateIndex = settings.distanceRates.findIndex(
+        (dr) => dr.id === distanceRateId,
+      );
 
       if (distanceRateIndex === -1) {
-        throw new NotFoundException(`Distance rate with ID ${distanceRateId} not found`);
+        throw new NotFoundException(
+          `Distance rate with ID ${distanceRateId} not found`,
+        );
       }
 
       settings.distanceRates[distanceRateIndex] = {
@@ -1327,7 +1402,9 @@ export class TariffSettingsService {
         throw new NotFoundException(`Tariff settings with ID ${id} not found`);
       }
 
-      this.logger.log(`Updated distance rate ${distanceRateId} in tariff ${id}`);
+      this.logger.log(
+        `Updated distance rate ${distanceRateId} in tariff ${id}`,
+      );
       this.invalidateCache();
 
       return updated.distanceRates.find((dr) => dr.id === distanceRateId)!;
@@ -1340,7 +1417,11 @@ export class TariffSettingsService {
     }
   }
 
-  async deleteDistanceRate(id: string, distanceRateId: string, userId: string): Promise<void> {
+  async deleteDistanceRate(
+    id: string,
+    distanceRateId: string,
+    userId: string,
+  ): Promise<void> {
     try {
       const updated = await this.tariffSettingsModel
         .findByIdAndUpdate(
@@ -1358,7 +1439,9 @@ export class TariffSettingsService {
         throw new NotFoundException(`Tariff settings with ID ${id} not found`);
       }
 
-      this.logger.log(`Deleted distance rate ${distanceRateId} from tariff ${id}`);
+      this.logger.log(
+        `Deleted distance rate ${distanceRateId} from tariff ${id}`,
+      );
       this.invalidateCache();
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -1388,12 +1471,18 @@ export class TariffSettingsService {
       }
 
       // Validate hourly rates
-      if (settings.hourlyRates?.enabled && settings.hourlyRates.rates.length === 0) {
+      if (
+        settings.hourlyRates?.enabled &&
+        settings.hourlyRates.rates.length === 0
+      ) {
         errors.push('Hourly rates are enabled but no rates are defined');
       }
 
       // Validate effective dates
-      if (settings.effectiveTo && settings.effectiveFrom > settings.effectiveTo) {
+      if (
+        settings.effectiveTo &&
+        settings.effectiveFrom > settings.effectiveTo
+      ) {
         errors.push('Effective from date must be before effective to date');
       }
 
@@ -1402,7 +1491,8 @@ export class TariffSettingsService {
         errors.push('No pricing methods defined');
       }
 
-      const defaultMethods = settings.pricingMethods?.filter((pm) => pm.isDefault) || [];
+      const defaultMethods =
+        settings.pricingMethods?.filter((pm) => pm.isDefault) || [];
       if (defaultMethods.length === 0) {
         errors.push('No default pricing method set');
       }

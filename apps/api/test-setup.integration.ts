@@ -4,7 +4,10 @@
  */
 
 // Set test environment variables
-Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', writable: true });
+Object.defineProperty(process.env, 'NODE_ENV', {
+  value: 'test',
+  writable: true,
+});
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-integration';
 process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-key-for-integration';
 

@@ -6,7 +6,7 @@ import {
   CreateAuditLogDto,
   AuditLogContext,
   AuditSeverity,
-  AuditOutcome
+  AuditOutcome,
 } from './dto/create-audit-log.dto';
 import { QueryAuditLogDto, ExportFormat } from './dto/query-audit-log.dto';
 
@@ -45,7 +45,7 @@ export class AuditLogsService {
 
       // Log to console for monitoring systems
       this.logger.log(
-        `[AUDIT] ${createAuditLogDto.action} by ${createAuditLogDto.userName} (${createAuditLogDto.userId}) - ${createAuditLogDto.outcome}`
+        `[AUDIT] ${createAuditLogDto.action} by ${createAuditLogDto.userName} (${createAuditLogDto.userId}) - ${createAuditLogDto.outcome}`,
       );
 
       return savedLog.toObject();
@@ -77,7 +77,7 @@ export class AuditLogsService {
       metadata?: Record<string, any>;
       errorMessage?: string;
       errorStack?: string;
-    }
+    },
   ): Promise<AuditLog> {
     return this.createLog({
       userId: context.userId,
@@ -104,7 +104,7 @@ export class AuditLogsService {
    * @returns Array of audit logs and total count
    */
   async findAll(
-    query: QueryAuditLogDto
+    query: QueryAuditLogDto,
   ): Promise<{ logs: AuditLog[]; total: number }> {
     const filter: FilterQuery<AuditLogDocument> = {};
 
@@ -232,7 +232,7 @@ export class AuditLogsService {
   async findByResource(
     resource: string,
     resourceId: string,
-    limit = 100
+    limit = 100,
   ): Promise<AuditLog[]> {
     return this.auditLogModel
       .find({ resource, resourceId })
@@ -280,7 +280,7 @@ export class AuditLogsService {
       'Error Message',
     ];
 
-    const rows = logs.map(log => [
+    const rows = logs.map((log) => [
       log.timestamp.toISOString(),
       log.userId,
       log.userName,
@@ -296,8 +296,8 @@ export class AuditLogsService {
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row =>
-        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      ...rows.map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','),
       ),
     ].join('\n');
 
@@ -368,10 +368,18 @@ export class AuditLogsService {
 
     return {
       total,
-      byOutcome: Object.fromEntries(byOutcome.map(item => [item._id, item.count])),
-      bySeverity: Object.fromEntries(bySeverity.map(item => [item._id, item.count])),
-      byAction: Object.fromEntries(byAction.map(item => [item._id, item.count])),
-      byResource: Object.fromEntries(byResource.map(item => [item._id, item.count])),
+      byOutcome: Object.fromEntries(
+        byOutcome.map((item) => [item._id, item.count]),
+      ),
+      bySeverity: Object.fromEntries(
+        bySeverity.map((item) => [item._id, item.count]),
+      ),
+      byAction: Object.fromEntries(
+        byAction.map((item) => [item._id, item.count]),
+      ),
+      byResource: Object.fromEntries(
+        byResource.map((item) => [item._id, item.count]),
+      ),
       recentActivity,
     };
   }
@@ -383,7 +391,9 @@ export class AuditLogsService {
    * @returns Number of deleted logs
    */
   async cleanup(daysOld = 90): Promise<number> {
-    this.logger.warn(`Manually cleaning up audit logs older than ${daysOld} days`);
+    this.logger.warn(
+      `Manually cleaning up audit logs older than ${daysOld} days`,
+    );
 
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);

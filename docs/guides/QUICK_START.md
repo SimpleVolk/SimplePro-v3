@@ -14,16 +14,19 @@
 The development infrastructure (MongoDB, Redis, MinIO) is **already running** ✅
 
 To verify:
+
 ```bash
 docker ps
 ```
 
 You should see 3 healthy containers:
+
 - `simplepro-mongodb` (Port 27017)
 - `simplepro-redis` (Internal)
 - `simplepro-minio` (Ports 9000, 9001)
 
 If containers are not running:
+
 ```bash
 npm run docker:dev
 ```
@@ -49,6 +52,7 @@ code .env.local  # or notepad .env.local on Windows
 Dependencies are **already installed** ✅
 
 If you need to reinstall:
+
 ```bash
 npm install --legacy-peer-deps
 ```
@@ -56,14 +60,18 @@ npm install --legacy-peer-deps
 ## Step 4: Start Development Servers
 
 **Option A: Start Both API and Web (Recommended)**
+
 ```bash
 npm run dev
 ```
+
 This starts:
+
 - API Server: `http://localhost:3001`
 - Web Dashboard: `http://localhost:3009`
 
 **Option B: Start Services Individually**
+
 ```bash
 # Terminal 1 - API Server
 npm run dev:api
@@ -75,9 +83,11 @@ npm run dev:web
 ## Step 5: Access the Application
 
 ### Web Dashboard
+
 **URL:** http://localhost:3009
 
 **Default Admin Credentials:**
+
 - **Username:** `admin`
 - **Email:** `admin@simplepro.com`
 - **Password:** Check `D:\Claude\SimplePro-v3\.secrets\admin-password.txt`
@@ -85,17 +95,20 @@ npm run dev:web
 > ⚠️ **Security Note:** The password is stored securely in the `.secrets` directory and will NOT appear in console logs.
 
 ### API Documentation
+
 - **Swagger UI:** http://localhost:3001/api/docs (if enabled)
 - **Health Check:** http://localhost:3001/api/health
 
 ## Step 6: Verify Everything Works
 
 ### Test API Health
+
 ```bash
 curl http://localhost:3001/api/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -105,12 +118,15 @@ Expected response:
 ```
 
 ### Test MongoDB Connection
+
 Check API logs - you should see:
+
 ```
 [DatabaseModule] Connected to MongoDB successfully
 ```
 
 ### Test Authentication
+
 1. Open http://localhost:3009
 2. Click "Login"
 3. Use admin credentials from `.secrets/admin-password.txt`
@@ -119,6 +135,7 @@ Check API logs - you should see:
 ## Common Commands
 
 ### Development
+
 ```bash
 npm run dev              # Start both API and Web
 npm run dev:api          # API only (port 3001)
@@ -126,6 +143,7 @@ npm run dev:web          # Web only (port 3009)
 ```
 
 ### Testing
+
 ```bash
 npm test                 # Run all tests
 npm run test:api         # API tests only
@@ -135,6 +153,7 @@ npm run test:coverage    # All tests with coverage
 ```
 
 ### Building
+
 ```bash
 npm run build            # Build all projects
 nx build api             # Build API only
@@ -142,6 +161,7 @@ nx build web             # Build web only
 ```
 
 ### Docker Management
+
 ```bash
 npm run docker:dev       # Start infrastructure
 npm run docker:dev:down  # Stop infrastructure
@@ -150,6 +170,7 @@ docker ps                # Check status
 ```
 
 ### Database Operations
+
 ```bash
 npm run db:seed          # Seed database (when available)
 npm run db:migrate       # Run migrations (when available)
@@ -162,6 +183,7 @@ npm run db:migrate       # Run migrations (when available)
 **Error:** `Port 3001 is already in use`
 
 **Solution:**
+
 ```bash
 # Windows
 netstat -ano | findstr :3001
@@ -176,6 +198,7 @@ lsof -ti:3001 | xargs kill -9
 **Error:** `MongoServerError: Authentication failed`
 
 **Solution:**
+
 ```bash
 # Restart MongoDB container
 npm run docker:dev:down
@@ -190,6 +213,7 @@ docker ps
 **Location:** `D:\Claude\SimplePro-v3\.secrets\admin-password.txt`
 
 **If file doesn't exist:**
+
 1. Stop the API server
 2. Delete the admin user from MongoDB (or reset database)
 3. Restart API - it will recreate the admin user and password file
@@ -199,6 +223,7 @@ docker ps
 **Error:** TypeScript or dependency errors
 
 **Solution:**
+
 ```bash
 # Clean everything and reinstall
 npm run clean
@@ -229,6 +254,7 @@ npm run build
    - Explore customer/job management
 
 3. **Run Tests:**
+
    ```bash
    npm run test:coverage
    ```
@@ -241,11 +267,13 @@ npm run build
 ## Support
 
 **Common Issues:**
+
 - MongoDB connection: Check Docker containers are running
 - Authentication errors: Verify credentials in `.secrets/admin-password.txt`
 - Port conflicts: Kill existing Node processes
 
 **Useful Links:**
+
 - Project Documentation: See `CLAUDE.md`
 - Security Report: See `SECURITY_FIXES_REPORT.md`
 - API Reference: http://localhost:3001/api/docs
@@ -255,6 +283,7 @@ npm run build
 **Quick Start Complete! 🚀**
 
 Your SimplePro-v3 system is now:
+
 - ✅ Secure (all critical vulnerabilities fixed)
 - ✅ Running (Docker infrastructure operational)
 - ✅ Ready for development

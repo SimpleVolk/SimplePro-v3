@@ -1,4 +1,5 @@
 # E2E Test Report: SimplePro-v3 Settings Data Persistence
+
 Date: October 1, 2025
 Tester: e2e-project-tester agent
 Test Focus: Recently fixed PackingRates and LocationHandicaps persistence
@@ -10,6 +11,7 @@ Test Focus: Recently fixed PackingRates and LocationHandicaps persistence
 **CRITICAL ISSUE FOUND:** The E2E testing revealed a **blocking backend permission bug** that prevents ALL tariff-settings endpoints from being accessed by any user, including super_admin. This is a critical blocker that must be fixed before any frontend persistence testing can be completed.
 
 **Status:**
+
 - Services Running: ✅ (API, MongoDB, Redis all healthy)
 - Authentication: ✅ (Login successful, JWT tokens working)
 - Tariff Settings Endpoints: ❌ **BLOCKED BY PERMISSION BUG**
@@ -19,12 +21,14 @@ Test Focus: Recently fixed PackingRates and LocationHandicaps persistence
 ## Test Environment
 
 ### Service Status
+
 - **API Server**: Running on port 3001 (PID: 11432) ✅
 - **Web Application**: Running on port 3009 (PID: 30412) ✅
 - **MongoDB**: Docker container "simplepro-mongodb" - Up 2 hours (healthy) ✅
 - **Redis**: Docker container "simplepro-redis" - Up 2 hours (healthy) ✅
 
 ### API Health Check
+
 ```json
 {
   "status": "ok",
@@ -47,6 +51,7 @@ Test Focus: Recently fixed PackingRates and LocationHandicaps persistence
 ```
 
 ### Authentication Test
+
 **Endpoint:** `POST /api/auth/login`
 **Credentials:** `admin` / `Admin123!`
 **Result:** ✅ SUCCESS
@@ -72,23 +77,55 @@ Test Focus: Recently fixed PackingRates and LocationHandicaps persistence
         "permissions": []
       },
       "permissions": [
-        {"id": "perm_users_all", "resource": "users", "action": "create"},
-        {"id": "perm_users_read", "resource": "users", "action": "read"},
-        {"id": "perm_users_update", "resource": "users", "action": "update"},
-        {"id": "perm_users_delete", "resource": "users", "action": "delete"},
-        {"id": "perm_customers_all", "resource": "customers", "action": "create"},
-        {"id": "perm_customers_read", "resource": "customers", "action": "read"},
-        {"id": "perm_customers_update", "resource": "customers", "action": "update"},
-        {"id": "perm_customers_delete", "resource": "customers", "action": "delete"},
-        {"id": "perm_jobs_all", "resource": "jobs", "action": "create"},
-        {"id": "perm_jobs_read", "resource": "jobs", "action": "read"},
-        {"id": "perm_jobs_update", "resource": "jobs", "action": "update"},
-        {"id": "perm_jobs_delete", "resource": "jobs", "action": "delete"},
-        {"id": "perm_estimates_all", "resource": "estimates", "action": "create"},
-        {"id": "perm_estimates_read", "resource": "estimates", "action": "read"},
-        {"id": "perm_estimates_update", "resource": "estimates", "action": "update"},
-        {"id": "perm_reports_read", "resource": "reports", "action": "read"},
-        {"id": "perm_system_admin", "resource": "system_settings", "action": "update"}
+        { "id": "perm_users_all", "resource": "users", "action": "create" },
+        { "id": "perm_users_read", "resource": "users", "action": "read" },
+        { "id": "perm_users_update", "resource": "users", "action": "update" },
+        { "id": "perm_users_delete", "resource": "users", "action": "delete" },
+        {
+          "id": "perm_customers_all",
+          "resource": "customers",
+          "action": "create"
+        },
+        {
+          "id": "perm_customers_read",
+          "resource": "customers",
+          "action": "read"
+        },
+        {
+          "id": "perm_customers_update",
+          "resource": "customers",
+          "action": "update"
+        },
+        {
+          "id": "perm_customers_delete",
+          "resource": "customers",
+          "action": "delete"
+        },
+        { "id": "perm_jobs_all", "resource": "jobs", "action": "create" },
+        { "id": "perm_jobs_read", "resource": "jobs", "action": "read" },
+        { "id": "perm_jobs_update", "resource": "jobs", "action": "update" },
+        { "id": "perm_jobs_delete", "resource": "jobs", "action": "delete" },
+        {
+          "id": "perm_estimates_all",
+          "resource": "estimates",
+          "action": "create"
+        },
+        {
+          "id": "perm_estimates_read",
+          "resource": "estimates",
+          "action": "read"
+        },
+        {
+          "id": "perm_estimates_update",
+          "resource": "estimates",
+          "action": "update"
+        },
+        { "id": "perm_reports_read", "resource": "reports", "action": "read" },
+        {
+          "id": "perm_system_admin",
+          "resource": "system_settings",
+          "action": "update"
+        }
       ]
     }
   }
@@ -102,11 +139,13 @@ Test Focus: Recently fixed PackingRates and LocationHandicaps persistence
 ## CRITICAL FINDING #1: Missing Tariff Settings Permissions
 
 ### Issue Description
+
 The `super_admin` role is missing ALL permissions for the `tariff_settings` resource. This causes 403 Forbidden errors on all tariff-settings API endpoints.
 
 ### Evidence
 
 **API Test Results:**
+
 ```bash
 # Test: GET /api/tariff-settings/packing-rates
 Response: 403 Forbidden
@@ -148,15 +187,35 @@ if (role.name === 'super_admin') {
     // Customers permissions (lines 53-56) ✅
     { id: 'perm_all_customers', resource: 'customers', action: 'create' },
     { id: 'perm_all_customers_read', resource: 'customers', action: 'read' },
-    { id: 'perm_all_customers_update', resource: 'customers', action: 'update' },
-    { id: 'perm_all_customers_delete', resource: 'customers', action: 'delete' },
+    {
+      id: 'perm_all_customers_update',
+      resource: 'customers',
+      action: 'update',
+    },
+    {
+      id: 'perm_all_customers_delete',
+      resource: 'customers',
+      action: 'delete',
+    },
 
     // Estimates permissions (lines 57-61) ✅
     { id: 'perm_all_estimates', resource: 'estimates', action: 'create' },
     { id: 'perm_all_estimates_read', resource: 'estimates', action: 'read' },
-    { id: 'perm_all_estimates_update', resource: 'estimates', action: 'update' },
-    { id: 'perm_all_estimates_delete', resource: 'estimates', action: 'delete' },
-    { id: 'perm_all_estimates_approve', resource: 'estimates', action: 'approve' },
+    {
+      id: 'perm_all_estimates_update',
+      resource: 'estimates',
+      action: 'update',
+    },
+    {
+      id: 'perm_all_estimates_delete',
+      resource: 'estimates',
+      action: 'delete',
+    },
+    {
+      id: 'perm_all_estimates_approve',
+      resource: 'estimates',
+      action: 'approve',
+    },
 
     // Jobs permissions (lines 62-66) ✅
     { id: 'perm_all_jobs', resource: 'jobs', action: 'create' },
@@ -174,11 +233,19 @@ if (role.name === 'super_admin') {
 
     // System settings permissions (lines 72-73) ✅
     { id: 'perm_all_system', resource: 'system_settings', action: 'read' },
-    { id: 'perm_all_system_update', resource: 'system_settings', action: 'update' },
+    {
+      id: 'perm_all_system_update',
+      resource: 'system_settings',
+      action: 'update',
+    },
 
     // Pricing rules permissions (lines 74-75) ✅
     { id: 'perm_all_pricing', resource: 'pricing_rules', action: 'read' },
-    { id: 'perm_all_pricing_update', resource: 'pricing_rules', action: 'update' },
+    {
+      id: 'perm_all_pricing_update',
+      resource: 'pricing_rules',
+      action: 'update',
+    },
 
     // Reports permissions (lines 76-77) ✅
     { id: 'perm_all_reports', resource: 'reports', action: 'read' },
@@ -205,6 +272,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 **Severity:** 🔴 **CRITICAL - BLOCKING**
 
 **Affected Components:**
+
 1. ❌ PackingRates component (`apps/web/src/app/components/settings/tariffs/PackingRates.tsx`)
 2. ❌ LocationHandicaps component (`apps/web/src/app/components/settings/tariffs/LocationHandicaps.tsx`)
 3. ❌ DistanceRates component (likely affected)
@@ -212,6 +280,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 5. ❌ Any other tariff-settings UI components
 
 **Frontend Impact:**
+
 - Users cannot fetch existing tariff settings
 - Users cannot create new packing rates
 - Users cannot edit location handicaps
@@ -219,6 +288,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 - No CRUD operations work on tariff-settings
 
 **Business Impact:**
+
 - Settings → Tariffs section completely non-functional
 - Cannot configure pricing parameters
 - Estimate calculations may use incorrect/outdated tariff data
@@ -229,6 +299,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 ## Test Results Summary
 
 ### Tests Planned
+
 - Total Scenarios: 5
 - Completed: 2 (40%)
 - Blocked: 3 (60%)
@@ -238,6 +309,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 #### ✅ PASSED Tests
 
 **1. Service Availability Test**
+
 - API Server: Running and healthy
 - Web Application: Running and accessible
 - MongoDB: Connected and healthy
@@ -245,6 +317,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 - **Result:** PASS
 
 **2. Authentication Flow Test**
+
 - Login endpoint: Working correctly
 - JWT token generation: Successful
 - Token format: Valid
@@ -254,6 +327,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 #### ❌ BLOCKED Tests
 
 **3. PackingRates Persistence Test - BLOCKED**
+
 - **Reason:** Cannot test due to 403 Forbidden errors
 - **Expected Behavior:** Fetch, create, update, delete packing rates with persistence
 - **Actual Behavior:** All API calls return 403 Forbidden
@@ -261,6 +335,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 - **Status:** BLOCKED - Cannot proceed until permission bug is fixed
 
 **4. LocationHandicaps Persistence Test - BLOCKED**
+
 - **Reason:** Cannot test due to 403 Forbidden errors
 - **Expected Behavior:** Fetch, create, update, delete handicaps with persistence
 - **Actual Behavior:** All API calls return 403 Forbidden
@@ -268,6 +343,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 - **Status:** BLOCKED - Cannot proceed until permission bug is fixed
 
 **5. Settings → Estimate Integration Test - BLOCKED**
+
 - **Reason:** Cannot configure tariff settings to test pricing engine integration
 - **Expected Behavior:** Settings changes affect estimate calculations
 - **Actual Behavior:** Cannot modify settings due to permission errors
@@ -283,6 +359,7 @@ The tariff-settings controller (`D:\Claude\SimplePro-v3\apps\api\src\tariff-sett
 **File:** `D:\Claude\SimplePro-v3\apps\web\src\app\components\settings\tariffs\PackingRates.tsx`
 
 The component has proper error handling (lines 51-96):
+
 ```typescript
 const fetchPackingRates = async () => {
   try {
@@ -290,9 +367,12 @@ const fetchPackingRates = async () => {
     setError(null);
 
     // First, get active tariff settings ID
-    const settingsResponse = await fetch(`${API_BASE_URL}/tariff-settings/active`, {
-      headers: getAuthHeaders()
-    });
+    const settingsResponse = await fetch(
+      `${API_BASE_URL}/tariff-settings/active`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
 
     if (!settingsResponse.ok) {
       throw new Error('Failed to fetch tariff settings');
@@ -301,7 +381,9 @@ const fetchPackingRates = async () => {
     // ... more code
   } catch (err) {
     console.error('Error fetching packing rates:', err);
-    setError(err instanceof Error ? err.message : 'Failed to load packing rates');
+    setError(
+      err instanceof Error ? err.message : 'Failed to load packing rates',
+    );
   } finally {
     setLoading(false);
   }
@@ -309,6 +391,7 @@ const fetchPackingRates = async () => {
 ```
 
 **Expected User Experience:**
+
 - Loading spinner shows
 - Error message displays: "Failed to fetch tariff settings"
 - User cannot proceed with CRUD operations
@@ -363,6 +446,7 @@ Add the following permissions to the `allPermissions` array for super_admin:
 ```
 
 **Deployment Steps:**
+
 1. Update the auth.service.ts file with the missing permissions
 2. Restart the API server to reinitialize roles
 3. **CRITICAL:** Delete the existing admin user from MongoDB or update permissions
@@ -377,6 +461,7 @@ Create a database migration script to update existing super_admin users' permiss
 Once the permission issue is resolved, complete the following E2E test cases:
 
 #### Test Case 1: PackingRates CRUD Operations
+
 1. Navigate to Settings → Tariffs → Packing Rates
 2. Verify existing rates load from database
 3. Create new rate: "E2E Test Packing Rate" with $999 hourly rate
@@ -388,6 +473,7 @@ Once the permission issue is resolved, complete the following E2E test cases:
 9. Refresh page - verify deletion persisted
 
 #### Test Case 2: LocationHandicaps CRUD Operations
+
 1. Navigate to Settings → Tariffs → Location Handicaps
 2. Verify existing handicaps load from database
 3. Create new handicap: "E2E Test Handicap" with 25% stairs adjustment
@@ -399,6 +485,7 @@ Once the permission issue is resolved, complete the following E2E test cases:
 9. Verify all changes persist across refreshes
 
 #### Test Case 3: Settings → Estimate Integration
+
 1. Configure packing rates in Settings
 2. Navigate to New Opportunity form
 3. Create customer and estimate
@@ -407,7 +494,9 @@ Once the permission issue is resolved, complete the following E2E test cases:
 6. Check customer appears in Customers list
 
 #### Test Case 4: Browser Console Monitoring
+
 During all tests, monitor:
+
 - JavaScript errors in console (F12)
 - Network tab for failed API requests
 - API terminal for server errors
@@ -416,6 +505,7 @@ During all tests, monitor:
 ### VALIDATION CHECKLIST
 
 After implementing the fix, verify:
+
 - [ ] Super admin user has `tariff_settings:read` permission
 - [ ] Super admin user has `tariff_settings:create` permission
 - [ ] Super admin user has `tariff_settings:update` permission
@@ -433,18 +523,21 @@ After implementing the fix, verify:
 ## Testing Environment Details
 
 ### API Endpoints Tested
+
 1. ✅ `GET /api/health` - PASS (200 OK)
 2. ✅ `POST /api/auth/login` - PASS (200 OK, JWT tokens returned)
 3. ❌ `GET /api/tariff-settings/packing-rates` - FAIL (403 Forbidden)
 4. ❌ `GET /api/tariff-settings/location-handicaps` - FAIL (403 Forbidden)
 
 ### Files Analyzed
+
 1. `D:\Claude\SimplePro-v3\apps\api\src\auth\auth.service.ts` (Permission initialization)
 2. `D:\Claude\SimplePro-v3\apps\api\src\auth\interfaces\user.interface.ts` (Type definitions)
 3. `D:\Claude\SimplePro-v3\apps\api\src\tariff-settings\tariff-settings.controller.ts` (Required permissions)
 4. `D:\Claude\SimplePro-v3\apps\web\src\app\components\settings\tariffs\PackingRates.tsx` (Frontend implementation)
 
 ### Default Credentials Used
+
 - **Username:** `admin`
 - **Password:** `Admin123!` (case-sensitive with exclamation mark)
 - **Result:** Authentication successful, but permissions incomplete
@@ -460,6 +553,7 @@ The recently implemented data persistence fixes for PackingRates and LocationHan
 **This is a simple oversight with a straightforward fix**, but it completely blocks all tariff-settings functionality until resolved.
 
 ### Severity Assessment
+
 - **Bug Severity:** 🔴 CRITICAL
 - **User Impact:** COMPLETE BLOCKER for Settings → Tariffs functionality
 - **Business Impact:** HIGH - Cannot configure pricing, blocks production deployment
@@ -467,6 +561,7 @@ The recently implemented data persistence fixes for PackingRates and LocationHan
 - **Fix Risk:** LOW - Well-defined permissions system, no side effects expected
 
 ### Estimated Fix Time
+
 - Code changes: 5 minutes
 - Testing: 10 minutes
 - Full E2E test suite: 30 minutes
@@ -477,12 +572,14 @@ The recently implemented data persistence fixes for PackingRates and LocationHan
 ## Next Session Recommendations
 
 **For the backend-specialist agent:**
+
 1. Add missing tariff_settings permissions to super_admin role (auth.service.ts lines 48-78)
 2. Consider adding permissions for other roles (admin, manager) as appropriate
 3. Create database migration to update existing users if needed
 4. Add unit test to verify super_admin has all resource permissions
 
 **For the e2e-project-tester agent (next session):**
+
 1. Re-run authentication test to verify tariff_settings permissions present
 2. Execute PackingRates CRUD test suite
 3. Execute LocationHandicaps CRUD test suite
@@ -490,6 +587,7 @@ The recently implemented data persistence fixes for PackingRates and LocationHan
 5. Document any additional findings
 
 **For the project-manager agent:**
+
 1. Prioritize backend permission fix as CRITICAL blocker
 2. Schedule frontend E2E testing after backend fix is deployed
 3. Add regression test to CI/CD to verify all resource types have super_admin permissions

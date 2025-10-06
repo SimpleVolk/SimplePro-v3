@@ -111,7 +111,10 @@ export default function QuoteTimeline({ opportunityId }: QuoteTimelineProps) {
       });
 
       // Sort by timestamp (newest first)
-      events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      events.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      );
 
       setTimeline(events);
     } catch (err) {
@@ -139,15 +142,21 @@ export default function QuoteTimeline({ opportunityId }: QuoteTimelineProps) {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return 'Today, ' + date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return (
+        'Today, ' +
+        date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      );
     } else if (diffDays === 1) {
-      return 'Yesterday, ' + date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return (
+        'Yesterday, ' +
+        date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      );
     } else if (diffDays < 7) {
       return `${diffDays} days ago`;
     } else {
@@ -228,7 +237,7 @@ function renderEngagementHeatmap(timeline: TimelineEvent[]) {
   // Group events by day
   const eventsByDay: Record<string, number> = {};
 
-  timeline.forEach(event => {
+  timeline.forEach((event) => {
     const date = new Date(event.timestamp);
     const dayKey = date.toISOString().split('T')[0];
     eventsByDay[dayKey] = (eventsByDay[dayKey] || 0) + 1;
@@ -244,13 +253,13 @@ function renderEngagementHeatmap(timeline: TimelineEvent[]) {
     days.push({ date: dayKey, count });
   }
 
-  const maxCount = Math.max(...days.map(d => d.count), 1);
+  const maxCount = Math.max(...days.map((d) => d.count), 1);
 
   return (
     <div className={styles.heatmapGrid}>
       {days.map((day, index) => {
         const intensity = day.count / maxCount;
-        const opacity = day.count === 0 ? 0.1 : 0.3 + (intensity * 0.7);
+        const opacity = day.count === 0 ? 0.1 : 0.3 + intensity * 0.7;
 
         return (
           <div

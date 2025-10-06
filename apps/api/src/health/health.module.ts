@@ -15,7 +15,7 @@ import { ExternalServiceHealthIndicator } from './indicators/external-service-he
   imports: [
     TerminusModule,
     HttpModule,
-    MongooseModule.forFeature([]) // Empty array since we'll inject connection directly
+    MongooseModule.forFeature([]), // Empty array since we'll inject connection directly
   ],
   controllers: [HealthController],
   providers: [

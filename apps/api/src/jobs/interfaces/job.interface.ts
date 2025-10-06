@@ -94,7 +94,13 @@ export interface CrewAssignment {
 export interface InventoryItem {
   id: string;
   name: string;
-  category: 'furniture' | 'appliances' | 'boxes' | 'fragile' | 'electronics' | 'other';
+  category:
+    | 'furniture'
+    | 'appliances'
+    | 'boxes'
+    | 'fragile'
+    | 'electronics'
+    | 'other';
   quantity: number;
   weight?: number;
   volume?: number;
@@ -105,7 +111,15 @@ export interface InventoryItem {
 }
 
 export interface JobService {
-  type: 'loading' | 'unloading' | 'packing' | 'unpacking' | 'assembly' | 'disassembly' | 'storage' | 'cleaning';
+  type:
+    | 'loading'
+    | 'unloading'
+    | 'packing'
+    | 'unpacking'
+    | 'assembly'
+    | 'disassembly'
+    | 'storage'
+    | 'cleaning';
   description: string;
   status: 'pending' | 'in_progress' | 'completed' | 'skipped';
   assignedCrew?: string[];
@@ -115,7 +129,15 @@ export interface JobService {
 }
 
 export interface EquipmentRequirement {
-  type: 'truck' | 'dolly' | 'straps' | 'blankets' | 'boxes' | 'bubble_wrap' | 'tape' | 'tools';
+  type:
+    | 'truck'
+    | 'dolly'
+    | 'straps'
+    | 'blankets'
+    | 'boxes'
+    | 'bubble_wrap'
+    | 'tape'
+    | 'tools';
   description: string;
   quantity: number;
   status: 'required' | 'assigned' | 'checked_out' | 'returned';
@@ -123,7 +145,14 @@ export interface EquipmentRequirement {
 }
 
 export interface AdditionalCharge {
-  type: 'overtime' | 'materials' | 'travel' | 'storage' | 'fuel' | 'tolls' | 'other';
+  type:
+    | 'overtime'
+    | 'materials'
+    | 'travel'
+    | 'storage'
+    | 'fuel'
+    | 'tolls'
+    | 'other';
   description: string;
   amount: number;
   approvedBy?: string;
@@ -162,7 +191,14 @@ export interface JobDocument {
 
 export interface CustomerNotification {
   id: string;
-  type: 'scheduled' | 'crew_dispatched' | 'arrival_eta' | 'started' | 'completed' | 'delay' | 'issue';
+  type:
+    | 'scheduled'
+    | 'crew_dispatched'
+    | 'arrival_eta'
+    | 'started'
+    | 'completed'
+    | 'delay'
+    | 'issue';
   message: string;
   sentAt: Date;
   method: 'email' | 'sms' | 'phone' | 'app';

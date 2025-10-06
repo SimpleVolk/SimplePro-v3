@@ -6,7 +6,14 @@ import styles from './LocationHandicaps.module.css';
 interface LocationHandicap {
   id: string;
   name: string;
-  handicapType: 'stairs' | 'long_carry' | 'elevator' | 'parking_distance' | 'access_difficulty' | 'no_elevator' | 'multiple_flights';
+  handicapType:
+    | 'stairs'
+    | 'long_carry'
+    | 'elevator'
+    | 'parking_distance'
+    | 'access_difficulty'
+    | 'no_elevator'
+    | 'multiple_flights';
   adjustmentType: 'percentage' | 'fixed_amount';
   value: number;
   description?: string;
@@ -15,19 +22,29 @@ interface LocationHandicap {
 const API_BASE_URL = 'http://localhost:3001/api';
 
 export default function LocationHandicaps() {
-  const [locationHandicaps, setLocationHandicaps] = useState<LocationHandicap[]>([]);
+  const [locationHandicaps, setLocationHandicaps] = useState<
+    LocationHandicap[]
+  >([]);
   const [tariffSettingsId, setTariffSettingsId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [showForm, setShowForm] = useState(false);
-  const [editingHandicap, setEditingHandicap] = useState<LocationHandicap | null>(null);
+  const [editingHandicap, setEditingHandicap] =
+    useState<LocationHandicap | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    handicapType: 'stairs' as 'stairs' | 'long_carry' | 'elevator' | 'parking_distance' | 'access_difficulty' | 'no_elevator' | 'multiple_flights',
+    handicapType: 'stairs' as
+      | 'stairs'
+      | 'long_carry'
+      | 'elevator'
+      | 'parking_distance'
+      | 'access_difficulty'
+      | 'no_elevator'
+      | 'multiple_flights',
     adjustmentType: 'fixed_amount' as 'percentage' | 'fixed_amount',
     value: 0,
-    description: ''
+    description: '',
   });
 
   const handicapTypes = [
@@ -37,12 +54,12 @@ export default function LocationHandicaps() {
     { value: 'parking_distance', label: 'Parking Distance' },
     { value: 'access_difficulty', label: 'Access Difficulty' },
     { value: 'no_elevator', label: 'No Elevator Access' },
-    { value: 'multiple_flights', label: 'Multiple Flights' }
+    { value: 'multiple_flights', label: 'Multiple Flights' },
   ];
 
   const adjustmentTypes = [
     { value: 'fixed_amount', label: 'Fixed Amount ($)' },
-    { value: 'percentage', label: 'Percentage (%)' }
+    { value: 'percentage', label: 'Percentage (%)' },
   ];
 
   // Fetch active tariff settings and handicaps on mount
@@ -54,7 +71,7 @@ export default function LocationHandicaps() {
     const token = localStorage.getItem('token');
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     };
   };
 
@@ -64,9 +81,12 @@ export default function LocationHandicaps() {
       setError(null);
 
       // First, get active tariff settings ID
-      const settingsResponse = await fetch(`${API_BASE_URL}/tariff-settings/active`, {
-        headers: getAuthHeaders()
-      });
+      const settingsResponse = await fetch(
+        `${API_BASE_URL}/tariff-settings/active`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (!settingsResponse.ok) {
         throw new Error('Failed to fetch tariff settings');
@@ -77,9 +97,12 @@ export default function LocationHandicaps() {
       setTariffSettingsId(settingsId);
 
       // Then fetch handicaps
-      const handicapsResponse = await fetch(`${API_BASE_URL}/tariff-settings/${settingsId}/handicaps`, {
-        headers: getAuthHeaders()
-      });
+      const handicapsResponse = await fetch(
+        `${API_BASE_URL}/tariff-settings/${settingsId}/handicaps`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (!handicapsResponse.ok) {
         throw new Error('Failed to fetch location handicaps');
@@ -88,19 +111,35 @@ export default function LocationHandicaps() {
       const handicapsData = await handicapsResponse.json();
 
       // Map API data to component state format
-      const mappedHandicaps: LocationHandicap[] = (handicapsData || []).map((handicap: any) => ({
-        id: handicap.id || handicap._id,
-        name: handicap.name,
-        handicapType: handicap.category as 'stairs' | 'long_carry' | 'elevator' | 'parking_distance' | 'access_difficulty' | 'no_elevator' | 'multiple_flights',
-        adjustmentType: handicap.type === 'fixed_fee' ? 'fixed_amount' : handicap.type as 'percentage' | 'fixed_amount',
-        value: handicap.value,
-        description: handicap.description || ''
-      }));
+      const mappedHandicaps: LocationHandicap[] = (handicapsData || []).map(
+        (handicap: any) => ({
+          id: handicap.id || handicap._id,
+          name: handicap.name,
+          handicapType: handicap.category as
+            | 'stairs'
+            | 'long_carry'
+            | 'elevator'
+            | 'parking_distance'
+            | 'access_difficulty'
+            | 'no_elevator'
+            | 'multiple_flights',
+          adjustmentType:
+            handicap.type === 'fixed_fee'
+              ? 'fixed_amount'
+              : (handicap.type as 'percentage' | 'fixed_amount'),
+          value: handicap.value,
+          description: handicap.description || '',
+        }),
+      );
 
       setLocationHandicaps(mappedHandicaps);
     } catch (err) {
       console.error('Error fetching location handicaps:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load location handicaps');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load location handicaps',
+      );
     } finally {
       setLoading(false);
     }
@@ -108,7 +147,13 @@ export default function LocationHandicaps() {
 
   const handleAddNew = () => {
     setEditingHandicap(null);
-    setFormData({ name: '', handicapType: 'stairs', adjustmentType: 'fixed_amount', value: 0, description: '' });
+    setFormData({
+      name: '',
+      handicapType: 'stairs',
+      adjustmentType: 'fixed_amount',
+      value: 0,
+      description: '',
+    });
     setShowForm(true);
   };
 
@@ -119,14 +164,17 @@ export default function LocationHandicaps() {
       handicapType: handicap.handicapType,
       adjustmentType: handicap.adjustmentType,
       value: handicap.value,
-      description: handicap.description || ''
+      description: handicap.description || '',
     });
     setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
-    const handicap = locationHandicaps.find(h => h.id === id);
-    if (!handicap || !window.confirm(`Are you sure you want to delete "${handicap.name}"?`)) {
+    const handicap = locationHandicaps.find((h) => h.id === id);
+    if (
+      !handicap ||
+      !window.confirm(`Are you sure you want to delete "${handicap.name}"?`)
+    ) {
       return;
     }
 
@@ -136,21 +184,30 @@ export default function LocationHandicaps() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/tariff-settings/${tariffSettingsId}/handicaps/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/tariff-settings/${tariffSettingsId}/handicaps/${id}`,
+        {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to delete location handicap');
+        throw new Error(
+          errorData.message || 'Failed to delete location handicap',
+        );
       }
 
       // Refresh data from API
       await fetchHandicaps();
     } catch (err) {
       console.error('Error deleting location handicap:', err);
-      alert(err instanceof Error ? err.message : 'Failed to delete location handicap');
+      alert(
+        err instanceof Error
+          ? err.message
+          : 'Failed to delete location handicap',
+      );
     }
   };
 
@@ -168,37 +225,51 @@ export default function LocationHandicaps() {
         name: formData.name,
         description: formData.description || '',
         category: formData.handicapType,
-        type: formData.adjustmentType === 'fixed_amount' ? 'fixed_fee' : formData.adjustmentType,
+        type:
+          formData.adjustmentType === 'fixed_amount'
+            ? 'fixed_fee'
+            : formData.adjustmentType,
         value: formData.value,
-        unit: formData.adjustmentType === 'fixed_amount' ? 'dollars' : 'percentage',
+        unit:
+          formData.adjustmentType === 'fixed_amount' ? 'dollars' : 'percentage',
         isActive: true,
         appliesTo: ['pickup', 'delivery'] as ('pickup' | 'delivery' | 'both')[],
-        notes: formData.description || ''
+        notes: formData.description || '',
       };
 
       if (editingHandicap) {
         // Update existing handicap
-        const response = await fetch(`${API_BASE_URL}/tariff-settings/${tariffSettingsId}/handicaps/${editingHandicap.id}`, {
-          method: 'PATCH',
-          headers: getAuthHeaders(),
-          body: JSON.stringify(apiHandicap)
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/tariff-settings/${tariffSettingsId}/handicaps/${editingHandicap.id}`,
+          {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(apiHandicap),
+          },
+        );
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to update location handicap');
+          throw new Error(
+            errorData.message || 'Failed to update location handicap',
+          );
         }
       } else {
         // Add new handicap
-        const response = await fetch(`${API_BASE_URL}/tariff-settings/${tariffSettingsId}/handicaps`, {
-          method: 'POST',
-          headers: getAuthHeaders(),
-          body: JSON.stringify(apiHandicap)
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/tariff-settings/${tariffSettingsId}/handicaps`,
+          {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(apiHandicap),
+          },
+        );
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to create location handicap');
+          throw new Error(
+            errorData.message || 'Failed to create location handicap',
+          );
         }
       }
 
@@ -206,22 +277,36 @@ export default function LocationHandicaps() {
       await fetchHandicaps();
 
       setShowForm(false);
-      setFormData({ name: '', handicapType: 'stairs', adjustmentType: 'fixed_amount', value: 0, description: '' });
+      setFormData({
+        name: '',
+        handicapType: 'stairs',
+        adjustmentType: 'fixed_amount',
+        value: 0,
+        description: '',
+      });
       setEditingHandicap(null);
     } catch (err) {
       console.error('Error saving location handicap:', err);
-      alert(err instanceof Error ? err.message : 'Failed to save location handicap');
+      alert(
+        err instanceof Error ? err.message : 'Failed to save location handicap',
+      );
     }
   };
 
   const handleCancel = () => {
     setShowForm(false);
-    setFormData({ name: '', handicapType: 'stairs', adjustmentType: 'fixed_amount', value: 0, description: '' });
+    setFormData({
+      name: '',
+      handicapType: 'stairs',
+      adjustmentType: 'fixed_amount',
+      value: 0,
+      description: '',
+    });
     setEditingHandicap(null);
   };
 
   const formatHandicapType = (type: string) => {
-    return handicapTypes.find(t => t.value === type)?.label || type;
+    return handicapTypes.find((t) => t.value === type)?.label || type;
   };
 
   const formatValue = (value: number, adjustmentType: string) => {
@@ -260,7 +345,10 @@ export default function LocationHandicaps() {
       <div className={styles.header}>
         <div>
           <h3>Location Handicaps</h3>
-          <p>Configure pricing adjustments for location-based challenges and access difficulties</p>
+          <p>
+            Configure pricing adjustments for location-based challenges and
+            access difficulties
+          </p>
         </div>
         <button
           onClick={handleAddNew}
@@ -274,7 +362,11 @@ export default function LocationHandicaps() {
       {showForm && (
         <div className={styles.formContainer}>
           <div className={styles.formCard}>
-            <h4>{editingHandicap ? 'Edit Location Handicap' : 'New Location Handicap'}</h4>
+            <h4>
+              {editingHandicap
+                ? 'Edit Location Handicap'
+                : 'New Location Handicap'}
+            </h4>
             <form onSubmit={handleSubmit}>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
@@ -283,7 +375,9 @@ export default function LocationHandicaps() {
                     id="name"
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="e.g., Stairs at Pickup/Delivery"
                     required
                     className={styles.input}
@@ -295,14 +389,23 @@ export default function LocationHandicaps() {
                   <select
                     id="handicapType"
                     value={formData.handicapType}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      handicapType: e.target.value as 'stairs' | 'long_carry' | 'elevator' | 'parking_distance' | 'access_difficulty' | 'no_elevator' | 'multiple_flights'
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        handicapType: e.target.value as
+                          | 'stairs'
+                          | 'long_carry'
+                          | 'elevator'
+                          | 'parking_distance'
+                          | 'access_difficulty'
+                          | 'no_elevator'
+                          | 'multiple_flights',
+                      })
+                    }
                     className={styles.select}
                     required
                   >
-                    {handicapTypes.map(type => (
+                    {handicapTypes.map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
                       </option>
@@ -315,14 +418,18 @@ export default function LocationHandicaps() {
                   <select
                     id="adjustmentType"
                     value={formData.adjustmentType}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      adjustmentType: e.target.value as 'percentage' | 'fixed_amount'
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        adjustmentType: e.target.value as
+                          | 'percentage'
+                          | 'fixed_amount',
+                      })
+                    }
                     className={styles.select}
                     required
                   >
-                    {adjustmentTypes.map(type => (
+                    {adjustmentTypes.map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
                       </option>
@@ -332,27 +439,43 @@ export default function LocationHandicaps() {
 
                 <div className={styles.formGroup}>
                   <label htmlFor="value">
-                    {formData.adjustmentType === 'percentage' ? 'Percentage (%)' : 'Amount ($)'}
+                    {formData.adjustmentType === 'percentage'
+                      ? 'Percentage (%)'
+                      : 'Amount ($)'}
                   </label>
                   <input
                     id="value"
                     type="number"
                     min="0"
-                    step={formData.adjustmentType === 'percentage' ? '0.1' : '0.01'}
+                    step={
+                      formData.adjustmentType === 'percentage' ? '0.1' : '0.01'
+                    }
                     value={formData.value}
-                    onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })}
-                    placeholder={formData.adjustmentType === 'percentage' ? '10' : '50.00'}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        value: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    placeholder={
+                      formData.adjustmentType === 'percentage' ? '10' : '50.00'
+                    }
                     required
                     className={styles.input}
                   />
                 </div>
 
-                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <div
+                  className={styles.formGroup}
+                  style={{ gridColumn: '1 / -1' }}
+                >
                   <label htmlFor="description">Description (Optional)</label>
                   <textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Add a description for this location handicap..."
                     className={styles.textarea}
                     rows={3}
@@ -361,7 +484,11 @@ export default function LocationHandicaps() {
               </div>
 
               <div className={styles.formActions}>
-                <button type="button" onClick={handleCancel} className={styles.cancelButton}>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className={styles.cancelButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.saveButton}>
@@ -396,9 +523,13 @@ export default function LocationHandicaps() {
                 <tr key={handicap.id}>
                   <td>
                     <div className={styles.nameCell}>
-                      <span className={styles.handicapName}>{handicap.name}</span>
+                      <span className={styles.handicapName}>
+                        {handicap.name}
+                      </span>
                       {handicap.description && (
-                        <span className={styles.handicapDescription}>{handicap.description}</span>
+                        <span className={styles.handicapDescription}>
+                          {handicap.description}
+                        </span>
                       )}
                     </div>
                   </td>
@@ -442,31 +573,52 @@ export default function LocationHandicaps() {
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
             <h5>Stairs</h5>
-            <p>Per-flight charges for stairs when elevator access is unavailable. Accounts for additional labor and time required.</p>
+            <p>
+              Per-flight charges for stairs when elevator access is unavailable.
+              Accounts for additional labor and time required.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Long Carry</h5>
-            <p>Extra charges when the carrying distance from parking to entrance exceeds 75 feet, requiring additional effort.</p>
+            <p>
+              Extra charges when the carrying distance from parking to entrance
+              exceeds 75 feet, requiring additional effort.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>No Elevator Access</h5>
-            <p>Percentage surcharge for multi-story buildings without elevator service, significantly increasing move difficulty.</p>
+            <p>
+              Percentage surcharge for multi-story buildings without elevator
+              service, significantly increasing move difficulty.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Parking Distance</h5>
-            <p>Additional fees when parking is more than 50 feet from the building entrance, causing logistical challenges.</p>
+            <p>
+              Additional fees when parking is more than 50 feet from the
+              building entrance, causing logistical challenges.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Access Difficulty</h5>
-            <p>Surcharge for locations with narrow hallways, tight corners, or other physical access limitations.</p>
+            <p>
+              Surcharge for locations with narrow hallways, tight corners, or
+              other physical access limitations.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Elevator Issues</h5>
-            <p>Time-based charges when elevator availability, capacity, or wait times cause delays during the move.</p>
+            <p>
+              Time-based charges when elevator availability, capacity, or wait
+              times cause delays during the move.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Multiple Flights</h5>
-            <p>Flat fee for carrying heavy items up or down three or more flights of stairs without elevator assistance.</p>
+            <p>
+              Flat fee for carrying heavy items up or down three or more flights
+              of stairs without elevator assistance.
+            </p>
           </div>
         </div>
       </div>

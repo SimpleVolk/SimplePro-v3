@@ -15,11 +15,11 @@ interface SettingsNavigationProps {
 export function SettingsNavigation({
   currentPath,
   onNavigate,
-  searchQuery = ''
+  searchQuery = '',
 }: SettingsNavigationProps) {
   const { user } = useAuth();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['company', 'estimates', 'tariffs']) // Default expanded sections
+    new Set(['company', 'estimates', 'tariffs']), // Default expanded sections
   );
 
   const toggleSection = (sectionId: string) => {
@@ -43,7 +43,8 @@ export function SettingsNavigation({
     return (
       route.label.toLowerCase().includes(searchLower) ||
       route.path.toLowerCase().includes(searchLower) ||
-      (route.children?.some(child => matchesSearch(child, query)) || false)
+      route.children?.some((child) => matchesSearch(child, query)) ||
+      false
     );
   };
 
@@ -56,9 +57,11 @@ export function SettingsNavigation({
     const isParentActive = currentPath.startsWith(route.path + '/');
     const hasChildren = route.children && route.children.length > 0;
     const isExpanded = expandedSections.has(route.id);
-    const hasVisibleChildren = hasChildren && route.children!.some(child =>
-      hasAccess(child) && matchesSearch(child, searchQuery)
-    );
+    const hasVisibleChildren =
+      hasChildren &&
+      route.children!.some(
+        (child) => hasAccess(child) && matchesSearch(child, searchQuery),
+      );
 
     return (
       <div key={route.id} className={styles.navigationItem}>
@@ -77,14 +80,14 @@ export function SettingsNavigation({
           title={route.label}
         >
           <div className={styles.navContent}>
-            {route.icon && (
-              <span className={styles.navIcon}>{route.icon}</span>
-            )}
+            {route.icon && <span className={styles.navIcon}>{route.icon}</span>}
             <span className={styles.navLabel}>{route.label}</span>
           </div>
 
           {hasVisibleChildren && level === 0 && (
-            <span className={`${styles.expandIcon} ${isExpanded ? styles.expanded : ''}`}>
+            <span
+              className={`${styles.expandIcon} ${isExpanded ? styles.expanded : ''}`}
+            >
               ▶
             </span>
           )}
@@ -92,7 +95,9 @@ export function SettingsNavigation({
 
         {hasVisibleChildren && isExpanded && (
           <div className={styles.childrenContainer}>
-            {route.children!.map(child => renderNavigationItem(child, level + 1))}
+            {route.children!.map((child) =>
+              renderNavigationItem(child, level + 1),
+            )}
           </div>
         )}
       </div>
@@ -102,7 +107,7 @@ export function SettingsNavigation({
   return (
     <nav className={styles.settingsNavigation} aria-label="Settings navigation">
       <div className={styles.navigationContent}>
-        {settingsRoutes.map(route => renderNavigationItem(route))}
+        {settingsRoutes.map((route) => renderNavigationItem(route))}
       </div>
     </nav>
   );

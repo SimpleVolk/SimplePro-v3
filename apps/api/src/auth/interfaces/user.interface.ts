@@ -29,7 +29,15 @@ export interface User {
 
 export interface UserRole {
   id: string;
-  name: 'super_admin' | 'admin' | 'manager' | 'dispatcher' | 'sales' | 'crew_lead' | 'crew_member' | 'customer_service';
+  name:
+    | 'super_admin'
+    | 'admin'
+    | 'manager'
+    | 'dispatcher'
+    | 'sales'
+    | 'crew_lead'
+    | 'crew_member'
+    | 'customer_service';
   displayName: string;
   description: string;
   permissions: Permission[];
@@ -69,7 +77,13 @@ export type ActionType =
 
 export interface PermissionCondition {
   field: string;
-  operator: 'equals' | 'not_equals' | 'in' | 'not_in' | 'owns' | 'department_only';
+  operator:
+    | 'equals'
+    | 'not_equals'
+    | 'in'
+    | 'not_in'
+    | 'owns'
+    | 'department_only';
   value: any;
 }
 
@@ -175,7 +189,7 @@ export const DEFAULT_ROLES: UserRole[] = [
     displayName: 'Super Administrator',
     description: 'Full system access with all permissions',
     isSystemRole: true,
-    permissions: [] // Will be populated with all permissions
+    permissions: [], // Will be populated with all permissions
   },
   {
     id: 'role_admin',
@@ -189,9 +203,13 @@ export const DEFAULT_ROLES: UserRole[] = [
       { id: 'perm_users_update', resource: 'users', action: 'update' },
       { id: 'perm_users_delete', resource: 'users', action: 'delete' },
       { id: 'perm_system_read', resource: 'system_settings', action: 'read' },
-      { id: 'perm_system_update', resource: 'system_settings', action: 'update' },
+      {
+        id: 'perm_system_update',
+        resource: 'system_settings',
+        action: 'update',
+      },
       { id: 'perm_reports_all', resource: 'reports', action: 'read' },
-    ]
+    ],
   },
   {
     id: 'role_manager',
@@ -206,7 +224,11 @@ export const DEFAULT_ROLES: UserRole[] = [
       { id: 'perm_estimates_all', resource: 'estimates', action: 'create' },
       { id: 'perm_estimates_read', resource: 'estimates', action: 'read' },
       { id: 'perm_estimates_update', resource: 'estimates', action: 'update' },
-      { id: 'perm_estimates_approve', resource: 'estimates', action: 'approve' },
+      {
+        id: 'perm_estimates_approve',
+        resource: 'estimates',
+        action: 'approve',
+      },
       { id: 'perm_jobs_all', resource: 'jobs', action: 'create' },
       { id: 'perm_jobs_read', resource: 'jobs', action: 'read' },
       { id: 'perm_jobs_update', resource: 'jobs', action: 'update' },
@@ -214,7 +236,7 @@ export const DEFAULT_ROLES: UserRole[] = [
       { id: 'perm_crews_read', resource: 'crews', action: 'read' },
       { id: 'perm_crews_assign', resource: 'crews', action: 'assign' },
       { id: 'perm_reports_read', resource: 'reports', action: 'read' },
-    ]
+    ],
   },
   {
     id: 'role_dispatcher',
@@ -229,7 +251,7 @@ export const DEFAULT_ROLES: UserRole[] = [
       { id: 'perm_crews_read', resource: 'crews', action: 'read' },
       { id: 'perm_crews_assign', resource: 'crews', action: 'assign' },
       { id: 'perm_customers_read', resource: 'customers', action: 'read' },
-    ]
+    ],
   },
   {
     id: 'role_sales',
@@ -244,10 +266,13 @@ export const DEFAULT_ROLES: UserRole[] = [
       { id: 'perm_estimates_create', resource: 'estimates', action: 'create' },
       { id: 'perm_estimates_read', resource: 'estimates', action: 'read' },
       { id: 'perm_estimates_update', resource: 'estimates', action: 'update' },
-      { id: 'perm_jobs_read', resource: 'jobs', action: 'read', conditions: [
-        { field: 'createdBy', operator: 'owns', value: true }
-      ]},
-    ]
+      {
+        id: 'perm_jobs_read',
+        resource: 'jobs',
+        action: 'read',
+        conditions: [{ field: 'createdBy', operator: 'owns', value: true }],
+      },
+    ],
   },
   {
     id: 'role_crew_lead',
@@ -256,15 +281,25 @@ export const DEFAULT_ROLES: UserRole[] = [
     description: 'Lead crew operations and job completion',
     isSystemRole: true,
     permissions: [
-      { id: 'perm_jobs_read', resource: 'jobs', action: 'read', conditions: [
-        { field: 'assignedCrew', operator: 'in', value: 'current_user' }
-      ]},
-      { id: 'perm_jobs_update', resource: 'jobs', action: 'update', conditions: [
-        { field: 'assignedCrew', operator: 'in', value: 'current_user' }
-      ]},
+      {
+        id: 'perm_jobs_read',
+        resource: 'jobs',
+        action: 'read',
+        conditions: [
+          { field: 'assignedCrew', operator: 'in', value: 'current_user' },
+        ],
+      },
+      {
+        id: 'perm_jobs_update',
+        resource: 'jobs',
+        action: 'update',
+        conditions: [
+          { field: 'assignedCrew', operator: 'in', value: 'current_user' },
+        ],
+      },
       { id: 'perm_inventory_read', resource: 'inventory', action: 'read' },
       { id: 'perm_inventory_update', resource: 'inventory', action: 'update' },
-    ]
+    ],
   },
   {
     id: 'role_crew_member',
@@ -273,11 +308,16 @@ export const DEFAULT_ROLES: UserRole[] = [
     description: 'Basic crew operations and job updates',
     isSystemRole: true,
     permissions: [
-      { id: 'perm_jobs_read_assigned', resource: 'jobs', action: 'read', conditions: [
-        { field: 'assignedCrew', operator: 'in', value: 'current_user' }
-      ]},
+      {
+        id: 'perm_jobs_read_assigned',
+        resource: 'jobs',
+        action: 'read',
+        conditions: [
+          { field: 'assignedCrew', operator: 'in', value: 'current_user' },
+        ],
+      },
       { id: 'perm_inventory_read', resource: 'inventory', action: 'read' },
-    ]
+    ],
   },
   {
     id: 'role_customer_service',
@@ -290,6 +330,6 @@ export const DEFAULT_ROLES: UserRole[] = [
       { id: 'perm_customers_update', resource: 'customers', action: 'update' },
       { id: 'perm_jobs_read', resource: 'jobs', action: 'read' },
       { id: 'perm_estimates_read', resource: 'estimates', action: 'read' },
-    ]
-  }
+    ],
+  },
 ];

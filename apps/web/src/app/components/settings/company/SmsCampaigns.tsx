@@ -29,7 +29,9 @@ export default function SmsCampaigns() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'settings' | 'campaigns' | 'templates'>('settings');
+  const [activeTab, setActiveTab] = useState<
+    'settings' | 'campaigns' | 'templates'
+  >('settings');
 
   const [smsSettings, setSmsSettings] = useState<SmsSettings>({
     twilioAccountSid: '',
@@ -46,7 +48,8 @@ export default function SmsCampaigns() {
     {
       id: '1',
       name: 'Move Reminder (24h before)',
-      template: 'Hi {customer_name}, this is a reminder that your move is scheduled for tomorrow at {move_time}. Reply READY to confirm.',
+      template:
+        'Hi {customer_name}, this is a reminder that your move is scheduled for tomorrow at {move_time}. Reply READY to confirm.',
       schedule: '24 hours before move',
       active: true,
       sendCount: 45,
@@ -54,7 +57,8 @@ export default function SmsCampaigns() {
     {
       id: '2',
       name: 'Follow-up Survey',
-      template: 'Thanks for choosing us! How was your moving experience? Rate us: {survey_link}',
+      template:
+        'Thanks for choosing us! How was your moving experience? Rate us: {survey_link}',
       schedule: '2 hours after completion',
       active: true,
       sendCount: 38,
@@ -82,9 +86,9 @@ export default function SmsCampaigns() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('company/sms-campaigns'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -118,7 +122,7 @@ export default function SmsCampaigns() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ settings: smsSettings, campaigns }),
       });
@@ -135,7 +139,9 @@ export default function SmsCampaigns() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving SMS settings:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -165,7 +171,7 @@ export default function SmsCampaigns() {
 
   const handleDeleteCampaign = (id: string) => {
     if (confirm('Are you sure you want to delete this campaign?')) {
-      setCampaigns(campaigns.filter(c => c.id !== id));
+      setCampaigns(campaigns.filter((c) => c.id !== id));
       setSuccess('Campaign deleted successfully');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -223,7 +229,13 @@ export default function SmsCampaigns() {
       ) : (
         <>
           {activeTab === 'settings' && (
-            <form className={styles.form} onSubmit={(e) => { e.preventDefault(); handleSaveSettings(); }}>
+            <form
+              className={styles.form}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSaveSettings();
+              }}
+            >
               <div className={styles.section}>
                 <h3>Twilio Integration</h3>
                 <div className={styles.formGrid}>
@@ -233,7 +245,12 @@ export default function SmsCampaigns() {
                       id="twilioAccountSid"
                       type="text"
                       value={smsSettings.twilioAccountSid}
-                      onChange={(e) => setSmsSettings({ ...smsSettings, twilioAccountSid: e.target.value })}
+                      onChange={(e) =>
+                        setSmsSettings({
+                          ...smsSettings,
+                          twilioAccountSid: e.target.value,
+                        })
+                      }
                       className={styles.input}
                       placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                     />
@@ -250,19 +267,31 @@ export default function SmsCampaigns() {
                       id="twilioAuthToken"
                       type="password"
                       value={smsSettings.twilioAuthToken}
-                      onChange={(e) => setSmsSettings({ ...smsSettings, twilioAuthToken: e.target.value })}
+                      onChange={(e) =>
+                        setSmsSettings({
+                          ...smsSettings,
+                          twilioAuthToken: e.target.value,
+                        })
+                      }
                       className={styles.input}
                       placeholder="Your Twilio auth token"
                     />
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="twilioPhoneNumber">Twilio Phone Number</label>
+                    <label htmlFor="twilioPhoneNumber">
+                      Twilio Phone Number
+                    </label>
                     <input
                       id="twilioPhoneNumber"
                       type="tel"
                       value={smsSettings.twilioPhoneNumber}
-                      onChange={(e) => setSmsSettings({ ...smsSettings, twilioPhoneNumber: e.target.value })}
+                      onChange={(e) =>
+                        setSmsSettings({
+                          ...smsSettings,
+                          twilioPhoneNumber: e.target.value,
+                        })
+                      }
                       className={styles.input}
                       placeholder="+1234567890"
                     />
@@ -280,7 +309,12 @@ export default function SmsCampaigns() {
                       type="number"
                       min="0"
                       value={smsSettings.monthlyBudget}
-                      onChange={(e) => setSmsSettings({ ...smsSettings, monthlyBudget: parseFloat(e.target.value) })}
+                      onChange={(e) =>
+                        setSmsSettings({
+                          ...smsSettings,
+                          monthlyBudget: parseFloat(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   </div>
@@ -288,12 +322,15 @@ export default function SmsCampaigns() {
                   <div className={styles.formGroup}>
                     <label>Usage This Month</label>
                     <div className={styles.usageDisplay}>
-                      ${smsSettings.usageThisMonth.toFixed(2)} / ${smsSettings.monthlyBudget.toFixed(2)}
+                      ${smsSettings.usageThisMonth.toFixed(2)} / $
+                      {smsSettings.monthlyBudget.toFixed(2)}
                     </div>
                     <div className={styles.progressBar}>
                       <div
                         className={styles.progressFill}
-                        style={{ width: `${(smsSettings.usageThisMonth / smsSettings.monthlyBudget) * 100}%` }}
+                        style={{
+                          width: `${(smsSettings.usageThisMonth / smsSettings.monthlyBudget) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -307,7 +344,12 @@ export default function SmsCampaigns() {
                     <input
                       type="checkbox"
                       checked={smsSettings.complianceEnabled}
-                      onChange={(e) => setSmsSettings({ ...smsSettings, complianceEnabled: e.target.checked })}
+                      onChange={(e) =>
+                        setSmsSettings({
+                          ...smsSettings,
+                          complianceEnabled: e.target.checked,
+                        })
+                      }
                     />
                     Enable TCPA Compliance
                   </label>
@@ -318,29 +360,44 @@ export default function SmsCampaigns() {
                   <textarea
                     id="optInMessage"
                     value={smsSettings.optInMessage}
-                    onChange={(e) => setSmsSettings({ ...smsSettings, optInMessage: e.target.value })}
+                    onChange={(e) =>
+                      setSmsSettings({
+                        ...smsSettings,
+                        optInMessage: e.target.value,
+                      })
+                    }
                     className={styles.textarea}
                     rows={3}
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="optOutKeywords">Opt-Out Keywords (comma-separated)</label>
+                  <label htmlFor="optOutKeywords">
+                    Opt-Out Keywords (comma-separated)
+                  </label>
                   <input
                     id="optOutKeywords"
                     type="text"
                     value={smsSettings.optOutKeywords.join(', ')}
-                    onChange={(e) => setSmsSettings({
-                      ...smsSettings,
-                      optOutKeywords: e.target.value.split(',').map(k => k.trim())
-                    })}
+                    onChange={(e) =>
+                      setSmsSettings({
+                        ...smsSettings,
+                        optOutKeywords: e.target.value
+                          .split(',')
+                          .map((k) => k.trim()),
+                      })
+                    }
                     className={styles.input}
                   />
                 </div>
               </div>
 
               <div className={styles.formActions}>
-                <button type="submit" className={styles.saveButton} disabled={saving}>
+                <button
+                  type="submit"
+                  className={styles.saveButton}
+                  disabled={saving}
+                >
                   {saving ? 'Saving...' : 'Save Settings'}
                 </button>
               </div>
@@ -368,7 +425,12 @@ export default function SmsCampaigns() {
                         id="campaignName"
                         type="text"
                         value={newCampaign.name || ''}
-                        onChange={(e) => setNewCampaign({ ...newCampaign, name: e.target.value })}
+                        onChange={(e) =>
+                          setNewCampaign({
+                            ...newCampaign,
+                            name: e.target.value,
+                          })
+                        }
                         className={styles.input}
                         placeholder="e.g., Move Reminder"
                       />
@@ -380,7 +442,12 @@ export default function SmsCampaigns() {
                         id="campaignSchedule"
                         type="text"
                         value={newCampaign.schedule || ''}
-                        onChange={(e) => setNewCampaign({ ...newCampaign, schedule: e.target.value })}
+                        onChange={(e) =>
+                          setNewCampaign({
+                            ...newCampaign,
+                            schedule: e.target.value,
+                          })
+                        }
                         className={styles.input}
                         placeholder="e.g., 24 hours before move"
                       />
@@ -392,7 +459,12 @@ export default function SmsCampaigns() {
                     <textarea
                       id="campaignTemplate"
                       value={newCampaign.template || ''}
-                      onChange={(e) => setNewCampaign({ ...newCampaign, template: e.target.value })}
+                      onChange={(e) =>
+                        setNewCampaign({
+                          ...newCampaign,
+                          template: e.target.value,
+                        })
+                      }
                       className={styles.textarea}
                       rows={3}
                       placeholder="Use {customer_name}, {move_date}, {move_time} as variables"
@@ -409,7 +481,7 @@ export default function SmsCampaigns() {
               )}
 
               <div className={styles.campaignsList}>
-                {campaigns.map(campaign => (
+                {campaigns.map((campaign) => (
                   <div key={campaign.id} className={styles.campaignCard}>
                     <div className={styles.campaignHeader}>
                       <h4>{campaign.name}</h4>
@@ -419,9 +491,13 @@ export default function SmsCampaigns() {
                             type="checkbox"
                             checked={campaign.active}
                             onChange={(e) => {
-                              setCampaigns(campaigns.map(c =>
-                                c.id === campaign.id ? { ...c, active: e.target.checked } : c
-                              ));
+                              setCampaigns(
+                                campaigns.map((c) =>
+                                  c.id === campaign.id
+                                    ? { ...c, active: e.target.checked }
+                                    : c,
+                                ),
+                              );
                             }}
                           />
                           Active
@@ -434,7 +510,9 @@ export default function SmsCampaigns() {
                         </button>
                       </div>
                     </div>
-                    <p className={styles.campaignTemplate}>{campaign.template}</p>
+                    <p className={styles.campaignTemplate}>
+                      {campaign.template}
+                    </p>
                     <div className={styles.campaignMeta}>
                       <span>Schedule: {campaign.schedule}</span>
                       <span>Sent: {campaign.sendCount} times</span>
@@ -449,10 +527,11 @@ export default function SmsCampaigns() {
             <div className={styles.section}>
               <h3>Available Variables</h3>
               <p className={styles.helpText}>
-                Use these variables in your SMS templates. They will be automatically replaced with actual values.
+                Use these variables in your SMS templates. They will be
+                automatically replaced with actual values.
               </p>
               <div className={styles.variablesList}>
-                <code>{'{customer_name}'}</code> - Customer&apos;s full name
+                <code>{'{customer_name}'}</code> - Customer's full name
                 <code>{'{move_date}'}</code> - Move date
                 <code>{'{move_time}'}</code> - Move time
                 <code>{'{crew_lead}'}</code> - Crew lead name

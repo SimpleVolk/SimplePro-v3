@@ -7,9 +7,7 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/api-e2e',
-  testMatch: [
-    '<rootDir>/test/e2e/**/*.e2e-spec.ts',
-  ],
+  testMatch: ['<rootDir>/test/e2e/**/*.e2e-spec.ts'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.spec.ts',
@@ -24,7 +22,8 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/test/e2e-setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@simplepro/pricing-engine$': '<rootDir>/../../packages/pricing-engine/src/index.ts'
+    '^@simplepro/pricing-engine$':
+      '<rootDir>/../../packages/pricing-engine/src/index.ts',
   },
   testTimeout: 30000, // 30 seconds for E2E tests
   maxWorkers: 1, // Run E2E tests sequentially to avoid DB conflicts

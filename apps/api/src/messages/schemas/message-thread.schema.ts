@@ -5,7 +5,11 @@ export type MessageThreadDocument = MessageThread & Document;
 
 @Schema({ collection: 'message_threads', timestamps: true })
 export class MessageThread {
-  @Prop({ required: true, type: [{ type: Types.ObjectId, ref: 'User' }], index: true })
+  @Prop({
+    required: true,
+    type: [{ type: Types.ObjectId, ref: 'User' }],
+    index: true,
+  })
   participants!: Types.ObjectId[];
 
   @Prop({ enum: ['direct', 'job', 'group'], default: 'direct', index: true })
@@ -43,20 +47,20 @@ MessageThreadSchema.index({ threadType: 1, createdAt: -1 });
 // Ensure virtuals are serialized
 MessageThreadSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret: any) {
+  transform: function (_doc, ret: any) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
     return ret;
-  }
+  },
 });
 
 MessageThreadSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret: any) {
+  transform: function (_doc, ret: any) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
     return ret;
-  }
+  },
 });

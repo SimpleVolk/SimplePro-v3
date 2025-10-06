@@ -11,6 +11,7 @@ SimplePro-v3 now features **enterprise-grade deployment infrastructure** with mu
 ### **🏗️ Infrastructure Components**
 
 #### **Core Application Stack**
+
 - **API Server**: NestJS with MongoDB, Redis, JWT authentication
 - **Web Application**: Next.js with Server-Side Rendering
 - **Database**: MongoDB with replication and backup
@@ -18,6 +19,7 @@ SimplePro-v3 now features **enterprise-grade deployment infrastructure** with mu
 - **Reverse Proxy**: Nginx with SSL termination and load balancing
 
 #### **Monitoring & Observability**
+
 - **Metrics**: Prometheus + Grafana with custom dashboards
 - **Logging**: ELK Stack (Elasticsearch + Logstash + Kibana)
 - **APM**: Elastic APM with distributed tracing
@@ -25,6 +27,7 @@ SimplePro-v3 now features **enterprise-grade deployment infrastructure** with mu
 - **Uptime Monitoring**: Blackbox Exporter for external monitoring
 
 #### **Security & Compliance**
+
 - **Container Scanning**: Trivy for vulnerability assessment
 - **Code Analysis**: CodeQL for security scanning
 - **SSL/TLS**: Automated certificate management
@@ -46,6 +49,7 @@ docker-compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml up -d
 ```
 
 **Features:**
+
 - Single environment deployment
 - Full monitoring and alerting
 - Automated health checks
@@ -68,6 +72,7 @@ docker-compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml up -d
 ```
 
 **Features:**
+
 - Zero-downtime deployments
 - Automated traffic switching
 - Health check validation
@@ -77,11 +82,13 @@ docker-compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml up -d
 ### **3. CI/CD Automated Deployment**
 
 **GitHub Actions Workflows:**
+
 - **`ci-cd.yml`**: Complete CI/CD pipeline with testing and security scanning
 - **`production-deploy.yml`**: Production deployment with approval gates
 - **`dependency-update.yml`**: Automated dependency updates
 
 **Pipeline Features:**
+
 - Automated testing (unit, integration, performance)
 - Security vulnerability scanning
 - Docker image building and scanning
@@ -173,7 +180,7 @@ sudo certbot --nginx -d yourdomain.com
 
 Set up production secrets:
 
-```bash
+````bash
 # Initialize secrets management
 ./scripts/secrets-management.sh setup
 
@@ -181,7 +188,7 @@ Set up production secrets:
 ./scripts/secrets-management.sh validate
 
 # Rotate secrets (periodic security update)
-**Summary of changes:**  
+**Summary of changes:**
 All bare URLs (e.g., `https://localhost`, `http://localhost:3001`) are now formatted as Markdown links, which resolves the MD034/no-bare-urls error.
 - **Daily**: Full system backup at 2 AM
 - **Hourly**: Database incremental backup during business hours
@@ -252,7 +259,7 @@ docker-compose -f docker-compose.prod.yml logs service-name
 
 # Restart specific service
 docker-compose -f docker-compose.prod.yml restart service-name
-```
+````
 
 #### Database Connection Issues
 

@@ -44,8 +44,10 @@ export async function findAllCached(
 
     if (filters.scheduledAfter || filters.scheduledBefore) {
       query.scheduledDate = {};
-      if (filters.scheduledAfter) query.scheduledDate.$gte = filters.scheduledAfter;
-      if (filters.scheduledBefore) query.scheduledDate.$lte = filters.scheduledBefore;
+      if (filters.scheduledAfter)
+        query.scheduledDate.$gte = filters.scheduledAfter;
+      if (filters.scheduledBefore)
+        query.scheduledDate.$lte = filters.scheduledBefore;
     }
 
     if (filters.search) {
@@ -117,7 +119,7 @@ export async function findOneCached(this: any, id: string): Promise<Job> {
  */
 export async function getCalendarWeekCached(
   this: any,
-  startDate: Date
+  startDate: Date,
 ): Promise<Job[]> {
   const cacheService: CacheService = this.cacheService;
 
@@ -178,17 +180,19 @@ export async function getJobStatsCached(this: any) {
     inProgressCount,
     completedCount,
     cancelledCount,
-    revenueData
+    revenueData,
   ] = await Promise.all([
     this.jobModel.countDocuments().exec(),
     this.jobModel.countDocuments({ status: 'scheduled' }).exec(),
     this.jobModel.countDocuments({ status: 'in_progress' }).exec(),
     this.jobModel.countDocuments({ status: 'completed' }).exec(),
     this.jobModel.countDocuments({ status: 'cancelled' }).exec(),
-    this.jobModel.aggregate([
-      { $match: { status: 'completed' } },
-      { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } }
-    ]).exec()
+    this.jobModel
+      .aggregate([
+        { $match: { status: 'completed' } },
+        { $group: { _id: null, total: { $sum: '$pricing.finalPrice' } } },
+      ])
+      .exec(),
   ]);
 
   const stats = {
@@ -203,7 +207,10 @@ export async function getJobStatsCached(this: any) {
   };
 
   // Cache for 5 minutes
-  await cacheService.set(cacheKey, stats, { ttl: 300, tags: ['jobs', 'analytics'] });
+  await cacheService.set(cacheKey, stats, {
+    ttl: 300,
+    tags: ['jobs', 'analytics'],
+  });
 
   return stats;
 }
@@ -222,7 +229,10 @@ export async function invalidateCacheOnJobCreate(cacheService: CacheService) {
 /**
  * CACHE INVALIDATION for update
  */
-export async function invalidateCacheOnJobUpdate(cacheService: CacheService, jobId: string) {
+export async function invalidateCacheOnJobUpdate(
+  cacheService: CacheService,
+  jobId: string,
+) {
   await Promise.all([
     cacheService.del(`job:${jobId}`),
     cacheService.deletePattern('jobs:list:*'),
@@ -235,7 +245,10 @@ export async function invalidateCacheOnJobUpdate(cacheService: CacheService, job
  * CACHE INVALIDATION for status update
  * Status changes affect stats and lists heavily
  */
-export async function invalidateCacheOnStatusChange(cacheService: CacheService, jobId: string) {
+export async function invalidateCacheOnStatusChange(
+  cacheService: CacheService,
+  jobId: string,
+) {
   await Promise.all([
     cacheService.del(`job:${jobId}`),
     cacheService.deletePattern('jobs:list:*'),
@@ -248,7 +261,10 @@ export async function invalidateCacheOnStatusChange(cacheService: CacheService, 
 /**
  * CACHE INVALIDATION for delete
  */
-export async function invalidateCacheOnJobDelete(cacheService: CacheService, jobId: string) {
+export async function invalidateCacheOnJobDelete(
+  cacheService: CacheService,
+  jobId: string,
+) {
   await Promise.all([
     cacheService.del(`job:${jobId}`),
     cacheService.deletePattern('jobs:list:*'),

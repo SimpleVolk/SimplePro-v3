@@ -1,4 +1,17 @@
-import { IsString, IsEmail, IsEnum, IsOptional, IsObject, ValidateNested, IsBoolean, IsNumber, IsArray, Min, Max, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsObject,
+  ValidateNested,
+  IsBoolean,
+  IsNumber,
+  IsArray,
+  Min,
+  Max,
+  IsDateString,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CommissionTierDto {
@@ -93,7 +106,7 @@ export class CreatePartnerDto {
     'storage_facility',
     'corporate_client',
     'referral_network',
-    'other'
+    'other',
   ])
   partnerType!: string;
 

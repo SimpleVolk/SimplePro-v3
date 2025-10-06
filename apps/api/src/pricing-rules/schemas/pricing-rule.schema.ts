@@ -8,7 +8,23 @@ export class PricingRuleCondition {
   @Prop({ required: true })
   field!: string;
 
-  @Prop({ required: true, type: String, enum: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'in', 'not_in', 'contains', 'starts_with', 'ends_with'] })
+  @Prop({
+    required: true,
+    type: String,
+    enum: [
+      'eq',
+      'neq',
+      'gt',
+      'gte',
+      'lt',
+      'lte',
+      'in',
+      'not_in',
+      'contains',
+      'starts_with',
+      'ends_with',
+    ],
+  })
   operator!: string;
 
   @Prop({ type: Object })
@@ -20,7 +36,19 @@ export class PricingRuleCondition {
 
 @Schema({ collection: 'pricing-rules' })
 export class PricingRuleAction {
-  @Prop({ required: true, type: String, enum: ['add_fixed', 'add_percentage', 'subtract_fixed', 'subtract_percentage', 'multiply', 'set_fixed', 'set_percentage'] })
+  @Prop({
+    required: true,
+    type: String,
+    enum: [
+      'add_fixed',
+      'add_percentage',
+      'subtract_fixed',
+      'subtract_percentage',
+      'multiply',
+      'set_fixed',
+      'set_percentage',
+    ],
+  })
   type!: string;
 
   @Prop({ required: true, min: 0 })
@@ -49,8 +77,17 @@ export class PricingRule {
 
   @Prop({
     required: true,
-    enum: ['base_pricing', 'crew_adjustments', 'weight_volume', 'distance', 'timing', 'special_items', 'location_handicaps', 'additional_services'],
-    index: true
+    enum: [
+      'base_pricing',
+      'crew_adjustments',
+      'weight_volume',
+      'distance',
+      'timing',
+      'special_items',
+      'location_handicaps',
+      'additional_services',
+    ],
+    index: true,
   })
   category!: string;
 
@@ -70,7 +107,7 @@ export class PricingRule {
     type: [String],
     enum: ['local', 'long_distance', 'storage', 'packing_only'],
     required: true,
-    index: true
+    index: true,
   })
   applicableServices!: string[];
 
@@ -114,11 +151,11 @@ PricingRuleSchema.index({ updatedAt: -1 });
 PricingRuleSchema.index({
   name: 'text',
   description: 'text',
-  id: 'text'
+  id: 'text',
 });
 
 // Virtual for rule status
-PricingRuleSchema.virtual('status').get(function() {
+PricingRuleSchema.virtual('status').get(function () {
   if (this.deletedAt) return 'deleted';
   if (!this.isActive) return 'inactive';
   if (this.expiryDate && this.expiryDate < new Date()) return 'expired';

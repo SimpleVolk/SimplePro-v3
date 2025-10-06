@@ -24,7 +24,12 @@ interface ReadReceipt {
 
 @Schema({ collection: 'messages', timestamps: true })
 export class Message {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'MessageThread', index: true })
+  @Prop({
+    required: true,
+    type: Types.ObjectId,
+    ref: 'MessageThread',
+    index: true,
+  })
   threadId!: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User', index: true })
@@ -33,7 +38,10 @@ export class Message {
   @Prop({ required: true, maxlength: 5000 })
   content!: string;
 
-  @Prop({ enum: ['text', 'image', 'file', 'location', 'quick_reply'], default: 'text' })
+  @Prop({
+    enum: ['text', 'image', 'file', 'location', 'quick_reply'],
+    default: 'text',
+  })
   messageType!: string;
 
   @Prop({ type: [Object], default: [] })
@@ -42,7 +50,10 @@ export class Message {
   @Prop({ type: Object })
   location?: MessageLocation;
 
-  @Prop({ type: [{ userId: { type: Types.ObjectId, ref: 'User' }, readAt: Date }], default: [] })
+  @Prop({
+    type: [{ userId: { type: Types.ObjectId, ref: 'User' }, readAt: Date }],
+    default: [],
+  })
   readBy!: ReadReceipt[];
 
   @Prop({ default: false })
@@ -83,7 +94,9 @@ MessageSchema.pre('save', async function (next) {
       const User = mongoose.model('User');
       const senderExists = await User.exists({ _id: this.senderId });
       if (!senderExists) {
-        throw new Error(`Referenced User (senderId) not found: ${this.senderId}`);
+        throw new Error(
+          `Referenced User (senderId) not found: ${this.senderId}`,
+        );
       }
     }
 
@@ -92,7 +105,9 @@ MessageSchema.pre('save', async function (next) {
       const Message = mongoose.model('Message');
       const replyToExists = await Message.exists({ _id: this.replyToId });
       if (!replyToExists) {
-        throw new Error(`Referenced Message (replyToId) not found: ${this.replyToId}`);
+        throw new Error(
+          `Referenced Message (replyToId) not found: ${this.replyToId}`,
+        );
       }
     }
 
@@ -103,7 +118,9 @@ MessageSchema.pre('save', async function (next) {
         if (receipt.userId) {
           const userExists = await User.exists({ _id: receipt.userId });
           if (!userExists) {
-            throw new Error(`Referenced User in readBy not found: ${receipt.userId}`);
+            throw new Error(
+              `Referenced User in readBy not found: ${receipt.userId}`,
+            );
           }
         }
       }
@@ -127,20 +144,20 @@ MessageSchema.index({ content: 'text' }, { name: 'message_content_search' });
 // Ensure virtuals are serialized
 MessageSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret: any) {
+  transform: function (_doc, ret: any) {
     ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
     return ret;
-  }
+  },
 });
 
 MessageSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret: any) {
+  transform: function (_doc, ret: any) {
     ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
     return ret;
-  }
+  },
 });

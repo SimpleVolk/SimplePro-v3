@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ConversionTrackingService } from '../conversion-tracking.service';
 import { QuoteHistoryService } from '../../quote-history/quote-history.service';
-import { ConversionEventType, SourceChannel } from '../schemas/conversion-event.schema';
+import {
+  ConversionEventType,
+  SourceChannel,
+} from '../schemas/conversion-event.schema';
 
 @Injectable()
 export class ConversionEventsListener {
@@ -273,7 +276,8 @@ export class ConversionEventsListener {
       return 0;
     }
 
-    const margin = ((payload.totalCost - payload.estimatedCost) / payload.totalCost) * 100;
+    const margin =
+      ((payload.totalCost - payload.estimatedCost) / payload.totalCost) * 100;
     return parseFloat(margin.toFixed(2));
   }
 }

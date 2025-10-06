@@ -33,31 +33,31 @@ The application uses a comprehensive WCAG AA compliant color system defined in `
 
 #### Text Colors (on dark backgrounds #0f1419)
 
-| Color | Hex | Contrast Ratio | Usage |
-|-------|-----|----------------|-------|
-| Primary | `#ffffff` | 16.5:1 ✓ | Headings, important text |
-| Secondary | `#e2e8f0` | 11.2:1 ✓ | Body text, labels |
-| Tertiary | `#cbd5e1` | 8.4:1 ✓ | Descriptions, secondary info |
-| Muted | `#94a3b8` | 4.8:1 ✓ | Placeholder text, hints |
-| Disabled | `#64748b` | 3.1:1 ✓ | Large text only |
+| Color     | Hex       | Contrast Ratio | Usage                        |
+| --------- | --------- | -------------- | ---------------------------- |
+| Primary   | `#ffffff` | 16.5:1 ✓       | Headings, important text     |
+| Secondary | `#e2e8f0` | 11.2:1 ✓       | Body text, labels            |
+| Tertiary  | `#cbd5e1` | 8.4:1 ✓        | Descriptions, secondary info |
+| Muted     | `#94a3b8` | 4.8:1 ✓        | Placeholder text, hints      |
+| Disabled  | `#64748b` | 3.1:1 ✓        | Large text only              |
 
 #### Link Colors
 
-| State | Hex | Contrast Ratio |
-|-------|-----|----------------|
-| Default | `#60a5fa` | 4.52:1 ✓ |
-| Hover | `#93c5fd` | 6.1:1 ✓ |
-| Visited | `#a78bfa` | 4.6:1 ✓ |
-| Active | `#38bdf8` | 5.2:1 ✓ |
+| State   | Hex       | Contrast Ratio |
+| ------- | --------- | -------------- |
+| Default | `#60a5fa` | 4.52:1 ✓       |
+| Hover   | `#93c5fd` | 6.1:1 ✓        |
+| Visited | `#a78bfa` | 4.6:1 ✓        |
+| Active  | `#38bdf8` | 5.2:1 ✓        |
 
 #### Status Colors
 
-| Status | Hex | Contrast Ratio | Usage |
-|--------|-----|----------------|-------|
-| Success | `#4ade80` | 6.8:1 ✓ | Success messages, completed states |
-| Error | `#f87171` | 4.1:1 ✓ | Error messages, validation |
-| Warning | `#fbbf24` | 8.2:1 ✓ | Warning alerts, caution |
-| Info | `#22d3ee` | 6.2:1 ✓ | Information, tips |
+| Status  | Hex       | Contrast Ratio | Usage                              |
+| ------- | --------- | -------------- | ---------------------------------- |
+| Success | `#4ade80` | 6.8:1 ✓        | Success messages, completed states |
+| Error   | `#f87171` | 4.1:1 ✓        | Error messages, validation         |
+| Warning | `#fbbf24` | 8.2:1 ✓        | Warning alerts, caution            |
+| Info    | `#22d3ee` | 6.2:1 ✓        | Information, tips                  |
 
 #### Sidebar Colors
 
@@ -94,15 +94,15 @@ All interactive elements are fully keyboard accessible without requiring a mouse
 
 ### Essential Keyboard Shortcuts
 
-| Action | Shortcut | Context |
-|--------|----------|---------|
-| Skip to main content | `Tab` (on page load) | Bypasses navigation |
-| Navigate forward | `Tab` | Move to next focusable element |
-| Navigate backward | `Shift + Tab` | Move to previous element |
-| Activate element | `Enter` or `Space` | Buttons, links, form elements |
-| Navigate sidebar | `Arrow Up/Down` | Within navigation menu |
-| Close modal/dialog | `Escape` | Dismisses overlays |
-| Submit form | `Enter` | When focused in form |
+| Action               | Shortcut             | Context                        |
+| -------------------- | -------------------- | ------------------------------ |
+| Skip to main content | `Tab` (on page load) | Bypasses navigation            |
+| Navigate forward     | `Tab`                | Move to next focusable element |
+| Navigate backward    | `Shift + Tab`        | Move to previous element       |
+| Activate element     | `Enter` or `Space`   | Buttons, links, form elements  |
+| Navigate sidebar     | `Arrow Up/Down`      | Within navigation menu         |
+| Close modal/dialog   | `Escape`             | Dismisses overlays             |
+| Submit form          | `Enter`              | When focused in form           |
 
 ### Tab Order
 
@@ -132,6 +132,7 @@ All interactive elements have clear focus indicators:
 ### Focus Trap in Modals
 
 When a modal is open:
+
 - Focus moves to the modal
 - `Tab` cycles through modal elements only
 - `Escape` closes modal and returns focus
@@ -159,7 +160,7 @@ The application uses semantic HTML5 and ARIA landmarks for navigation:
 </aside>
 
 <!-- Main content area -->
-<main id="main-content" role="main" tabIndex={-1}>
+<main id="main-content" role="main" tabIndex="{-1}">
   <!-- Page content -->
 </main>
 
@@ -180,14 +181,10 @@ Dynamic content updates are announced to screen readers:
 </div>
 
 <!-- Loading states -->
-<div role="status" aria-live="polite" aria-busy="true">
-  Loading data...
-</div>
+<div role="status" aria-live="polite" aria-busy="true">Loading data...</div>
 
 <!-- Success notifications -->
-<div role="status" aria-live="polite">
-  Customer saved successfully
-</div>
+<div role="status" aria-live="polite">Customer saved successfully</div>
 ```
 
 ### Screen Reader Only Text
@@ -214,7 +211,7 @@ A skip link is provided for keyboard users to bypass navigation:
 import { SkipLink } from './components/SkipLink';
 
 // In AppLayout
-<SkipLink /> // Visible only on focus
+<SkipLink />; // Visible only on focus
 ```
 
 Press `Tab` on page load to reveal the skip link.
@@ -222,6 +219,7 @@ Press `Tab` on page load to reveal the skip link.
 ### Focus Restoration
 
 After closing a modal or completing an action:
+
 - Focus returns to the trigger element
 - Or moves to a logical next element
 
@@ -239,6 +237,7 @@ const closeModal = () => {
 ### Initial Focus
 
 When a modal opens:
+
 - Focus moves to the first focusable element
 - Or to the modal's close button
 - Or to a designated primary action
@@ -273,6 +272,7 @@ All form inputs have visible labels and indicate required fields:
 ### Form Validation
 
 Error messages are:
+
 - Visually associated with the input
 - Announced to screen readers via `role="alert"`
 - Linked using `aria-describedby`
@@ -306,16 +306,8 @@ Related form elements use `<fieldset>` and `<legend>`:
 Forms use appropriate `autocomplete` attributes:
 
 ```html
-<input
-  type="email"
-  autocomplete="email"
-  aria-label="Email address"
-/>
-<input
-  type="tel"
-  autocomplete="tel"
-  aria-label="Phone number"
-/>
+<input type="email" autocomplete="email" aria-label="Email address" />
+<input type="tel" autocomplete="tel" aria-label="Phone number" />
 ```
 
 ---
@@ -367,7 +359,9 @@ Data tables have proper structure:
 
 ```html
 <table>
-  <caption>Customer List</caption>
+  <caption>
+    Customer List
+  </caption>
   <thead>
     <tr>
       <th scope="col">Name</th>
@@ -397,9 +391,7 @@ Dialogs use proper ARIA attributes:
   aria-describedby="dialog-description"
 >
   <h2 id="dialog-title">Confirm Deletion</h2>
-  <p id="dialog-description">
-    Are you sure you want to delete this customer?
-  </p>
+  <p id="dialog-description">Are you sure you want to delete this customer?</p>
   <button onClick={handleDelete}>Delete</button>
   <button onClick={handleClose}>Cancel</button>
 </div>
@@ -448,6 +440,7 @@ Notifications use appropriate ARIA:
 ### Manual Testing
 
 #### Keyboard Navigation
+
 - [ ] Tab through entire page without mouse
 - [ ] All interactive elements are focusable
 - [ ] Focus order is logical
@@ -456,6 +449,7 @@ Notifications use appropriate ARIA:
 - [ ] Skip link works on first tab
 
 #### Screen Reader Testing (NVDA/JAWS/VoiceOver)
+
 - [ ] All text content is read correctly
 - [ ] Form labels are announced
 - [ ] Error messages are announced
@@ -466,12 +460,14 @@ Notifications use appropriate ARIA:
 - [ ] Modal focus is trapped and restored
 
 #### Color Contrast
+
 - [ ] All text meets 4.5:1 ratio (or 3:1 for large text)
 - [ ] Borders and UI components meet 3:1 ratio
 - [ ] Focus indicators have sufficient contrast
 - [ ] Error states are distinguishable
 
 #### Forms
+
 - [ ] All inputs have visible labels
 - [ ] Required fields are indicated
 - [ ] Error messages are clear and helpful
@@ -479,6 +475,7 @@ Notifications use appropriate ARIA:
 - [ ] Autocomplete works correctly
 
 #### Responsive Design
+
 - [ ] Mobile touch targets are 44x44px minimum
 - [ ] Content is readable when zoomed to 200%
 - [ ] No horizontal scrolling at 320px width
@@ -490,29 +487,29 @@ Notifications use appropriate ARIA:
 ### Desktop Browsers
 
 | Browser | Version | Support |
-|---------|---------|---------|
-| Chrome | 90+ | Full ✓ |
-| Firefox | 88+ | Full ✓ |
-| Safari | 14+ | Full ✓ |
-| Edge | 90+ | Full ✓ |
+| ------- | ------- | ------- |
+| Chrome  | 90+     | Full ✓  |
+| Firefox | 88+     | Full ✓  |
+| Safari  | 14+     | Full ✓  |
+| Edge    | 90+     | Full ✓  |
 
 ### Mobile Browsers
 
-| Browser | Platform | Support |
-|---------|----------|---------|
-| Safari | iOS 14+ | Full ✓ |
-| Chrome | Android 10+ | Full ✓ |
-| Samsung Internet | Android 10+ | Full ✓ |
+| Browser          | Platform    | Support |
+| ---------------- | ----------- | ------- |
+| Safari           | iOS 14+     | Full ✓  |
+| Chrome           | Android 10+ | Full ✓  |
+| Samsung Internet | Android 10+ | Full ✓  |
 
 ### Assistive Technologies
 
-| Technology | Platform | Support |
-|-----------|----------|---------|
-| NVDA | Windows | Full ✓ |
-| JAWS | Windows | Full ✓ |
-| VoiceOver | macOS/iOS | Full ✓ |
-| TalkBack | Android | Full ✓ |
-| Dragon NaturallySpeaking | Windows | Supported |
+| Technology               | Platform  | Support   |
+| ------------------------ | --------- | --------- |
+| NVDA                     | Windows   | Full ✓    |
+| JAWS                     | Windows   | Full ✓    |
+| VoiceOver                | macOS/iOS | Full ✓    |
+| TalkBack                 | Android   | Full ✓    |
+| Dragon NaturallySpeaking | Windows   | Supported |
 
 ---
 

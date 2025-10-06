@@ -11,9 +11,9 @@ db.createUser({
   roles: [
     {
       role: 'readWrite',
-      db: 'simplepro_dev'
-    }
-  ]
+      db: 'simplepro_dev',
+    },
+  ],
 });
 
 // Create collections with validation schemas
@@ -24,18 +24,28 @@ db.createCollection('users', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['email', 'firstName', 'lastName', 'role', 'password', 'isActive'],
+      required: [
+        'email',
+        'firstName',
+        'lastName',
+        'role',
+        'password',
+        'isActive',
+      ],
       properties: {
-        email: { bsonType: 'string', pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' },
+        email: {
+          bsonType: 'string',
+          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+        },
         firstName: { bsonType: 'string', minLength: 1 },
         lastName: { bsonType: 'string', minLength: 1 },
         role: { enum: ['super_admin', 'admin', 'dispatcher', 'crew'] },
         password: { bsonType: 'string', minLength: 8 },
         isActive: { bsonType: 'bool' },
-        permissions: { bsonType: 'array' }
-      }
-    }
-  }
+        permissions: { bsonType: 'array' },
+      },
+    },
+  },
 });
 
 // Jobs collection
@@ -48,13 +58,23 @@ db.createCollection('jobs', {
         jobNumber: { bsonType: 'string' },
         title: { bsonType: 'string' },
         type: { enum: ['local', 'long_distance', 'storage', 'packing_only'] },
-        status: { enum: ['draft', 'scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'on_hold'] },
+        status: {
+          enum: [
+            'draft',
+            'scheduled',
+            'confirmed',
+            'in_progress',
+            'completed',
+            'cancelled',
+            'on_hold',
+          ],
+        },
         priority: { enum: ['low', 'normal', 'high', 'urgent'] },
         customerId: { bsonType: 'string' },
-        scheduledDate: { bsonType: 'string' }
-      }
-    }
-  }
+        scheduledDate: { bsonType: 'string' },
+      },
+    },
+  },
 });
 
 // Customers collection
@@ -66,13 +86,16 @@ db.createCollection('customers', {
       properties: {
         firstName: { bsonType: 'string' },
         lastName: { bsonType: 'string' },
-        email: { bsonType: 'string', pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' },
+        email: {
+          bsonType: 'string',
+          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+        },
         phone: { bsonType: 'string' },
         type: { enum: ['residential', 'commercial'] },
-        status: { enum: ['lead', 'prospect', 'active', 'inactive'] }
-      }
-    }
-  }
+        status: { enum: ['lead', 'prospect', 'active', 'inactive'] },
+      },
+    },
+  },
 });
 
 // Estimates collection
@@ -84,11 +107,15 @@ db.createCollection('estimates', {
       properties: {
         customerId: { bsonType: 'string' },
         estimateNumber: { bsonType: 'string' },
-        status: { enum: ['draft', 'sent', 'viewed', 'accepted', 'rejected', 'expired'] },
-        serviceType: { enum: ['local', 'long_distance', 'storage', 'packing_only'] }
-      }
-    }
-  }
+        status: {
+          enum: ['draft', 'sent', 'viewed', 'accepted', 'rejected', 'expired'],
+        },
+        serviceType: {
+          enum: ['local', 'long_distance', 'storage', 'packing_only'],
+        },
+      },
+    },
+  },
 });
 
 // User sessions collection
@@ -96,52 +123,58 @@ db.createCollection('user-sessions', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['userId', 'accessToken', 'refreshToken', 'isActive', 'expiresAt'],
+      required: [
+        'userId',
+        'accessToken',
+        'refreshToken',
+        'isActive',
+        'expiresAt',
+      ],
       properties: {
         userId: { bsonType: 'string' },
         accessToken: { bsonType: 'string' },
         refreshToken: { bsonType: 'string' },
         isActive: { bsonType: 'bool' },
-        expiresAt: { bsonType: 'date' }
-      }
-    }
-  }
+        expiresAt: { bsonType: 'date' },
+      },
+    },
+  },
 });
 
 // Create indexes for better performance
 print('Creating indexes...');
 
 // Users indexes
-db.users.createIndex({ 'email': 1 }, { unique: true });
-db.users.createIndex({ 'role': 1 });
-db.users.createIndex({ 'isActive': 1 });
+db.users.createIndex({ email: 1 }, { unique: true });
+db.users.createIndex({ role: 1 });
+db.users.createIndex({ isActive: 1 });
 
 // Jobs indexes
-db.jobs.createIndex({ 'jobNumber': 1 }, { unique: true });
-db.jobs.createIndex({ 'customerId': 1 });
-db.jobs.createIndex({ 'status': 1 });
-db.jobs.createIndex({ 'scheduledDate': 1 });
+db.jobs.createIndex({ jobNumber: 1 }, { unique: true });
+db.jobs.createIndex({ customerId: 1 });
+db.jobs.createIndex({ status: 1 });
+db.jobs.createIndex({ scheduledDate: 1 });
 db.jobs.createIndex({ 'assignedCrew.crewMemberId': 1 });
-db.jobs.createIndex({ 'type': 1 });
-db.jobs.createIndex({ 'createdAt': 1 });
+db.jobs.createIndex({ type: 1 });
+db.jobs.createIndex({ createdAt: 1 });
 
 // Customers indexes
-db.customers.createIndex({ 'email': 1 }, { unique: true });
-db.customers.createIndex({ 'status': 1 });
-db.customers.createIndex({ 'type': 1 });
-db.customers.createIndex({ 'lastName': 1, 'firstName': 1 });
+db.customers.createIndex({ email: 1 }, { unique: true });
+db.customers.createIndex({ status: 1 });
+db.customers.createIndex({ type: 1 });
+db.customers.createIndex({ lastName: 1, firstName: 1 });
 
 // Estimates indexes
-db.estimates.createIndex({ 'estimateNumber': 1 }, { unique: true });
-db.estimates.createIndex({ 'customerId': 1 });
-db.estimates.createIndex({ 'status': 1 });
-db.estimates.createIndex({ 'createdAt': 1 });
+db.estimates.createIndex({ estimateNumber: 1 }, { unique: true });
+db.estimates.createIndex({ customerId: 1 });
+db.estimates.createIndex({ status: 1 });
+db.estimates.createIndex({ createdAt: 1 });
 
 // Sessions indexes
-db['user-sessions'].createIndex({ 'userId': 1 });
-db['user-sessions'].createIndex({ 'accessToken': 1 });
-db['user-sessions'].createIndex({ 'refreshToken': 1 });
-db['user-sessions'].createIndex({ 'expiresAt': 1 }, { expireAfterSeconds: 0 }); // TTL index
+db['user-sessions'].createIndex({ userId: 1 });
+db['user-sessions'].createIndex({ accessToken: 1 });
+db['user-sessions'].createIndex({ refreshToken: 1 });
+db['user-sessions'].createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL index
 
 print('SimplePro MongoDB initialization completed successfully!');
 print('Database: simplepro_dev');

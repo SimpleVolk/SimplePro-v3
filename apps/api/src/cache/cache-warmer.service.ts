@@ -24,7 +24,7 @@ export class CacheWarmerService implements OnModuleInit {
   async onModuleInit() {
     // Wait 5 seconds after startup to let dependencies initialize
     setTimeout(() => {
-      this.warmCaches().catch(err => {
+      this.warmCaches().catch((err) => {
         this.logger.error('Failed to warm caches on startup:', err);
       });
     }, 5000);
@@ -67,10 +67,14 @@ export class CacheWarmerService implements OnModuleInit {
     try {
       // This would call the analytics service to populate dashboard cache
       // For now, we'll set a placeholder to indicate warming
-      await this.cacheService.set('cache:warming:dashboard', {
-        status: 'warmed',
-        timestamp: new Date(),
-      }, { ttl: 300 });
+      await this.cacheService.set(
+        'cache:warming:dashboard',
+        {
+          status: 'warmed',
+          timestamp: new Date(),
+        },
+        { ttl: 300 },
+      );
 
       this.logger.debug('Dashboard metrics cache warmed');
     } catch (error) {
@@ -84,10 +88,14 @@ export class CacheWarmerService implements OnModuleInit {
    */
   private async warmRecentJobs(): Promise<void> {
     try {
-      await this.cacheService.set('cache:warming:jobs', {
-        status: 'warmed',
-        timestamp: new Date(),
-      }, { ttl: 180, tags: ['jobs'] });
+      await this.cacheService.set(
+        'cache:warming:jobs',
+        {
+          status: 'warmed',
+          timestamp: new Date(),
+        },
+        { ttl: 180, tags: ['jobs'] },
+      );
 
       this.logger.debug('Recent jobs cache warmed');
     } catch (error) {
@@ -101,10 +109,14 @@ export class CacheWarmerService implements OnModuleInit {
    */
   private async warmRecentCustomers(): Promise<void> {
     try {
-      await this.cacheService.set('cache:warming:customers', {
-        status: 'warmed',
-        timestamp: new Date(),
-      }, { ttl: 300, tags: ['customers'] });
+      await this.cacheService.set(
+        'cache:warming:customers',
+        {
+          status: 'warmed',
+          timestamp: new Date(),
+        },
+        { ttl: 300, tags: ['customers'] },
+      );
 
       this.logger.debug('Recent customers cache warmed');
     } catch (error) {
@@ -117,10 +129,14 @@ export class CacheWarmerService implements OnModuleInit {
    */
   private async warmJobStats(): Promise<void> {
     try {
-      await this.cacheService.set('cache:warming:job-stats', {
-        status: 'warmed',
-        timestamp: new Date(),
-      }, { ttl: 300, tags: ['jobs', 'analytics'] });
+      await this.cacheService.set(
+        'cache:warming:job-stats',
+        {
+          status: 'warmed',
+          timestamp: new Date(),
+        },
+        { ttl: 300, tags: ['jobs', 'analytics'] },
+      );
 
       this.logger.debug('Job stats cache warmed');
     } catch (error) {
@@ -133,10 +149,14 @@ export class CacheWarmerService implements OnModuleInit {
    */
   private async warmCustomerStats(): Promise<void> {
     try {
-      await this.cacheService.set('cache:warming:customer-stats', {
-        status: 'warmed',
-        timestamp: new Date(),
-      }, { ttl: 300, tags: ['customers', 'analytics'] });
+      await this.cacheService.set(
+        'cache:warming:customer-stats',
+        {
+          status: 'warmed',
+          timestamp: new Date(),
+        },
+        { ttl: 300, tags: ['customers', 'analytics'] },
+      );
 
       this.logger.debug('Customer stats cache warmed');
     } catch (error) {
@@ -159,7 +179,9 @@ export class CacheWarmerService implements OnModuleInit {
     if (stats.hitRate > 50) {
       await this.warmCaches();
     } else {
-      this.logger.log(`Skipping cache refresh - hit rate too low (${stats.hitRate.toFixed(2)}%)`);
+      this.logger.log(
+        `Skipping cache refresh - hit rate too low (${stats.hitRate.toFixed(2)}%)`,
+      );
     }
   }
 
@@ -184,7 +206,9 @@ export class CacheWarmerService implements OnModuleInit {
     const jobs = await this.cacheService.get('cache:warming:jobs');
     const customers = await this.cacheService.get('cache:warming:customers');
     const jobStats = await this.cacheService.get('cache:warming:job-stats');
-    const customerStats = await this.cacheService.get('cache:warming:customer-stats');
+    const customerStats = await this.cacheService.get(
+      'cache:warming:customer-stats',
+    );
 
     const markers: string[] = [];
     let lastWarmedAt: Date | null = null;

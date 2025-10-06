@@ -22,7 +22,9 @@ export function DocumentViewer({
   const [rotation, setRotation] = useState(0);
   const [isEditingMetadata, setIsEditingMetadata] = useState(false);
   const [editedTags, setEditedTags] = useState(document.tags.join(', '));
-  const [editedDescription, setEditedDescription] = useState(document.description || '');
+  const [editedDescription, setEditedDescription] = useState(
+    document.description || '',
+  );
 
   const isPDF = document.mimeType === 'application/pdf';
   const isImage = document.mimeType.startsWith('image/');
@@ -59,7 +61,10 @@ export function DocumentViewer({
 
   return (
     <div className={styles.viewerOverlay} onClick={onClose}>
-      <div className={styles.viewerContainer} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.viewerContainer}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className={styles.viewerHeader}>
           <div className={styles.headerLeft}>
@@ -132,10 +137,10 @@ export function DocumentViewer({
                   >
                     ←
                   </button>
-                  <span>
-                    Page {currentPage}
-                  </span>
-                  <button onClick={() => setCurrentPage((p) => p + 1)}>→</button>
+                  <span>Page {currentPage}</span>
+                  <button onClick={() => setCurrentPage((p) => p + 1)}>
+                    →
+                  </button>
                 </div>
               </div>
             ) : isImage ? (

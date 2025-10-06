@@ -28,6 +28,7 @@ This playbook provides step-by-step procedures for responding to security incide
 ### 1.2 Scope
 
 Covers incidents related to:
+
 - Authentication bypass
 - Brute force attacks
 - WebSocket DoS attacks
@@ -49,12 +50,12 @@ Covers incidents related to:
 
 ### 2.1 Severity Levels
 
-| Level | Description | Response Time | Examples |
-|-------|-------------|---------------|----------|
-| **P0 - CRITICAL** | System-wide impact, data breach | Immediate (< 15 min) | Massive data breach, complete system compromise |
-| **P1 - HIGH** | Significant impact, active attack | < 1 hour | Active brute force, DDoS attack, privilege escalation |
-| **P2 - MEDIUM** | Limited impact, potential threat | < 4 hours | Suspicious activity, minor data exposure |
-| **P3 - LOW** | Minimal impact, isolated issue | < 24 hours | Single failed intrusion attempt, minor policy violation |
+| Level             | Description                       | Response Time        | Examples                                                |
+| ----------------- | --------------------------------- | -------------------- | ------------------------------------------------------- |
+| **P0 - CRITICAL** | System-wide impact, data breach   | Immediate (< 15 min) | Massive data breach, complete system compromise         |
+| **P1 - HIGH**     | Significant impact, active attack | < 1 hour             | Active brute force, DDoS attack, privilege escalation   |
+| **P2 - MEDIUM**   | Limited impact, potential threat  | < 4 hours            | Suspicious activity, minor data exposure                |
+| **P3 - LOW**      | Minimal impact, isolated issue    | < 24 hours           | Single failed intrusion attempt, minor policy violation |
 
 ### 2.2 Incident Types
 
@@ -72,15 +73,15 @@ Covers incidents related to:
 
 ### 3.1 Roles and Responsibilities
 
-| Role | Responsibilities | Contact |
-|------|-----------------|---------|
-| **Incident Commander** | Overall response coordination | security-lead@company.com |
-| **Security Analyst** | Investigation and forensics | security-team@company.com |
-| **DevOps Engineer** | System access and infrastructure | devops@company.com |
-| **Development Lead** | Code fixes and deployments | dev-lead@company.com |
-| **Legal Counsel** | Legal and compliance | legal@company.com |
-| **Communications Lead** | Internal/external communications | comms@company.com |
-| **CTO/CISO** | Executive decision-making | cto@company.com |
+| Role                    | Responsibilities                 | Contact                   |
+| ----------------------- | -------------------------------- | ------------------------- |
+| **Incident Commander**  | Overall response coordination    | security-lead@company.com |
+| **Security Analyst**    | Investigation and forensics      | security-team@company.com |
+| **DevOps Engineer**     | System access and infrastructure | devops@company.com        |
+| **Development Lead**    | Code fixes and deployments       | dev-lead@company.com      |
+| **Legal Counsel**       | Legal and compliance             | legal@company.com         |
+| **Communications Lead** | Internal/external communications | comms@company.com         |
+| **CTO/CISO**            | Executive decision-making        | cto@company.com           |
 
 ### 3.2 Escalation Path
 
@@ -110,6 +111,7 @@ P0 (Critical) → Full Incident Response Team + Legal + Executive Team
 ### Immediate Response (< 15 minutes)
 
 **Step 1: Verify the Attack**
+
 ```bash
 # Check Grafana dashboard
 # URL: http://localhost:3000/d/security-overview
@@ -123,6 +125,7 @@ tail -f apps/api/logs/app.log | grep "authentication failed"
 ```
 
 **Step 2: Identify Attacking IP(s)**
+
 ```bash
 # Get top failing IPs
 curl -G http://localhost:9090/api/v1/query \
@@ -133,6 +136,7 @@ curl https://ipapi.co/{IP}/json/
 ```
 
 **Step 3: Block Attacking IPs**
+
 ```bash
 # Option A: Firewall block (recommended)
 sudo ufw deny from {ATTACKING_IP}
@@ -145,6 +149,7 @@ sudo ufw deny from {ATTACKING_IP}
 ```
 
 **Step 4: Verify Block Effectiveness**
+
 ```bash
 # Monitor for continued attempts
 watch -n 5 'curl -s http://localhost:9090/api/v1/query \
@@ -156,12 +161,14 @@ watch -n 5 'curl -s http://localhost:9090/api/v1/query \
 ### Containment (< 30 minutes)
 
 **Step 5: Implement Enhanced Rate Limiting**
+
 ```typescript
 // Temporarily reduce rate limits
 @Throttle({ default: { limit: 3, ttl: 3600000 } })  // 3 attempts per hour
 ```
 
 **Step 6: Enable Additional Monitoring**
+
 ```bash
 # Increase log verbosity
 export LOG_LEVEL=debug
@@ -176,6 +183,7 @@ tail -f apps/api/logs/app.log | grep -E "(authentication|login|bruteforce)"
 ### Investigation (< 1 hour)
 
 **Step 7: Analyze Attack Pattern**
+
 ```bash
 # Extract attack timeline
 grep "authentication failed" apps/api/logs/app.log \
@@ -193,6 +201,7 @@ grep "authentication failed" apps/api/logs/app.log \
 ```
 
 **Step 8: Check for Compromised Accounts**
+
 ```bash
 # Query successful logins from attacking IPs
 db.userSessions.find({
@@ -206,6 +215,7 @@ db.userSessions.find({
 ### Eradication (< 2 hours)
 
 **Step 9: Force Password Reset (if compromised)**
+
 ```bash
 # If any accounts compromised
 db.users.updateMany(
@@ -220,6 +230,7 @@ db.userSessions.deleteMany({
 ```
 
 **Step 10: Strengthen Defenses**
+
 ```typescript
 // Add CAPTCHA for repeated failures (future enhancement)
 // Implement account lockout after 5 failures
@@ -229,6 +240,7 @@ db.userSessions.deleteMany({
 ### Recovery (< 4 hours)
 
 **Step 11: Restore Normal Operations**
+
 ```bash
 # Remove temporary rate limits (if appropriate)
 # Restore normal monitoring
@@ -238,6 +250,7 @@ curl http://localhost:3001/api/health
 ```
 
 **Step 12: Notify Affected Users**
+
 ```
 Subject: Security Notice - Suspicious Login Activity
 
@@ -253,6 +266,7 @@ Best practices:
 ### Post-Incident (< 24 hours)
 
 **Step 13: Document Incident**
+
 ```markdown
 # Incident Report: Brute Force Attack
 
@@ -262,25 +276,30 @@ Best practices:
 **Affected Systems:** Authentication API
 
 ## Summary
+
 Brute force attack from IP range 203.0.113.0/24 targeting admin accounts.
 Blocked 15,432 login attempts. No accounts compromised.
 
 ## Timeline
+
 - 14:00 UTC: Attack detected
 - 14:15 UTC: IPs blocked
 - 14:30 UTC: Enhanced rate limiting enabled
 - 16:15 UTC: Normal operations restored
 
 ## Root Cause
+
 Rate limiting was sufficient but could be more aggressive.
 
 ## Action Items
+
 1. [P1] Implement account lockout after 5 failures
 2. [P2] Add CAPTCHA for repeated failures
 3. [P3] Implement email notifications for suspicious activity
 ```
 
 **Step 14: Update Defenses**
+
 - Improve rate limiting
 - Add IP reputation checking
 - Implement account lockout
@@ -300,6 +319,7 @@ Rate limiting was sufficient but could be more aggressive.
 ### Immediate Response (< 15 minutes)
 
 **Step 1: Verify Attack**
+
 ```bash
 # Check active connections
 curl http://localhost:3001/api/websocket/stats
@@ -313,6 +333,7 @@ htop
 ```
 
 **Step 2: Identify Attack Source**
+
 ```bash
 # Get connection attempts by IP
 curl -G http://localhost:9090/api/v1/query \
@@ -323,6 +344,7 @@ grep "WebSocket connection" apps/api/logs/app.log | tail -100
 ```
 
 **Step 3: Block Attacking IPs**
+
 ```bash
 # Firewall block
 sudo ufw deny from {ATTACKING_IP}
@@ -333,6 +355,7 @@ const BLOCKED_IPS = ['ATTACKING_IP_1', 'ATTACKING_IP_2'];
 ```
 
 **Step 4: Reduce Connection Limits (Emergency)**
+
 ```typescript
 // Temporarily reduce limits
 private readonly MAX_CONNECTIONS_PER_USER = 3;  // Down from 5
@@ -342,6 +365,7 @@ private readonly MAX_CONNECTIONS_PER_IP = 5;    // Down from 10
 ### Containment (< 30 minutes)
 
 **Step 5: Restart WebSocket Gateway**
+
 ```bash
 # Graceful restart to clear connections
 pm2 restart api
@@ -351,6 +375,7 @@ curl http://localhost:3001/api/health
 ```
 
 **Step 6: Monitor Recovery**
+
 ```bash
 # Watch connection count
 watch -n 2 'curl -s http://localhost:3001/api/websocket/stats'
@@ -362,6 +387,7 @@ watch -n 2 'ps aux | grep node'
 ### Investigation (< 1 hour)
 
 **Step 7: Analyze Attack Pattern**
+
 ```bash
 # Check connection timing
 grep "WebSocket connection" apps/api/logs/app.log \
@@ -375,6 +401,7 @@ grep "WebSocket connection" apps/api/logs/app.log \
 ```
 
 **Step 8: Check for Data Exfiltration**
+
 ```bash
 # Check for successful connections that sent unusual amounts of data
 db.auditLogs.find({
@@ -387,6 +414,7 @@ db.auditLogs.find({
 ### Eradication & Recovery
 
 **Step 9: Implement Enhanced Protections**
+
 ```typescript
 // Add connection rate limiting per IP
 const CONNECTION_RATE_LIMIT = 10; // connections per minute per IP
@@ -398,6 +426,7 @@ const CONNECTION_RATE_LIMIT = 10; // connections per minute per IP
 ```
 
 **Step 10: Restore Normal Operations**
+
 ```bash
 # Return limits to normal values
 # Remove temporary blocks (if appropriate)
@@ -407,6 +436,7 @@ const CONNECTION_RATE_LIMIT = 10; // connections per minute per IP
 ### Post-Incident
 
 **Document and improve:**
+
 - Update WebSocket security documentation
 - Review connection limits
 - Consider implementing progressive connection delays
@@ -425,6 +455,7 @@ const CONNECTION_RATE_LIMIT = 10; // connections per minute per IP
 ### Immediate Response (< 15 minutes)
 
 **Step 1: Verify Attack**
+
 ```bash
 # Check document share attempts
 curl -G http://localhost:9090/api/v1/query \
@@ -435,6 +466,7 @@ grep "Document share" apps/api/logs/app.log | tail -50
 ```
 
 **Step 2: Identify Attack**
+
 ```bash
 # Get failing IPs and tokens
 db.auditLogs.aggregate([
@@ -458,6 +490,7 @@ db.auditLogs.aggregate([
 ```
 
 **Step 3: Revoke Compromised Tokens**
+
 ```bash
 # If token under heavy attack, revoke it
 db.documentShares.updateOne(
@@ -470,6 +503,7 @@ db.documentShares.updateOne(
 ```
 
 **Step 4: Block Attacking IPs**
+
 ```bash
 # Block at firewall
 sudo ufw deny from {ATTACKING_IP}
@@ -484,12 +518,14 @@ curl -X POST http://localhost:3001/api/documents/shared/TOKEN/access \
 ### Containment (< 30 minutes)
 
 **Step 5: Reduce Rate Limits (Emergency)**
+
 ```typescript
 // Temporarily reduce document share rate limit
 @Throttle({ default: { limit: 3, ttl: 3600000 } })  // 3 attempts per hour (down from 5)
 ```
 
 **Step 6: Notify Affected Users**
+
 ```
 Subject: Security Alert - Document Share Link Revoked
 
@@ -504,6 +540,7 @@ Contact support if you have questions.
 ### Investigation & Eradication
 
 **Step 7: Review All Recent Shares**
+
 ```bash
 # Check for other potential targets
 db.documentShares.find({
@@ -522,6 +559,7 @@ db.auditLogs.find({
 ```
 
 **Step 8: Strengthen Password Requirements**
+
 ```typescript
 // For future shares, require stronger passwords
 const MIN_PASSWORD_LENGTH = 12;
@@ -531,6 +569,7 @@ const PASSWORD_REQUIREMENTS = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
 ### Recovery & Post-Incident
 
 **Step 9: Restore Services**
+
 ```bash
 # Return rate limits to normal
 # Unblock IPs if appropriate
@@ -538,6 +577,7 @@ const PASSWORD_REQUIREMENTS = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
 ```
 
 **Step 10: Implement Improvements**
+
 - Add password strength meter for share creation
 - Implement email notifications for failed access attempts
 - Consider implementing one-time-use share links
@@ -557,6 +597,7 @@ const PASSWORD_REQUIREMENTS = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
 ### CRITICAL - Immediate Response (< 5 minutes)
 
 **Step 1: ESCALATE IMMEDIATELY**
+
 ```
 NOTIFY IMMEDIATELY:
 - Incident Commander
@@ -568,6 +609,7 @@ DO NOT DELAY - This is a P0 incident
 ```
 
 **Step 2: Stop Data Exfiltration**
+
 ```bash
 # If active exfiltration, block immediately
 sudo ufw deny from {ATTACKING_IP}
@@ -583,6 +625,7 @@ db.userSessions.deleteMany({ userId: ObjectId("COMPROMISED_USER_ID") })
 ```
 
 **Step 3: Preserve Evidence**
+
 ```bash
 # DO NOT modify logs or database
 # Create snapshots immediately
@@ -599,6 +642,7 @@ mongodump --out=/tmp/incident-db-$(date +%Y%m%d-%H%M%S)
 ### Containment (< 30 minutes)
 
 **Step 4: Assess Scope**
+
 ```bash
 # Determine what data was accessed
 db.auditLogs.find({
@@ -612,6 +656,7 @@ db.auditLogs.find({
 ```
 
 **Step 5: Isolate Affected Systems**
+
 ```bash
 # If necessary, take systems offline
 # Only if data exfiltration is ongoing and cannot be stopped otherwise
@@ -622,6 +667,7 @@ db.auditLogs.find({
 ### Legal & Compliance (< 1 hour)
 
 **Step 6: Assess Legal Obligations**
+
 ```
 CONSULT LEGAL IMMEDIATELY:
 - GDPR notification requirements (72 hours)
@@ -637,6 +683,7 @@ DOCUMENT:
 ```
 
 **Step 7: Prepare Notifications**
+
 ```
 Required notifications:
 - Affected users
@@ -654,6 +701,7 @@ Timeline:
 ### Investigation (< 24 hours)
 
 **Step 8: Forensic Analysis**
+
 ```bash
 # Engage forensics team
 # Preserve all evidence
@@ -666,8 +714,10 @@ Timeline:
 ```
 
 **Step 9: Root Cause Analysis**
+
 ```markdown
 Common causes:
+
 - Compromised credentials
 - SQL/NoSQL injection
 - Authentication bypass
@@ -679,6 +729,7 @@ Common causes:
 ### Eradication & Recovery (< 48 hours)
 
 **Step 10: Remediate Vulnerability**
+
 ```
 Fix the root cause:
 - Patch vulnerabilities
@@ -688,6 +739,7 @@ Fix the root cause:
 ```
 
 **Step 11: Restore Normal Operations**
+
 ```
 - Verify fix effectiveness
 - Restore services
@@ -698,8 +750,10 @@ Fix the root cause:
 ### Post-Incident (< 7 days)
 
 **Step 12: Comprehensive Report**
+
 ```markdown
 Required sections:
+
 - Executive summary
 - Incident timeline
 - Data affected
@@ -711,6 +765,7 @@ Required sections:
 ```
 
 **Step 13: Regulatory Notifications**
+
 ```
 File required notifications:
 - GDPR: Data Protection Authority
@@ -720,6 +775,7 @@ File required notifications:
 ```
 
 **Step 14: Affected User Notification**
+
 ```
 Subject: Important Security Notice
 
@@ -736,6 +792,7 @@ future occurrences.
 ```
 
 **Step 15: Implement Long-Term Improvements**
+
 - Enhanced monitoring
 - Additional security controls
 - Security awareness training
@@ -749,6 +806,7 @@ future occurrences.
 ### 5.1 Internal Communication
 
 **Incident Declared:**
+
 ```
 To: incident-response-team@company.com
 Subject: [P1] Security Incident - Brute Force Attack
@@ -775,6 +833,7 @@ Next Update: 30 minutes
 ```
 
 **Status Updates:**
+
 ```
 Every 30-60 minutes during active incident:
 - Current status
@@ -786,6 +845,7 @@ Every 30-60 minutes during active incident:
 ### 5.2 External Communication
 
 **Customer Notification:**
+
 ```
 Only notify customers if:
 - Service disruption affects them
@@ -803,6 +863,7 @@ No action required. We'll update when complete.
 ```
 
 **Public Statement (if needed):**
+
 ```
 REQUIRES APPROVAL FROM:
 - Legal
@@ -815,6 +876,7 @@ Template available from Communications team
 ### 5.3 Regulatory Communication
 
 **GDPR Breach Notification (72 hours):**
+
 ```
 To: Data Protection Authority
 Subject: Personal Data Breach Notification
@@ -845,9 +907,11 @@ Must include:
 **Status:** RESOLVED
 
 ## Executive Summary
+
 [2-3 sentence summary of incident and resolution]
 
 ## Incident Details
+
 - **Type:** [Attack type]
 - **Detected:** [Date/time]
 - **Resolved:** [Date/time]
@@ -856,6 +920,7 @@ Must include:
 - **Data Impact:** [None/Limited/Significant]
 
 ## Timeline
+
 - 14:00 UTC: Incident detected
 - 14:15 UTC: IPs blocked
 - 14:30 UTC: Enhanced monitoring enabled
@@ -863,32 +928,40 @@ Must include:
 - 16:30 UTC: Normal operations restored
 
 ## Root Cause
+
 [Detailed analysis of why incident occurred]
 
 ## Impact Assessment
+
 - **Users Affected:** [Number]
 - **Data Compromised:** [Yes/No/Unknown]
 - **Service Downtime:** [Duration]
 - **Financial Impact:** [Estimate]
 
 ## Response Actions
+
 1. [Action taken]
 2. [Action taken]
 3. [Action taken]
 
 ## Lessons Learned
+
 **What Went Well:**
+
 - [Item]
 
 **What Could Be Improved:**
+
 - [Item]
 
 ## Corrective Actions
-| Action | Priority | Owner | Due Date | Status |
-|--------|----------|-------|----------|--------|
-| [Action] | P1 | [Name] | 2025-10-10 | Open |
+
+| Action   | Priority | Owner  | Due Date   | Status |
+| -------- | -------- | ------ | ---------- | ------ |
+| [Action] | P1       | [Name] | 2025-10-10 | Open   |
 
 ## Attachments
+
 - Logs: /incidents/INC-2025-001/logs/
 - Screenshots: /incidents/INC-2025-001/screenshots/
 - Forensics: /incidents/INC-2025-001/forensics/
@@ -899,12 +972,14 @@ Must include:
 **Schedule:** Within 1 week of incident resolution
 
 **Attendees:**
+
 - Incident Commander
 - Response team members
 - Affected system owners
 - Management
 
 **Agenda:**
+
 1. Incident recap
 2. Timeline review
 3. Response effectiveness
@@ -915,12 +990,14 @@ Must include:
 ### 6.3 Knowledge Base Update
 
 **Document:**
+
 - New attack patterns
 - Effective response techniques
 - Tool usage tips
 - Escalation procedures
 
 **Update:**
+
 - Runbooks
 - Playbooks
 - Training materials
@@ -932,26 +1009,27 @@ Must include:
 
 ### 7.1 Internal Contacts
 
-| Role | Name | Email | Phone | Slack |
-|------|------|-------|-------|-------|
+| Role               | Name   | Email                     | Phone       | Slack          |
+| ------------------ | ------ | ------------------------- | ----------- | -------------- |
 | Incident Commander | [Name] | security-lead@company.com | +1-555-0100 | @security-lead |
-| Security Team Lead | [Name] | security@company.com | +1-555-0101 | @sec-team-lead |
-| DevOps Lead | [Name] | devops@company.com | +1-555-0102 | @devops-lead |
-| CTO | [Name] | cto@company.com | +1-555-0103 | @cto |
-| Legal Counsel | [Name] | legal@company.com | +1-555-0104 | @legal |
+| Security Team Lead | [Name] | security@company.com      | +1-555-0101 | @sec-team-lead |
+| DevOps Lead        | [Name] | devops@company.com        | +1-555-0102 | @devops-lead   |
+| CTO                | [Name] | cto@company.com           | +1-555-0103 | @cto           |
+| Legal Counsel      | [Name] | legal@company.com         | +1-555-0104 | @legal         |
 
 ### 7.2 External Contacts
 
-| Organization | Contact | Phone | Purpose |
-|--------------|---------|-------|---------|
-| Hosting Provider | support@provider.com | +1-555-0200 | Infrastructure issues |
-| Security Vendor | vendor@security.com | +1-555-0201 | Security tools support |
-| Law Enforcement | cybercrime@agency.gov | +1-555-0202 | Criminal activity reporting |
-| Insurance | claims@insurance.com | +1-555-0203 | Cyber insurance claims |
+| Organization     | Contact               | Phone       | Purpose                     |
+| ---------------- | --------------------- | ----------- | --------------------------- |
+| Hosting Provider | support@provider.com  | +1-555-0200 | Infrastructure issues       |
+| Security Vendor  | vendor@security.com   | +1-555-0201 | Security tools support      |
+| Law Enforcement  | cybercrime@agency.gov | +1-555-0202 | Criminal activity reporting |
+| Insurance        | claims@insurance.com  | +1-555-0203 | Cyber insurance claims      |
 
 ### 7.3 Emergency Procedures
 
 **After Hours:**
+
 ```
 1. Call Incident Commander: +1-555-0100
 2. If no answer, call CTO: +1-555-0103
@@ -960,6 +1038,7 @@ Must include:
 ```
 
 **Escalation Chain:**
+
 ```
 Security Analyst
     ↓

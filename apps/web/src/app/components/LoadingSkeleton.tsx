@@ -8,7 +8,7 @@ interface LoadingSkeletonProps {
 
 export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   type = 'default',
-  rows = 3
+  rows = 3,
 }) => {
   const renderSkeleton = () => {
     switch (type) {
@@ -88,7 +88,11 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   };
 
   return (
-    <div className={styles.skeletonContainer} role="status" aria-label="Loading content">
+    <div
+      className={styles.skeletonContainer}
+      role="status"
+      aria-label="Loading content"
+    >
       {renderSkeleton()}
       <span className="sr-only">Loading...</span>
     </div>

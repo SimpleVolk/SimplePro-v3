@@ -63,7 +63,12 @@ describe('Authentication Integration Tests', () => {
           role: 'dispatcher',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/auth/users', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/users',
+          adminAuth.accessToken,
+        )
           .send(newUserData)
           .expect(201);
 
@@ -91,16 +96,30 @@ describe('Authentication Integration Tests', () => {
         });
 
         // Create first user
-        await authenticatedRequest(app, 'post', '/auth/users', adminAuth.accessToken)
+        await authenticatedRequest(
+          app,
+          'post',
+          '/auth/users',
+          adminAuth.accessToken,
+        )
           .send(userData)
           .expect(201);
 
         // Attempt to create second user with same email
-        const response = await authenticatedRequest(app, 'post', '/auth/users', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/users',
+          adminAuth.accessToken,
+        )
           .send(userData)
           .expect(409);
 
-        ResponseAssertions.assertErrorResponse(response, 409, /email.*already.*exists/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          409,
+          /email.*already.*exists/i,
+        );
       });
 
       it('should validate password requirements', async () => {
@@ -115,7 +134,12 @@ describe('Authentication Integration Tests', () => {
           password: '123', // Too weak
         });
 
-        const response = await authenticatedRequest(app, 'post', '/auth/users', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/users',
+          adminAuth.accessToken,
+        )
           .send(weakPasswordData)
           .expect(400);
 
@@ -134,7 +158,12 @@ describe('Authentication Integration Tests', () => {
           email: 'unauthorized@example.com',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/auth/users', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/users',
+          dispatcherAuth.accessToken,
+        )
           .send(newUserData)
           .expect(403);
 
@@ -160,8 +189,12 @@ describe('Authentication Integration Tests', () => {
           role: 'crew',
         });
 
-        const response = await authenticatedRequest(app, 'get', '/auth/users', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/auth/users',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
         expect(Array.isArray(response.body.data)).toBe(true);
@@ -183,8 +216,12 @@ describe('Authentication Integration Tests', () => {
           permissions: ['read:jobs'],
         });
 
-        const response = await authenticatedRequest(app, 'get', '/auth/users', crewAuth.accessToken)
-          .expect(403);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/auth/users',
+          crewAuth.accessToken,
+        ).expect(403);
 
         ResponseAssertions.assertErrorResponse(response, 403);
       });
@@ -230,7 +267,11 @@ describe('Authentication Integration Tests', () => {
           })
           .expect(401);
 
-        ResponseAssertions.assertErrorResponse(response, 401, /invalid.*credentials/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          401,
+          /invalid.*credentials/i,
+        );
       });
 
       it('should reject invalid password', async () => {
@@ -248,7 +289,11 @@ describe('Authentication Integration Tests', () => {
           })
           .expect(401);
 
-        ResponseAssertions.assertErrorResponse(response, 401, /invalid.*credentials/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          401,
+          /invalid.*credentials/i,
+        );
       });
 
       it('should validate required fields', async () => {
@@ -289,7 +334,11 @@ describe('Authentication Integration Tests', () => {
           })
           .expect(401);
 
-        ResponseAssertions.assertErrorResponse(response, 401, /invalid.*token/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          401,
+          /invalid.*token/i,
+        );
       });
 
       it('should reject expired refresh token', async () => {
@@ -310,15 +359,23 @@ describe('Authentication Integration Tests', () => {
       it('should logout user and invalidate tokens', async () => {
         const authData = await createAuthenticatedTestUser();
 
-        const response = await authenticatedRequest(app, 'post', '/auth/logout', authData.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/logout',
+          authData.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
         expect(response.body.message).toMatch(/logout.*successful/i);
 
         // Verify token is invalidated by trying to use it
-        const protectedResponse = await authenticatedRequest(app, 'get', '/auth/profile', authData.accessToken)
-          .expect(401);
+        const protectedResponse = await authenticatedRequest(
+          app,
+          'get',
+          '/auth/profile',
+          authData.accessToken,
+        ).expect(401);
 
         ResponseAssertions.assertErrorResponse(protectedResponse, 401);
       });
@@ -338,8 +395,12 @@ describe('Authentication Integration Tests', () => {
       it('should return user profile for authenticated user', async () => {
         const authData = await createAuthenticatedTestUser();
 
-        const response = await authenticatedRequest(app, 'get', '/auth/profile', authData.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/auth/profile',
+          authData.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
         expect(response.body.data).toMatchObject({
@@ -369,7 +430,12 @@ describe('Authentication Integration Tests', () => {
           lastName: 'Name',
         };
 
-        const response = await authenticatedRequest(app, 'patch', '/auth/profile', authData.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'patch',
+          '/auth/profile',
+          authData.accessToken,
+        )
           .send(updateData)
           .expect(200);
 
@@ -385,7 +451,12 @@ describe('Authentication Integration Tests', () => {
           firstName: 'Updated',
         };
 
-        const response = await authenticatedRequest(app, 'patch', '/auth/profile', authData.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'patch',
+          '/auth/profile',
+          authData.accessToken,
+        )
           .send(updateData)
           .expect(400);
 
@@ -402,7 +473,12 @@ describe('Authentication Integration Tests', () => {
           password: originalPassword,
         });
 
-        const response = await authenticatedRequest(app, 'post', '/auth/change-password', authData.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/change-password',
+          authData.accessToken,
+        )
           .send({
             currentPassword: originalPassword,
             newPassword: newPassword,
@@ -435,20 +511,34 @@ describe('Authentication Integration Tests', () => {
       it('should reject incorrect current password', async () => {
         const authData = await createAuthenticatedTestUser();
 
-        const response = await authenticatedRequest(app, 'post', '/auth/change-password', authData.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/change-password',
+          authData.accessToken,
+        )
           .send({
             currentPassword: 'WrongPassword',
             newPassword: 'NewPassword456!',
           })
           .expect(401);
 
-        ResponseAssertions.assertErrorResponse(response, 401, /current.*password.*incorrect/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          401,
+          /current.*password.*incorrect/i,
+        );
       });
 
       it('should validate new password requirements', async () => {
         const authData = await createAuthenticatedTestUser();
 
-        const response = await authenticatedRequest(app, 'post', '/auth/change-password', authData.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/auth/change-password',
+          authData.accessToken,
+        )
           .send({
             currentPassword: 'Test123!@#',
             newPassword: '123', // Too weak
@@ -481,16 +571,28 @@ describe('Authentication Integration Tests', () => {
       };
 
       // Admin should access user management
-      await authenticatedRequest(app, 'get', '/auth/users', users.admin.accessToken)
-        .expect(200);
+      await authenticatedRequest(
+        app,
+        'get',
+        '/auth/users',
+        users.admin.accessToken,
+      ).expect(200);
 
       // Dispatcher should not access user management
-      await authenticatedRequest(app, 'get', '/auth/users', users.dispatcher.accessToken)
-        .expect(403);
+      await authenticatedRequest(
+        app,
+        'get',
+        '/auth/users',
+        users.dispatcher.accessToken,
+      ).expect(403);
 
       // Crew should not access user management
-      await authenticatedRequest(app, 'get', '/auth/users', users.crew.accessToken)
-        .expect(403);
+      await authenticatedRequest(
+        app,
+        'get',
+        '/auth/users',
+        users.crew.accessToken,
+      ).expect(403);
     });
 
     it('should validate specific permissions for actions', async () => {
@@ -501,12 +603,20 @@ describe('Authentication Integration Tests', () => {
       });
 
       // Should be able to read their profile
-      await authenticatedRequest(app, 'get', '/auth/profile', readOnlyUser.accessToken)
-        .expect(200);
+      await authenticatedRequest(
+        app,
+        'get',
+        '/auth/profile',
+        readOnlyUser.accessToken,
+      ).expect(200);
 
       // Should not be able to access admin functions
-      await authenticatedRequest(app, 'get', '/auth/users', readOnlyUser.accessToken)
-        .expect(403);
+      await authenticatedRequest(
+        app,
+        'get',
+        '/auth/users',
+        readOnlyUser.accessToken,
+      ).expect(403);
     });
   });
 
@@ -537,18 +647,16 @@ describe('Authentication Integration Tests', () => {
 
       // Make multiple concurrent login requests
       const loginPromises = Array.from({ length: 5 }, () =>
-        request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            email: userData.email,
-            password: userData.password,
-          })
+        request(app.getHttpServer()).post('/auth/login').send({
+          email: userData.email,
+          password: userData.password,
+        }),
       );
 
       const responses = await Promise.all(loginPromises);
 
       // All should succeed with valid tokens
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
         ResponseAssertions.assertSuccessResponse(response);
         expect(response.body.data).toHaveProperty('accessToken');
@@ -563,12 +671,20 @@ describe('Authentication Integration Tests', () => {
       expect(authData.accessToken).toBeDefined();
 
       // Logout should clean up session
-      await authenticatedRequest(app, 'post', '/auth/logout', authData.accessToken)
-        .expect(200);
+      await authenticatedRequest(
+        app,
+        'post',
+        '/auth/logout',
+        authData.accessToken,
+      ).expect(200);
 
       // Token should no longer work
-      await authenticatedRequest(app, 'get', '/auth/profile', authData.accessToken)
-        .expect(401);
+      await authenticatedRequest(
+        app,
+        'get',
+        '/auth/profile',
+        authData.accessToken,
+      ).expect(401);
     });
   });
 
@@ -584,19 +700,17 @@ describe('Authentication Integration Tests', () => {
 
       // Make multiple login requests
       const loginPromises = Array.from({ length: 10 }, () =>
-        request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            email: userData.email,
-            password: userData.password,
-          })
+        request(app.getHttpServer()).post('/auth/login').send({
+          email: userData.email,
+          password: userData.password,
+        }),
       );
 
       const responses = await Promise.all(loginPromises);
       const endTime = Date.now();
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
       });
 

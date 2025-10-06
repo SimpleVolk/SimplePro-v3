@@ -34,22 +34,22 @@ export default function CompanyBranding() {
   const [branding, setBranding] = useState<BrandingSettings>({
     logos: {
       companyLogo: null,
-      favicon: null
+      favicon: null,
     },
     colors: {
       primary: '#3B82F6',
       secondary: '#8B5CF6',
-      accent: '#10B981'
+      accent: '#10B981',
     },
     companyInfo: {
       tagline: 'Your Trusted Moving Partner',
-      slogan: 'Moving Made Simple'
+      slogan: 'Moving Made Simple',
     },
     socialMedia: {
       facebook: 'https://facebook.com/movecorp',
       twitter: 'https://twitter.com/movecorp',
       linkedin: 'https://linkedin.com/company/movecorp',
-      instagram: 'https://instagram.com/movecorp'
+      instagram: 'https://instagram.com/movecorp',
     },
     templates: {
       emailSignature: `Best regards,
@@ -59,13 +59,15 @@ MoveCorp Professional Moving Services
 Phone: {phone}
 Email: {email}`,
       businessCardTemplate: 'Standard Template',
-      invoiceHeader: 'MoveCorp - Professional Moving Services'
-    }
+      invoiceHeader: 'MoveCorp - Professional Moving Services',
+    },
   });
 
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'logos' | 'colors' | 'info' | 'social' | 'templates'>('logos');
+  const [activeTab, setActiveTab] = useState<
+    'logos' | 'colors' | 'info' | 'social' | 'templates'
+  >('logos');
 
   const handleLogoUpload = (type: 'companyLogo' | 'favicon') => {
     const input = document.createElement('input');
@@ -76,12 +78,12 @@ Email: {email}`,
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-          setBranding(prev => ({
+          setBranding((prev) => ({
             ...prev,
             logos: {
               ...prev.logos,
-              [type]: reader.result as string
-            }
+              [type]: reader.result as string,
+            },
           }));
         };
         reader.readAsDataURL(file);
@@ -91,17 +93,17 @@ Email: {email}`,
   };
 
   const handleRemoveLogo = (type: 'companyLogo' | 'favicon') => {
-    setBranding(prev => ({
+    setBranding((prev) => ({
       ...prev,
       logos: {
         ...prev.logos,
-        [type]: null
-      }
+        [type]: null,
+      },
     }));
   };
 
   const updateBranding = (path: string[], value: any) => {
-    setBranding(prev => {
+    setBranding((prev) => {
       const updated = { ...prev } as any;
       let current = updated;
 
@@ -140,7 +142,12 @@ Email: {email}`,
       {successMessage && (
         <div className={styles.successMessage}>
           <span>✅ {successMessage}</span>
-          <button onClick={() => setSuccessMessage(null)} className={styles.closeSuccess}>×</button>
+          <button
+            onClick={() => setSuccessMessage(null)}
+            className={styles.closeSuccess}
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -191,15 +198,23 @@ Email: {email}`,
                   {branding.logos.companyLogo ? (
                     <img src={branding.logos.companyLogo} alt="Company Logo" />
                   ) : (
-                    <div className={styles.placeholderLogo}>No logo uploaded</div>
+                    <div className={styles.placeholderLogo}>
+                      No logo uploaded
+                    </div>
                   )}
                 </div>
                 <div className={styles.logoActions}>
-                  <button onClick={() => handleLogoUpload('companyLogo')} className={styles.uploadButton}>
+                  <button
+                    onClick={() => handleLogoUpload('companyLogo')}
+                    className={styles.uploadButton}
+                  >
                     📤 Upload Logo
                   </button>
                   {branding.logos.companyLogo && (
-                    <button onClick={() => handleRemoveLogo('companyLogo')} className={styles.removeButton}>
+                    <button
+                      onClick={() => handleRemoveLogo('companyLogo')}
+                      className={styles.removeButton}
+                    >
                       🗑️ Remove
                     </button>
                   )}
@@ -213,15 +228,23 @@ Email: {email}`,
                   {branding.logos.favicon ? (
                     <img src={branding.logos.favicon} alt="Favicon" />
                   ) : (
-                    <div className={styles.placeholderLogo}>No favicon uploaded</div>
+                    <div className={styles.placeholderLogo}>
+                      No favicon uploaded
+                    </div>
                   )}
                 </div>
                 <div className={styles.logoActions}>
-                  <button onClick={() => handleLogoUpload('favicon')} className={styles.uploadButton}>
+                  <button
+                    onClick={() => handleLogoUpload('favicon')}
+                    className={styles.uploadButton}
+                  >
                     📤 Upload Favicon
                   </button>
                   {branding.logos.favicon && (
-                    <button onClick={() => handleRemoveLogo('favicon')} className={styles.removeButton}>
+                    <button
+                      onClick={() => handleRemoveLogo('favicon')}
+                      className={styles.removeButton}
+                    >
                       🗑️ Remove
                     </button>
                   )}
@@ -236,7 +259,8 @@ Email: {email}`,
           <div className={styles.formSection}>
             <h4>Brand Colors</h4>
             <p className={styles.sectionDescription}>
-              Define your brand colors that will be used throughout the application
+              Define your brand colors that will be used throughout the
+              application
             </p>
             <div className={styles.colorsGrid}>
               <div className={styles.colorCard}>
@@ -245,18 +269,25 @@ Email: {email}`,
                   <input
                     type="color"
                     value={branding.colors.primary}
-                    onChange={(e) => updateBranding(['colors', 'primary'], e.target.value)}
+                    onChange={(e) =>
+                      updateBranding(['colors', 'primary'], e.target.value)
+                    }
                     className={styles.colorPicker}
                   />
                   <input
                     type="text"
                     value={branding.colors.primary}
-                    onChange={(e) => updateBranding(['colors', 'primary'], e.target.value)}
+                    onChange={(e) =>
+                      updateBranding(['colors', 'primary'], e.target.value)
+                    }
                     className={styles.colorInput}
                     placeholder="#3B82F6"
                   />
                 </div>
-                <div className={styles.colorPreview} style={{ backgroundColor: branding.colors.primary }}>
+                <div
+                  className={styles.colorPreview}
+                  style={{ backgroundColor: branding.colors.primary }}
+                >
                   <span>Primary</span>
                 </div>
               </div>
@@ -267,18 +298,25 @@ Email: {email}`,
                   <input
                     type="color"
                     value={branding.colors.secondary}
-                    onChange={(e) => updateBranding(['colors', 'secondary'], e.target.value)}
+                    onChange={(e) =>
+                      updateBranding(['colors', 'secondary'], e.target.value)
+                    }
                     className={styles.colorPicker}
                   />
                   <input
                     type="text"
                     value={branding.colors.secondary}
-                    onChange={(e) => updateBranding(['colors', 'secondary'], e.target.value)}
+                    onChange={(e) =>
+                      updateBranding(['colors', 'secondary'], e.target.value)
+                    }
                     className={styles.colorInput}
                     placeholder="#8B5CF6"
                   />
                 </div>
-                <div className={styles.colorPreview} style={{ backgroundColor: branding.colors.secondary }}>
+                <div
+                  className={styles.colorPreview}
+                  style={{ backgroundColor: branding.colors.secondary }}
+                >
                   <span>Secondary</span>
                 </div>
               </div>
@@ -289,18 +327,25 @@ Email: {email}`,
                   <input
                     type="color"
                     value={branding.colors.accent}
-                    onChange={(e) => updateBranding(['colors', 'accent'], e.target.value)}
+                    onChange={(e) =>
+                      updateBranding(['colors', 'accent'], e.target.value)
+                    }
                     className={styles.colorPicker}
                   />
                   <input
                     type="text"
                     value={branding.colors.accent}
-                    onChange={(e) => updateBranding(['colors', 'accent'], e.target.value)}
+                    onChange={(e) =>
+                      updateBranding(['colors', 'accent'], e.target.value)
+                    }
                     className={styles.colorInput}
                     placeholder="#10B981"
                   />
                 </div>
-                <div className={styles.colorPreview} style={{ backgroundColor: branding.colors.accent }}>
+                <div
+                  className={styles.colorPreview}
+                  style={{ backgroundColor: branding.colors.accent }}
+                >
                   <span>Accent</span>
                 </div>
               </div>
@@ -318,11 +363,15 @@ Email: {email}`,
                 <input
                   type="text"
                   value={branding.companyInfo.tagline}
-                  onChange={(e) => updateBranding(['companyInfo', 'tagline'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(['companyInfo', 'tagline'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., Your Trusted Moving Partner"
                 />
-                <span className={styles.helpText}>Short phrase that appears on marketing materials</span>
+                <span className={styles.helpText}>
+                  Short phrase that appears on marketing materials
+                </span>
               </div>
 
               <div className={styles.formGroup}>
@@ -330,11 +379,15 @@ Email: {email}`,
                 <input
                   type="text"
                   value={branding.companyInfo.slogan}
-                  onChange={(e) => updateBranding(['companyInfo', 'slogan'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(['companyInfo', 'slogan'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., Moving Made Simple"
                 />
-                <span className={styles.helpText}>Memorable phrase for brand recognition</span>
+                <span className={styles.helpText}>
+                  Memorable phrase for brand recognition
+                </span>
               </div>
             </div>
           </div>
@@ -345,7 +398,8 @@ Email: {email}`,
           <div className={styles.formSection}>
             <h4>Social Media Links</h4>
             <p className={styles.sectionDescription}>
-              Connect your social media profiles to appear on your website and marketing materials
+              Connect your social media profiles to appear on your website and
+              marketing materials
             </p>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
@@ -353,7 +407,9 @@ Email: {email}`,
                 <input
                   type="url"
                   value={branding.socialMedia.facebook}
-                  onChange={(e) => updateBranding(['socialMedia', 'facebook'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(['socialMedia', 'facebook'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="https://facebook.com/yourcompany"
                 />
@@ -364,7 +420,9 @@ Email: {email}`,
                 <input
                   type="url"
                   value={branding.socialMedia.twitter}
-                  onChange={(e) => updateBranding(['socialMedia', 'twitter'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(['socialMedia', 'twitter'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="https://twitter.com/yourcompany"
                 />
@@ -375,7 +433,9 @@ Email: {email}`,
                 <input
                   type="url"
                   value={branding.socialMedia.linkedin}
-                  onChange={(e) => updateBranding(['socialMedia', 'linkedin'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(['socialMedia', 'linkedin'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="https://linkedin.com/company/yourcompany"
                 />
@@ -386,7 +446,9 @@ Email: {email}`,
                 <input
                   type="url"
                   value={branding.socialMedia.instagram}
-                  onChange={(e) => updateBranding(['socialMedia', 'instagram'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(['socialMedia', 'instagram'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="https://instagram.com/yourcompany"
                 />
@@ -404,13 +466,19 @@ Email: {email}`,
                 <label>Email Signature Template</label>
                 <textarea
                   value={branding.templates.emailSignature}
-                  onChange={(e) => updateBranding(['templates', 'emailSignature'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(
+                      ['templates', 'emailSignature'],
+                      e.target.value,
+                    )
+                  }
                   className={styles.textarea}
                   rows={6}
                   placeholder="Email signature template with placeholders"
                 />
                 <span className={styles.helpText}>
-                  Available placeholders: {'{name}'}, {'{title}'}, {'{phone}'}, {'{email}'}
+                  Available placeholders: {'{name}'}, {'{title}'}, {'{phone}'},{' '}
+                  {'{email}'}
                 </span>
               </div>
 
@@ -419,18 +487,30 @@ Email: {email}`,
                 <input
                   type="text"
                   value={branding.templates.invoiceHeader}
-                  onChange={(e) => updateBranding(['templates', 'invoiceHeader'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(
+                      ['templates', 'invoiceHeader'],
+                      e.target.value,
+                    )
+                  }
                   className={styles.input}
                   placeholder="Invoice header text"
                 />
-                <span className={styles.helpText}>Text that appears at the top of invoices</span>
+                <span className={styles.helpText}>
+                  Text that appears at the top of invoices
+                </span>
               </div>
 
               <div className={styles.formGroup}>
                 <label>Business Card Template</label>
                 <select
                   value={branding.templates.businessCardTemplate}
-                  onChange={(e) => updateBranding(['templates', 'businessCardTemplate'], e.target.value)}
+                  onChange={(e) =>
+                    updateBranding(
+                      ['templates', 'businessCardTemplate'],
+                      e.target.value,
+                    )
+                  }
                   className={styles.select}
                 >
                   <option value="Standard Template">Standard Template</option>
@@ -438,7 +518,9 @@ Email: {email}`,
                   <option value="Classic Template">Classic Template</option>
                   <option value="Minimal Template">Minimal Template</option>
                 </select>
-                <span className={styles.helpText}>Choose a template for business card design</span>
+                <span className={styles.helpText}>
+                  Choose a template for business card design
+                </span>
               </div>
             </div>
           </div>
@@ -447,7 +529,11 @@ Email: {email}`,
 
       {/* Save Button */}
       <div className={styles.footer}>
-        <button onClick={handleSave} disabled={isSaving} className={styles.saveButton}>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={styles.saveButton}
+        >
           {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>

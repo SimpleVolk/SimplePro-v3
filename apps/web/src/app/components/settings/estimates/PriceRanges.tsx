@@ -20,10 +20,38 @@ export default function PriceRanges() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [priceRanges, setPriceRanges] = useState<PriceRange[]>([
-    { id: '1', name: 'Small', minPrice: 0, maxPrice: 500, color: '#22c55e', active: true },
-    { id: '2', name: 'Medium', minPrice: 501, maxPrice: 2000, color: '#3b82f6', active: true },
-    { id: '3', name: 'Large', minPrice: 2001, maxPrice: 5000, color: '#f59e0b', active: true },
-    { id: '4', name: 'Enterprise', minPrice: 5001, maxPrice: 999999, color: '#8b5cf6', active: true },
+    {
+      id: '1',
+      name: 'Small',
+      minPrice: 0,
+      maxPrice: 500,
+      color: '#22c55e',
+      active: true,
+    },
+    {
+      id: '2',
+      name: 'Medium',
+      minPrice: 501,
+      maxPrice: 2000,
+      color: '#3b82f6',
+      active: true,
+    },
+    {
+      id: '3',
+      name: 'Large',
+      minPrice: 2001,
+      maxPrice: 5000,
+      color: '#f59e0b',
+      active: true,
+    },
+    {
+      id: '4',
+      name: 'Enterprise',
+      minPrice: 5001,
+      maxPrice: 999999,
+      color: '#8b5cf6',
+      active: true,
+    },
   ]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -42,9 +70,9 @@ export default function PriceRanges() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/price-ranges'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -77,7 +105,7 @@ export default function PriceRanges() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ priceRanges }),
       });
@@ -94,14 +122,20 @@ export default function PriceRanges() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving price ranges:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const handleAdd = () => {
-    if (!editForm.name || editForm.minPrice === undefined || editForm.maxPrice === undefined) {
+    if (
+      !editForm.name ||
+      editForm.minPrice === undefined ||
+      editForm.maxPrice === undefined
+    ) {
       setError('Name, min price, and max price are required');
       return;
     }
@@ -129,9 +163,11 @@ export default function PriceRanges() {
 
   const handleUpdate = () => {
     if (editingId) {
-      setPriceRanges(priceRanges.map(r =>
-        r.id === editingId ? { ...r, ...editForm } : r
-      ));
+      setPriceRanges(
+        priceRanges.map((r) =>
+          r.id === editingId ? { ...r, ...editForm } : r,
+        ),
+      );
       setEditingId(null);
       setEditForm({});
       setSuccess('Price range updated');
@@ -141,7 +177,7 @@ export default function PriceRanges() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this price range?')) {
-      setPriceRanges(priceRanges.filter(r => r.id !== id));
+      setPriceRanges(priceRanges.filter((r) => r.id !== id));
       setSuccess('Price range deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -186,7 +222,9 @@ export default function PriceRanges() {
                 id="name"
                 type="text"
                 value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., Medium"
               />
@@ -199,7 +237,12 @@ export default function PriceRanges() {
                 type="number"
                 min="0"
                 value={editForm.minPrice || 0}
-                onChange={(e) => setEditForm({ ...editForm, minPrice: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    minPrice: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -211,7 +254,12 @@ export default function PriceRanges() {
                 type="number"
                 min="0"
                 value={editForm.maxPrice || 0}
-                onChange={(e) => setEditForm({ ...editForm, maxPrice: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    maxPrice: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -222,7 +270,9 @@ export default function PriceRanges() {
                 id="color"
                 type="color"
                 value={editForm.color || '#6b7280'}
-                onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, color: e.target.value })
+                }
                 className={styles.colorPicker}
               />
             </div>
@@ -247,12 +297,15 @@ export default function PriceRanges() {
             </tr>
           </thead>
           <tbody>
-            {priceRanges.map(range => (
+            {priceRanges.map((range) => (
               <tr key={range.id}>
                 <td>
                   <span
                     className={styles.tagBadge}
-                    style={{ backgroundColor: range.color + '20', color: range.color }}
+                    style={{
+                      backgroundColor: range.color + '20',
+                      color: range.color,
+                    }}
                   >
                     {range.name}
                   </span>
@@ -262,7 +315,9 @@ export default function PriceRanges() {
                     <input
                       type="text"
                       value={editForm.name || ''}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -274,7 +329,12 @@ export default function PriceRanges() {
                     <input
                       type="number"
                       value={editForm.minPrice || 0}
-                      onChange={(e) => setEditForm({ ...editForm, minPrice: parseFloat(e.target.value) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          minPrice: parseFloat(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -286,7 +346,12 @@ export default function PriceRanges() {
                     <input
                       type="number"
                       value={editForm.maxPrice || 0}
-                      onChange={(e) => setEditForm({ ...editForm, maxPrice: parseFloat(e.target.value) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          maxPrice: parseFloat(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -294,7 +359,11 @@ export default function PriceRanges() {
                   )}
                 </td>
                 <td>
-                  <span className={range.active ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      range.active ? styles.statusActive : styles.statusInactive
+                    }
+                  >
                     {range.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -302,19 +371,38 @@ export default function PriceRanges() {
                   <div className={styles.actions}>
                     {editingId === range.id ? (
                       <>
-                        <button className={styles.actionButton} onClick={handleUpdate} title="Save">
+                        <button
+                          className={styles.actionButton}
+                          onClick={handleUpdate}
+                          title="Save"
+                        >
                           💾
                         </button>
-                        <button className={styles.actionButton} onClick={() => { setEditingId(null); setEditForm({}); }} title="Cancel">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditForm({});
+                          }}
+                          title="Cancel"
+                        >
                           ✕
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className={styles.actionButton} onClick={() => handleEdit(range)} title="Edit">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleEdit(range)}
+                          title="Edit"
+                        >
                           ✏️
                         </button>
-                        <button className={styles.actionButton} onClick={() => handleDelete(range.id)} title="Delete">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(range.id)}
+                          title="Delete"
+                        >
                           🗑️
                         </button>
                       </>
@@ -328,7 +416,11 @@ export default function PriceRanges() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

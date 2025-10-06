@@ -52,7 +52,9 @@ export class NotificationEventListener {
     shiftDuration: number;
     reminderMinutes: number;
   }) {
-    this.logger.log(`Shift reminder event received for employee ${payload.employeeId}`);
+    this.logger.log(
+      `Shift reminder event received for employee ${payload.employeeId}`,
+    );
 
     await this.notificationsService.createNotification({
       recipientId: payload.employeeId,
@@ -78,7 +80,9 @@ export class NotificationEventListener {
     inquiryType: string;
     inquiryMessage: string;
   }) {
-    this.logger.log(`Customer inquiry event received for customer ${payload.customerId}`);
+    this.logger.log(
+      `Customer inquiry event received for customer ${payload.customerId}`,
+    );
 
     await this.notificationsService.createNotification({
       recipientId: payload.salesRepId,
@@ -111,7 +115,9 @@ export class NotificationEventListener {
     originAddress: string;
     destinationAddress: string;
   }) {
-    this.logger.log(`Estimate sent event received for estimate ${payload.estimateId}`);
+    this.logger.log(
+      `Estimate sent event received for estimate ${payload.estimateId}`,
+    );
 
     await this.notificationsService.createNotification({
       recipientId: payload.salesRepId,
@@ -225,7 +231,9 @@ export class NotificationEventListener {
     messageContent: string;
     messageId: string;
   }) {
-    this.logger.log(`Message received event for recipient ${payload.recipientId}`);
+    this.logger.log(
+      `Message received event for recipient ${payload.recipientId}`,
+    );
 
     await this.notificationsService.createNotification({
       recipientId: payload.recipientId,
@@ -254,7 +262,9 @@ export class NotificationEventListener {
     approverName: string;
     requestId: string;
   }) {
-    this.logger.log(`Time off approved event for employee ${payload.employeeId}`);
+    this.logger.log(
+      `Time off approved event for employee ${payload.employeeId}`,
+    );
 
     await this.notificationsService.createNotification({
       recipientId: payload.employeeId,
@@ -307,7 +317,9 @@ export class NotificationEventListener {
     location: string;
     changeNotes: string;
   }) {
-    this.logger.log(`Schedule changed event for employee ${payload.employeeId}`);
+    this.logger.log(
+      `Schedule changed event for employee ${payload.employeeId}`,
+    );
 
     await this.notificationsService.createNotification({
       recipientId: payload.employeeId,

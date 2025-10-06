@@ -4,7 +4,11 @@ function generateUUID(): string {
 
   try {
     // Node.js environment - try crypto.randomUUID first (Node.js 15.6.0+)
-    if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+    if (
+      typeof process !== 'undefined' &&
+      process.versions &&
+      process.versions.node
+    ) {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const crypto = require('crypto');
       if (crypto && typeof crypto.randomUUID === 'function') {
@@ -15,25 +19,39 @@ function generateUUID(): string {
       }
     }
   } catch (error) {
-    console.warn('Node.js crypto.randomUUID failed, falling back to alternative methods:', error instanceof Error ? error.message : String(error));
+    console.warn(
+      'Node.js crypto.randomUUID failed, falling back to alternative methods:',
+      error instanceof Error ? error.message : String(error),
+    );
   }
 
   try {
     // Browser environment - use crypto.randomUUID if available (modern browsers)
-    if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+    if (
+      typeof globalThis !== 'undefined' &&
+      globalThis.crypto &&
+      typeof globalThis.crypto.randomUUID === 'function'
+    ) {
       uuid = globalThis.crypto.randomUUID();
       if (isValidUUID(uuid)) {
         return uuid;
       }
     }
   } catch (error) {
-    console.warn('Browser crypto.randomUUID failed, falling back to getRandomValues:', error instanceof Error ? error.message : String(error));
+    console.warn(
+      'Browser crypto.randomUUID failed, falling back to getRandomValues:',
+      error instanceof Error ? error.message : String(error),
+    );
   }
 
   try {
     // Fallback to crypto.getRandomValues (both Node.js with webcrypto and browsers)
-    const crypto = typeof globalThis !== 'undefined' ? globalThis.crypto :
-                  typeof window !== 'undefined' ? window.crypto : null;
+    const crypto =
+      typeof globalThis !== 'undefined'
+        ? globalThis.crypto
+        : typeof window !== 'undefined'
+          ? window.crypto
+          : null;
 
     if (crypto && typeof crypto.getRandomValues === 'function') {
       const randomBytes = crypto.getRandomValues(new Uint8Array(16));
@@ -56,26 +74,34 @@ function generateUUID(): string {
       }
     }
   } catch (error) {
-    console.warn('crypto.getRandomValues failed, falling back to Math.random:', error instanceof Error ? error.message : String(error));
+    console.warn(
+      'crypto.getRandomValues failed, falling back to Math.random:',
+      error instanceof Error ? error.message : String(error),
+    );
   }
 
   // Final fallback using Math.random with better entropy
-  console.warn('Using Math.random fallback for UUID generation - not cryptographically secure');
+  console.warn(
+    'Using Math.random fallback for UUID generation - not cryptographically secure',
+  );
 
   let timestamp = Date.now();
   let performanceNow = 0;
 
   try {
     // Add performance counter for better entropy if available
-    performanceNow = typeof performance !== 'undefined' && performance.now ? performance.now() : 0;
+    performanceNow =
+      typeof performance !== 'undefined' && performance.now
+        ? performance.now()
+        : 0;
   } catch (e) {
     // Performance API not available
   }
 
-  uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16 + timestamp + performanceNow) % 16 | 0;
     timestamp = Math.floor(timestamp / 16);
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 
@@ -93,7 +119,8 @@ function isValidUUID(uuid: string): boolean {
   }
 
   // Standard UUID v4 format validation
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
 import {
@@ -104,7 +131,7 @@ import {
   AppliedRule,
   AppliedLocationHandicap,
   RuleCondition,
-  PriceBreakdown
+  PriceBreakdown,
 } from './schemas/rules.schema';
 
 export class DeterministicEstimator {
@@ -113,9 +140,13 @@ export class DeterministicEstimator {
   private tariffSettings: any = null;
   private readonly VERSION = '1.0.0';
 
-  constructor(rules: PricingRule[], locationHandicaps: LocationHandicap[], tariffSettings?: any) {
+  constructor(
+    rules: PricingRule[],
+    locationHandicaps: LocationHandicap[],
+    tariffSettings?: any,
+  ) {
     this.rules = rules.sort((a, b) => a.priority - b.priority);
-    this.locationHandicaps = locationHandicaps.filter(h => h.isActive);
+    this.locationHandicaps = locationHandicaps.filter((h) => h.isActive);
     this.tariffSettings = tariffSettings || null;
   }
 
@@ -123,7 +154,10 @@ export class DeterministicEstimator {
    * Calculate a deterministic estimate based on input parameters
    * The same input will always produce the same output
    */
-  public calculateEstimate(input: EstimateInput, calculatedBy: string): EstimateResult {
+  public calculateEstimate(
+    input: EstimateInput,
+    calculatedBy: string,
+  ): EstimateResult {
     // Create deterministic hash of input for reproducibility
     const inputHash = this.createDeterministicHash(input);
 
@@ -144,7 +178,11 @@ export class DeterministicEstimator {
           description: rule.description,
           conditionsMet: true,
           priceImpact: ruleImpact,
-          calculationDetails: this.getRuleCalculationDetails(rule, input, ruleImpact)
+          calculationDetails: this.getRuleCalculationDetails(
+            rule,
+            input,
+            ruleImpact,
+          ),
         });
       }
     }
@@ -153,7 +191,11 @@ export class DeterministicEstimator {
     const appliedHandicaps: AppliedLocationHandicap[] = [];
     for (const handicap of this.locationHandicaps) {
       if (this.shouldApplyLocationHandicap(handicap, input)) {
-        const handicapImpact = this.applyLocationHandicap(handicap, input, currentPrice);
+        const handicapImpact = this.applyLocationHandicap(
+          handicap,
+          input,
+          currentPrice,
+        );
         currentPrice = handicapImpact.finalPrice;
 
         const appliedHandicap: AppliedLocationHandicap = {
@@ -161,7 +203,7 @@ export class DeterministicEstimator {
           name: handicap.name,
           description: handicap.description,
           type: this.getHandicapType(handicap),
-          priceImpact: handicapImpact.impact
+          priceImpact: handicapImpact.impact,
         };
 
         if (handicap.multiplier !== 1.0) {
@@ -177,7 +219,13 @@ export class DeterministicEstimator {
     }
 
     // Create price breakdown
-    const breakdown = this.createPriceBreakdown(input, basePrice, appliedRules, appliedHandicaps, currentPrice);
+    const breakdown = this.createPriceBreakdown(
+      input,
+      basePrice,
+      appliedRules,
+      appliedHandicaps,
+      currentPrice,
+    );
 
     return {
       estimateId: generateUUID(),
@@ -188,15 +236,15 @@ export class DeterministicEstimator {
         locationHandicaps: appliedHandicaps,
         adjustments: [],
         finalPrice: currentPrice,
-        breakdown
+        breakdown,
       },
       metadata: {
         calculatedAt: new Date(),
         calculatedBy,
         rulesVersion: this.VERSION,
         deterministic: true,
-        hash: inputHash
-      }
+        hash: inputHash,
+      },
     };
   }
 
@@ -219,7 +267,7 @@ export class DeterministicEstimator {
         parkingDistance: input.pickup.parkingDistance,
         accessDifficulty: input.pickup.accessDifficulty,
         stairsCount: input.pickup.stairsCount || 0,
-        narrowHallways: input.pickup.narrowHallways || false
+        narrowHallways: input.pickup.narrowHallways || false,
       },
       delivery: {
         floorLevel: input.delivery.floorLevel,
@@ -228,7 +276,7 @@ export class DeterministicEstimator {
         parkingDistance: input.delivery.parkingDistance,
         accessDifficulty: input.delivery.accessDifficulty,
         stairsCount: input.delivery.stairsCount || 0,
-        narrowHallways: input.delivery.narrowHallways || false
+        narrowHallways: input.delivery.narrowHallways || false,
       },
       specialItems: input.specialItems,
       additionalServices: input.additionalServices,
@@ -236,10 +284,13 @@ export class DeterministicEstimator {
       isHoliday: input.isHoliday,
       seasonalPeriod: input.seasonalPeriod,
       specialtyCrewRequired: input.specialtyCrewRequired,
-      rulesVersion: this.VERSION
+      rulesVersion: this.VERSION,
     };
 
-    const inputString = JSON.stringify(normalizedInput, Object.keys(normalizedInput).sort());
+    const inputString = JSON.stringify(
+      normalizedInput,
+      Object.keys(normalizedInput).sort(),
+    );
 
     // Try to use Node.js crypto module if available
     try {
@@ -256,7 +307,7 @@ export class DeterministicEstimator {
     let hash = 0;
     for (let i = 0; i < inputString.length; i++) {
       const char = inputString.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16).padStart(8, '0');
@@ -270,7 +321,10 @@ export class DeterministicEstimator {
       try {
         return this.calculateBasePriceFromTariff(input);
       } catch (error) {
-        console.warn('Failed to calculate from tariff, using legacy:', error instanceof Error ? error.message : String(error));
+        console.warn(
+          'Failed to calculate from tariff, using legacy:',
+          error instanceof Error ? error.message : String(error),
+        );
         return this.calculateBasePriceLegacy(input);
       }
     }
@@ -306,7 +360,8 @@ export class DeterministicEstimator {
       case 'local': {
         // Base rate is typically per hour, multiply by estimated duration and crew size
         const baseHourlyRate = 150; // $150 for 2-person crew
-        const crewAdjustment = input.crewSize > 2 ? (input.crewSize - 2) * 75 : 0;
+        const crewAdjustment =
+          input.crewSize > 2 ? (input.crewSize - 2) * 75 : 0;
         return (baseHourlyRate + crewAdjustment) * input.estimatedDuration;
       }
 
@@ -336,8 +391,25 @@ export class DeterministicEstimator {
   /**
    * Get day of week from date
    */
-  private getDayOfWeek(date: Date): 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' {
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+  private getDayOfWeek(
+    date: Date,
+  ):
+    | 'monday'
+    | 'tuesday'
+    | 'wednesday'
+    | 'thursday'
+    | 'friday'
+    | 'saturday'
+    | 'sunday' {
+    const days = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ] as const;
     return days[date.getDay()];
   }
 
@@ -353,9 +425,13 @@ export class DeterministicEstimator {
     const { hourlyRates } = this.tariffSettings;
 
     // Find rate for crew size
-    const rateEntry = hourlyRates.rates?.find((r: any) => r.crewSize === input.crewSize);
+    const rateEntry = hourlyRates.rates?.find(
+      (r: any) => r.crewSize === input.crewSize,
+    );
     if (!rateEntry) {
-      console.warn(`No hourly rate found for crew size ${input.crewSize}, using legacy`);
+      console.warn(
+        `No hourly rate found for crew size ${input.crewSize}, using legacy`,
+      );
       return this.calculateBasePriceLegacy(input);
     }
 
@@ -379,7 +455,10 @@ export class DeterministicEstimator {
   /**
    * Calculate packing rate from tariff settings
    */
-  private calculatePackingRate(input: EstimateInput, dayOfWeek: string): number {
+  private calculatePackingRate(
+    input: EstimateInput,
+    dayOfWeek: string,
+  ): number {
     if (!this.tariffSettings?.packingRates) {
       console.warn('No packing rates in tariff settings, using legacy');
       return this.calculateBasePriceLegacy(input);
@@ -388,9 +467,13 @@ export class DeterministicEstimator {
     const { packingRates } = this.tariffSettings;
 
     // Find rate for crew size
-    const rateEntry = packingRates.rates?.find((r: any) => r.crewSize === input.crewSize);
+    const rateEntry = packingRates.rates?.find(
+      (r: any) => r.crewSize === input.crewSize,
+    );
     if (!rateEntry) {
-      console.warn(`No packing rate found for crew size ${input.crewSize}, using legacy`);
+      console.warn(
+        `No packing rate found for crew size ${input.crewSize}, using legacy`,
+      );
       return this.calculateBasePriceLegacy(input);
     }
 
@@ -416,7 +499,7 @@ export class DeterministicEstimator {
 
     // Find active by_weight distance rate
     const distanceRate = this.tariffSettings.distanceRates.find(
-      (r: any) => r.isActive && r.type === 'by_weight'
+      (r: any) => r.isActive && r.type === 'by_weight',
     );
 
     if (!distanceRate) {
@@ -426,11 +509,13 @@ export class DeterministicEstimator {
 
     // Find applicable bracket
     const bracket = distanceRate.brackets?.find(
-      (b: any) => input.totalWeight >= b.min && input.totalWeight < b.max
+      (b: any) => input.totalWeight >= b.min && input.totalWeight < b.max,
     );
 
     if (!bracket) {
-      console.warn(`No distance rate bracket found for weight ${input.totalWeight}, using legacy`);
+      console.warn(
+        `No distance rate bracket found for weight ${input.totalWeight}, using legacy`,
+      );
       return this.calculateBasePriceLegacy(input);
     }
 
@@ -466,7 +551,10 @@ export class DeterministicEstimator {
   /**
    * Evaluate rule conditions against input data
    */
-  private evaluateConditions(conditions: RuleCondition[], input: EstimateInput): boolean {
+  private evaluateConditions(
+    conditions: RuleCondition[],
+    input: EstimateInput,
+  ): boolean {
     if (conditions.length === 0) return true;
 
     let result = true;
@@ -493,7 +581,10 @@ export class DeterministicEstimator {
   /**
    * Evaluate a single condition
    */
-  private evaluateCondition(condition: RuleCondition, input: EstimateInput): boolean {
+  private evaluateCondition(
+    condition: RuleCondition,
+    input: EstimateInput,
+  ): boolean {
     const fieldValue = this.getFieldValue(condition.field, input);
 
     switch (condition.operator) {
@@ -510,14 +601,21 @@ export class DeterministicEstimator {
       case 'lte':
         return Number(fieldValue) <= Number(condition.value);
       case 'in':
-        return Array.isArray(condition.value) && condition.value.includes(fieldValue);
+        return (
+          Array.isArray(condition.value) && condition.value.includes(fieldValue)
+        );
       case 'nin':
-        return Array.isArray(condition.value) && !condition.value.includes(fieldValue);
+        return (
+          Array.isArray(condition.value) &&
+          !condition.value.includes(fieldValue)
+        );
       case 'between':
-        return Array.isArray(condition.value) &&
-               condition.value.length === 2 &&
-               Number(fieldValue) >= Number(condition.value[0]) &&
-               Number(fieldValue) <= Number(condition.value[1]);
+        return (
+          Array.isArray(condition.value) &&
+          condition.value.length === 2 &&
+          Number(fieldValue) >= Number(condition.value[0]) &&
+          Number(fieldValue) <= Number(condition.value[1])
+        );
       case 'exists':
         return fieldValue !== undefined && fieldValue !== null;
       case 'regex':
@@ -531,13 +629,19 @@ export class DeterministicEstimator {
    * Get field value from input using dot notation
    */
   private getFieldValue(fieldPath: string, input: EstimateInput): any {
-    return fieldPath.split('.').reduce((obj: any, key: string) => obj?.[key], input);
+    return fieldPath
+      .split('.')
+      .reduce((obj: any, key: string) => obj?.[key], input);
   }
 
   /**
    * Apply a pricing rule and return the price impact
    */
-  private applyRule(rule: PricingRule, input: EstimateInput, currentPrice: number): number {
+  private applyRule(
+    rule: PricingRule,
+    input: EstimateInput,
+    currentPrice: number,
+  ): number {
     let totalImpact = 0;
 
     for (const action of rule.actions) {
@@ -550,7 +654,10 @@ export class DeterministicEstimator {
           }
           // For fragile items, multiply by quantity over threshold
           else if (rule.id === 'fragile_items_surcharge') {
-            const extraFragile = Math.max(0, input.specialItems.fragileItems - 5);
+            const extraFragile = Math.max(
+              0,
+              input.specialItems.fragileItems - 5,
+            );
             totalImpact += action.amount * extraFragile;
           } else {
             totalImpact += action.amount;
@@ -593,7 +700,10 @@ export class DeterministicEstimator {
   /**
    * Check if location handicap should be applied
    */
-  private shouldApplyLocationHandicap(handicap: LocationHandicap, input: EstimateInput): boolean {
+  private shouldApplyLocationHandicap(
+    handicap: LocationHandicap,
+    input: EstimateInput,
+  ): boolean {
     if (!handicap.isActive) return false;
     return this.evaluateConditions(handicap.conditions, input);
   }
@@ -601,7 +711,11 @@ export class DeterministicEstimator {
   /**
    * Apply location handicap and return impact details
    */
-  private applyLocationHandicap(handicap: LocationHandicap, input: EstimateInput, currentPrice: number): { impact: number; finalPrice: number } {
+  private applyLocationHandicap(
+    handicap: LocationHandicap,
+    input: EstimateInput,
+    currentPrice: number,
+  ): { impact: number; finalPrice: number } {
     let impact = 0;
     let finalPrice = currentPrice;
 
@@ -609,15 +723,19 @@ export class DeterministicEstimator {
     if (this.tariffSettings?.handicaps) {
       try {
         const tariffHandicap = this.tariffSettings.handicaps.find(
-          (h: any) => h.isActive && this.matchesHandicap(h, handicap)
+          (h: any) => h.isActive && this.matchesHandicap(h, handicap),
         );
 
         if (tariffHandicap?.percentage) {
           // Apply percentage-based surcharge
-          const percentageImpact = currentPrice * (tariffHandicap.percentage / 100);
+          const percentageImpact =
+            currentPrice * (tariffHandicap.percentage / 100);
 
           // Check if multiplier applies (e.g., per flight of stairs)
-          if (tariffHandicap.isMultiplier && tariffHandicap.category === 'stairs') {
+          if (
+            tariffHandicap.isMultiplier &&
+            tariffHandicap.category === 'stairs'
+          ) {
             const multiplier = this.getStairsMultiplier(handicap, input);
             impact = percentageImpact * multiplier;
           } else {
@@ -627,11 +745,14 @@ export class DeterministicEstimator {
           finalPrice = currentPrice + impact;
           return {
             impact: Math.round(impact * 100) / 100,
-            finalPrice: Math.round(finalPrice * 100) / 100
+            finalPrice: Math.round(finalPrice * 100) / 100,
           };
         }
       } catch (error) {
-        console.warn('Failed to apply tariff handicap, using legacy:', error instanceof Error ? error.message : String(error));
+        console.warn(
+          'Failed to apply tariff handicap, using legacy:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
     }
 
@@ -639,9 +760,9 @@ export class DeterministicEstimator {
     if (handicap.fixedAmount && handicap.fixedAmount > 0) {
       // For stairs, multiply by number of flights
       if (handicap.id.includes('stairs')) {
-        const stairsCount = handicap.id.includes('pickup') ?
-          (input.pickup.stairsCount || 1) :
-          (input.delivery.stairsCount || 1);
+        const stairsCount = handicap.id.includes('pickup')
+          ? input.pickup.stairsCount || 1
+          : input.delivery.stairsCount || 1;
         impact = handicap.fixedAmount * stairsCount;
       } else {
         impact = handicap.fixedAmount;
@@ -652,27 +773,51 @@ export class DeterministicEstimator {
     if (handicap.multiplier && handicap.multiplier !== 1.0) {
       const multiplierImpact = currentPrice * (handicap.multiplier - 1);
       impact += multiplierImpact;
-      finalPrice = currentPrice * handicap.multiplier + (finalPrice - currentPrice);
+      finalPrice =
+        currentPrice * handicap.multiplier + (finalPrice - currentPrice);
     }
 
     return {
       impact: Math.round(impact * 100) / 100,
-      finalPrice: Math.round(finalPrice * 100) / 100
+      finalPrice: Math.round(finalPrice * 100) / 100,
     };
   }
 
   /**
    * Match tariff handicap to location handicap
    */
-  private matchesHandicap(tariffHandicap: any, locationHandicap: LocationHandicap): boolean {
+  private matchesHandicap(
+    tariffHandicap: any,
+    locationHandicap: LocationHandicap,
+  ): boolean {
     // Match by category
-    if (tariffHandicap.category === 'stairs' && locationHandicap.id.includes('stairs')) return true;
-    if (tariffHandicap.category === 'elevator' && locationHandicap.id.includes('elevator')) return true;
-    if (tariffHandicap.category === 'long_carry' && locationHandicap.id.includes('long_carry')) return true;
+    if (
+      tariffHandicap.category === 'stairs' &&
+      locationHandicap.id.includes('stairs')
+    )
+      return true;
+    if (
+      tariffHandicap.category === 'elevator' &&
+      locationHandicap.id.includes('elevator')
+    )
+      return true;
+    if (
+      tariffHandicap.category === 'long_carry' &&
+      locationHandicap.id.includes('long_carry')
+    )
+      return true;
 
     // Match by name (partial)
-    if (tariffHandicap.name.toLowerCase().includes('flight') && locationHandicap.id.includes('stairs')) return true;
-    if (tariffHandicap.name.toLowerCase().includes('elevator') && locationHandicap.id.includes('elevator')) return true;
+    if (
+      tariffHandicap.name.toLowerCase().includes('flight') &&
+      locationHandicap.id.includes('stairs')
+    )
+      return true;
+    if (
+      tariffHandicap.name.toLowerCase().includes('elevator') &&
+      locationHandicap.id.includes('elevator')
+    )
+      return true;
 
     return false;
   }
@@ -680,7 +825,10 @@ export class DeterministicEstimator {
   /**
    * Get stairs multiplier based on flight count
    */
-  private getStairsMultiplier(handicap: LocationHandicap, input: EstimateInput): number {
+  private getStairsMultiplier(
+    handicap: LocationHandicap,
+    input: EstimateInput,
+  ): number {
     let totalFlights = 0;
 
     if (handicap.id.includes('pickup')) {
@@ -697,9 +845,15 @@ export class DeterministicEstimator {
   /**
    * Determine handicap type based on conditions
    */
-  private getHandicapType(handicap: LocationHandicap): 'pickup' | 'delivery' | 'both' {
-    const hasPickupConditions = handicap.conditions.some(c => c.field.startsWith('pickup'));
-    const hasDeliveryConditions = handicap.conditions.some(c => c.field.startsWith('delivery'));
+  private getHandicapType(
+    handicap: LocationHandicap,
+  ): 'pickup' | 'delivery' | 'both' {
+    const hasPickupConditions = handicap.conditions.some((c) =>
+      c.field.startsWith('pickup'),
+    );
+    const hasDeliveryConditions = handicap.conditions.some((c) =>
+      c.field.startsWith('delivery'),
+    );
 
     if (hasPickupConditions && hasDeliveryConditions) return 'both';
     if (hasPickupConditions) return 'pickup';
@@ -710,7 +864,11 @@ export class DeterministicEstimator {
   /**
    * Get detailed calculation description for a rule
    */
-  private getRuleCalculationDetails(rule: PricingRule, input: EstimateInput, impact: number): string {
+  private getRuleCalculationDetails(
+    rule: PricingRule,
+    input: EstimateInput,
+    impact: number,
+  ): string {
     switch (rule.id) {
       case 'crew_size_adjustment': {
         const extraCrew = Math.max(0, input.crewSize - 2);
@@ -744,35 +902,54 @@ export class DeterministicEstimator {
     basePrice: number,
     appliedRules: AppliedRule[],
     appliedHandicaps: AppliedLocationHandicap[],
-    finalPrice: number
+    finalPrice: number,
   ): PriceBreakdown {
     const baseLabor = basePrice;
 
     // Calculate materials (packing supplies, etc.)
     const materials = appliedRules
-      .filter(r => r.ruleId === 'packing_service_rate' || r.ruleId === 'assembly_service')
+      .filter(
+        (r) =>
+          r.ruleId === 'packing_service_rate' ||
+          r.ruleId === 'assembly_service',
+      )
       .reduce((sum, r) => sum + r.priceImpact, 0);
 
     // Calculate transportation (distance-based charges)
     const transportation = appliedRules
-      .filter(r => r.ruleId.includes('distance'))
+      .filter((r) => r.ruleId.includes('distance'))
       .reduce((sum, r) => sum + r.priceImpact, 0);
 
     // Calculate location handicaps
-    const locationHandicaps = appliedHandicaps
-      .reduce((sum, h) => sum + h.priceImpact, 0);
+    const locationHandicaps = appliedHandicaps.reduce(
+      (sum, h) => sum + h.priceImpact,
+      0,
+    );
 
     // Calculate special services (piano, antiques, etc.)
     const specialServices = appliedRules
-      .filter(r => r.ruleId.includes('piano') || r.ruleId.includes('antique') || r.ruleId.includes('fragile'))
+      .filter(
+        (r) =>
+          r.ruleId.includes('piano') ||
+          r.ruleId.includes('antique') ||
+          r.ruleId.includes('fragile'),
+      )
       .reduce((sum, r) => sum + r.priceImpact, 0);
 
     // Calculate seasonal adjustments
     const seasonalAdjustment = appliedRules
-      .filter(r => r.ruleId.includes('weekend') || r.ruleId.includes('season'))
+      .filter(
+        (r) => r.ruleId.includes('weekend') || r.ruleId.includes('season'),
+      )
       .reduce((sum, r) => sum + r.priceImpact, 0);
 
-    const subtotal = baseLabor + materials + transportation + locationHandicaps + specialServices + seasonalAdjustment;
+    const subtotal =
+      baseLabor +
+      materials +
+      transportation +
+      locationHandicaps +
+      specialServices +
+      seasonalAdjustment;
     const taxes = 0; // Typically calculated separately based on location
     const total = finalPrice;
 
@@ -785,14 +962,17 @@ export class DeterministicEstimator {
       seasonalAdjustment: Math.round(seasonalAdjustment * 100) / 100,
       subtotal: Math.round(subtotal * 100) / 100,
       taxes: Math.round(taxes * 100) / 100,
-      total: Math.round(total * 100) / 100
+      total: Math.round(total * 100) / 100,
     };
   }
 
   /**
    * Validate estimate input for completeness and accuracy
    */
-  public validateInput(input: EstimateInput): { valid: boolean; errors: string[] } {
+  public validateInput(input: EstimateInput): {
+    valid: boolean;
+    errors: string[];
+  } {
     const errors: string[] = [];
 
     // Required fields validation
@@ -801,18 +981,22 @@ export class DeterministicEstimator {
     if (!input.service) errors.push('Service type is required');
 
     // Numeric validations
-    if (input.totalWeight <= 0) errors.push('Total weight must be greater than 0');
-    if (input.totalVolume <= 0) errors.push('Total volume must be greater than 0');
+    if (input.totalWeight <= 0)
+      errors.push('Total weight must be greater than 0');
+    if (input.totalVolume <= 0)
+      errors.push('Total volume must be greater than 0');
     if (input.distance < 0) errors.push('Distance cannot be negative');
     if (input.crewSize < 1) errors.push('Crew size must be at least 1');
-    if (input.estimatedDuration <= 0) errors.push('Estimated duration must be greater than 0');
+    if (input.estimatedDuration <= 0)
+      errors.push('Estimated duration must be greater than 0');
 
     // Address validations
     if (!input.pickup.address) errors.push('Pickup address is required');
     if (!input.delivery.address) errors.push('Delivery address is required');
 
     // Date validations
-    if (input.moveDate < new Date()) errors.push('Move date cannot be in the past');
+    if (input.moveDate < new Date())
+      errors.push('Move date cannot be in the past');
 
     // Logical validations
     if (input.service === 'long_distance' && input.distance <= 50) {
@@ -824,7 +1008,7 @@ export class DeterministicEstimator {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -843,7 +1027,9 @@ export class DeterministicEstimator {
     const { crewRequired } = this.tariffSettings.autoPricing;
 
     // Sort by minCubicFeet ascending
-    const sorted = [...crewRequired].sort((a: any, b: any) => a.minCubicFeet - b.minCubicFeet);
+    const sorted = [...crewRequired].sort(
+      (a: any, b: any) => a.minCubicFeet - b.minCubicFeet,
+    );
 
     // Find first crew size where cubic feet is below threshold
     for (const entry of sorted) {
@@ -869,7 +1055,9 @@ export class DeterministicEstimator {
     const { trucksRequired } = this.tariffSettings.autoPricing;
 
     // Sort by minCubicFeet ascending
-    const sorted = [...trucksRequired].sort((a: any, b: any) => a.minCubicFeet - b.minCubicFeet);
+    const sorted = [...trucksRequired].sort(
+      (a: any, b: any) => a.minCubicFeet - b.minCubicFeet,
+    );
 
     // Find first truck count where cubic feet is below threshold
     for (const entry of sorted) {

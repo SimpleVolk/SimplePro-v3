@@ -8,9 +8,7 @@ import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Job.name, schema: JobSchema }
-    ]),
+    MongooseModule.forFeature([{ name: Job.name, schema: JobSchema }]),
     forwardRef(() => WebSocketModule),
     AuditLogsModule,
   ],

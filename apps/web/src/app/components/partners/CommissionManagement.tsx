@@ -13,9 +13,13 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<CommissionStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<CommissionStatus | 'all'>(
+    'all',
+  );
   const [partnerFilter, setPartnerFilter] = useState<string>('all');
-  const [selectedCommissions, setSelectedCommissions] = useState<Set<string>>(new Set());
+  const [selectedCommissions, setSelectedCommissions] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Fetch commissions
   const fetchCommissions = async () => {
@@ -30,7 +34,7 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
 
       const response = await fetch(getApiUrl('/partner-commissions'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -43,7 +47,9 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
       setCommissions(data);
     } catch (err) {
       console.error('Error fetching commissions:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load commissions');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load commissions',
+      );
     } finally {
       setLoading(false);
     }
@@ -54,9 +60,11 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
   }, []);
 
   // Filter commissions
-  const filteredCommissions = commissions.filter(commission => {
-    const matchesStatus = statusFilter === 'all' || commission.status === statusFilter;
-    const matchesPartner = partnerFilter === 'all' || commission.partnerId === partnerFilter;
+  const filteredCommissions = commissions.filter((commission) => {
+    const matchesStatus =
+      statusFilter === 'all' || commission.status === statusFilter;
+    const matchesPartner =
+      partnerFilter === 'all' || commission.partnerId === partnerFilter;
     return matchesStatus && matchesPartner;
   });
 
@@ -64,15 +72,18 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
   const summary = {
     totalCommissions: filteredCommissions.length,
     pendingAmount: filteredCommissions
-      .filter(c => c.status === 'pending')
+      .filter((c) => c.status === 'pending')
       .reduce((sum, c) => sum + c.commissionAmount, 0),
     calculatedAmount: filteredCommissions
-      .filter(c => c.status === 'calculated')
+      .filter((c) => c.status === 'calculated')
       .reduce((sum, c) => sum + c.commissionAmount, 0),
     paidAmount: filteredCommissions
-      .filter(c => c.status === 'paid')
+      .filter((c) => c.status === 'paid')
       .reduce((sum, c) => sum + c.commissionAmount, 0),
-    totalAmount: filteredCommissions.reduce((sum, c) => sum + c.commissionAmount, 0),
+    totalAmount: filteredCommissions.reduce(
+      (sum, c) => sum + c.commissionAmount,
+      0,
+    ),
   };
 
   // Toggle commission selection
@@ -91,7 +102,7 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
     if (selectedCommissions.size === filteredCommissions.length) {
       setSelectedCommissions(new Set());
     } else {
-      setSelectedCommissions(new Set(filteredCommissions.map(c => c.id)));
+      setSelectedCommissions(new Set(filteredCommissions.map((c) => c.id)));
     }
   };
 
@@ -100,17 +111,20 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
     try {
       const token = localStorage.getItem('accessToken');
 
-      const response = await fetch(getApiUrl(`/partner-commissions/${commissionId}/status`), {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getApiUrl(`/partner-commissions/${commissionId}/status`),
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: 'paid',
+            paidAt: new Date().toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          status: 'paid',
-          paidAt: new Date().toISOString(),
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to mark commission as paid');
@@ -131,18 +145,21 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
 
       await Promise.all(
         Array.from(selectedCommissions).map(async (commissionId) => {
-          await fetch(getApiUrl(`/partner-commissions/${commissionId}/status`), {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
+          await fetch(
+            getApiUrl(`/partner-commissions/${commissionId}/status`),
+            {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                status: 'paid',
+                paidAt: new Date().toISOString(),
+              }),
             },
-            body: JSON.stringify({
-              status: 'paid',
-              paidAt: new Date().toISOString(),
-            }),
-          });
-        })
+          );
+        }),
       );
 
       setSelectedCommissions(new Set());
@@ -158,16 +175,26 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
   // Export commissions
   const exportCommissions = () => {
     const csvContent = [
-      ['Partner', 'Job Value', 'Commission', 'Rate', 'Status', 'Created', 'Paid'].join(','),
-      ...filteredCommissions.map(c => [
-        c.partnerName || 'Unknown',
-        c.jobValue.toFixed(2),
-        c.commissionAmount.toFixed(2),
-        c.commissionRate ? `${c.commissionRate}%` : 'N/A',
-        c.status,
-        new Date(c.createdAt).toLocaleDateString(),
-        c.paidAt ? new Date(c.paidAt).toLocaleDateString() : 'N/A',
-      ].join(','))
+      [
+        'Partner',
+        'Job Value',
+        'Commission',
+        'Rate',
+        'Status',
+        'Created',
+        'Paid',
+      ].join(','),
+      ...filteredCommissions.map((c) =>
+        [
+          c.partnerName || 'Unknown',
+          c.jobValue.toFixed(2),
+          c.commissionAmount.toFixed(2),
+          c.commissionRate ? `${c.commissionRate}%` : 'N/A',
+          c.status,
+          new Date(c.createdAt).toLocaleDateString(),
+          c.paidAt ? new Date(c.paidAt).toLocaleDateString() : 'N/A',
+        ].join(','),
+      ),
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -181,7 +208,7 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
 
   // Get partner name
   const getPartnerName = (partnerId: string): string => {
-    const partner = partners.find(p => p.id === partnerId);
+    const partner = partners.find((p) => p.id === partnerId);
     return partner?.name || 'Unknown Partner';
   };
 
@@ -201,16 +228,22 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
         <div className={styles.summaryCard}>
           <div className={styles.summaryIcon}>💰</div>
           <div className={styles.summaryContent}>
-            <div className={styles.summaryValue}>${summary.totalAmount.toLocaleString()}</div>
+            <div className={styles.summaryValue}>
+              ${summary.totalAmount.toLocaleString()}
+            </div>
             <div className={styles.summaryLabel}>Total Commissions</div>
-            <div className={styles.summarySubtext}>{summary.totalCommissions} records</div>
+            <div className={styles.summarySubtext}>
+              {summary.totalCommissions} records
+            </div>
           </div>
         </div>
 
         <div className={styles.summaryCard}>
           <div className={styles.summaryIcon}>⏳</div>
           <div className={styles.summaryContent}>
-            <div className={styles.summaryValue}>${summary.pendingAmount.toLocaleString()}</div>
+            <div className={styles.summaryValue}>
+              ${summary.pendingAmount.toLocaleString()}
+            </div>
             <div className={styles.summaryLabel}>Pending</div>
             <div className={styles.summarySubtext}>awaiting calculation</div>
           </div>
@@ -219,7 +252,9 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
         <div className={styles.summaryCard}>
           <div className={styles.summaryIcon}>📊</div>
           <div className={styles.summaryContent}>
-            <div className={styles.summaryValue}>${summary.calculatedAmount.toLocaleString()}</div>
+            <div className={styles.summaryValue}>
+              ${summary.calculatedAmount.toLocaleString()}
+            </div>
             <div className={styles.summaryLabel}>Calculated</div>
             <div className={styles.summarySubtext}>ready to pay</div>
           </div>
@@ -228,7 +263,9 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
         <div className={styles.summaryCard}>
           <div className={styles.summaryIcon}>✅</div>
           <div className={styles.summaryContent}>
-            <div className={styles.summaryValue}>${summary.paidAmount.toLocaleString()}</div>
+            <div className={styles.summaryValue}>
+              ${summary.paidAmount.toLocaleString()}
+            </div>
             <div className={styles.summaryLabel}>Paid</div>
             <div className={styles.summarySubtext}>completed</div>
           </div>
@@ -240,7 +277,9 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
         <select
           className={styles.filterSelect}
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as CommissionStatus | 'all')}
+          onChange={(e) =>
+            setStatusFilter(e.target.value as CommissionStatus | 'all')
+          }
         >
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
@@ -254,8 +293,10 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
           onChange={(e) => setPartnerFilter(e.target.value)}
         >
           <option value="all">All Partners</option>
-          {partners.map(partner => (
-            <option key={partner.id} value={partner.id}>{partner.name}</option>
+          {partners.map((partner) => (
+            <option key={partner.id} value={partner.id}>
+              {partner.name}
+            </option>
           ))}
         </select>
 
@@ -293,7 +334,10 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
               <th>
                 <input
                   type="checkbox"
-                  checked={selectedCommissions.size === filteredCommissions.length && filteredCommissions.length > 0}
+                  checked={
+                    selectedCommissions.size === filteredCommissions.length &&
+                    filteredCommissions.length > 0
+                  }
                   onChange={selectAll}
                 />
               </th>
@@ -315,7 +359,7 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
                 </td>
               </tr>
             ) : (
-              filteredCommissions.map(commission => (
+              filteredCommissions.map((commission) => (
                 <tr key={commission.id}>
                   <td>
                     <input
@@ -331,13 +375,17 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
                     ${commission.jobValue.toLocaleString()}
                   </td>
                   <td className={styles.rateCell}>
-                    {commission.commissionRate ? `${commission.commissionRate}%` : 'N/A'}
+                    {commission.commissionRate
+                      ? `${commission.commissionRate}%`
+                      : 'N/A'}
                   </td>
                   <td className={styles.commissionCell}>
                     ${commission.commissionAmount.toLocaleString()}
                   </td>
                   <td>
-                    <span className={`${styles.statusBadge} ${getStatusClass(commission.status)}`}>
+                    <span
+                      className={`${styles.statusBadge} ${getStatusClass(commission.status)}`}
+                    >
                       {commission.status}
                     </span>
                   </td>
@@ -367,15 +415,18 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
       </div>
 
       {/* Payment History */}
-      {filteredCommissions.filter(c => c.status === 'paid').length > 0 && (
+      {filteredCommissions.filter((c) => c.status === 'paid').length > 0 && (
         <div className={styles.paymentHistory}>
           <h3 className={styles.historyTitle}>Recent Payments</h3>
           <div className={styles.timeline}>
             {filteredCommissions
-              .filter(c => c.status === 'paid' && c.paidAt)
-              .sort((a, b) => new Date(b.paidAt!).getTime() - new Date(a.paidAt!).getTime())
+              .filter((c) => c.status === 'paid' && c.paidAt)
+              .sort(
+                (a, b) =>
+                  new Date(b.paidAt!).getTime() - new Date(a.paidAt!).getTime(),
+              )
               .slice(0, 10)
-              .map(commission => (
+              .map((commission) => (
                 <div key={commission.id} className={styles.timelineItem}>
                   <div className={styles.timelineDot} />
                   <div className={styles.timelineContent}>
@@ -388,11 +439,14 @@ export function CommissionManagement({ partners }: CommissionManagementProps) {
                       </span>
                     </div>
                     <div className={styles.timelineDate}>
-                      {new Date(commission.paidAt!).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {new Date(commission.paidAt!).toLocaleDateString(
+                        'en-US',
+                        {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        },
+                      )}
                     </div>
                     {commission.paymentReference && (
                       <div className={styles.timelineReference}>

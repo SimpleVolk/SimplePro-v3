@@ -9,12 +9,14 @@ This document outlines the security measures implemented in SimplePro-v3 and pro
 ### 1. Credential Management
 
 **❌ NEVER DO:**
+
 - Commit `.env.production` or any files containing real credentials to version control
 - Use default passwords or weak credentials in production
 - Store credentials in environment variables for production deployment
 - Reuse development credentials in production
 
 **✅ SECURE APPROACH:**
+
 - Use file-based secret storage in `.secrets/` directory with 600 permissions
 - Generate cryptographically secure secrets using `npm run secrets:setup`
 - Use Docker secrets for container deployment
@@ -23,6 +25,7 @@ This document outlines the security measures implemented in SimplePro-v3 and pro
 ### 2. File-Based Secret Management
 
 **Production Secrets Location:**
+
 ```
 .secrets/
 ├── mongodb_password      # MongoDB admin password
@@ -35,6 +38,7 @@ This document outlines the security measures implemented in SimplePro-v3 and pro
 ```
 
 **Security Features:**
+
 - Directory permissions: `700` (owner read/write/execute only)
 - File permissions: `600` (owner read/write only)
 - Automatic secret strength validation
@@ -44,6 +48,7 @@ This document outlines the security measures implemented in SimplePro-v3 and pro
 ### 3. Application Security
 
 **Authentication & Authorization:**
+
 - JWT tokens with configurable expiration (default: 1h access, 7d refresh)
 - Role-based access control (RBAC) with granular permissions
 - Password hashing with bcrypt (12 rounds)
@@ -51,12 +56,14 @@ This document outlines the security measures implemented in SimplePro-v3 and pro
 - Multi-device session tracking
 
 **Input Validation:**
+
 - Comprehensive input validation using class-validator
 - SQL injection prevention through Mongoose ODM
 - XSS protection via proper output encoding
 - CORS configuration for frontend origins
 
 **Database Security:**
+
 - MongoDB connection with authentication
 - Connection pooling with secure defaults
 - Default credential validation and rejection
@@ -107,11 +114,13 @@ npm run secrets:validate
 The recommended production deployment method uses Docker secrets and file-based credential management:
 
 1. **Initialize Secrets:**
+
    ```bash
    npm run secrets:setup
    ```
 
 2. **Run Security Checks:**
+
    ```bash
    npm run security:check
    ```
@@ -124,6 +133,7 @@ The recommended production deployment method uses Docker secrets and file-based 
 ### Security Validation
 
 The `security:check` command validates:
+
 - No credential files are tracked by git
 - `.secrets/` directory exists with proper permissions
 - All required secret files exist with correct permissions
@@ -135,6 +145,7 @@ The `security:check` command validates:
 ### Development Environment Setup
 
 1. **Copy Template:**
+
    ```bash
    cp .env.development.template .env
    ```
@@ -149,19 +160,20 @@ The `security:check` command validates:
 
 ### Development vs Production
 
-| Aspect | Development | Production |
-|--------|-------------|------------|
-| Secret Storage | Environment variables | File-based in `.secrets/` |
-| Credential Strength | Moderate (32+ chars) | Strong (64+ chars) |
-| Git Tracking | `.env` not tracked | `.secrets/` not tracked |
-| JWT Secrets | Development patterns allowed | No dev patterns allowed |
-| Database Validation | Basic validation | Enhanced security checks |
+| Aspect              | Development                  | Production                |
+| ------------------- | ---------------------------- | ------------------------- |
+| Secret Storage      | Environment variables        | File-based in `.secrets/` |
+| Credential Strength | Moderate (32+ chars)         | Strong (64+ chars)        |
+| Git Tracking        | `.env` not tracked           | `.secrets/` not tracked   |
+| JWT Secrets         | Development patterns allowed | No dev patterns allowed   |
+| Database Validation | Basic validation             | Enhanced security checks  |
 
 ## Security Monitoring
 
 ### Log Security Events
 
 The application logs security-relevant events:
+
 - Authentication attempts (success/failure)
 - Authorization failures
 - Invalid token usage
@@ -171,6 +183,7 @@ The application logs security-relevant events:
 ### Health Checks
 
 Monitor security health via:
+
 - `/api/health` endpoint for service status
 - Docker container health checks
 - Secret file validation during startup
@@ -182,6 +195,7 @@ Monitor security health via:
 If credentials are compromised:
 
 1. **Immediate Actions:**
+
    ```bash
    # Rotate all affected secrets
    npm run secrets:rotate mongodb_password
@@ -191,6 +205,7 @@ If credentials are compromised:
    ```
 
 2. **Update Production:**
+
    ```bash
    # Redeploy with new secrets
    npm run deploy:prod:secure
@@ -207,6 +222,7 @@ If credentials are compromised:
 If credentials were accidentally committed:
 
 1. **Remove from tracking:**
+
    ```bash
    git rm --cached .env.production
    git rm --cached .secrets/
@@ -265,6 +281,7 @@ If credentials were accidentally committed:
 ## Security Contact
 
 For security issues or questions:
+
 - Review this documentation first
 - Check application logs for error details
 - Use `npm run security:check` for validation

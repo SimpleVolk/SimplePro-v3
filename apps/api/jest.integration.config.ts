@@ -10,7 +10,7 @@ export default {
   coverageDirectory: '../../coverage/apps/api-integration',
   testMatch: [
     '<rootDir>/test/**/*.integration.spec.ts',
-    '<rootDir>/src/**/*.integration.spec.ts'
+    '<rootDir>/src/**/*.integration.spec.ts',
   ],
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -26,7 +26,8 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/test/integration-setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@simplepro/pricing-engine$': '<rootDir>/../../packages/pricing-engine/src/index.ts'
+    '^@simplepro/pricing-engine$':
+      '<rootDir>/../../packages/pricing-engine/src/index.ts',
   },
   testTimeout: 30000,
   maxWorkers: 1, // Run integration tests sequentially

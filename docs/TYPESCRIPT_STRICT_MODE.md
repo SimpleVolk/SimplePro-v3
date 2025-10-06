@@ -7,15 +7,18 @@
 TypeScript strict mode has been successfully enabled across the SimplePro-v3 monorepo with varying levels of completion:
 
 ### ✅ Fully Complete
+
 - **Pricing Engine** (`packages/pricing-engine`): 100% strict mode enabled with zero errors
 - **Web Application** (`apps/web`): Already had strict mode enabled, builds successfully
 
 ### ⚠️ Partially Complete
+
 - **API Server** (`apps/api`): Strict flags enabled but with remaining type errors
 
 ## Current Configuration
 
 ### Root Configuration (`tsconfig.base.json`)
+
 ```json
 {
   "strict": true,
@@ -34,21 +37,25 @@ TypeScript strict mode has been successfully enabled across the SimplePro-v3 mon
 ```
 
 ### Pricing Engine (`packages/pricing-engine/tsconfig.json`)
+
 - **Status**: ✅ All strict flags enabled
 - **Errors**: 0
 - **Build**: ✅ Successful
 
 ### Web Application (`apps/web/tsconfig.json`)
+
 - **Status**: ✅ Inherits from base (strict mode enabled)
 - **Errors**: 0
 - **Build**: ✅ Successful
 
 ### API Server (`apps/api/tsconfig.json`)
+
 - **Status**: ⚠️ Strict mode enabled with exceptions
 - **Errors**: ~185 (mostly strictNullChecks related)
 - **Build**: ❌ Fails with strict mode
 
 Current configuration:
+
 ```json
 {
   "strict": true,
@@ -89,6 +96,7 @@ export interface AuthenticatedRequest extends ExpressRequest {
 Fixed all NestJS controller methods to use properly typed Request parameters:
 
 **Before**:
+
 ```typescript
 async createRule(@Body() dto: CreateRuleDto, @Request() req) {
   const userId = req.user.userId; // req is 'any'
@@ -96,6 +104,7 @@ async createRule(@Body() dto: CreateRuleDto, @Request() req) {
 ```
 
 **After**:
+
 ```typescript
 async createRule(@Body() dto: CreateRuleDto, @Request() req: AuthenticatedRequest) {
   const userId = req.user.userId; // req is properly typed
@@ -103,6 +112,7 @@ async createRule(@Body() dto: CreateRuleDto, @Request() req: AuthenticatedReques
 ```
 
 **Files Modified**:
+
 - `apps/api/src/crew-schedule/crew-schedule.controller.ts` (5 methods)
 - `apps/api/src/follow-up-rules/follow-up-rules.controller.ts` (2 methods)
 - `apps/api/src/lead-activities/lead-activities.controller.ts` (all methods)
@@ -112,6 +122,7 @@ async createRule(@Body() dto: CreateRuleDto, @Request() req: AuthenticatedReques
 Fixed various implicit `any` type errors:
 
 **MongoDB Aggregation**:
+
 ```typescript
 // Fixed: _id implicitly has 'any' type
 $group: {
@@ -121,14 +132,16 @@ $group: {
 ```
 
 **Empty Arrays**:
+
 ```typescript
 // Fixed: Implicit any[] type
-attachments: [] as string[]
-rates: [] as any[]
-crewAbility: [] as any[]
+attachments: [] as string[];
+rates: [] as any[];
+crewAbility: [] as any[];
 ```
 
 **Undefined Values**:
+
 ```typescript
 // Fixed: Implicit any type from undefined
 // Before: effectiveTo: undefined
@@ -136,6 +149,7 @@ crewAbility: [] as any[]
 ```
 
 **Object Literal Index Signatures**:
+
 ```typescript
 // Fixed: No index signature with parameter of type 'string'
 const dayOfWeekMap: Record<string, number> = {
@@ -171,6 +185,7 @@ async getCrewMembers(@Args('filters') filters?: any): Promise<any[]> {
 The majority of errors fall into these categories:
 
 #### 1. Null/Undefined Checking (~70%)
+
 ```typescript
 // Error: Object is possibly 'undefined'
 const user = await this.userModel.findById(id);
@@ -183,6 +198,7 @@ user.email; // ✅ TypeScript knows it's not null
 ```
 
 #### 2. Cache/Decorator Files (~20%)
+
 - `apps/api/src/cache/cache.service.ts`
 - `apps/api/src/cache/decorators/cacheable.decorator.ts`
 - `apps/api/src/cache/decorators/cache-evict.decorator.ts`
@@ -193,6 +209,7 @@ user.email; // ✅ TypeScript knows it's not null
 These files use advanced TypeScript patterns (decorators, generics) that need careful handling.
 
 #### 3. Error Handling (~10%)
+
 ```typescript
 // Error: 'error' is of type 'unknown'
 catch (error) {
@@ -208,6 +225,7 @@ catch (error) {
 ## Recommended Fix Strategy
 
 ### Phase 1: Core Business Logic (Priority: HIGH)
+
 Fix strictNullChecks errors in core business modules first:
 
 1. **Auth Module** - User authentication and authorization
@@ -217,11 +235,13 @@ Fix strictNullChecks errors in core business modules first:
 5. **Crews Module** - Crew management
 
 **Approach**:
+
 - Add null checks before accessing properties
 - Use optional chaining (`?.`) where appropriate
 - Add non-null assertions (`!`) only when absolutely certain
 
 ### Phase 2: Supporting Infrastructure (Priority: MEDIUM)
+
 Fix remaining modules:
 
 6. **Analytics Module** - Business intelligence
@@ -231,6 +251,7 @@ Fix remaining modules:
 10. **WebSocket Gateway** - Real-time communication
 
 ### Phase 3: Cache Infrastructure (Priority: LOW)
+
 Fix caching and decorator-related errors:
 
 - Cache service and decorators
@@ -240,11 +261,12 @@ Fix caching and decorator-related errors:
 **Note**: These are infrastructure components that can temporarily use `any` types without impacting business logic safety.
 
 ### Phase 4: Full Strict Mode (Priority: LOW)
+
 Once all errors are fixed, enable remaining strict flags:
 
 ```json
 {
-  "strictPropertyInitialization": true  // Currently disabled
+  "strictPropertyInitialization": true // Currently disabled
 }
 ```
 
@@ -253,6 +275,7 @@ Once all errors are fixed, enable remaining strict flags:
 When writing new code in the API project, follow these patterns:
 
 ### 1. Controller Methods
+
 ```typescript
 import { AuthenticatedRequest } from '../types';
 
@@ -261,7 +284,7 @@ export class ExampleController {
   @Post()
   async create(
     @Body() dto: CreateDto,
-    @Request() req: AuthenticatedRequest  // ✅ Always type the request
+    @Request() req: AuthenticatedRequest, // ✅ Always type the request
   ) {
     return this.service.create(dto, req.user.userId);
   }
@@ -269,6 +292,7 @@ export class ExampleController {
 ```
 
 ### 2. Service Methods with Database Queries
+
 ```typescript
 async findOne(id: string): Promise<Customer | null> {  // ✅ Explicit return type
   return this.model.findById(id).exec();
@@ -284,6 +308,7 @@ async getCustomer(id: string): Promise<Customer> {
 ```
 
 ### 3. Error Handling
+
 ```typescript
 try {
   // ... operation
@@ -296,9 +321,10 @@ try {
 ```
 
 ### 4. Optional Properties
+
 ```typescript
 interface UpdateDto {
-  name?: string;  // Optional field
+  name?: string; // Optional field
   email?: string;
 }
 
@@ -314,6 +340,7 @@ function updateUser(id: string, dto: UpdateDto) {
 ```
 
 ### 5. Array Initialization
+
 ```typescript
 // ❌ Avoid implicit any[]
 const items = [];
@@ -327,14 +354,15 @@ const items: ItemType[] = [];
 ```
 
 ### 6. DTOs and Interfaces
+
 ```typescript
 export class CreateCustomerDto {
   @IsString()
-  name!: string;  // ✅ Required field
+  name!: string; // ✅ Required field
 
   @IsEmail()
   @IsOptional()
-  email?: string;  // ✅ Optional field
+  email?: string; // ✅ Optional field
 
   @IsString()
   @IsOptional()
@@ -345,21 +373,25 @@ export class CreateCustomerDto {
 ## Benefits of Strict Mode
 
 ### Type Safety
+
 - Catches null/undefined errors at compile time
 - Prevents accessing properties on potentially null objects
 - Ensures proper error handling
 
 ### Better IDE Support
+
 - Improved autocomplete and IntelliSense
 - More accurate error messages
 - Better refactoring support
 
 ### Code Quality
+
 - Forces explicit typing of parameters and return values
 - Encourages proper null checking
 - Reduces runtime errors
 
 ### Maintainability
+
 - Self-documenting code through types
 - Easier onboarding for new developers
 - Safer refactoring and changes
@@ -385,7 +417,9 @@ describe('CustomerService', () => {
   });
 
   it('should find a customer by id', async () => {
-    const mockCustomer = { /* ... */ } as CustomerDocument;
+    const mockCustomer = {
+      /* ... */
+    } as CustomerDocument;
     jest.spyOn(model, 'findById').mockResolvedValue(mockCustomer);
 
     const result = await service.findOne('123');
@@ -402,10 +436,13 @@ The following ESLint rules should be added to enforce strict mode patterns:
 {
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/explicit-function-return-type": ["warn", {
-      "allowExpressions": true,
-      "allowTypedFunctionExpressions": true
-    }],
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {
+        "allowExpressions": true,
+        "allowTypedFunctionExpressions": true
+      }
+    ],
     "@typescript-eslint/no-non-null-assertion": "warn",
     "@typescript-eslint/strict-boolean-expressions": "warn",
     "@typescript-eslint/no-unnecessary-condition": "warn",

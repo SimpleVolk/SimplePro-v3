@@ -80,6 +80,7 @@ npm run validate:env:production       # Validate production environment
 ### ENVIRONMENT_CONFIGURATION_GUIDE.md
 
 Complete reference documentation covering:
+
 - All environment variables with descriptions
 - Required vs optional variables
 - Security requirements and best practices
@@ -89,6 +90,7 @@ Complete reference documentation covering:
 ### GITHUB_SECRETS_SETUP.md
 
 Step-by-step guide for CI/CD setup:
+
 - Creating GitHub environments
 - Adding secrets for staging and production
 - Secret rotation procedures
@@ -162,10 +164,10 @@ npm run test:api -- --coverage src/config/env.validation.spec.ts
 
 ### Optional (Feature-Dependent)
 
-- SMTP_* (for email notifications)
-- TWILIO_* (for SMS notifications)
-- FIREBASE_* (for push notifications)
-- STRIPE_* (for payments)
+- SMTP\_\* (for email notifications)
+- TWILIO\_\* (for SMS notifications)
+- FIREBASE\_\* (for push notifications)
+- STRIPE\_\* (for payments)
 - GOOGLE_MAPS_API_KEY (for geocoding)
 
 See [ENVIRONMENT_CONFIGURATION_GUIDE.md](./ENVIRONMENT_CONFIGURATION_GUIDE.md) for complete details.
@@ -246,6 +248,7 @@ If validation fails, fix issues before deploying.
 **Error**: "MongoServerError: Authentication failed"
 
 **Solution**:
+
 1. Verify credentials in MONGODB_URI
 2. Check database name and authSource
 3. Ensure IP is whitelisted (MongoDB Atlas)
@@ -261,6 +264,7 @@ If validation fails, fix issues before deploying.
 ## Support
 
 For deployment issues:
+
 1. Check this documentation first
 2. Run validation: `npm run validate:env:production`
 3. Review error logs

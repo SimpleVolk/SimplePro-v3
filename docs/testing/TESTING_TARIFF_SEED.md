@@ -5,6 +5,7 @@
 ### Prerequisites
 
 1. **MongoDB Running**
+
    ```bash
    # Start MongoDB (via Docker)
    npm run docker:dev
@@ -26,6 +27,7 @@ npm run db:seed:tariffs
 ```
 
 **Expected Output:**
+
 ```
 ╔════════════════════════════════════════════════════════════════════╗
 ║           SimplePro - Tariff Settings Seeder                      ║
@@ -93,6 +95,7 @@ npm run db:seed:tariffs
 ```
 
 **Expected Output:**
+
 ```
 ⚠️  Default tariff settings already exist
 
@@ -117,6 +120,7 @@ npm run db:seed:tariffs:reset
 ```
 
 **Expected Output:**
+
 ```
 🗑️  Deleting existing default tariff settings...
 ✅ Existing tariff deleted
@@ -130,11 +134,13 @@ npm run db:seed:tariffs:reset
 ### Enable Auto-Seeding
 
 1. **Edit `.env` file:**
+
    ```bash
    SEED_DATA=true
    ```
 
 2. **Start API:**
+
    ```bash
    npm run dev:api
    ```
@@ -151,6 +157,7 @@ npm run db:seed:tariffs:reset
 ### Test Skip on Existing Tariff
 
 1. **Start API again (with same database):**
+
    ```bash
    npm run dev:api
    ```
@@ -168,6 +175,7 @@ npm run db:seed:tariffs:reset
 ### Create Test Script
 
 Create `test-seed.ts`:
+
 ```typescript
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -199,6 +207,7 @@ testSeed();
 ```
 
 ### Run Test
+
 ```bash
 ts-node apps/api/src/test-seed.ts
 ```
@@ -208,11 +217,13 @@ ts-node apps/api/src/test-seed.ts
 ### Start API and Check Data
 
 1. **Start API:**
+
    ```bash
    npm run dev:api
    ```
 
 2. **Get Tariff Settings (requires auth):**
+
    ```bash
    # Login first
    curl -X POST http://localhost:3001/api/auth/login \
@@ -299,6 +310,7 @@ npm test -- seed-tariff-settings.spec.ts
 ```
 
 **Expected Output:**
+
 ```
 PASS  src/tariff-settings/seed-data/seed-tariff-settings.spec.ts
   Tariff Settings Seed
@@ -348,6 +360,7 @@ Tests:       32 passed, 32 total
 After seeding, verify the following:
 
 ### ✅ Metadata
+
 - [ ] Name: "Default Tariff Settings"
 - [ ] Version: "1.0.0"
 - [ ] Status: "active"
@@ -355,49 +368,58 @@ After seeding, verify the following:
 - [ ] isArchived: false
 
 ### ✅ Hourly Rates
+
 - [ ] 10 crew sizes (1-10)
 - [ ] All rates > 0
 - [ ] Minimum hours: weekday=2, weekend=3
 - [ ] Crew abilities: 10 entries
 
 ### ✅ Packing Rates
+
 - [ ] 5 rate configurations
 - [ ] All rates > 0
 
 ### ✅ Auto Pricing
+
 - [ ] Enabled: true
 - [ ] Max hours: 10
 - [ ] Weekend surcharge: 10%
 - [ ] Holiday surcharge: 15%
 
 ### ✅ Materials
+
 - [ ] Total: 14 items
 - [ ] All active
 - [ ] Categories: box, packing, protection, specialty
 - [ ] SKU codes present
 
 ### ✅ Move Sizes
+
 - [ ] Total: 21 categories
 - [ ] All active
 - [ ] Valid ranges (min < max)
 - [ ] Recommended crew sizes (1-6)
 
 ### ✅ Room Sizes
+
 - [ ] Total: 7 types
 - [ ] All active
 - [ ] Positive cubic feet and weight values
 
 ### ✅ Handicaps
+
 - [ ] Total: 3 active
 - [ ] Categories: stairs, elevator, access
 - [ ] Values: 9%, 18%, 9%
 
 ### ✅ Distance Rates
+
 - [ ] Total: 4 tiers
 - [ ] All active
 - [ ] Valid mile ranges
 
 ### ✅ Pricing Methods
+
 - [ ] Total: 5 methods
 - [ ] At least 1 default
 - [ ] At least 1 enabled
@@ -407,11 +429,13 @@ After seeding, verify the following:
 ### Issue: Connection Refused
 
 **Symptoms:**
+
 ```
 Error: connect ECONNREFUSED 127.0.0.1:27017
 ```
 
 **Solution:**
+
 ```bash
 # Start MongoDB
 npm run docker:dev
@@ -423,11 +447,13 @@ docker ps | grep mongo
 ### Issue: Environment Variable Missing
 
 **Symptoms:**
+
 ```
 ❌ Error: MONGODB_URI or DATABASE_URL environment variable is required
 ```
 
 **Solution:**
+
 ```bash
 # Create/update .env file
 echo "MONGODB_URI=mongodb://localhost:27017/simplepro" >> .env
@@ -436,11 +462,13 @@ echo "MONGODB_URI=mongodb://localhost:27017/simplepro" >> .env
 ### Issue: Tariff Already Exists
 
 **Symptoms:**
+
 ```
 ⚠️  Default tariff settings already exist
 ```
 
 **Solution:**
+
 ```bash
 # Option 1: Skip (recommended)
 # Do nothing, existing tariff is preserved
@@ -457,12 +485,14 @@ db.tariff_settings.deleteOne({ name: "Default Tariff Settings" })
 ### Issue: Validation Warnings
 
 **Symptoms:**
+
 ```
 ⚠️  Validation Warnings:
    - No default pricing method configured
 ```
 
 **Solution:**
+
 - Check seed data in `default-tariff-data.ts`
 - Ensure at least one pricing method has `isDefault: true`
 - Re-run seed after fixing
@@ -470,6 +500,7 @@ db.tariff_settings.deleteOne({ name: "Default Tariff Settings" })
 ## Success Indicators
 
 ✅ **Successful Seed:**
+
 - Exit code 0
 - "Seeding Completed Successfully" message
 - All validation checks passed
@@ -477,11 +508,13 @@ db.tariff_settings.deleteOne({ name: "Default Tariff Settings" })
 - MongoDB contains default tariff
 
 ✅ **Successful Skip:**
+
 - Exit code 0
 - "already exist" message
 - Existing tariff info displayed
 
 ✅ **Successful API Integration:**
+
 - API starts without errors
 - Tariff endpoints return data
 - Web interface displays tariff settings

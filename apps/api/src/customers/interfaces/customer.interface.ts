@@ -20,7 +20,13 @@ export interface Customer {
   // Customer Type & Status
   type: 'residential' | 'commercial';
   status: 'lead' | 'prospect' | 'active' | 'inactive';
-  source: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
 
   // Business Information (for commercial customers)
   companyName?: string;
@@ -74,7 +80,13 @@ export interface CreateCustomerDto {
   };
 
   type: 'residential' | 'commercial';
-  source: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
 
   companyName?: string;
   businessLicense?: string;
@@ -115,7 +127,13 @@ export interface UpdateCustomerDto {
 
   type?: 'residential' | 'commercial';
   status?: 'lead' | 'prospect' | 'active' | 'inactive';
-  source?: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source?:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
 
   companyName?: string;
   businessLicense?: string;
@@ -144,7 +162,13 @@ export interface UpdateCustomerDto {
 export interface CustomerFilters {
   status?: 'lead' | 'prospect' | 'active' | 'inactive';
   type?: 'residential' | 'commercial';
-  source?: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source?:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
   assignedSalesRep?: string;
   tags?: string[];
   leadScoreMin?: number;

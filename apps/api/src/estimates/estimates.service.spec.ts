@@ -54,7 +54,9 @@ describe('EstimatesService', () => {
       expect(result.estimate.totalPrice).toBeGreaterThan(0);
       // Large move should be more expensive than base move
       const baseResult = service.calculateEstimate(baseEstimateDto);
-      expect(result.estimate.totalPrice).toBeGreaterThan(baseResult.estimate.totalPrice);
+      expect(result.estimate.totalPrice).toBeGreaterThan(
+        baseResult.estimate.totalPrice,
+      );
     });
 
     it('should calculate estimate for minimal move', () => {
@@ -93,7 +95,9 @@ describe('EstimatesService', () => {
       const weekendResult = service.calculateEstimate(weekendEstimateDto);
 
       // Weekend move should be more expensive
-      expect(weekendResult.estimate.totalPrice).toBeGreaterThan(weekdayResult.estimate.totalPrice);
+      expect(weekendResult.estimate.totalPrice).toBeGreaterThan(
+        weekdayResult.estimate.totalPrice,
+      );
     });
 
     it('should apply peak season pricing', () => {
@@ -101,7 +105,9 @@ describe('EstimatesService', () => {
       const peakResult = service.calculateEstimate(peakSeasonEstimateDto);
 
       // Peak season should be more expensive
-      expect(peakResult.estimate.totalPrice).toBeGreaterThan(standardResult.estimate.totalPrice);
+      expect(peakResult.estimate.totalPrice).toBeGreaterThan(
+        standardResult.estimate.totalPrice,
+      );
     });
 
     it('should apply off-season pricing correctly', () => {
@@ -130,7 +136,9 @@ describe('EstimatesService', () => {
       const noPianoResult = service.calculateEstimate(noPianoDto);
       const withPianoResult = service.calculateEstimate(withPianoDto);
 
-      expect(withPianoResult.estimate.totalPrice).toBeGreaterThan(noPianoResult.estimate.totalPrice);
+      expect(withPianoResult.estimate.totalPrice).toBeGreaterThan(
+        noPianoResult.estimate.totalPrice,
+      );
     });
 
     it('should apply multiple special items surcharges', () => {
@@ -151,7 +159,9 @@ describe('EstimatesService', () => {
 
       expect(result.estimate.totalPrice).toBeGreaterThan(0);
       // Should have multiple surcharges applied
-      expect(result.estimate.calculations.appliedRules.length).toBeGreaterThan(0);
+      expect(result.estimate.calculations.appliedRules.length).toBeGreaterThan(
+        0,
+      );
     });
   });
 
@@ -175,7 +185,9 @@ describe('EstimatesService', () => {
       const noStairsResult = service.calculateEstimate(noStairsDto);
       const withStairsResult = service.calculateEstimate(withStairsDto);
 
-      expect(withStairsResult.estimate.totalPrice).toBeGreaterThan(noStairsResult.estimate.totalPrice);
+      expect(withStairsResult.estimate.totalPrice).toBeGreaterThan(
+        noStairsResult.estimate.totalPrice,
+      );
     });
 
     it('should apply long carry surcharge', () => {
@@ -197,7 +209,9 @@ describe('EstimatesService', () => {
       const shortResult = service.calculateEstimate(shortCarryDto);
       const longResult = service.calculateEstimate(longCarryDto);
 
-      expect(longResult.estimate.totalPrice).toBeGreaterThan(shortResult.estimate.totalPrice);
+      expect(longResult.estimate.totalPrice).toBeGreaterThan(
+        shortResult.estimate.totalPrice,
+      );
     });
 
     it('should handle difficult access scenarios', () => {
@@ -207,7 +221,9 @@ describe('EstimatesService', () => {
       expect(result.success).toBe(true);
       // Difficult access should result in higher price
       const easyAccessResult = service.calculateEstimate(baseEstimateDto);
-      expect(result.estimate.totalPrice).toBeGreaterThan(easyAccessResult.estimate.totalPrice);
+      expect(result.estimate.totalPrice).toBeGreaterThan(
+        easyAccessResult.estimate.totalPrice,
+      );
     });
 
     it('should apply parking distance surcharge', () => {
@@ -215,43 +231,62 @@ describe('EstimatesService', () => {
         ...baseEstimateDto,
         locations: {
           pickup: { ...baseEstimateDto.locations.pickup, parkingDistance: 10 },
-          delivery: { ...baseEstimateDto.locations.delivery, parkingDistance: 10 },
+          delivery: {
+            ...baseEstimateDto.locations.delivery,
+            parkingDistance: 10,
+          },
         },
       };
       const farParkingDto = {
         ...baseEstimateDto,
         locations: {
           pickup: { ...baseEstimateDto.locations.pickup, parkingDistance: 150 },
-          delivery: { ...baseEstimateDto.locations.delivery, parkingDistance: 150 },
+          delivery: {
+            ...baseEstimateDto.locations.delivery,
+            parkingDistance: 150,
+          },
         },
       };
 
       const closeResult = service.calculateEstimate(closeParkingDto);
       const farResult = service.calculateEstimate(farParkingDto);
 
-      expect(farResult.estimate.totalPrice).toBeGreaterThan(closeResult.estimate.totalPrice);
+      expect(farResult.estimate.totalPrice).toBeGreaterThan(
+        closeResult.estimate.totalPrice,
+      );
     });
 
     it('should handle narrow hallways condition', () => {
       const noNarrowDto = {
         ...baseEstimateDto,
         locations: {
-          pickup: { ...baseEstimateDto.locations.pickup, narrowHallways: false },
-          delivery: { ...baseEstimateDto.locations.delivery, narrowHallways: false },
+          pickup: {
+            ...baseEstimateDto.locations.pickup,
+            narrowHallways: false,
+          },
+          delivery: {
+            ...baseEstimateDto.locations.delivery,
+            narrowHallways: false,
+          },
         },
       };
       const withNarrowDto = {
         ...baseEstimateDto,
         locations: {
           pickup: { ...baseEstimateDto.locations.pickup, narrowHallways: true },
-          delivery: { ...baseEstimateDto.locations.delivery, narrowHallways: true },
+          delivery: {
+            ...baseEstimateDto.locations.delivery,
+            narrowHallways: true,
+          },
         },
       };
 
       const noNarrowResult = service.calculateEstimate(noNarrowDto);
       const withNarrowResult = service.calculateEstimate(withNarrowDto);
 
-      expect(withNarrowResult.estimate.totalPrice).toBeGreaterThanOrEqual(noNarrowResult.estimate.totalPrice);
+      expect(withNarrowResult.estimate.totalPrice).toBeGreaterThanOrEqual(
+        noNarrowResult.estimate.totalPrice,
+      );
     });
   });
 
@@ -269,7 +304,9 @@ describe('EstimatesService', () => {
       const noPackingResult = service.calculateEstimate(noPackingDto);
       const withPackingResult = service.calculateEstimate(withPackingDto);
 
-      expect(withPackingResult.estimate.totalPrice).toBeGreaterThan(noPackingResult.estimate.totalPrice);
+      expect(withPackingResult.estimate.totalPrice).toBeGreaterThan(
+        noPackingResult.estimate.totalPrice,
+      );
     });
 
     it('should apply assembly service fee', () => {
@@ -285,7 +322,9 @@ describe('EstimatesService', () => {
       const noAssemblyResult = service.calculateEstimate(noAssemblyDto);
       const withAssemblyResult = service.calculateEstimate(withAssemblyDto);
 
-      expect(withAssemblyResult.estimate.totalPrice).toBeGreaterThan(noAssemblyResult.estimate.totalPrice);
+      expect(withAssemblyResult.estimate.totalPrice).toBeGreaterThan(
+        noAssemblyResult.estimate.totalPrice,
+      );
     });
 
     it('should apply storage service fee', () => {
@@ -301,7 +340,9 @@ describe('EstimatesService', () => {
       const noStorageResult = service.calculateEstimate(noStorageDto);
       const withStorageResult = service.calculateEstimate(withStorageDto);
 
-      expect(withStorageResult.estimate.totalPrice).toBeGreaterThan(noStorageResult.estimate.totalPrice);
+      expect(withStorageResult.estimate.totalPrice).toBeGreaterThan(
+        noStorageResult.estimate.totalPrice,
+      );
     });
 
     it('should apply multiple additional services', () => {
@@ -319,7 +360,9 @@ describe('EstimatesService', () => {
         ...baseEstimateDto,
         services: { packing: false, assembly: false, storage: false },
       });
-      expect(result.estimate.totalPrice).toBeGreaterThan(noServicesResult.estimate.totalPrice);
+      expect(result.estimate.totalPrice).toBeGreaterThan(
+        noServicesResult.estimate.totalPrice,
+      );
     });
   });
 
@@ -337,7 +380,9 @@ describe('EstimatesService', () => {
       const twoCrewResult = service.calculateEstimate(twoCrewDto);
       const fourCrewResult = service.calculateEstimate(fourCrewDto);
 
-      expect(twoCrewResult.estimate.totalPrice).toBeLessThan(fourCrewResult.estimate.totalPrice);
+      expect(twoCrewResult.estimate.totalPrice).toBeLessThan(
+        fourCrewResult.estimate.totalPrice,
+      );
     });
 
     it('should handle single crew member edge case', () => {
@@ -381,7 +426,9 @@ describe('EstimatesService', () => {
       const lightResult = service.calculateEstimate(lightDto);
       const heavyResult = service.calculateEstimate(heavyDto);
 
-      expect(heavyResult.estimate.totalPrice).toBeGreaterThan(lightResult.estimate.totalPrice);
+      expect(heavyResult.estimate.totalPrice).toBeGreaterThan(
+        lightResult.estimate.totalPrice,
+      );
     });
 
     it('should scale price with volume', () => {
@@ -397,7 +444,9 @@ describe('EstimatesService', () => {
       const smallResult = service.calculateEstimate(smallVolumeDto);
       const largeResult = service.calculateEstimate(largeVolumeDto);
 
-      expect(largeResult.estimate.totalPrice).toBeGreaterThan(smallResult.estimate.totalPrice);
+      expect(largeResult.estimate.totalPrice).toBeGreaterThan(
+        smallResult.estimate.totalPrice,
+      );
     });
 
     it('should handle zero weight edge case', () => {
@@ -487,7 +536,9 @@ describe('EstimatesService', () => {
       const result1 = service.calculateEstimate(baseEstimateDto);
       const result2 = service.calculateEstimate(baseEstimateDto);
 
-      expect(result1.estimate.metadata.verificationHash).toBe(result2.estimate.metadata.verificationHash);
+      expect(result1.estimate.metadata.verificationHash).toBe(
+        result2.estimate.metadata.verificationHash,
+      );
     });
 
     it('should produce different results for different inputs', () => {

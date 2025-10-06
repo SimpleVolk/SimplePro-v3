@@ -68,14 +68,16 @@ export default function UserManagement() {
     password: '',
     confirmPassword: '',
     roleId: '',
-    phoneNumber: ''
+    phoneNumber: '',
   });
 
   const [, setSelectedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'active' | 'inactive'
+  >('all');
   const [filterRole, setFilterRole] = useState<string>('all');
 
   // Fetch users on component mount
@@ -143,9 +145,11 @@ export default function UserManagement() {
         setAvailableRoles(result.data || []);
         // Set default role if not set
         if (result.data && result.data.length > 0 && !createForm.roleId) {
-          setCreateForm(prev => ({
+          setCreateForm((prev) => ({
             ...prev,
-            roleId: result.data.find((r: Role) => r.name === 'dispatcher')?.id || result.data[0].id
+            roleId:
+              result.data.find((r: Role) => r.name === 'dispatcher')?.id ||
+              result.data[0].id,
           }));
         }
       }
@@ -154,14 +158,15 @@ export default function UserManagement() {
     }
   };
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.username.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus = filterStatus === 'all' ||
+    const matchesStatus =
+      filterStatus === 'all' ||
       (filterStatus === 'active' && user.isActive) ||
       (filterStatus === 'inactive' && !user.isActive);
 
@@ -222,7 +227,9 @@ export default function UserManagement() {
       }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to create user' }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: 'Failed to create user' }));
         throw new Error(errorData.message || 'Failed to create user');
       }
 
@@ -230,7 +237,7 @@ export default function UserManagement() {
 
       // Add the new user to the state
       if (result.success && result.data) {
-        setUsers(prev => [...prev, result.data]);
+        setUsers((prev) => [...prev, result.data]);
       }
 
       // Reset form and close modal
@@ -241,18 +248,26 @@ export default function UserManagement() {
         email: '',
         password: '',
         confirmPassword: '',
-        roleId: availableRoles.find(r => r.name === 'dispatcher')?.id || availableRoles[0]?.id || '',
-        phoneNumber: ''
+        roleId:
+          availableRoles.find((r) => r.name === 'dispatcher')?.id ||
+          availableRoles[0]?.id ||
+          '',
+        phoneNumber: '',
       });
       setShowCreateForm(false);
 
       // Show success message
       alert('User created successfully!');
-
     } catch (error) {
       console.error('Error creating user:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create user');
-      alert(error instanceof Error ? error.message : 'Failed to create user. Please try again.');
+      setError(
+        error instanceof Error ? error.message : 'Failed to create user',
+      );
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Failed to create user. Please try again.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -292,7 +307,9 @@ export default function UserManagement() {
       }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to update user status' }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: 'Failed to update user status' }));
         throw new Error(errorData.message || 'Failed to update user status');
       }
 
@@ -300,17 +317,22 @@ export default function UserManagement() {
 
       // Update user in state
       if (result.success && result.data) {
-        setUsers(prev => prev.map(user =>
-          user.id === userId ? result.data : user
-        ));
+        setUsers((prev) =>
+          prev.map((user) => (user.id === userId ? result.data : user)),
+        );
       }
 
       alert(`User ${newIsActive ? 'activated' : 'deactivated'} successfully!`);
-
     } catch (error) {
       console.error('Error updating user status:', error);
-      setError(error instanceof Error ? error.message : 'Failed to update user status');
-      alert(error instanceof Error ? error.message : 'Failed to update user status. Please try again.');
+      setError(
+        error instanceof Error ? error.message : 'Failed to update user status',
+      );
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user status. Please try again.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -322,7 +344,7 @@ export default function UserManagement() {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -350,7 +372,15 @@ export default function UserManagement() {
 
       {/* Error Display */}
       {error && (
-        <div style={{ padding: '1rem', backgroundColor: '#f44336', color: 'white', borderRadius: '4px', marginBottom: '1rem' }}>
+        <div
+          style={{
+            padding: '1rem',
+            backgroundColor: '#f44336',
+            color: 'white',
+            borderRadius: '4px',
+            marginBottom: '1rem',
+          }}
+        >
           {error}
         </div>
       )}
@@ -391,8 +421,10 @@ export default function UserManagement() {
           className={styles.filterSelect}
         >
           <option value="all">All Roles</option>
-          {availableRoles.map(role => (
-            <option key={role.name} value={role.name}>{role.displayName}</option>
+          {availableRoles.map((role) => (
+            <option key={role.name} value={role.name}>
+              {role.displayName}
+            </option>
           ))}
         </select>
       </div>
@@ -411,12 +443,13 @@ export default function UserManagement() {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map(user => (
+            {filteredUsers.map((user) => (
               <tr key={user.id} className={styles.userRow}>
                 <td>
                   <div className={styles.userInfo}>
                     <div className={styles.userAvatar}>
-                      {user.firstName[0]}{user.lastName[0]}
+                      {user.firstName[0]}
+                      {user.lastName[0]}
                     </div>
                     <div>
                       <div className={styles.userName}>
@@ -432,7 +465,9 @@ export default function UserManagement() {
                   </span>
                 </td>
                 <td>
-                  <span className={`${styles.statusBadge} ${getStatusBadge(user.isActive).className}`}>
+                  <span
+                    className={`${styles.statusBadge} ${getStatusBadge(user.isActive).className}`}
+                  >
                     {getStatusBadge(user.isActive).label}
                   </span>
                 </td>
@@ -503,7 +538,12 @@ export default function UserManagement() {
                     id="username"
                     type="text"
                     value={createForm.username}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, username: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        username: e.target.value,
+                      }))
+                    }
                     required
                     className={styles.input}
                     placeholder="Enter username"
@@ -516,7 +556,12 @@ export default function UserManagement() {
                     id="email"
                     type="email"
                     value={createForm.email}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                     required
                     className={styles.input}
                     placeholder="user@example.com"
@@ -529,7 +574,12 @@ export default function UserManagement() {
                     id="firstName"
                     type="text"
                     value={createForm.firstName}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, firstName: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        firstName: e.target.value,
+                      }))
+                    }
                     required
                     className={styles.input}
                     placeholder="John"
@@ -542,7 +592,12 @@ export default function UserManagement() {
                     id="lastName"
                     type="text"
                     value={createForm.lastName}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, lastName: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        lastName: e.target.value,
+                      }))
+                    }
                     required
                     className={styles.input}
                     placeholder="Doe"
@@ -555,7 +610,12 @@ export default function UserManagement() {
                     id="phoneNumber"
                     type="tel"
                     value={createForm.phoneNumber || ''}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        phoneNumber: e.target.value,
+                      }))
+                    }
                     className={styles.input}
                     placeholder="+1 (555) 000-0000"
                   />
@@ -566,14 +626,25 @@ export default function UserManagement() {
                   <select
                     id="roleId"
                     value={createForm.roleId}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, roleId: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        roleId: e.target.value,
+                      }))
+                    }
                     required
                     className={styles.select}
                   >
-                    {availableRoles.length === 0 && <option value="">Loading roles...</option>}
+                    {availableRoles.length === 0 && (
+                      <option value="">Loading roles...</option>
+                    )}
                     {availableRoles
-                      .filter(role => currentUser?.role?.name === 'super_admin' || role.name !== 'super_admin')
-                      .map(role => (
+                      .filter(
+                        (role) =>
+                          currentUser?.role?.name === 'super_admin' ||
+                          role.name !== 'super_admin',
+                      )
+                      .map((role) => (
                         <option key={role.id} value={role.id}>
                           {role.displayName}
                         </option>
@@ -587,7 +658,12 @@ export default function UserManagement() {
                     id="password"
                     type="password"
                     value={createForm.password}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        password: e.target.value,
+                      }))
+                    }
                     required
                     minLength={8}
                     className={styles.input}
@@ -600,7 +676,12 @@ export default function UserManagement() {
                     id="confirmPassword"
                     type="password"
                     value={createForm.confirmPassword}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        confirmPassword: e.target.value,
+                      }))
+                    }
                     required
                     minLength={8}
                     className={styles.input}

@@ -15,8 +15,12 @@ describe('MoveSizes Component', () => {
 
       expect(screen.getByText('Move Sizes')).toBeInTheDocument();
       expect(screen.getByText('Room Sizes')).toBeInTheDocument();
-      expect(screen.getByText('Configure move size presets for estimates')).toBeInTheDocument();
-      expect(screen.getByText('Configure room size presets for inventory')).toBeInTheDocument();
+      expect(
+        screen.getByText('Configure move size presets for estimates'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Configure room size presets for inventory'),
+      ).toBeInTheDocument();
     });
 
     it('should display initial move size data', () => {
@@ -51,7 +55,9 @@ describe('MoveSizes Component', () => {
       fireEvent.click(addButton);
 
       expect(screen.getByText('Add Move Size')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('e.g., 1 Bedroom Apartment')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'),
+      ).toBeInTheDocument();
     });
 
     it('should add a new move size with valid data', async () => {
@@ -62,17 +68,20 @@ describe('MoveSizes Component', () => {
       fireEvent.click(addButton);
 
       // Fill form
-      fireEvent.change(screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'), {
-        target: { value: 'Test Move Size' }
-      });
+      fireEvent.change(
+        screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'),
+        {
+          target: { value: 'Test Move Size' },
+        },
+      );
       fireEvent.change(screen.getByPlaceholderText('e.g., 500 - 800 Sq Ft'), {
-        target: { value: '600 - 900 Sq Ft' }
+        target: { value: '600 - 900 Sq Ft' },
       });
       fireEvent.change(screen.getByPlaceholderText('e.g., 432'), {
-        target: { value: '500' }
+        target: { value: '500' },
       });
       fireEvent.change(screen.getByPlaceholderText('e.g., 3888'), {
-        target: { value: '4000' }
+        target: { value: '4000' },
       });
 
       // Submit
@@ -97,7 +106,9 @@ describe('MoveSizes Component', () => {
       fireEvent.click(cancelButton);
 
       // Modal should be closed (button text should not be in modal context)
-      expect(screen.queryByPlaceholderText('e.g., 1 Bedroom Apartment')).not.toBeInTheDocument();
+      expect(
+        screen.queryByPlaceholderText('e.g., 1 Bedroom Apartment'),
+      ).not.toBeInTheDocument();
     });
 
     it('should close modal when X button is clicked', () => {
@@ -111,7 +122,9 @@ describe('MoveSizes Component', () => {
       fireEvent.click(closeButton);
 
       // Modal should be closed
-      expect(screen.queryByPlaceholderText('e.g., 1 Bedroom Apartment')).not.toBeInTheDocument();
+      expect(
+        screen.queryByPlaceholderText('e.g., 1 Bedroom Apartment'),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -136,7 +149,9 @@ describe('MoveSizes Component', () => {
 
       // Find input fields and change values
       const inputs = screen.getAllByRole('textbox');
-      const nameInput = inputs.find(input => (input as HTMLInputElement).value === 'Studio or Less');
+      const nameInput = inputs.find(
+        (input) => (input as HTMLInputElement).value === 'Studio or Less',
+      );
 
       if (nameInput) {
         fireEvent.change(nameInput, { target: { value: 'Updated Studio' } });
@@ -161,7 +176,9 @@ describe('MoveSizes Component', () => {
 
       // Find number inputs
       const numberInputs = screen.getAllByRole('spinbutton');
-      const weightInput = numberInputs.find(input => (input as HTMLInputElement).value === '675');
+      const weightInput = numberInputs.find(
+        (input) => (input as HTMLInputElement).value === '675',
+      );
 
       if (weightInput) {
         fireEvent.change(weightInput, { target: { value: '700' } });
@@ -188,7 +205,9 @@ describe('MoveSizes Component', () => {
       const deleteButtons = screen.getAllByText('Delete');
       fireEvent.click(deleteButtons[0]);
 
-      expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this move size?');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to delete this move size?',
+      );
     });
 
     it('should delete move size when confirmed', async () => {
@@ -207,7 +226,9 @@ describe('MoveSizes Component', () => {
       // Verify deletion
       await waitFor(() => {
         const afterStudioElements = screen.queryAllByText(/Studio or Less/);
-        expect(afterStudioElements.length).toBe(initialStudioElements.length - 1);
+        expect(afterStudioElements.length).toBe(
+          initialStudioElements.length - 1,
+        );
       });
     });
 
@@ -246,13 +267,13 @@ describe('MoveSizes Component', () => {
 
       // Fill form
       fireEvent.change(screen.getByPlaceholderText('e.g., Living Room'), {
-        target: { value: 'Master Bedroom' }
+        target: { value: 'Master Bedroom' },
       });
       fireEvent.change(screen.getByPlaceholderText('e.g., 400'), {
-        target: { value: '450' }
+        target: { value: '450' },
       });
       fireEvent.change(screen.getByPlaceholderText('e.g., 500'), {
-        target: { value: '550' }
+        target: { value: '550' },
       });
 
       // Submit
@@ -287,7 +308,9 @@ describe('MoveSizes Component', () => {
       // Click delete from room sizes table
       fireEvent.click(deleteButtons[deleteButtons.length - 1]);
 
-      expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this room size?');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to delete this room size?',
+      );
     });
   });
 
@@ -302,7 +325,9 @@ describe('MoveSizes Component', () => {
       fireEvent.click(screen.getByText('Add Move Size'));
 
       // Modal should still be open (validation failed)
-      expect(screen.getByPlaceholderText('e.g., 1 Bedroom Apartment')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'),
+      ).toBeInTheDocument();
     });
 
     it('should handle zero values for cubic feet', async () => {
@@ -311,21 +336,26 @@ describe('MoveSizes Component', () => {
       fireEvent.click(screen.getByText('+ Add Move Size'));
 
       // Fill with zero cubic feet
-      fireEvent.change(screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'), {
-        target: { value: 'Test' }
-      });
+      fireEvent.change(
+        screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'),
+        {
+          target: { value: 'Test' },
+        },
+      );
       fireEvent.change(screen.getByPlaceholderText('e.g., 432'), {
-        target: { value: '0' }
+        target: { value: '0' },
       });
       fireEvent.change(screen.getByPlaceholderText('e.g., 3888'), {
-        target: { value: '100' }
+        target: { value: '100' },
       });
 
       // Submit
       fireEvent.click(screen.getByText('Add Move Size'));
 
       // Should remain open (zero is not valid)
-      expect(screen.getByPlaceholderText('e.g., 1 Bedroom Apartment')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'),
+      ).toBeInTheDocument();
     });
 
     it('should parse numeric values correctly', async () => {
@@ -334,14 +364,17 @@ describe('MoveSizes Component', () => {
       fireEvent.click(screen.getByText('+ Add Move Size'));
 
       // Fill with string numbers
-      fireEvent.change(screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'), {
-        target: { value: 'Numeric Test' }
-      });
+      fireEvent.change(
+        screen.getByPlaceholderText('e.g., 1 Bedroom Apartment'),
+        {
+          target: { value: 'Numeric Test' },
+        },
+      );
       fireEvent.change(screen.getByPlaceholderText('e.g., 432'), {
-        target: { value: '123.45' }
+        target: { value: '123.45' },
       });
       fireEvent.change(screen.getByPlaceholderText('e.g., 3888'), {
-        target: { value: '456.78' }
+        target: { value: '456.78' },
       });
 
       fireEvent.click(screen.getByText('Add Move Size'));

@@ -6,7 +6,7 @@ import { faker } from '@faker-js/faker';
 export async function seedMessages(
   MessageModel: any,
   MessageThreadModel: any,
-  users: any[]
+  users: any[],
 ): Promise<number> {
   let totalMessages = 0;
 
@@ -68,13 +68,20 @@ export async function seedMessages(
         content: faker.helpers.arrayElement(messageTemplates),
         messageType: 'text',
         attachments: [] as string[],
-        readBy: faker.helpers.arrayElements(
-          participants.filter((p) => p._id.toString() !== sender._id.toString()),
-          { min: 0, max: participants.length - 1 }
-        ).map((p) => ({
-          userId: p._id,
-          readAt: new Date(messageDate.getTime() + faker.number.int({ min: 60000, max: 3600000 })),
-        })),
+        readBy: faker.helpers
+          .arrayElements(
+            participants.filter(
+              (p) => p._id.toString() !== sender._id.toString(),
+            ),
+            { min: 0, max: participants.length - 1 },
+          )
+          .map((p) => ({
+            userId: p._id,
+            readAt: new Date(
+              messageDate.getTime() +
+                faker.number.int({ min: 60000, max: 3600000 }),
+            ),
+          })),
         isEdited: false,
         isDeleted: false,
         metadata: {},

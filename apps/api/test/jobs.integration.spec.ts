@@ -54,7 +54,12 @@ describe('Job Management Integration Tests', () => {
     dispatcherAuth = await createAuthenticatedTestUser({
       email: 'dispatcher@example.com',
       role: 'dispatcher',
-      permissions: ['read:jobs', 'write:jobs', 'read:customers', 'assign:crews'],
+      permissions: [
+        'read:jobs',
+        'write:jobs',
+        'read:customers',
+        'assign:crews',
+      ],
     });
 
     crewAuth = await createAuthenticatedTestUser({
@@ -77,8 +82,12 @@ describe('Job Management Integration Tests', () => {
       status: 'active',
     });
 
-    const customerResponse = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-      .send(customerData);
+    const customerResponse = await authenticatedRequest(
+      app,
+      'post',
+      '/customers',
+      adminAuth.accessToken,
+    ).send(customerData);
     testCustomer = customerResponse.body.data;
   });
 
@@ -91,7 +100,12 @@ describe('Job Management Integration Tests', () => {
           priority: 'high',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(201);
 
@@ -108,8 +122,12 @@ describe('Job Management Integration Tests', () => {
         expect(response.body.data).toHaveProperty('id');
         expect(response.body.data).toHaveProperty('createdAt');
         expect(response.body.data).toHaveProperty('scheduledDate');
-        expect(response.body.data.pickupAddress).toMatchObject(jobData.pickupAddress);
-        expect(response.body.data.deliveryAddress).toMatchObject(jobData.deliveryAddress);
+        expect(response.body.data.pickupAddress).toMatchObject(
+          jobData.pickupAddress,
+        );
+        expect(response.body.data.deliveryAddress).toMatchObject(
+          jobData.deliveryAddress,
+        );
       });
 
       it('should create job with complete address information', async () => {
@@ -132,13 +150,22 @@ describe('Job Management Integration Tests', () => {
           },
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(201);
 
         ResponseAssertions.assertSuccessResponse(response);
-        expect(response.body.data.pickupAddress).toMatchObject(jobData.pickupAddress);
-        expect(response.body.data.deliveryAddress).toMatchObject(jobData.deliveryAddress);
+        expect(response.body.data.pickupAddress).toMatchObject(
+          jobData.pickupAddress,
+        );
+        expect(response.body.data.deliveryAddress).toMatchObject(
+          jobData.deliveryAddress,
+        );
       });
 
       it('should validate required fields', async () => {
@@ -148,7 +175,12 @@ describe('Job Management Integration Tests', () => {
           // Missing required fields
         };
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(incompleteJobData)
           .expect(400);
 
@@ -160,11 +192,20 @@ describe('Job Management Integration Tests', () => {
         const nonExistentCustomerId = '507f1f77bcf86cd799439011';
         const jobData = TestDataFactories.createJobData(nonExistentCustomerId);
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(404);
 
-        ResponseAssertions.assertErrorResponse(response, 404, /customer.*not.*found/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          404,
+          /customer.*not.*found/i,
+        );
       });
 
       it('should validate job type', async () => {
@@ -172,7 +213,12 @@ describe('Job Management Integration Tests', () => {
           type: 'invalid-type',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(400);
 
@@ -185,7 +231,12 @@ describe('Job Management Integration Tests', () => {
           status: 'invalid-status',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(400);
 
@@ -198,7 +249,12 @@ describe('Job Management Integration Tests', () => {
           priority: 'invalid-priority',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(400);
 
@@ -212,7 +268,12 @@ describe('Job Management Integration Tests', () => {
           scheduledDate: pastDate,
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        )
           .send(jobData)
           .expect(400);
 
@@ -224,7 +285,12 @@ describe('Job Management Integration Tests', () => {
         const jobData = TestDataFactories.createJobData(testCustomer.id);
 
         // Crew member should not be able to create jobs
-        const response = await authenticatedRequest(app, 'post', '/jobs', crewAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          crewAuth.accessToken,
+        )
           .send(jobData)
           .expect(403);
 
@@ -237,7 +303,12 @@ describe('Job Management Integration Tests', () => {
           priority: 'urgent',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          adminAuth.accessToken,
+        )
           .send(jobData)
           .expect(201);
 
@@ -283,16 +354,24 @@ describe('Job Management Integration Tests', () => {
       ];
 
       for (const jobData of jobsData) {
-        const response = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-          .send(jobData);
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          adminAuth.accessToken,
+        ).send(jobData);
         testJobs.push(response.body.data);
       }
     });
 
     describe('GET /jobs', () => {
       it('should retrieve all jobs for admin', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(testJobs.length);
@@ -300,24 +379,36 @@ describe('Job Management Integration Tests', () => {
       });
 
       it('should allow dispatchers to read jobs', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs', dispatcherAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs',
+          dispatcherAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(testJobs.length);
       });
 
       it('should allow crew to read jobs', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs', crewAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs',
+          crewAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(testJobs.length);
       });
 
       it('should filter jobs by status', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs?status=scheduled', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs?status=scheduled',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(1);
@@ -325,8 +416,12 @@ describe('Job Management Integration Tests', () => {
       });
 
       it('should filter jobs by type', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs?type=local', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs?type=local',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(2);
@@ -336,8 +431,12 @@ describe('Job Management Integration Tests', () => {
       });
 
       it('should filter jobs by priority', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs?priority=high', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs?priority=high',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(1);
@@ -345,8 +444,12 @@ describe('Job Management Integration Tests', () => {
       });
 
       it('should search jobs by description', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs?search=storage', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs?search=storage',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(1);
@@ -358,7 +461,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           '/jobs?type=local&status=scheduled&priority=high',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
@@ -369,8 +472,12 @@ describe('Job Management Integration Tests', () => {
       });
 
       it('should support pagination', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs?page=1&limit=2', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs?page=1&limit=2',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(2);
@@ -380,8 +487,12 @@ describe('Job Management Integration Tests', () => {
       });
 
       it('should sort jobs by scheduled date', async () => {
-        const response = await authenticatedRequest(app, 'get', '/jobs?sortBy=scheduledDate&sortOrder=asc', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/jobs?sortBy=scheduledDate&sortOrder=asc',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         const jobs = response.body.data.items;
@@ -389,8 +500,11 @@ describe('Job Management Integration Tests', () => {
         // Verify sorting order (excluding null scheduled dates)
         const jobsWithDates = jobs.filter((job: any) => job.scheduledDate);
         for (let i = 1; i < jobsWithDates.length; i++) {
-          expect(new Date(jobsWithDates[i].scheduledDate).getTime())
-            .toBeGreaterThanOrEqual(new Date(jobsWithDates[i - 1].scheduledDate).getTime());
+          expect(
+            new Date(jobsWithDates[i].scheduledDate).getTime(),
+          ).toBeGreaterThanOrEqual(
+            new Date(jobsWithDates[i - 1].scheduledDate).getTime(),
+          );
         }
       });
     });
@@ -403,7 +517,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           `/jobs/${job.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -423,7 +537,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           `/jobs/${job.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -443,7 +557,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           `/jobs/${nonExistentId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(404);
 
         ResponseAssertions.assertErrorResponse(response, 404, /not.*found/i);
@@ -456,7 +570,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           `/jobs/${invalidId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(400);
 
         ResponseAssertions.assertErrorResponse(response, 400);
@@ -471,11 +585,15 @@ describe('Job Management Integration Tests', () => {
       const jobData = TestDataFactories.createJobData(testCustomer.id, {
         status: 'scheduled',
         priority: 'medium',
-        estimatedCost: 1000.00,
+        estimatedCost: 1000.0,
       });
 
-      const response = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-        .send(jobData);
+      const response = await authenticatedRequest(
+        app,
+        'post',
+        '/jobs',
+        adminAuth.accessToken,
+      ).send(jobData);
       testJob = response.body.data;
     });
 
@@ -483,7 +601,7 @@ describe('Job Management Integration Tests', () => {
       it('should update job information', async () => {
         const updateData = {
           priority: 'high',
-          estimatedCost: 1200.00,
+          estimatedCost: 1200.0,
           description: 'Updated job description',
         };
 
@@ -491,7 +609,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(updateData)
           .expect(200);
@@ -516,13 +634,15 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(updateData)
           .expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
-        expect(response.body.data.pickupAddress).toMatchObject(updateData.pickupAddress);
+        expect(response.body.data.pickupAddress).toMatchObject(
+          updateData.pickupAddress,
+        );
       });
 
       it('should validate update data', async () => {
@@ -535,7 +655,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(invalidUpdateData)
           .expect(400);
@@ -550,7 +670,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}`,
-          crewAuth.accessToken
+          crewAuth.accessToken,
         )
           .send(updateData)
           .expect(403);
@@ -563,7 +683,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send({ priority: 'low' })
           .expect(200);
@@ -586,7 +706,7 @@ describe('Job Management Integration Tests', () => {
             app,
             'patch',
             `/jobs/${testJob.id}/status`,
-            dispatcherAuth.accessToken
+            dispatcherAuth.accessToken,
           )
             .send({ status: transition.to })
             .expect(200);
@@ -602,12 +722,16 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}/status`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         )
           .send({ status: 'completed' })
           .expect(400);
 
-        ResponseAssertions.assertErrorResponse(response, 400, /invalid.*transition/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          400,
+          /invalid.*transition/i,
+        );
       });
 
       it('should allow crew to update job status', async () => {
@@ -616,7 +740,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}/status`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         )
           .send({ status: 'in_progress' })
           .expect(200);
@@ -626,7 +750,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}/status`,
-          crewAuth.accessToken
+          crewAuth.accessToken,
         )
           .send({ status: 'completed' })
           .expect(200);
@@ -641,16 +765,15 @@ describe('Job Management Integration Tests', () => {
           app,
           'patch',
           `/jobs/${testJob.id}/status`,
-          dispatcherAuth.accessToken
-        )
-          .send({ status: 'in_progress' });
+          dispatcherAuth.accessToken,
+        ).send({ status: 'in_progress' });
 
         // Complete the job
         const response = await authenticatedRequest(
           app,
           'patch',
           `/jobs/${testJob.id}/status`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         )
           .send({ status: 'completed' })
           .expect(200);
@@ -672,8 +795,12 @@ describe('Job Management Integration Tests', () => {
         crewSize: 3,
       });
 
-      const response = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-        .send(jobData);
+      const response = await authenticatedRequest(
+        app,
+        'post',
+        '/jobs',
+        adminAuth.accessToken,
+      ).send(jobData);
       testJob = response.body.data;
     });
 
@@ -684,12 +811,12 @@ describe('Job Management Integration Tests', () => {
             {
               userId: crewAuth.user.id,
               role: 'lead',
-              hourlyRate: 25.00,
+              hourlyRate: 25.0,
             },
             {
               userId: adminAuth.user.id, // Admin can also be crew
               role: 'helper',
-              hourlyRate: 20.00,
+              hourlyRate: 20.0,
             },
           ],
         };
@@ -698,7 +825,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'post',
           `/jobs/${testJob.id}/crew`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         )
           .send(crewAssignment)
           .expect(200);
@@ -709,7 +836,7 @@ describe('Job Management Integration Tests', () => {
         expect(response.body.data.assignedCrew[0]).toMatchObject({
           userId: crewAuth.user.id,
           role: 'lead',
-          hourlyRate: 25.00,
+          hourlyRate: 25.0,
         });
       });
 
@@ -719,7 +846,7 @@ describe('Job Management Integration Tests', () => {
             {
               userId: '507f1f77bcf86cd799439011', // Non-existent user
               role: 'lead',
-              hourlyRate: 25.00,
+              hourlyRate: 25.0,
             },
           ],
         };
@@ -728,12 +855,16 @@ describe('Job Management Integration Tests', () => {
           app,
           'post',
           `/jobs/${testJob.id}/crew`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         )
           .send(crewAssignment)
           .expect(404);
 
-        ResponseAssertions.assertErrorResponse(response, 404, /user.*not.*found/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          404,
+          /user.*not.*found/i,
+        );
       });
 
       it('should require crew assignment permissions', async () => {
@@ -742,7 +873,7 @@ describe('Job Management Integration Tests', () => {
             {
               userId: crewAuth.user.id,
               role: 'lead',
-              hourlyRate: 25.00,
+              hourlyRate: 25.0,
             },
           ],
         };
@@ -751,7 +882,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'post',
           `/jobs/${testJob.id}/crew`,
-          crewAuth.accessToken
+          crewAuth.accessToken,
         )
           .send(crewAssignment)
           .expect(403);
@@ -764,7 +895,7 @@ describe('Job Management Integration Tests', () => {
           crewMembers: Array.from({ length: 10 }, () => ({
             userId: crewAuth.user.id,
             role: 'helper',
-            hourlyRate: 20.00,
+            hourlyRate: 20.0,
           })),
         };
 
@@ -772,7 +903,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'post',
           `/jobs/${testJob.id}/crew`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         )
           .send(largeCrew)
           .expect(400);
@@ -801,8 +932,12 @@ describe('Job Management Integration Tests', () => {
           description: `Job scheduled for ${jobDates[i].toDateString()}`,
         });
 
-        const response = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-          .send(jobData);
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/jobs',
+          adminAuth.accessToken,
+        ).send(jobData);
         scheduledJobs.push(response.body.data);
       }
     });
@@ -819,7 +954,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           `/jobs/calendar/week/${formattedDate}`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -828,7 +963,10 @@ describe('Job Management Integration Tests', () => {
         // Should include jobs from this week
         const weekJobs = response.body.data.filter((job: any) => {
           const jobDate = new Date(job.scheduledDate);
-          return jobDate >= startOfWeek && jobDate < new Date(startOfWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
+          return (
+            jobDate >= startOfWeek &&
+            jobDate < new Date(startOfWeek.getTime() + 7 * 24 * 60 * 60 * 1000)
+          );
         });
 
         expect(weekJobs.length).toBeGreaterThanOrEqual(0);
@@ -839,7 +977,7 @@ describe('Job Management Integration Tests', () => {
           app,
           'get',
           '/jobs/calendar/week/invalid-date',
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         ).expect(400);
 
         ResponseAssertions.assertErrorResponse(response, 400, /date/i);
@@ -869,21 +1007,30 @@ describe('Job Management Integration Tests', () => {
         });
 
         operations.push(
-          authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken).send(jobData)
+          authenticatedRequest(
+            app,
+            'post',
+            '/jobs',
+            adminAuth.accessToken,
+          ).send(jobData),
         );
       }
 
       const responses = await Promise.all(operations);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(201);
         ResponseAssertions.assertSuccessResponse(response);
       });
 
       // Verify all jobs were created
-      const listResponse = await authenticatedRequest(app, 'get', '/jobs', adminAuth.accessToken)
-        .expect(200);
+      const listResponse = await authenticatedRequest(
+        app,
+        'get',
+        '/jobs',
+        adminAuth.accessToken,
+      ).expect(200);
 
       expect(listResponse.body.data.total).toBe(10);
     }, 15000);
@@ -891,8 +1038,12 @@ describe('Job Management Integration Tests', () => {
     it('should handle job status updates efficiently', async () => {
       // Create job
       const jobData = TestDataFactories.createJobData(testCustomer.id);
-      const createResponse = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-        .send(jobData);
+      const createResponse = await authenticatedRequest(
+        app,
+        'post',
+        '/jobs',
+        adminAuth.accessToken,
+      ).send(jobData);
 
       const jobId = createResponse.body.data.id;
 
@@ -903,7 +1054,7 @@ describe('Job Management Integration Tests', () => {
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'in_progress' })
         .expect(200);
@@ -912,7 +1063,7 @@ describe('Job Management Integration Tests', () => {
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'completed' })
         .expect(200);
@@ -928,11 +1079,15 @@ describe('Job Management Integration Tests', () => {
     it('should maintain job lifecycle integrity', async () => {
       const jobData = TestDataFactories.createJobData(testCustomer.id, {
         status: 'scheduled',
-        estimatedCost: 1000.00,
+        estimatedCost: 1000.0,
       });
 
-      const createResponse = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-        .send(jobData);
+      const createResponse = await authenticatedRequest(
+        app,
+        'post',
+        '/jobs',
+        adminAuth.accessToken,
+      ).send(jobData);
 
       const jobId = createResponse.body.data.id;
 
@@ -945,7 +1100,7 @@ describe('Job Management Integration Tests', () => {
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'in_progress' })
         .expect(200);
@@ -958,14 +1113,16 @@ describe('Job Management Integration Tests', () => {
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'completed' })
         .expect(200);
 
       expect(completeResponse.body.data.status).toBe('completed');
       expect(completeResponse.body.data.completedAt).toBeDefined();
-      expect(new Date(completeResponse.body.data.completedAt)).toBeInstanceOf(Date);
+      expect(new Date(completeResponse.body.data.completedAt)).toBeInstanceOf(
+        Date,
+      );
     });
 
     it('should handle concurrent status updates correctly', async () => {
@@ -973,23 +1130,35 @@ describe('Job Management Integration Tests', () => {
         status: 'scheduled',
       });
 
-      const createResponse = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-        .send(jobData);
+      const createResponse = await authenticatedRequest(
+        app,
+        'post',
+        '/jobs',
+        adminAuth.accessToken,
+      ).send(jobData);
 
       const jobId = createResponse.body.data.id;
 
       // Make concurrent status update attempts
       const updatePromises = [
-        authenticatedRequest(app, 'patch', `/jobs/${jobId}/status`, dispatcherAuth.accessToken)
-          .send({ status: 'in_progress' }),
-        authenticatedRequest(app, 'patch', `/jobs/${jobId}/status`, adminAuth.accessToken)
-          .send({ status: 'in_progress' }),
+        authenticatedRequest(
+          app,
+          'patch',
+          `/jobs/${jobId}/status`,
+          dispatcherAuth.accessToken,
+        ).send({ status: 'in_progress' }),
+        authenticatedRequest(
+          app,
+          'patch',
+          `/jobs/${jobId}/status`,
+          adminAuth.accessToken,
+        ).send({ status: 'in_progress' }),
       ];
 
       const responses = await Promise.all(updatePromises);
 
       // Both should succeed (last write wins)
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
       });
 
@@ -998,7 +1167,7 @@ describe('Job Management Integration Tests', () => {
         app,
         'get',
         `/jobs/${jobId}`,
-        adminAuth.accessToken
+        adminAuth.accessToken,
       ).expect(200);
 
       expect(finalResponse.body.data.status).toBe('in_progress');
@@ -1007,11 +1176,15 @@ describe('Job Management Integration Tests', () => {
     it('should validate business rules for job completion', async () => {
       const jobData = TestDataFactories.createJobData(testCustomer.id, {
         status: 'scheduled',
-        estimatedCost: 1000.00,
+        estimatedCost: 1000.0,
       });
 
-      const createResponse = await authenticatedRequest(app, 'post', '/jobs', adminAuth.accessToken)
-        .send(jobData);
+      const createResponse = await authenticatedRequest(
+        app,
+        'post',
+        '/jobs',
+        adminAuth.accessToken,
+      ).send(jobData);
 
       const jobId = createResponse.body.data.id;
 
@@ -1020,19 +1193,23 @@ describe('Job Management Integration Tests', () => {
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'completed' })
         .expect(400);
 
-      ResponseAssertions.assertErrorResponse(invalidComplete, 400, /transition/i);
+      ResponseAssertions.assertErrorResponse(
+        invalidComplete,
+        400,
+        /transition/i,
+      );
 
       // Should be able to complete after going through proper flow
       await authenticatedRequest(
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'in_progress' })
         .expect(200);
@@ -1041,7 +1218,7 @@ describe('Job Management Integration Tests', () => {
         app,
         'patch',
         `/jobs/${jobId}/status`,
-        dispatcherAuth.accessToken
+        dispatcherAuth.accessToken,
       )
         .send({ status: 'completed' })
         .expect(200);

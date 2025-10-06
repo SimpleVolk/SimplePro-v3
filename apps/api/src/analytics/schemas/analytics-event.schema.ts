@@ -50,9 +50,9 @@ export class AnalyticsEvent {
       zipCode: String,
       coordinates: {
         latitude: Number,
-        longitude: Number
-      }
-    }
+        longitude: Number,
+      },
+    },
   })
   location?: {
     city: string;
@@ -82,7 +82,8 @@ export class AnalyticsEvent {
   processedAt?: Date;
 }
 
-export const AnalyticsEventSchema = SchemaFactory.createForClass(AnalyticsEvent);
+export const AnalyticsEventSchema =
+  SchemaFactory.createForClass(AnalyticsEvent);
 
 // Create indexes for efficient querying
 AnalyticsEventSchema.index({ timestamp: -1 });
@@ -107,7 +108,7 @@ AnalyticsEventSchema.index({ processed: 1, processedAt: 1 });
 // Partial indexes for better performance
 AnalyticsEventSchema.index(
   { revenue: -1, timestamp: -1 },
-  { partialFilterExpression: { revenue: { $exists: true, $gt: 0 } } }
+  { partialFilterExpression: { revenue: { $exists: true, $gt: 0 } } },
 );
 
 // TTL index for automatic cleanup of old events (optional - keep 2 years)

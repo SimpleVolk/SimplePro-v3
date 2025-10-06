@@ -1,7 +1,10 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
+import {
+  DeterministicEstimator,
+  defaultRules,
+} from '@simplepro/pricing-engine';
 import {
   CreatePricingRuleDto,
   UpdatePricingRuleDto,
@@ -12,16 +15,24 @@ import {
   RuleBackup,
   OperatorType,
   ActionType,
-  RuleCategory
+  RuleCategory,
 } from './dto/pricing-rules.dto';
-import { PricingRule, PricingRuleDocument } from './schemas/pricing-rule.schema';
-import { RuleHistory, RuleHistoryDocument } from './schemas/rule-history.schema';
+import {
+  PricingRule,
+  PricingRuleDocument,
+} from './schemas/pricing-rule.schema';
+import {
+  RuleHistory,
+  RuleHistoryDocument,
+} from './schemas/rule-history.schema';
 
 @Injectable()
 export class PricingRulesService {
   constructor(
-    @InjectModel(PricingRule.name) private pricingRuleModel: Model<PricingRuleDocument>,
-    @InjectModel(RuleHistory.name) private ruleHistoryModel: Model<RuleHistoryDocument>
+    @InjectModel(PricingRule.name)
+    private pricingRuleModel: Model<PricingRuleDocument>,
+    @InjectModel(RuleHistory.name)
+    private ruleHistoryModel: Model<RuleHistoryDocument>,
   ) {}
 
   /**
@@ -44,7 +55,7 @@ export class PricingRulesService {
       query.$or = [
         { name: { $regex: filters.search, $options: 'i' } },
         { description: { $regex: filters.search, $options: 'i' } },
-        { id: { $regex: filters.search, $options: 'i' } }
+        { id: { $regex: filters.search, $options: 'i' } },
       ];
     }
 
@@ -55,7 +66,8 @@ export class PricingRulesService {
 
     // Build sort criteria
     const sortCriteria: any = {};
-    sortCriteria[filters.sortBy || 'priority'] = filters.sortOrder === 'desc' ? -1 : 1;
+    sortCriteria[filters.sortBy || 'priority'] =
+      filters.sortOrder === 'desc' ? -1 : 1;
 
     try {
       const [rules, total] = await Promise.all([
@@ -65,7 +77,7 @@ export class PricingRulesService {
           .skip(skip)
           .limit(limit)
           .exec(),
-        this.pricingRuleModel.countDocuments(query)
+        this.pricingRuleModel.countDocuments(query),
       ]);
 
       return {
@@ -74,13 +86,13 @@ export class PricingRulesService {
           page,
           limit,
           total,
-          pages: Math.ceil(total / limit)
-        }
+          pages: Math.ceil(total / limit),
+        },
       };
     } catch (error) {
       throw new HttpException(
         'Failed to retrieve pricing rules',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -94,7 +106,7 @@ export class PricingRulesService {
     } catch (error) {
       throw new HttpException(
         'Failed to retrieve pricing rule',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -102,14 +114,18 @@ export class PricingRulesService {
   /**
    * Create a new pricing rule
    */
-  async createRule(createRuleDto: CreatePricingRuleDto): Promise<PricingRuleDocument> {
+  async createRule(
+    createRuleDto: CreatePricingRuleDto,
+  ): Promise<PricingRuleDocument> {
     try {
       // Check if rule ID already exists
-      const existingRule = await this.pricingRuleModel.findOne({ id: createRuleDto.id });
+      const existingRule = await this.pricingRuleModel.findOne({
+        id: createRuleDto.id,
+      });
       if (existingRule) {
         throw new HttpException(
           `Rule with ID '${createRuleDto.id}' already exists`,
-          HttpStatus.CONFLICT
+          HttpStatus.CONFLICT,
         );
       }
 
@@ -121,23 +137,30 @@ export class PricingRulesService {
         ...createRuleDto,
         createdAt: new Date(),
         updatedAt: new Date(),
-        version: createRuleDto.version || '1.0.0'
+        version: createRuleDto.version || '1.0.0',
       });
 
       const savedRule = await newRule.save();
 
       // Log the creation
-      await this.logRuleChange(savedRule.id, 'created', {}, 'system', 'Rule created');
+      await this.logRuleChange(
+        savedRule.id,
+        'created',
+        {},
+        'system',
+        'Rule created',
+      );
 
       return savedRule;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to create pricing rule',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -145,7 +168,10 @@ export class PricingRulesService {
   /**
    * Update an existing pricing rule
    */
-  async updateRule(id: string, updateRuleDto: UpdatePricingRuleDto): Promise<PricingRuleDocument | null> {
+  async updateRule(
+    id: string,
+    updateRuleDto: UpdatePricingRuleDto,
+  ): Promise<PricingRuleDocument | null> {
     try {
       const existingRule = await this.pricingRuleModel.findOne({ id });
       if (!existingRule) {
@@ -165,14 +191,20 @@ export class PricingRulesService {
         {
           ...updateRuleDto,
           updatedAt: new Date(),
-          version: this.incrementVersion(existingRule.version)
+          version: this.incrementVersion(existingRule.version),
         },
-        { new: true }
+        { new: true },
       );
 
       // Log the update
       if (Object.keys(changes).length > 0) {
-        await this.logRuleChange(id, 'updated', changes, 'system', 'Rule updated');
+        await this.logRuleChange(
+          id,
+          'updated',
+          changes,
+          'system',
+          'Rule updated',
+        );
       }
 
       return updatedRule;
@@ -180,10 +212,11 @@ export class PricingRulesService {
       if (error instanceof HttpException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to update pricing rule',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -198,9 +231,9 @@ export class PricingRulesService {
         {
           isActive: false,
           deletedAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
-        { new: true }
+        { new: true },
       );
 
       if (!rule) {
@@ -208,13 +241,19 @@ export class PricingRulesService {
       }
 
       // Log the deletion
-      await this.logRuleChange(id, 'deleted', {}, 'system', 'Rule soft deleted');
+      await this.logRuleChange(
+        id,
+        'deleted',
+        {},
+        'system',
+        'Rule soft deleted',
+      );
 
       return true;
     } catch (error) {
       throw new HttpException(
         'Failed to delete pricing rule',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -231,7 +270,10 @@ export class PricingRulesService {
 
       // Create test estimator with the rule - convert DTO to pricing engine format
       const testRules = [this.convertDtoToPricingRule(rule)];
-      const estimator = new DeterministicEstimator(testRules, defaultRules.locationHandicaps as any);
+      const estimator = new DeterministicEstimator(
+        testRules,
+        defaultRules.locationHandicaps as any,
+      );
 
       // Create sample estimate input or use provided test data
       const estimateInput = this.createTestEstimateInput(testData);
@@ -240,29 +282,32 @@ export class PricingRulesService {
       const result = estimator.calculateEstimate(estimateInput, 'test-user');
 
       // Find if this rule was applied
-      const appliedRule = result.calculations.appliedRules.find(ar => ar.ruleId === rule.id);
+      const appliedRule = result.calculations.appliedRules.find(
+        (ar) => ar.ruleId === rule.id,
+      );
 
       return {
         ruleId: rule.id,
         ruleName: rule.name,
         matched: !!appliedRule,
-        conditionsEvaluated: rule.conditions.map(condition => ({
+        conditionsEvaluated: rule.conditions.map((condition) => ({
           condition,
           result: this.evaluateCondition(condition, estimateInput),
-          actualValue: this.getFieldValue(estimateInput, condition.field)
+          actualValue: this.getFieldValue(estimateInput, condition.field),
         })),
         actionsApplied: appliedRule ? rule.actions : undefined,
         priceImpact: appliedRule?.priceImpact || 0,
-        errors: []
+        errors: [],
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         ruleId: testRuleDto.rule.id,
         ruleName: testRuleDto.rule.name,
         matched: false,
         conditionsEvaluated: [],
-        errors: [errorMessage]
+        errors: [errorMessage],
       };
     }
   }
@@ -271,9 +316,9 @@ export class PricingRulesService {
    * Get available rule categories
    */
   async getCategories() {
-    return Object.values(RuleCategory).map(category => ({
+    return Object.values(RuleCategory).map((category) => ({
       value: category,
-      label: this.formatCategoryLabel(category)
+      label: this.formatCategoryLabel(category),
     }));
   }
 
@@ -281,9 +326,9 @@ export class PricingRulesService {
    * Get available operators
    */
   async getOperators() {
-    return Object.values(OperatorType).map(operator => ({
+    return Object.values(OperatorType).map((operator) => ({
       value: operator,
-      label: this.formatOperatorLabel(operator)
+      label: this.formatOperatorLabel(operator),
     }));
   }
 
@@ -291,9 +336,9 @@ export class PricingRulesService {
    * Get available action types
    */
   async getActionTypes() {
-    return Object.values(ActionType).map(action => ({
+    return Object.values(ActionType).map((action) => ({
       value: action,
-      label: this.formatActionLabel(action)
+      label: this.formatActionLabel(action),
     }));
   }
 
@@ -302,18 +347,20 @@ export class PricingRulesService {
    */
   async exportRules() {
     try {
-      const rules = await this.pricingRuleModel.find({ isActive: true }).sort({ priority: 1 });
+      const rules = await this.pricingRuleModel
+        .find({ isActive: true })
+        .sort({ priority: 1 });
 
       return {
         version: '1.0.0',
         exportDate: new Date().toISOString(),
         rulesCount: rules.length,
-        rules: rules.map(rule => rule.toObject())
+        rules: rules.map((rule) => rule.toObject()),
       };
     } catch (error) {
       throw new HttpException(
         'Failed to export rules',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -327,7 +374,7 @@ export class PricingRulesService {
       if (!rulesData.rules || !Array.isArray(rulesData.rules)) {
         throw new HttpException(
           'Invalid import data: rules array required',
-          HttpStatus.BAD_REQUEST
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -345,8 +392,8 @@ export class PricingRulesService {
         {
           isActive: false,
           deletedAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       );
 
       // Import new rules
@@ -356,29 +403,36 @@ export class PricingRulesService {
           ...ruleData,
           createdAt: new Date(),
           updatedAt: new Date(),
-          version: '1.0.0'
+          version: '1.0.0',
         });
 
         const savedRule = await newRule.save();
         importedRules.push(savedRule);
 
         // Log the import
-        await this.logRuleChange(savedRule.id, 'created', {}, 'system', 'Rule imported');
+        await this.logRuleChange(
+          savedRule.id,
+          'created',
+          {},
+          'system',
+          'Rule imported',
+        );
       }
 
       return {
         message: 'Rules imported successfully',
         importedCount: importedRules.length,
-        rules: importedRules
+        rules: importedRules,
       };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to import rules',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -394,20 +448,25 @@ export class PricingRulesService {
         .limit(50)
         .exec();
 
-      return historyDocs.map(doc => ({
+      return historyDocs.map((doc) => ({
         id: (doc as any)._id.toString(),
         ruleId: doc.ruleId,
-        action: doc.action as 'created' | 'updated' | 'deleted' | 'activated' | 'deactivated',
+        action: doc.action as
+          | 'created'
+          | 'updated'
+          | 'deleted'
+          | 'activated'
+          | 'deactivated',
         changes: doc.changes,
         userId: doc.userId,
         userName: doc.userName,
         timestamp: doc.timestamp,
-        reason: doc.reason
+        reason: doc.reason,
       }));
     } catch (error) {
       throw new HttpException(
         'Failed to retrieve rule history',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -426,7 +485,7 @@ export class PricingRulesService {
         userName: 'System Backup',
         rulesCount: rules.length,
         description: `Automatic backup created before rule changes`,
-        rules: rules.map(rule => rule.toObject())
+        rules: rules.map((rule) => rule.toObject()),
       };
 
       // In a real implementation, you might save this to a backup collection
@@ -435,7 +494,7 @@ export class PricingRulesService {
     } catch (error) {
       throw new HttpException(
         'Failed to create backup',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -449,34 +508,34 @@ export class PricingRulesService {
       description: dto.description,
       category: this.mapCategoryToPricingEngine(dto.category),
       priority: dto.priority,
-      conditions: dto.conditions.map(c => ({
+      conditions: dto.conditions.map((c) => ({
         field: c.field,
         operator: c.operator,
         value: c.value,
-        logicalOperator: 'and'
+        logicalOperator: 'and',
       })),
-      actions: dto.actions.map(a => ({
+      actions: dto.actions.map((a) => ({
         type: a.type,
         amount: a.amount,
         description: a.description,
-        targetField: a.targetField
+        targetField: a.targetField,
       })),
       isActive: dto.isActive || true,
       applicableServices: dto.applicableServices,
-      version: dto.version || '1.0.0'
+      version: dto.version || '1.0.0',
     };
   }
 
   private mapCategoryToPricingEngine(category: string): string {
     const categoryMap: Record<string, string> = {
-      'base_pricing': 'base_pricing',
-      'crew_adjustments': 'weight_based',
-      'weight_volume': 'volume_based',
-      'distance': 'distance_based',
-      'timing': 'seasonal',
-      'special_items': 'special_items',
-      'location_handicaps': 'location_handicap',
-      'additional_services': 'difficulty_based'
+      base_pricing: 'base_pricing',
+      crew_adjustments: 'weight_based',
+      weight_volume: 'volume_based',
+      distance: 'distance_based',
+      timing: 'seasonal',
+      special_items: 'special_items',
+      location_handicaps: 'location_handicap',
+      additional_services: 'difficulty_based',
     };
     return categoryMap[category] || 'base_pricing';
   }
@@ -497,7 +556,9 @@ export class PricingRulesService {
     // Validate actions
     for (const action of rule.actions) {
       if (!action.type || action.amount === undefined || !action.targetField) {
-        throw new Error('Invalid action: type, amount, and targetField required');
+        throw new Error(
+          'Invalid action: type, amount, and targetField required',
+        );
       }
     }
 
@@ -506,12 +567,12 @@ export class PricingRulesService {
       category: rule.category,
       priority: rule.priority,
       isActive: true,
-      id: { $ne: rule.id }
+      id: { $ne: rule.id },
     });
 
     if (existingRule) {
       throw new Error(
-        `Priority ${rule.priority} already exists in category ${rule.category}`
+        `Priority ${rule.priority} already exists in category ${rule.category}`,
       );
     }
   }
@@ -521,7 +582,7 @@ export class PricingRulesService {
     action: string,
     changes: any,
     userId: string,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     try {
       const historyEntry = new this.ruleHistoryModel({
@@ -531,7 +592,7 @@ export class PricingRulesService {
         userId,
         userName: 'System User', // In real implementation, get from user context
         timestamp: new Date(),
-        reason
+        reason,
       });
 
       await historyEntry.save();
@@ -541,14 +602,17 @@ export class PricingRulesService {
     }
   }
 
-  private trackChanges(oldRule: any, newRule: any): Record<string, { old: any; new: any }> {
+  private trackChanges(
+    oldRule: any,
+    newRule: any,
+  ): Record<string, { old: any; new: any }> {
     const changes: Record<string, { old: any; new: any }> = {};
 
     for (const key in newRule) {
-      if (Object.prototype.hasOwnProperty.call(newRule, key) && oldRule[key] !== newRule[key]) {
+      if (newRule.hasOwnProperty(key) && oldRule[key] !== newRule[key]) {
         changes[key] = {
           old: oldRule[key],
-          new: newRule[key]
+          new: newRule[key],
         };
       }
     }
@@ -607,51 +671,52 @@ export class PricingRulesService {
         floorLevel: 1,
         elevatorAccess: true,
         accessDifficulty: 'easy',
-        stairsCount: 0
+        stairsCount: 0,
       },
       delivery: testData?.delivery || {
         floorLevel: 1,
         elevatorAccess: true,
         accessDifficulty: 'easy',
-        stairsCount: 0
+        stairsCount: 0,
       },
       moveDate: new Date(),
-      rooms: []
+      rooms: [],
     };
   }
 
   private formatCategoryLabel(category: string): string {
-    return category.split('_').map(word =>
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ');
+    return category
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   private formatOperatorLabel(operator: string): string {
     const labels: Record<string, string> = {
-      'eq': 'Equals',
-      'neq': 'Not Equals',
-      'gt': 'Greater Than',
-      'gte': 'Greater Than or Equal',
-      'lt': 'Less Than',
-      'lte': 'Less Than or Equal',
-      'in': 'In List',
-      'not_in': 'Not In List',
-      'contains': 'Contains',
-      'starts_with': 'Starts With',
-      'ends_with': 'Ends With'
+      eq: 'Equals',
+      neq: 'Not Equals',
+      gt: 'Greater Than',
+      gte: 'Greater Than or Equal',
+      lt: 'Less Than',
+      lte: 'Less Than or Equal',
+      in: 'In List',
+      not_in: 'Not In List',
+      contains: 'Contains',
+      starts_with: 'Starts With',
+      ends_with: 'Ends With',
     };
     return labels[operator] || operator;
   }
 
   private formatActionLabel(action: string): string {
     const labels: Record<string, string> = {
-      'add_fixed': 'Add Fixed Amount',
-      'add_percentage': 'Add Percentage',
-      'subtract_fixed': 'Subtract Fixed Amount',
-      'subtract_percentage': 'Subtract Percentage',
-      'multiply': 'Multiply By',
-      'set_fixed': 'Set Fixed Amount',
-      'set_percentage': 'Set Percentage'
+      add_fixed: 'Add Fixed Amount',
+      add_percentage: 'Add Percentage',
+      subtract_fixed: 'Subtract Fixed Amount',
+      subtract_percentage: 'Subtract Percentage',
+      multiply: 'Multiply By',
+      set_fixed: 'Set Fixed Amount',
+      set_percentage: 'Set Percentage',
     };
     return labels[action] || action;
   }

@@ -44,7 +44,8 @@ describe('OpportunitiesResolver', () => {
     }).compile();
 
     resolver = module.get<OpportunitiesResolver>(OpportunitiesResolver);
-    opportunitiesService = module.get<OpportunitiesService>(OpportunitiesService);
+    opportunitiesService =
+      module.get<OpportunitiesService>(OpportunitiesService);
   });
 
   it('should be defined', () => {
@@ -91,7 +92,10 @@ describe('OpportunitiesResolver', () => {
       const result = await resolver.createOpportunity(input, req);
 
       expect(result).toEqual(mockCreatedOpportunity);
-      expect(opportunitiesService.create).toHaveBeenCalledWith(input, 'user-123');
+      expect(opportunitiesService.create).toHaveBeenCalledWith(
+        input,
+        'user-123',
+      );
     });
   });
 

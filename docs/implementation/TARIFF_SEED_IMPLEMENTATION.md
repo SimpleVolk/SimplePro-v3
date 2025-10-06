@@ -9,6 +9,7 @@ A comprehensive seed system has been implemented for the SimplePro tariff settin
 ### Files Created
 
 #### 1. Core Seed Data
+
 **Location:** `apps/api/src/tariff-settings/seed-data/`
 
 - **`default-tariff-data.ts`** (425 lines)
@@ -31,6 +32,7 @@ A comprehensive seed system has been implemented for the SimplePro tariff settin
   - Maintenance procedures
 
 #### 2. NestJS Integration
+
 **Location:** `apps/api/src/database/seeders/`
 
 - **`tariff-settings.seeder.ts`** (221 lines)
@@ -76,48 +78,58 @@ A comprehensive seed system has been implemented for the SimplePro tariff settin
 ### Complete Default Tariff Configuration
 
 #### 1. Hourly Rates
+
 - **10 crew sizes** with weekday/weekend/holiday rates
 - **Minimum hours:** Weekday: 2, Weekend: 3, Holiday: 3
 - **Rates range:** $89-$660 per hour
 - **Overtime multiplier:** 1.5x
 
 **Sample Rates:**
+
 - 1 Crew: $89/hour (Mon-Fri), $89/hour (Sat-Sun)
 - 2 Crew: $100/hour (Mon-Fri), $100/hour (Sat-Sun)
 - 3 Crew: $220/hour (Mon-Fri), $200/hour (Sat-Sun)
 - 4 Crew: $300/hour (Mon-Fri), $280/hour (Sat-Sun)
 
 #### 2. Crew Abilities
+
 - **10 crew size configurations**
 - **Volume capacity:** 50-500 cubic feet per crew
 - **Weight capacity:** 350-3,500 lbs per crew
 
 #### 3. Packing Rates
+
 - **5 rate configurations**
 - **Hourly rates:** $80-$330 per hour
 - **Per additional crew:** $50/hour
 
 #### 4. Auto Pricing Engine
+
 - **Max hours per job:** 10
 - **Weekend surcharge:** 10%
 - **Holiday surcharge:** 15%
 - **Crew ability limits:** Enabled
 
 #### 5. Materials (14 items)
+
 **Categories:**
+
 - **Boxes (3):** Small (1.5 cuft), Medium (3.0 cuft), Large (4.5 cuft)
 - **Specialty (3):** Dish Box, TV Box, Wardrobe Box
 - **Protection (4):** Mattress Bags (King, Queen, Full), Furniture Pads
 - **Packing (4):** Packing Paper (100/200 sheets), Plastic Wrap
 
 **Features:**
+
 - SKU codes for inventory tracking
 - Pack/unpack time estimates
 - Container vs. non-container classification
 - Active/inactive status tracking
 
 #### 6. Move Sizes (21 categories)
+
 **Residential:**
+
 - Room or Less to 6 Bedroom House
 - Studio through 6-bedroom configurations
 - Size ranges: 400-4,200+ SqFt
@@ -125,21 +137,25 @@ A comprehensive seed system has been implemented for the SimplePro tariff settin
 - Weight: 525-32,088 lbs
 
 **Storage Units:**
+
 - 14 ft to 20x30 units
 - 6 storage configurations
 
 **Each includes:**
+
 - Min/max cubic feet and weight ranges
 - Recommended crew size (1-6)
 - Estimated hours (2-13)
 - Square footage descriptions
 
 #### 7. Room Sizes (7 types)
+
 - Additional Room, Bedroom, Dining Room, Kitchen, Living Room, Patio: 153 cuft / 750 lbs
 - Office: 75 cuft / 525 lbs
 - Common items lists for inventory
 
 #### 8. Handicaps (3 active)
+
 - **Stairs:** 9% per flight (multiplier)
 - **Standard Elevator:** 18% flat rate
 - **Long Carry:** 9% per 100 feet (multiplier)
@@ -147,12 +163,14 @@ A comprehensive seed system has been implemented for the SimplePro tariff settin
 All apply to both pickup and delivery.
 
 #### 9. Distance Rates (4 tiers)
+
 1. **Local (0-50 miles):** $0/mile
 2. **Regional (51-200 miles):** $2.50/mile, $250 minimum
 3. **Long Distance (201-500 miles):** $2.00/mile, $500 minimum
 4. **Cross Country (501+ miles):** $1.75/mile, $1,000 minimum
 
 #### 10. Pricing Method Defaults (5 methods)
+
 1. **Local Labor** - Hourly, enabled, default, priority 10
 2. **Local Packing** - Hourly, enabled, priority 20
 3. **Local Labor Only** - Hourly, enabled, priority 30
@@ -172,6 +190,7 @@ npm run dev:api
 ```
 
 **Behavior:**
+
 - Seeds only if default tariff doesn't exist
 - Logs success/skip status
 - Non-blocking (warns on error, doesn't crash)
@@ -187,6 +206,7 @@ npm run db:seed:tariffs:reset
 ```
 
 **Features:**
+
 - Beautiful CLI output with progress indicators
 - Comprehensive statistics display
 - Validation reporting
@@ -221,6 +241,7 @@ await this.tariffSeeder.reset();
 ### Data Integrity Checks
 
 ✅ **Configuration Validation:**
+
 - Hourly rates configured for all crew sizes
 - Crew abilities match hourly rates count
 - Materials properly categorized
@@ -231,12 +252,14 @@ await this.tariffSeeder.reset();
 - At least one enabled pricing method
 
 ✅ **Schema Compliance:**
+
 - All required fields present
 - Proper enum values
 - Valid data types
 - Consistent ID generation
 
 ✅ **Business Rules:**
+
 - Minimum hours >= 0
 - All rates >= 0
 - Crew sizes between 1-10
@@ -277,6 +300,7 @@ The seeder provides detailed statistics:
 ### Unit Tests Included
 
 **Test Coverage:**
+
 - Default data structure validation
 - All metadata fields
 - All pricing configurations
@@ -292,6 +316,7 @@ The seeder provides detailed statistics:
 - Non-negative values
 
 **Run Tests:**
+
 ```bash
 nx test api
 ```
@@ -312,15 +337,18 @@ All seed data values are extracted from production screenshots:
 ## Environment Variables
 
 ### Required
+
 - `MONGODB_URI` or `DATABASE_URL` - MongoDB connection string
 
 ### Optional
+
 - `SEED_DATA=true` - Enable auto-seeding on startup
 - `RESET_TARIFFS=true` - Delete existing default tariff and recreate
 
 ## Idempotency
 
 The seed system is **fully idempotent**:
+
 - Safe to run multiple times
 - Checks for existing default tariff before creating
 - Skips seeding if tariff already exists
@@ -329,6 +357,7 @@ The seed system is **fully idempotent**:
 ## Audit Logging
 
 All seeded data includes audit trails:
+
 - Initial seed timestamp
 - System user attribution
 - Action type (INITIAL_SEED)
@@ -338,12 +367,14 @@ All seeded data includes audit trails:
 ## Error Handling
 
 ### Graceful Degradation
+
 - Non-blocking on startup (warns but doesn't crash)
 - Detailed error messages
 - Connection failure handling
 - Validation failure reporting
 
 ### Common Issues Handled
+
 - Missing environment variables
 - Database connection failures
 - Existing tariff conflicts
@@ -366,6 +397,7 @@ constructor(private readonly tariffSeeder: TariffSettingsSeeder) {}
 ### API Endpoints (Future)
 
 Potential admin endpoints:
+
 - `POST /api/tariff-settings/seed` - Trigger manual seed
 - `GET /api/tariff-settings/seed/status` - Check seed status
 - `DELETE /api/tariff-settings/seed/reset` - Reset default tariff
@@ -383,6 +415,7 @@ Potential admin endpoints:
 ### Adding New Items
 
 The seed data is structured for easy additions:
+
 - Use `generateId()` for consistent ID generation
 - Follow existing patterns for each category
 - Update counts in validation tests
@@ -391,6 +424,7 @@ The seed data is structured for easy additions:
 ## Security Considerations
 
 ### Production Safety
+
 - System user attribution
 - Audit logging enabled
 - No sensitive data in seed files
@@ -398,6 +432,7 @@ The seed data is structured for easy additions:
 - Admin-only modification via API
 
 ### Environment Isolation
+
 - Development vs. production separation
 - Optional seeding (not forced)
 - Version tracking for tariff changes
@@ -406,12 +441,14 @@ The seed data is structured for easy additions:
 ## Performance
 
 ### Optimizations
+
 - Single database transaction
 - Batch insert for subdocuments
 - Indexed fields for quick lookups
 - Cached active tariff in service layer
 
 ### Seed Time
+
 - Typical seed time: < 500ms
 - Validation time: < 100ms
 - Statistics generation: < 50ms
@@ -470,6 +507,7 @@ The seed data is structured for easy additions:
 The tariff settings seed system is **production-ready** and provides a solid foundation for the SimplePro pricing engine. All values are based on real-world moving company standards and can be easily customized via the web interface or API after initial seeding.
 
 The implementation follows best practices for:
+
 - Data integrity
 - Error handling
 - Documentation
@@ -478,6 +516,7 @@ The implementation follows best practices for:
 - Scalability
 
 **Total Implementation:**
+
 - 6 new files created
 - 3 files updated
 - 1,500+ lines of code

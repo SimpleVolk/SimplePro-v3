@@ -13,14 +13,17 @@ This document describes the security improvements made to the document sharing A
 ### Backend API Changes
 
 **Before (Insecure):**
+
 ```http
 GET /api/documents/shared/:token?password=secret
 ```
+
 - Password sent as URL query parameter
 - Visible in browser history, logs, and referrer headers
 - Security vulnerability
 
 **After (Secure):**
+
 ```http
 POST /api/documents/shared/:token/access
 Content-Type: application/json
@@ -29,6 +32,7 @@ Content-Type: application/json
   "password": "secret"
 }
 ```
+
 - Password sent in request body
 - Not visible in logs or browser history
 - Includes rate limiting (6 attempts per 5 minutes)
@@ -102,20 +106,20 @@ export class DocumentAccessError extends Error {
 
 ### New Components
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| `SharedDocumentAccess` | `apps/web/src/app/components/documents/SharedDocumentAccess.tsx` | Main public access component |
-| `RateLimitNotification` | `apps/web/src/app/components/documents/RateLimitNotification.tsx` | Rate limit feedback UI |
-| `documents.service.ts` | `apps/web/src/services/documents.service.ts` | API client service layer |
-| `/shared/[token]/page.tsx` | `apps/web/src/app/shared/[token]/page.tsx` | Public access route |
+| Component                  | Location                                                          | Purpose                      |
+| -------------------------- | ----------------------------------------------------------------- | ---------------------------- |
+| `SharedDocumentAccess`     | `apps/web/src/app/components/documents/SharedDocumentAccess.tsx`  | Main public access component |
+| `RateLimitNotification`    | `apps/web/src/app/components/documents/RateLimitNotification.tsx` | Rate limit feedback UI       |
+| `documents.service.ts`     | `apps/web/src/services/documents.service.ts`                      | API client service layer     |
+| `/shared/[token]/page.tsx` | `apps/web/src/app/shared/[token]/page.tsx`                        | Public access route          |
 
 ### Existing Components (No Changes Required)
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| `ShareDialog.tsx` | ✅ No changes | Generates share links (unchanged) |
-| `DocumentManagement.tsx` | ✅ No changes | Internal document management |
-| `DocumentViewer.tsx` | ✅ No changes | Authenticated document viewing |
+| Component                | Status        | Notes                             |
+| ------------------------ | ------------- | --------------------------------- |
+| `ShareDialog.tsx`        | ✅ No changes | Generates share links (unchanged) |
+| `DocumentManagement.tsx` | ✅ No changes | Internal document management      |
+| `DocumentViewer.tsx`     | ✅ No changes | Authenticated document viewing    |
 
 ## How to Test
 
@@ -163,12 +167,15 @@ export class DocumentAccessError extends Error {
 ### 5. Test Error Scenarios
 
 **Invalid Token:**
+
 ```
 http://localhost:3009/shared/invalid-token-12345
 ```
+
 Expected: "Document not found or link has expired"
 
 **Expired Link:**
+
 1. Generate link with expiration date in the past (modify backend or database)
 2. Access the link
 3. Expected: "This share link has expired"
@@ -186,6 +193,7 @@ Expected: "Document not found or link has expired"
 ### 7. Accessibility Testing
 
 **Keyboard Navigation:**
+
 1. Open share link
 2. Use Tab key to navigate through form
 3. Verify focus indicators are visible
@@ -193,6 +201,7 @@ Expected: "Document not found or link has expired"
 5. Verify all interactive elements are reachable
 
 **Screen Reader Testing:**
+
 1. Enable screen reader (NVDA, JAWS, VoiceOver)
 2. Navigate through the form
 3. Verify all labels are read correctly
@@ -204,11 +213,13 @@ Expected: "Document not found or link has expired"
 ### Issue: "Failed to access document" Error
 
 **Possible Causes:**
+
 1. API server not running
 2. CORS issue
 3. Invalid token
 
 **Solutions:**
+
 1. Verify API is running: `npm run dev:api`
 2. Check API URL in `.env.local`: `NEXT_PUBLIC_API_URL=http://localhost:3001`
 3. Check browser console for detailed error messages
@@ -218,6 +229,7 @@ Expected: "Document not found or link has expired"
 **Possible Cause:** Redis cache not clearing properly
 
 **Solution:**
+
 1. Check Redis is running: `docker ps | grep redis`
 2. Restart Redis: `npm run docker:dev:down && npm run docker:dev`
 3. Wait for TTL to expire (default 5 minutes)
@@ -225,11 +237,13 @@ Expected: "Document not found or link has expired"
 ### Issue: Download Not Working
 
 **Possible Causes:**
+
 1. Presigned URL expired
 2. MinIO not running
 3. CORS issue with MinIO
 
 **Solutions:**
+
 1. Check MinIO is running: `docker ps | grep minio`
 2. Access MinIO console: `http://localhost:9001`
 3. Verify document exists in bucket
@@ -240,6 +254,7 @@ Expected: "Document not found or link has expired"
 **Possible Cause:** CSS modules not loading
 
 **Solutions:**
+
 1. Restart Next.js dev server
 2. Clear `.next` cache: `rm -rf apps/web/.next`
 3. Rebuild: `npm run build`
@@ -311,13 +326,14 @@ Expected: "Document not found or link has expired"
 
 ## Change History
 
-| Date | Version | Changes | Author |
-|------|---------|---------|--------|
-| 2025-10-02 | 1.0.0 | Initial migration, new components created | Claude Code |
+| Date       | Version | Changes                                   | Author      |
+| ---------- | ------- | ----------------------------------------- | ----------- |
+| 2025-10-02 | 1.0.0   | Initial migration, new components created | Claude Code |
 
 ## Support
 
 For questions or issues:
+
 1. Check this documentation first
 2. Review backend API documentation
 3. Check browser console for errors

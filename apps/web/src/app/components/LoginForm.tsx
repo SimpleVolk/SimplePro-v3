@@ -34,7 +34,12 @@ export function LoginForm() {
         </header>
 
         <main>
-          <form onSubmit={handleSubmit} className={styles.form} noValidate aria-label="User login form">
+          <form
+            onSubmit={handleSubmit}
+            className={styles.form}
+            noValidate
+            aria-label="User login form"
+          >
             {error && (
               <div
                 className={styles.error}
@@ -112,8 +117,12 @@ export function LoginForm() {
         <footer className={styles.footer}>
           <h2 className="sr-only">Demo Information</h2>
           <p>Demo Credentials:</p>
-          <p><strong>Admin:</strong> admin / Admin123!</p>
-          <p><em>Additional users can be created from the admin dashboard</em></p>
+          <p>
+            <strong>Admin:</strong> admin / Admin123!
+          </p>
+          <p>
+            <em>Additional users can be created from the admin dashboard</em>
+          </p>
         </footer>
       </div>
     </div>

@@ -9,7 +9,10 @@ import { MoveSize, MoveSizeSchema } from './move-size.schema';
 import { RoomSize, RoomSizeSchema } from './room-size.schema';
 import { Handicap, HandicapSchema } from './handicap.schema';
 import { DistanceRate, DistanceRateSchema } from './distance-rate.schema';
-import { PricingMethodDefault, PricingMethodDefaultSchema } from './pricing-method.schema';
+import {
+  PricingMethodDefault,
+  PricingMethodDefaultSchema,
+} from './pricing-method.schema';
 
 export type TariffSettingsDocument = TariffSettings & Document;
 
@@ -55,7 +58,7 @@ export class TariffSettings {
     type: String,
     enum: Object.values(TariffStatus),
     default: TariffStatus.ACTIVE,
-    index: true
+    index: true,
   })
   status!: TariffStatus;
 
@@ -76,15 +79,15 @@ export class TariffSettings {
       enabled: true,
       minimumHours: { weekday: 2, weekend: 3, holiday: 3 },
       rates: [] as any[],
-      crewAbility: [] as any[]
-    })
+      crewAbility: [] as any[],
+    }),
   })
   hourlyRates!: HourlyRates;
 
   @Prop({
     type: PackingRatesSchema,
     required: true,
-    default: () => ({ enabled: true, rates: [] as any[] })
+    default: () => ({ enabled: true, rates: [] as any[] }),
   })
   packingRates!: PackingRates;
 
@@ -98,8 +101,8 @@ export class TariffSettings {
       applyWeekendSurcharge: true,
       weekendSurchargePercent: 10,
       applyHolidaySurcharge: true,
-      holidaySurchargePercent: 15
-    })
+      holidaySurchargePercent: 15,
+    }),
   })
   autoPricing!: AutoPricing;
 
@@ -143,7 +146,8 @@ export class TariffSettings {
   isArchived!: boolean;
 }
 
-export const TariffSettingsSchema = SchemaFactory.createForClass(TariffSettings);
+export const TariffSettingsSchema =
+  SchemaFactory.createForClass(TariffSettings);
 
 // ============================
 // Indexes for Performance
@@ -168,37 +172,49 @@ TariffSettingsSchema.index({ name: 1, version: 1 });
 TariffSettingsSchema.index({ isArchived: 1, isActive: 1 });
 
 // Indexes for subdocument arrays
-TariffSettingsSchema.index({ 'materials.isActive': 1, 'materials.category': 1 });
+TariffSettingsSchema.index({
+  'materials.isActive': 1,
+  'materials.category': 1,
+});
 TariffSettingsSchema.index({ 'materials.sku': 1 }, { sparse: true });
-TariffSettingsSchema.index({ 'handicaps.isActive': 1, 'handicaps.category': 1 });
+TariffSettingsSchema.index({
+  'handicaps.isActive': 1,
+  'handicaps.category': 1,
+});
 TariffSettingsSchema.index({ 'moveSizes.isActive': 1 });
 TariffSettingsSchema.index({ 'roomSizes.isActive': 1 });
 TariffSettingsSchema.index({ 'distanceRates.isActive': 1 });
-TariffSettingsSchema.index({ 'pricingMethods.enabled': 1, 'pricingMethods.isDefault': 1 });
+TariffSettingsSchema.index({
+  'pricingMethods.enabled': 1,
+  'pricingMethods.isDefault': 1,
+});
 
 // Text search index for comprehensive search
-TariffSettingsSchema.index({
-  name: 'text',
-  description: 'text',
-  notes: 'text',
-  'materials.name': 'text',
-  'handicaps.name': 'text'
-}, {
-  weights: {
-    name: 10,
-    description: 5,
-    'materials.name': 3,
-    'handicaps.name': 3,
-    notes: 1
+TariffSettingsSchema.index(
+  {
+    name: 'text',
+    description: 'text',
+    notes: 'text',
+    'materials.name': 'text',
+    'handicaps.name': 'text',
   },
-  name: 'tariff_settings_text_search'
-});
+  {
+    weights: {
+      name: 10,
+      description: 5,
+      'materials.name': 3,
+      'handicaps.name': 3,
+      notes: 1,
+    },
+    name: 'tariff_settings_text_search',
+  },
+);
 
 // ============================
 // Pre-save Middleware
 // ============================
 
-TariffSettingsSchema.pre('save', function(next) {
+TariffSettingsSchema.pre('save', function (next) {
   // Update timestamp
   if (this.isModified()) {
     this.set({ updatedAt: new Date() });
@@ -210,7 +226,7 @@ TariffSettingsSchema.pre('save', function(next) {
   }
 
   // Ensure only one default pricing method
-  const defaultMethods = this.pricingMethods.filter(pm => pm.isDefault);
+  const defaultMethods = this.pricingMethods.filter((pm) => pm.isDefault);
   if (defaultMethods.length > 1) {
     return next(new Error('Only one pricing method can be set as default'));
   }
@@ -223,17 +239,23 @@ TariffSettingsSchema.pre('save', function(next) {
 // ============================
 
 // Calculate total active materials count
-TariffSettingsSchema.virtual('activeMaterialsCount').get(function(this: TariffSettingsDocument) {
-  return this.materials.filter(m => m.isActive).length;
+TariffSettingsSchema.virtual('activeMaterialsCount').get(function (
+  this: TariffSettingsDocument,
+) {
+  return this.materials.filter((m) => m.isActive).length;
 });
 
 // Calculate total active handicaps count
-TariffSettingsSchema.virtual('activeHandicapsCount').get(function(this: TariffSettingsDocument) {
-  return this.handicaps.filter(h => h.isActive).length;
+TariffSettingsSchema.virtual('activeHandicapsCount').get(function (
+  this: TariffSettingsDocument,
+) {
+  return this.handicaps.filter((h) => h.isActive).length;
 });
 
 // Check if tariff is currently effective
-TariffSettingsSchema.virtual('isCurrentlyEffective').get(function(this: TariffSettingsDocument) {
+TariffSettingsSchema.virtual('isCurrentlyEffective').get(function (
+  this: TariffSettingsDocument,
+) {
   const now = new Date();
   const isAfterStart = this.effectiveFrom <= now;
   const isBeforeEnd = !this.effectiveTo || this.effectiveTo >= now;
@@ -251,23 +273,25 @@ TariffSettingsSchema.set('toObject', { virtuals: true });
 /**
  * Add an audit log entry
  */
-TariffSettingsSchema.methods.addAuditEntry = function(
+TariffSettingsSchema.methods.addAuditEntry = function (
   userId: string,
   action: string,
-  changes?: Record<string, any>
+  changes?: Record<string, any>,
 ): void {
   this.auditLog.push({
     timestamp: new Date(),
     userId,
     action,
-    changes
+    changes,
   });
 };
 
 /**
  * Get active hourly rate for a specific crew size
  */
-TariffSettingsSchema.methods.getHourlyRateForCrew = function(crewSize: number) {
+TariffSettingsSchema.methods.getHourlyRateForCrew = function (
+  crewSize: number,
+) {
   if (!this.hourlyRates.enabled) {
     return null;
   }
@@ -277,36 +301,48 @@ TariffSettingsSchema.methods.getHourlyRateForCrew = function(crewSize: number) {
 /**
  * Get crew ability limits for a specific crew size
  */
-TariffSettingsSchema.methods.getCrewAbility = function(crewSize: number) {
-  return this.hourlyRates.crewAbility.find((ca: any) => ca.crewSize === crewSize);
+TariffSettingsSchema.methods.getCrewAbility = function (crewSize: number) {
+  return this.hourlyRates.crewAbility.find(
+    (ca: any) => ca.crewSize === crewSize,
+  );
 };
 
 /**
  * Get active materials by category
  */
-TariffSettingsSchema.methods.getActiveMaterialsByCategory = function(category: string) {
-  return this.materials.filter((m: any) => m.isActive && m.category === category);
+TariffSettingsSchema.methods.getActiveMaterialsByCategory = function (
+  category: string,
+) {
+  return this.materials.filter(
+    (m: any) => m.isActive && m.category === category,
+  );
 };
 
 /**
  * Get active handicaps by category
  */
-TariffSettingsSchema.methods.getActiveHandicapsByCategory = function(category: string) {
-  return this.handicaps.filter((h: any) => h.isActive && h.category === category);
+TariffSettingsSchema.methods.getActiveHandicapsByCategory = function (
+  category: string,
+) {
+  return this.handicaps.filter(
+    (h: any) => h.isActive && h.category === category,
+  );
 };
 
 /**
  * Get distance rate for specific mileage
  */
-TariffSettingsSchema.methods.getDistanceRateForMiles = function(miles: number) {
+TariffSettingsSchema.methods.getDistanceRateForMiles = function (
+  miles: number,
+) {
   return this.distanceRates.find(
-    (dr: any) => dr.isActive && miles >= dr.minMiles && miles <= dr.maxMiles
+    (dr: any) => dr.isActive && miles >= dr.minMiles && miles <= dr.maxMiles,
   );
 };
 
 /**
  * Get default pricing method
  */
-TariffSettingsSchema.methods.getDefaultPricingMethod = function() {
+TariffSettingsSchema.methods.getDefaultPricingMethod = function () {
   return this.pricingMethods.find((pm: any) => pm.enabled && pm.isDefault);
 };

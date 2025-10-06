@@ -3,6 +3,8 @@ import { getModelToken } from '@nestjs/mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { RealtimeService } from '../websocket/realtime.service';
+import { TransactionService } from '../database/transaction.service';
+import { CacheService } from '../cache/cache.service';
 import { Job as JobSchema } from './schemas/job.schema';
 import {
   CreateJobDto,
@@ -21,12 +23,32 @@ describe('JobsService', () => {
     // Add other methods as needed
   };
 
+  const mockTransactionService = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    abortTransaction: jest.fn(),
+    withTransaction: jest.fn().mockImplementation(async (callback) => {
+      return await callback();
+    }),
+  };
+
+  const mockCacheService = {
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
+    reset: jest.fn(),
+    invalidatePattern: jest.fn(),
+  };
+
   // Create mock Job model
   const createMockJobModel = () => {
     const mockConstructor: any = jest.fn().mockImplementation((data) => ({
       ...data,
       _id: `job_${Math.random().toString(36).substr(2, 9)}`,
-      save: jest.fn().mockResolvedValue({ ...data, _id: `job_${Math.random().toString(36).substr(2, 9)}` })
+      save: jest.fn().mockResolvedValue({
+        ...data,
+        _id: `job_${Math.random().toString(36).substr(2, 9)}`,
+      }),
     }));
 
     // Add static methods
@@ -59,7 +81,7 @@ describe('JobsService', () => {
       state: 'IL',
       zipCode: '62701',
       contactPerson: 'John Doe',
-      contactPhone: '555-1234'
+      contactPhone: '555-1234',
     },
     deliveryAddress: {
       street: '456 House Ave',
@@ -67,19 +89,19 @@ describe('JobsService', () => {
       state: 'IL',
       zipCode: '62702',
       contactPerson: 'John Doe',
-      contactPhone: '555-1234'
+      contactPhone: '555-1234',
     },
     assignedCrew: [
       {
         crewMemberId: 'crew123',
         role: 'lead',
-        hourlyRate: 25
+        hourlyRate: 25,
       },
       {
         crewMemberId: 'crew456',
         role: 'mover',
-        hourlyRate: 20
-      }
+        hourlyRate: 20,
+      },
     ],
     inventory: [
       {
@@ -89,33 +111,33 @@ describe('JobsService', () => {
         weight: 150,
         volume: 80,
         condition: 'good',
-        location: 'pickup'
-      }
+        location: 'pickup',
+      },
     ],
     services: [
       {
         type: 'loading',
-        description: 'Load items from apartment'
+        description: 'Load items from apartment',
       },
       {
         type: 'unloading',
-        description: 'Unload items at house'
-      }
+        description: 'Unload items at house',
+      },
     ],
     equipment: [
       {
         type: 'truck',
         description: 'Moving truck - 26ft',
-        quantity: 1
+        quantity: 1,
       },
       {
         type: 'dolly',
         description: 'Furniture dolly',
-        quantity: 2
-      }
+        quantity: 2,
+      },
     ],
     estimatedCost: 800,
-    specialInstructions: 'Handle antique furniture with care'
+    specialInstructions: 'Handle antique furniture with care',
   };
 
   beforeEach(async () => {
@@ -127,17 +149,27 @@ describe('JobsService', () => {
         JobsService,
         {
           provide: getModelToken(JobSchema.name),
-          useValue: mockJobModel
+          useValue: mockJobModel,
         },
         {
           provide: RealtimeService,
-          useValue: mockRealtimeServiceImplementation
-        }
+          useValue: mockRealtimeServiceImplementation,
+        },
+        {
+          provide: TransactionService,
+          useValue: mockTransactionService,
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
+        },
       ],
     }).compile();
 
     service = module.get<JobsService>(JobsService);
-    mockRealtimeService = module.get(RealtimeService) as jest.Mocked<RealtimeService>;
+    mockRealtimeService = module.get(
+      RealtimeService,
+    ) as jest.Mocked<RealtimeService>;
 
     // Reset all mocks
     jest.clearAllMocks();
@@ -156,7 +188,7 @@ describe('JobsService', () => {
         customerId: 'customer123',
         estimateId: 'estimate123',
         estimatedCost: 800,
-        createdBy: 'user123'
+        createdBy: 'user123',
       });
 
       expect(result.id).toBeDefined();
@@ -190,7 +222,7 @@ describe('JobsService', () => {
         'Arrival at Delivery',
         'Unloading Started',
         'Unloading Completed',
-        'Job Completed'
+        'Job Completed',
       ];
 
       expect(result.milestones).toHaveLength(expectedMilestones.length);
@@ -201,10 +233,15 @@ describe('JobsService', () => {
     });
 
     it('should create additional milestone for long distance jobs', async () => {
-      const longDistanceDto = { ...mockCreateJobDto, type: 'long_distance' as const };
+      const longDistanceDto = {
+        ...mockCreateJobDto,
+        type: 'long_distance' as const,
+      };
       const result = await service.create(longDistanceDto, 'user123');
 
-      const inTransitMilestone = result.milestones.find(m => m.name === 'In Transit');
+      const inTransitMilestone = result.milestones.find(
+        (m) => m.name === 'In Transit',
+      );
       expect(inTransitMilestone).toBeDefined();
     });
 
@@ -212,7 +249,7 @@ describe('JobsService', () => {
       const invalidDto = { ...mockCreateJobDto, customerId: '' };
 
       await expect(service.create(invalidDto, 'user123')).rejects.toThrow(
-        new BadRequestException('Customer ID is required')
+        new BadRequestException('Customer ID is required'),
       );
     });
 
@@ -229,15 +266,15 @@ describe('JobsService', () => {
           street: '123 St',
           city: 'City',
           state: 'ST',
-          zipCode: '12345'
+          zipCode: '12345',
         },
         deliveryAddress: {
           street: '456 Ave',
           city: 'City',
           state: 'ST',
-          zipCode: '12346'
+          zipCode: '12346',
         },
-        estimatedCost: 500
+        estimatedCost: 500,
       };
 
       const result = await service.create(minimalDto, 'user123');
@@ -254,13 +291,16 @@ describe('JobsService', () => {
     beforeEach(async () => {
       // Create test jobs
       await service.create(mockCreateJobDto, 'user123');
-      await service.create({
-        ...mockCreateJobDto,
-        title: 'Commercial Move',
-        type: 'long_distance',
-        priority: 'high',
-        customerId: 'customer456'
-      }, 'user123');
+      await service.create(
+        {
+          ...mockCreateJobDto,
+          title: 'Commercial Move',
+          type: 'long_distance',
+          priority: 'high',
+          customerId: 'customer456',
+        },
+        'user123',
+      );
     });
 
     it('should return all jobs when no filters applied', async () => {
@@ -311,7 +351,9 @@ describe('JobsService', () => {
       const result = await service.findAll(filters);
 
       expect(result).toHaveLength(1);
-      expect(result[0].assignedCrew.some(c => c.crewMemberId === 'crew123')).toBe(true);
+      expect(
+        result[0].assignedCrew.some((c) => c.crewMemberId === 'crew123'),
+      ).toBe(true);
     });
 
     it('should filter by date range', async () => {
@@ -320,7 +362,7 @@ describe('JobsService', () => {
 
       const filters: JobFilters = {
         scheduledAfter: yesterday,
-        scheduledBefore: tomorrow
+        scheduledBefore: tomorrow,
       };
       const result = await service.findAll(filters);
 
@@ -343,13 +385,13 @@ describe('JobsService', () => {
 
       expect(result).toMatchObject({
         id: created.id,
-        title: 'Residential Move'
+        title: 'Residential Move',
       });
     });
 
     it('should throw NotFoundException for non-existent job', async () => {
       await expect(service.findOne('non-existent')).rejects.toThrow(
-        new NotFoundException('Job with ID non-existent not found')
+        new NotFoundException('Job with ID non-existent not found'),
       );
     });
   });
@@ -361,7 +403,7 @@ describe('JobsService', () => {
 
       expect(result).toMatchObject({
         id: created.id,
-        jobNumber: created.jobNumber
+        jobNumber: created.jobNumber,
       });
     });
 
@@ -384,7 +426,7 @@ describe('JobsService', () => {
         title: 'Updated Move',
         priority: 'high',
         estimatedCost: 1000,
-        specialInstructions: 'Updated instructions'
+        specialInstructions: 'Updated instructions',
       };
 
       const result = await service.update(jobId, updateDto, 'updater123');
@@ -401,29 +443,29 @@ describe('JobsService', () => {
       const updateDto: UpdateJobDto = {
         pickupAddress: {
           street: '789 New Street',
-          accessNotes: 'Use side entrance'
-        }
+          accessNotes: 'Use side entrance',
+        },
       };
 
       const result = await service.update(jobId, updateDto, 'updater123');
 
       expect(result.pickupAddress).toEqual({
         street: '789 New Street',
-        city: 'Springfield',    // Original value
-        state: 'IL',           // Original value
-        zipCode: '62701',      // Original value
+        city: 'Springfield', // Original value
+        state: 'IL', // Original value
+        zipCode: '62701', // Original value
         contactPerson: 'John Doe', // Original value
-        contactPhone: '555-1234',  // Original value
-        accessNotes: 'Use side entrance' // New value
+        contactPhone: '555-1234', // Original value
+        accessNotes: 'Use side entrance', // New value
       });
     });
 
     it('should throw NotFoundException for non-existent job', async () => {
       const updateDto: UpdateJobDto = { title: 'Updated' };
 
-      await expect(service.update('non-existent', updateDto, 'updater123')).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(
+        service.update('non-existent', updateDto, 'updater123'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -436,7 +478,11 @@ describe('JobsService', () => {
     });
 
     it('should update status to in_progress and set actual start time', async () => {
-      const result = await service.updateStatus(jobId, 'in_progress', 'dispatcher123');
+      const result = await service.updateStatus(
+        jobId,
+        'in_progress',
+        'dispatcher123',
+      );
 
       expect(result.status).toBe('in_progress');
       expect(result.actualStartTime).toBeInstanceOf(Date);
@@ -447,7 +493,11 @@ describe('JobsService', () => {
       // First set to in_progress
       await service.updateStatus(jobId, 'in_progress', 'dispatcher123');
 
-      const result = await service.updateStatus(jobId, 'completed', 'dispatcher123');
+      const result = await service.updateStatus(
+        jobId,
+        'completed',
+        'dispatcher123',
+      );
 
       expect(result.status).toBe('completed');
       expect(result.actualEndTime).toBeInstanceOf(Date);
@@ -459,7 +509,7 @@ describe('JobsService', () => {
       expect(mockRealtimeService.notifyJobStatusChange).toHaveBeenCalledWith(
         jobId,
         'in_progress',
-        'dispatcher123'
+        'dispatcher123',
       );
     });
 
@@ -469,7 +519,7 @@ describe('JobsService', () => {
       expect(mockRealtimeService.notifyJobCompletion).toHaveBeenCalledWith(
         jobId,
         'crew123', // First crew member ID
-        'dispatcher123'
+        'dispatcher123',
       );
     });
 
@@ -480,10 +530,14 @@ describe('JobsService', () => {
       // Manually set actual start time
       (service as any).jobs.set(jobId, {
         ...job,
-        actualStartTime: customStartTime
+        actualStartTime: customStartTime,
       });
 
-      const result = await service.updateStatus(jobId, 'in_progress', 'dispatcher123');
+      const result = await service.updateStatus(
+        jobId,
+        'in_progress',
+        'dispatcher123',
+      );
 
       expect(result.actualStartTime).toEqual(customStartTime);
     });
@@ -495,7 +549,9 @@ describe('JobsService', () => {
 
       await service.remove(created.id);
 
-      await expect(service.findOne(created.id)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(created.id)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException for in-progress job', async () => {
@@ -503,12 +559,14 @@ describe('JobsService', () => {
       await service.updateStatus(created.id, 'in_progress', 'user123');
 
       await expect(service.remove(created.id)).rejects.toThrow(
-        new BadRequestException('Cannot delete job that is in progress')
+        new BadRequestException('Cannot delete job that is in progress'),
       );
     });
 
     it('should throw NotFoundException for non-existent job', async () => {
-      await expect(service.remove('non-existent')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('non-existent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -525,11 +583,15 @@ describe('JobsService', () => {
         {
           crewMemberId: 'crew789',
           role: 'mover' as const,
-          hourlyRate: 18
-        }
+          hourlyRate: 18,
+        },
       ];
 
-      const result = await service.assignCrew(jobId, newAssignments, 'dispatcher123');
+      const result = await service.assignCrew(
+        jobId,
+        newAssignments,
+        'dispatcher123',
+      );
 
       expect(result.assignedCrew).toHaveLength(3); // Original 2 + 1 new
       expect(result.assignedCrew[2].crewMemberId).toBe('crew789');
@@ -539,9 +601,16 @@ describe('JobsService', () => {
     });
 
     it('should update crew status to checked_in', async () => {
-      const result = await service.updateCrewStatus(jobId, 'crew123', 'checked_in', 'crew123');
+      const result = await service.updateCrewStatus(
+        jobId,
+        'crew123',
+        'checked_in',
+        'crew123',
+      );
 
-      const leadCrew = result.assignedCrew.find(c => c.crewMemberId === 'crew123');
+      const leadCrew = result.assignedCrew.find(
+        (c) => c.crewMemberId === 'crew123',
+      );
       expect(leadCrew?.status).toBe('checked_in');
       expect(leadCrew?.checkInTime).toBeInstanceOf(Date);
     });
@@ -551,9 +620,16 @@ describe('JobsService', () => {
       await service.updateCrewStatus(jobId, 'crew123', 'checked_in', 'crew123');
 
       // Then check out
-      const result = await service.updateCrewStatus(jobId, 'crew123', 'checked_out', 'crew123');
+      const result = await service.updateCrewStatus(
+        jobId,
+        'crew123',
+        'checked_out',
+        'crew123',
+      );
 
-      const leadCrew = result.assignedCrew.find(c => c.crewMemberId === 'crew123');
+      const leadCrew = result.assignedCrew.find(
+        (c) => c.crewMemberId === 'crew123',
+      );
       expect(leadCrew?.status).toBe('checked_out');
       expect(leadCrew?.checkOutTime).toBeInstanceOf(Date);
       expect(leadCrew?.hoursWorked).toBeGreaterThan(0);
@@ -573,13 +649,15 @@ describe('JobsService', () => {
         content: 'Customer requested early start time',
         category: 'customer',
         isImportant: true,
-        createdBy: 'dispatcher123'
+        createdBy: 'dispatcher123',
       };
 
       const result = await service.addNote(jobId, note, 'dispatcher123');
 
       expect(result.internalNotes).toHaveLength(1);
-      expect(result.internalNotes[0].content).toBe('Customer requested early start time');
+      expect(result.internalNotes[0].content).toBe(
+        'Customer requested early start time',
+      );
       expect(result.internalNotes[0].category).toBe('customer');
       expect(result.internalNotes[0].isImportant).toBe(true);
       expect(result.internalNotes[0].id).toBeDefined();
@@ -598,18 +676,27 @@ describe('JobsService', () => {
     });
 
     it('should update milestone status to completed', async () => {
-      const result = await service.updateMilestone(jobId, milestoneId, 'completed', 'crew123');
+      const result = await service.updateMilestone(
+        jobId,
+        milestoneId,
+        'completed',
+        'crew123',
+      );
 
-      const milestone = result.milestones.find(m => m.id === milestoneId);
+      const milestone = result.milestones.find((m) => m.id === milestoneId);
       expect(milestone?.status).toBe('completed');
       expect(milestone?.completedAt).toBeInstanceOf(Date);
       expect(milestone?.completedBy).toBe('crew123');
     });
 
     it('should update milestone status without completion info', async () => {
-      const result = await service.updateMilestone(jobId, milestoneId, 'in_progress');
+      const result = await service.updateMilestone(
+        jobId,
+        milestoneId,
+        'in_progress',
+      );
 
-      const milestone = result.milestones.find(m => m.id === milestoneId);
+      const milestone = result.milestones.find((m) => m.id === milestoneId);
       expect(milestone?.status).toBe('in_progress');
       expect(milestone?.completedAt).toBeUndefined();
       expect(milestone?.completedBy).toBeUndefined();
@@ -625,27 +712,36 @@ describe('JobsService', () => {
       lastWeek.setDate(today.getDate() - 7);
 
       // Create jobs with different statuses and dates
-      const job1 = await service.create({
-        ...mockCreateJobDto,
-        scheduledDate: today,
-        estimatedCost: 800
-      }, 'user123');
+      const job1 = await service.create(
+        {
+          ...mockCreateJobDto,
+          scheduledDate: today,
+          estimatedCost: 800,
+        },
+        'user123',
+      );
 
-      const job2 = await service.create({
-        ...mockCreateJobDto,
-        title: 'Commercial Move',
-        type: 'long_distance',
-        priority: 'high',
-        scheduledDate: today,
-        estimatedCost: 1500
-      }, 'user123');
+      const job2 = await service.create(
+        {
+          ...mockCreateJobDto,
+          title: 'Commercial Move',
+          type: 'long_distance',
+          priority: 'high',
+          scheduledDate: today,
+          estimatedCost: 1500,
+        },
+        'user123',
+      );
 
-      await service.create({
-        ...mockCreateJobDto,
-        title: 'Overdue Job',
-        scheduledDate: yesterday,
-        estimatedCost: 600
-      }, 'user123');
+      await service.create(
+        {
+          ...mockCreateJobDto,
+          title: 'Overdue Job',
+          scheduledDate: yesterday,
+          estimatedCost: 600,
+        },
+        'user123',
+      );
 
       // Update statuses
       await service.updateStatus(job1.id, 'in_progress', 'user123');
@@ -662,14 +758,14 @@ describe('JobsService', () => {
       expect(stats.byStatus).toEqual({
         scheduled: 1,
         in_progress: 1,
-        completed: 1
+        completed: 1,
       });
       expect(stats.byType).toEqual({
-        local: 3
+        local: 3,
       });
       expect(stats.byPriority).toEqual({
         normal: 2,
-        high: 1
+        high: 1,
       });
       expect(stats.scheduledToday).toBe(2);
       expect(stats.inProgress).toBe(1);
@@ -695,24 +791,33 @@ describe('JobsService', () => {
       const testDate = new Date('2024-02-15');
       const otherDate = new Date('2024-02-16');
 
-      await service.create({
-        ...mockCreateJobDto,
-        scheduledDate: testDate,
-        scheduledStartTime: '08:00'
-      }, 'user123');
+      await service.create(
+        {
+          ...mockCreateJobDto,
+          scheduledDate: testDate,
+          scheduledStartTime: '08:00',
+        },
+        'user123',
+      );
 
-      await service.create({
-        ...mockCreateJobDto,
-        title: 'Second Job',
-        scheduledDate: testDate,
-        scheduledStartTime: '14:00'
-      }, 'user123');
+      await service.create(
+        {
+          ...mockCreateJobDto,
+          title: 'Second Job',
+          scheduledDate: testDate,
+          scheduledStartTime: '14:00',
+        },
+        'user123',
+      );
 
-      await service.create({
-        ...mockCreateJobDto,
-        title: 'Other Day Job',
-        scheduledDate: otherDate
-      }, 'user123');
+      await service.create(
+        {
+          ...mockCreateJobDto,
+          title: 'Other Day Job',
+          scheduledDate: otherDate,
+        },
+        'user123',
+      );
     });
 
     it('should return jobs for specific date sorted by start time', async () => {
@@ -763,11 +868,13 @@ describe('JobsService', () => {
         created.id,
         'non-existent-crew',
         'checked_in',
-        'user123'
+        'user123',
       );
 
       // Should not change anything if crew member not found
-      expect(result.assignedCrew.every(c => c.status === 'assigned')).toBe(true);
+      expect(result.assignedCrew.every((c) => c.status === 'assigned')).toBe(
+        true,
+      );
     });
 
     it('should handle milestone update for non-existent milestone', async () => {
@@ -777,37 +884,54 @@ describe('JobsService', () => {
         created.id,
         'non-existent-milestone',
         'completed',
-        'user123'
+        'user123',
       );
 
       // Should not change anything if milestone not found
-      expect(result.milestones.every(m => m.status === 'pending')).toBe(true);
+      expect(result.milestones.every((m) => m.status === 'pending')).toBe(true);
     });
 
     it('should create jobs without real-time service gracefully', async () => {
       // Create service without realtime service
-      const moduleWithoutRealtime: TestingModule = await Test.createTestingModule({
-        providers: [
-          JobsService,
-          {
-            provide: getModelToken(JobSchema.name),
-            useValue: createMockJobModel()
-          },
-          {
-            provide: RealtimeService,
-            useValue: null
-          }
-        ],
-      }).compile();
+      const moduleWithoutRealtime: TestingModule =
+        await Test.createTestingModule({
+          providers: [
+            JobsService,
+            {
+              provide: getModelToken(JobSchema.name),
+              useValue: createMockJobModel(),
+            },
+            {
+              provide: RealtimeService,
+              useValue: null,
+            },
+            {
+              provide: TransactionService,
+              useValue: mockTransactionService,
+            },
+            {
+              provide: CacheService,
+              useValue: mockCacheService,
+            },
+          ],
+        }).compile();
 
-      const serviceWithoutRealtime = moduleWithoutRealtime.get<JobsService>(JobsService);
+      const serviceWithoutRealtime =
+        moduleWithoutRealtime.get<JobsService>(JobsService);
       (serviceWithoutRealtime as any).jobs.clear();
 
-      const created = await serviceWithoutRealtime.create(mockCreateJobDto, 'user123');
+      const created = await serviceWithoutRealtime.create(
+        mockCreateJobDto,
+        'user123',
+      );
 
       // Should not throw error when updating status without realtime service
       await expect(
-        serviceWithoutRealtime.updateStatus(created.id, 'in_progress', 'user123')
+        serviceWithoutRealtime.updateStatus(
+          created.id,
+          'in_progress',
+          'user123',
+        ),
       ).resolves.not.toThrow();
     });
   });

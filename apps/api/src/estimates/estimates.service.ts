@@ -12,7 +12,7 @@ export class EstimatesService {
     // Use type assertion to bypass TypeScript strict checks for JSON import
     this.estimator = new DeterministicEstimator(
       defaultRulesData.pricingRules as any,
-      defaultRulesData.locationHandicaps as any
+      defaultRulesData.locationHandicaps as any,
     );
   }
 
@@ -25,24 +25,36 @@ export class EstimatesService {
 
       pickup: {
         address: createEstimateDto.locations.pickup.address,
-        floorLevel: Math.floor((createEstimateDto.locations.pickup.stairs || 0) / 10),
+        floorLevel: Math.floor(
+          (createEstimateDto.locations.pickup.stairs || 0) / 10,
+        ),
         elevatorAccess: (createEstimateDto.locations.pickup.stairs || 0) < 10,
         longCarry: (createEstimateDto.locations.pickup.longCarry || 0) > 75,
-        parkingDistance: createEstimateDto.locations.pickup.parkingDistance || 0,
-        accessDifficulty: this.mapDifficultyLevel(createEstimateDto.locations.pickup.difficultAccess || 1),
+        parkingDistance:
+          createEstimateDto.locations.pickup.parkingDistance || 0,
+        accessDifficulty: this.mapDifficultyLevel(
+          createEstimateDto.locations.pickup.difficultAccess || 1,
+        ),
         stairsCount: createEstimateDto.locations.pickup.stairs || 0,
-        narrowHallways: createEstimateDto.locations.pickup.narrowHallways || false,
+        narrowHallways:
+          createEstimateDto.locations.pickup.narrowHallways || false,
       },
 
       delivery: {
         address: createEstimateDto.locations.delivery.address,
-        floorLevel: Math.floor((createEstimateDto.locations.delivery.stairs || 0) / 10),
+        floorLevel: Math.floor(
+          (createEstimateDto.locations.delivery.stairs || 0) / 10,
+        ),
         elevatorAccess: (createEstimateDto.locations.delivery.stairs || 0) < 10,
         longCarry: (createEstimateDto.locations.delivery.longCarry || 0) > 75,
-        parkingDistance: createEstimateDto.locations.delivery.parkingDistance || 0,
-        accessDifficulty: this.mapDifficultyLevel(createEstimateDto.locations.delivery.difficultAccess || 1),
+        parkingDistance:
+          createEstimateDto.locations.delivery.parkingDistance || 0,
+        accessDifficulty: this.mapDifficultyLevel(
+          createEstimateDto.locations.delivery.difficultAccess || 1,
+        ),
         stairsCount: createEstimateDto.locations.delivery.stairs || 0,
-        narrowHallways: createEstimateDto.locations.delivery.narrowHallways || false,
+        narrowHallways:
+          createEstimateDto.locations.delivery.narrowHallways || false,
       },
 
       distance: 25,
@@ -56,7 +68,8 @@ export class EstimatesService {
         piano: (createEstimateDto.inventory.specialItems?.piano || 0) > 0,
         antiques: (createEstimateDto.inventory.specialItems?.antiques || 0) > 0,
         artwork: (createEstimateDto.inventory.specialItems?.artwork || 0) > 0,
-        fragileItems: createEstimateDto.inventory.specialItems?.fragileItems || 0,
+        fragileItems:
+          createEstimateDto.inventory.specialItems?.fragileItems || 0,
         valuableItems: 0,
       },
 
@@ -70,10 +83,13 @@ export class EstimatesService {
 
       isWeekend: this.isWeekend(new Date(createEstimateDto.moveDate)),
       isHoliday: false,
-      seasonalPeriod: this.getSeasonalPeriod(new Date(createEstimateDto.moveDate)),
+      seasonalPeriod: this.getSeasonalPeriod(
+        new Date(createEstimateDto.moveDate),
+      ),
 
       crewSize: createEstimateDto.inventory.crewSize,
-      specialtyCrewRequired: (createEstimateDto.inventory.specialItems?.piano || 0) > 0,
+      specialtyCrewRequired:
+        (createEstimateDto.inventory.specialItems?.piano || 0) > 0,
     };
 
     // Calculate estimate using the pricing engine
@@ -86,7 +102,9 @@ export class EstimatesService {
     };
   }
 
-  private mapDifficultyLevel(level: number): 'easy' | 'moderate' | 'difficult' | 'extreme' {
+  private mapDifficultyLevel(
+    level: number,
+  ): 'easy' | 'moderate' | 'difficult' | 'extreme' {
     if (level <= 1) return 'easy';
     if (level <= 2) return 'moderate';
     if (level <= 3) return 'difficult';

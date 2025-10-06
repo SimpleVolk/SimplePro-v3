@@ -3,7 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getApiUrl } from '../../lib/config';
-import { DeterministicEstimator, defaultRules } from '@simplepro/pricing-engine';
+import {
+  DeterministicEstimator,
+  defaultRules,
+} from '@simplepro/pricing-engine';
 import type { EstimateInput, EstimateResult } from '@simplepro/pricing-engine';
 import styles from './NewOpportunity.module.css';
 
@@ -21,7 +24,13 @@ interface CreateCustomerDto {
     country?: string;
   };
   type: 'residential' | 'commercial';
-  source: 'website' | 'referral' | 'advertising' | 'social_media' | 'partner' | 'other';
+  source:
+    | 'website'
+    | 'referral'
+    | 'advertising'
+    | 'social_media'
+    | 'partner'
+    | 'other';
   companyName?: string;
   businessLicense?: string;
   preferredContactMethod: 'email' | 'phone' | 'text';
@@ -52,22 +61,118 @@ interface NewOpportunityData {
 }
 
 const MOVE_SIZES: MoveSize[] = [
-  { id: '1', name: 'Studio or Less', description: 'Under 400 Sq Ft', cubicFeet: 75, weight: 675 },
-  { id: '2', name: 'Studio Apartment', description: '400 - 500 Sq Ft', cubicFeet: 250, weight: 2250 },
-  { id: '3', name: '1 Bedroom Apartment', description: '500 - 800 Sq Ft', cubicFeet: 432, weight: 3888 },
-  { id: '4', name: '2 Bedroom Apartment', description: '650 - 1000 Sq Ft', cubicFeet: 654, weight: 5886 },
-  { id: '5', name: '3 Bedroom Apartment', description: '1000 - 2000 Sq Ft', cubicFeet: 1236, weight: 4074 },
-  { id: '6', name: '1 Bedroom House', description: '800 - 1000 Sq Ft', cubicFeet: 576, weight: 4512 },
-  { id: '7', name: '2 Bedroom House (Small)', description: '1000 - 1200 Sq Ft', cubicFeet: 1152, weight: 9108 },
-  { id: '8', name: '2 Bedroom House', description: '1400 - 1600 Sq Ft', cubicFeet: 1458, weight: 7668 },
-  { id: '9', name: '2 Bedroom House (Large)', description: '1600 - 1800 Sq Ft', cubicFeet: 1632, weight: 8064 },
-  { id: '10', name: '3+ Br Storage Unit', description: '-', cubicFeet: 630, weight: 2860 },
-  { id: '11', name: '3 Bedroom House', description: '2000 - 2200 Sq Ft', cubicFeet: 1840, weight: 10880 },
-  { id: '12', name: '3 Bedroom House (Large)', description: '2200 - 2400 Sq Ft', cubicFeet: 1944, weight: 10488 },
-  { id: '13', name: '4 Bedroom House', description: '2400 - 2800 Sq Ft', cubicFeet: 1872, weight: 11264 },
-  { id: '14', name: '4 Bedroom House (Large)', description: '2800 - 3200 Sq Ft', cubicFeet: 2626, weight: 11832 },
-  { id: '15', name: '5 Bedroom House', description: '3200 - 3800 Sq Ft', cubicFeet: 2568, weight: 12476 },
-  { id: '16', name: '5 Bedroom House (Large)', description: '3800 - 4000 Sq Ft', cubicFeet: 3896, weight: 24732 },
+  {
+    id: '1',
+    name: 'Studio or Less',
+    description: 'Under 400 Sq Ft',
+    cubicFeet: 75,
+    weight: 675,
+  },
+  {
+    id: '2',
+    name: 'Studio Apartment',
+    description: '400 - 500 Sq Ft',
+    cubicFeet: 250,
+    weight: 2250,
+  },
+  {
+    id: '3',
+    name: '1 Bedroom Apartment',
+    description: '500 - 800 Sq Ft',
+    cubicFeet: 432,
+    weight: 3888,
+  },
+  {
+    id: '4',
+    name: '2 Bedroom Apartment',
+    description: '650 - 1000 Sq Ft',
+    cubicFeet: 654,
+    weight: 5886,
+  },
+  {
+    id: '5',
+    name: '3 Bedroom Apartment',
+    description: '1000 - 2000 Sq Ft',
+    cubicFeet: 1236,
+    weight: 4074,
+  },
+  {
+    id: '6',
+    name: '1 Bedroom House',
+    description: '800 - 1000 Sq Ft',
+    cubicFeet: 576,
+    weight: 4512,
+  },
+  {
+    id: '7',
+    name: '2 Bedroom House (Small)',
+    description: '1000 - 1200 Sq Ft',
+    cubicFeet: 1152,
+    weight: 9108,
+  },
+  {
+    id: '8',
+    name: '2 Bedroom House',
+    description: '1400 - 1600 Sq Ft',
+    cubicFeet: 1458,
+    weight: 7668,
+  },
+  {
+    id: '9',
+    name: '2 Bedroom House (Large)',
+    description: '1600 - 1800 Sq Ft',
+    cubicFeet: 1632,
+    weight: 8064,
+  },
+  {
+    id: '10',
+    name: '3+ Br Storage Unit',
+    description: '-',
+    cubicFeet: 630,
+    weight: 2860,
+  },
+  {
+    id: '11',
+    name: '3 Bedroom House',
+    description: '2000 - 2200 Sq Ft',
+    cubicFeet: 1840,
+    weight: 10880,
+  },
+  {
+    id: '12',
+    name: '3 Bedroom House (Large)',
+    description: '2200 - 2400 Sq Ft',
+    cubicFeet: 1944,
+    weight: 10488,
+  },
+  {
+    id: '13',
+    name: '4 Bedroom House',
+    description: '2400 - 2800 Sq Ft',
+    cubicFeet: 1872,
+    weight: 11264,
+  },
+  {
+    id: '14',
+    name: '4 Bedroom House (Large)',
+    description: '2800 - 3200 Sq Ft',
+    cubicFeet: 2626,
+    weight: 11832,
+  },
+  {
+    id: '15',
+    name: '5 Bedroom House',
+    description: '3200 - 3800 Sq Ft',
+    cubicFeet: 2568,
+    weight: 12476,
+  },
+  {
+    id: '16',
+    name: '5 Bedroom House (Large)',
+    description: '3800 - 4000 Sq Ft',
+    cubicFeet: 3896,
+    weight: 24732,
+  },
 ];
 
 export default function NewOpportunity() {
@@ -76,9 +181,13 @@ export default function NewOpportunity() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
-  const [estimateResult, setEstimateResult] = useState<EstimateResult | null>(null);
+  const [estimateResult, setEstimateResult] = useState<EstimateResult | null>(
+    null,
+  );
   const [calculatingEstimate, setCalculatingEstimate] = useState(false);
 
   // Customer Information State
@@ -196,17 +305,20 @@ export default function NewOpportunity() {
       const token = localStorage.getItem('access_token');
       const searchTerm = customerData.email || customerData.phone;
 
-      const response = await fetch(getApiUrl(`customers?search=${searchTerm}`), {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        getApiUrl(`customers?search=${searchTerm}`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const result = await response.json();
         if (result.customers && result.customers.length > 0) {
           setDuplicateWarning(
-            `A customer with this ${customerData.email ? 'email' : 'phone'} already exists. Please verify before creating.`
+            `A customer with this ${customerData.email ? 'email' : 'phone'} already exists. Please verify before creating.`,
           );
         } else {
           setDuplicateWarning(null);
@@ -228,7 +340,12 @@ export default function NewOpportunity() {
 
   // Calculate estimate in real-time
   const calculateEstimate = useCallback(async () => {
-    if (!moveDetails.pickup?.address || !moveDetails.delivery?.address || !moveDetails.totalWeight || !moveDetails.totalVolume) {
+    if (
+      !moveDetails.pickup?.address ||
+      !moveDetails.delivery?.address ||
+      !moveDetails.totalWeight ||
+      !moveDetails.totalVolume
+    ) {
       setEstimateResult(null);
       return;
     }
@@ -236,15 +353,19 @@ export default function NewOpportunity() {
     setCalculatingEstimate(true);
 
     try {
-      const rooms = moveDetails.rooms?.length ? moveDetails.rooms : [{
-        id: 'default-room',
-        type: 'mixed',
-        description: 'Combined room inventory',
-        items: [],
-        packingRequired: moveDetails.additionalServices?.packing || false,
-        totalWeight: moveDetails.totalWeight || 0,
-        totalVolume: moveDetails.totalVolume || 0,
-      }];
+      const rooms = moveDetails.rooms?.length
+        ? moveDetails.rooms
+        : [
+            {
+              id: 'default-room',
+              type: 'mixed',
+              description: 'Combined room inventory',
+              items: [],
+              packingRequired: moveDetails.additionalServices?.packing || false,
+              totalWeight: moveDetails.totalWeight || 0,
+              totalVolume: moveDetails.totalVolume || 0,
+            },
+          ];
 
       const estimateInput: EstimateInput = {
         ...moveDetails,
@@ -255,10 +376,13 @@ export default function NewOpportunity() {
 
       const estimator = new DeterministicEstimator(
         defaultRules.pricingRules as any,
-        defaultRules.locationHandicaps as any
+        defaultRules.locationHandicaps as any,
       );
 
-      const result = estimator.calculateEstimate(estimateInput, user?.id || 'temp-user');
+      const result = estimator.calculateEstimate(
+        estimateInput,
+        user?.id || 'temp-user',
+      );
       setEstimateResult(result);
     } catch (err) {
       console.error('Error calculating estimate:', err);
@@ -281,9 +405,9 @@ export default function NewOpportunity() {
   const handleMoveSizeChange = (moveSizeId: string) => {
     setSelectedMoveSize(moveSizeId);
     if (moveSizeId && moveSizeId !== 'manual') {
-      const moveSize = MOVE_SIZES.find(ms => ms.id === moveSizeId);
+      const moveSize = MOVE_SIZES.find((ms) => ms.id === moveSizeId);
       if (moveSize) {
-        setMoveDetails(prev => ({
+        setMoveDetails((prev) => ({
           ...prev,
           totalWeight: moveSize.weight,
           totalVolume: moveSize.cubicFeet,
@@ -300,23 +424,35 @@ export default function NewOpportunity() {
     const errors: Record<string, string> = {};
 
     if (step === 1) {
-      if (!customerData.firstName.trim()) errors.firstName = 'First name is required';
-      if (!customerData.lastName.trim()) errors.lastName = 'Last name is required';
+      if (!customerData.firstName.trim())
+        errors.firstName = 'First name is required';
+      if (!customerData.lastName.trim())
+        errors.lastName = 'Last name is required';
       if (!customerData.email.trim()) errors.email = 'Email is required';
-      if (customerData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerData.email)) {
+      if (
+        customerData.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerData.email)
+      ) {
         errors.email = 'Invalid email format';
       }
       if (!customerData.phone.trim()) errors.phone = 'Phone is required';
-      if (customerData.type === 'commercial' && !customerData.companyName?.trim()) {
-        errors.companyName = 'Company name is required for commercial customers';
+      if (
+        customerData.type === 'commercial' &&
+        !customerData.companyName?.trim()
+      ) {
+        errors.companyName =
+          'Company name is required for commercial customers';
       }
     }
 
     if (step === 2) {
-      if (!moveDetails.pickup?.address?.trim()) errors.pickupAddress = 'Pickup address is required';
-      if (!moveDetails.delivery?.address?.trim()) errors.deliveryAddress = 'Delivery address is required';
+      if (!moveDetails.pickup?.address?.trim())
+        errors.pickupAddress = 'Pickup address is required';
+      if (!moveDetails.delivery?.address?.trim())
+        errors.deliveryAddress = 'Delivery address is required';
       if (!moveDetails.moveDate) errors.moveDate = 'Move date is required';
-      if (!moveDetails.distance || moveDetails.distance <= 0) errors.distance = 'Distance must be greater than 0';
+      if (!moveDetails.distance || moveDetails.distance <= 0)
+        errors.distance = 'Distance must be greater than 0';
     }
 
     if (step === 3) {
@@ -326,7 +462,10 @@ export default function NewOpportunity() {
       if (!moveDetails.totalVolume || moveDetails.totalVolume <= 0) {
         errors.totalVolume = 'Total volume must be greater than 0';
       }
-      if (!moveDetails.estimatedDuration || moveDetails.estimatedDuration <= 0) {
+      if (
+        !moveDetails.estimatedDuration ||
+        moveDetails.estimatedDuration <= 0
+      ) {
         errors.estimatedDuration = 'Estimated duration must be greater than 0';
       }
     }
@@ -338,14 +477,14 @@ export default function NewOpportunity() {
   // Handle step navigation
   const handleNextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 4));
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
     } else {
       setError('Please correct the highlighted errors before continuing.');
     }
   };
 
   const handlePreviousStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
     setError(null);
   };
 
@@ -385,7 +524,9 @@ export default function NewOpportunity() {
         // Store estimate (if you have an endpoint for it)
         // For now, we'll just show success message
 
-        setSuccess(`Opportunity created successfully! Customer ID: ${customerId}`);
+        setSuccess(
+          `Opportunity created successfully! Customer ID: ${customerId}`,
+        );
 
         // Clear draft
         localStorage.removeItem('newOpportunityDraft');
@@ -397,7 +538,9 @@ export default function NewOpportunity() {
       }
     } catch (err) {
       console.error('Error creating opportunity:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create opportunity');
+      setError(
+        err instanceof Error ? err.message : 'Failed to create opportunity',
+      );
     } finally {
       setLoading(false);
     }
@@ -494,22 +637,30 @@ export default function NewOpportunity() {
 
       {/* Progress Indicator */}
       <div className={styles.progressIndicator}>
-        <div className={`${styles.step} ${currentStep >= 1 ? styles.active : ''} ${currentStep > 1 ? styles.completed : ''}`}>
+        <div
+          className={`${styles.step} ${currentStep >= 1 ? styles.active : ''} ${currentStep > 1 ? styles.completed : ''}`}
+        >
           <div className={styles.stepNumber}>1</div>
           <div className={styles.stepLabel}>Customer Info</div>
         </div>
         <div className={styles.progressLine}></div>
-        <div className={`${styles.step} ${currentStep >= 2 ? styles.active : ''} ${currentStep > 2 ? styles.completed : ''}`}>
+        <div
+          className={`${styles.step} ${currentStep >= 2 ? styles.active : ''} ${currentStep > 2 ? styles.completed : ''}`}
+        >
           <div className={styles.stepNumber}>2</div>
           <div className={styles.stepLabel}>Move Details</div>
         </div>
         <div className={styles.progressLine}></div>
-        <div className={`${styles.step} ${currentStep >= 3 ? styles.active : ''} ${currentStep > 3 ? styles.completed : ''}`}>
+        <div
+          className={`${styles.step} ${currentStep >= 3 ? styles.active : ''} ${currentStep > 3 ? styles.completed : ''}`}
+        >
           <div className={styles.stepNumber}>3</div>
           <div className={styles.stepLabel}>Inventory</div>
         </div>
         <div className={styles.progressLine}></div>
-        <div className={`${styles.step} ${currentStep >= 4 ? styles.active : ''} ${currentStep > 4 ? styles.completed : ''}`}>
+        <div
+          className={`${styles.step} ${currentStep >= 4 ? styles.active : ''} ${currentStep > 4 ? styles.completed : ''}`}
+        >
           <div className={styles.stepNumber}>4</div>
           <div className={styles.stepLabel}>Review</div>
         </div>
@@ -550,11 +701,20 @@ export default function NewOpportunity() {
                     id="firstName"
                     type="text"
                     value={customerData.firstName}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, firstName: e.target.value }))}
-                    className={validationErrors.firstName ? styles.fieldError : ''}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        firstName: e.target.value,
+                      }))
+                    }
+                    className={
+                      validationErrors.firstName ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.firstName && (
-                    <div className={styles.errorMessage}>{validationErrors.firstName}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.firstName}
+                    </div>
                   )}
                 </div>
 
@@ -564,11 +724,20 @@ export default function NewOpportunity() {
                     id="lastName"
                     type="text"
                     value={customerData.lastName}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, lastName: e.target.value }))}
-                    className={validationErrors.lastName ? styles.fieldError : ''}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        lastName: e.target.value,
+                      }))
+                    }
+                    className={
+                      validationErrors.lastName ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.lastName && (
-                    <div className={styles.errorMessage}>{validationErrors.lastName}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.lastName}
+                    </div>
                   )}
                 </div>
 
@@ -578,12 +747,19 @@ export default function NewOpportunity() {
                     id="email"
                     type="email"
                     value={customerData.email}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                     onBlur={checkDuplicateCustomer}
                     className={validationErrors.email ? styles.fieldError : ''}
                   />
                   {validationErrors.email && (
-                    <div className={styles.errorMessage}>{validationErrors.email}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.email}
+                    </div>
                   )}
                 </div>
 
@@ -593,13 +769,20 @@ export default function NewOpportunity() {
                     id="phone"
                     type="tel"
                     value={customerData.phone}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
                     onBlur={checkDuplicateCustomer}
                     className={validationErrors.phone ? styles.fieldError : ''}
                     placeholder="(555) 123-4567"
                   />
                   {validationErrors.phone && (
-                    <div className={styles.errorMessage}>{validationErrors.phone}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.phone}
+                    </div>
                   )}
                 </div>
 
@@ -609,7 +792,12 @@ export default function NewOpportunity() {
                     id="alternatePhone"
                     type="tel"
                     value={customerData.alternatePhone}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, alternatePhone: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        alternatePhone: e.target.value,
+                      }))
+                    }
                     placeholder="Optional"
                   />
                 </div>
@@ -619,7 +807,12 @@ export default function NewOpportunity() {
                   <select
                     id="customerType"
                     value={customerData.type}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, type: e.target.value as 'residential' | 'commercial' }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        type: e.target.value as 'residential' | 'commercial',
+                      }))
+                    }
                   >
                     <option value="residential">Residential</option>
                     <option value="commercial">Commercial</option>
@@ -633,11 +826,20 @@ export default function NewOpportunity() {
                       id="companyName"
                       type="text"
                       value={customerData.companyName || ''}
-                      onChange={(e) => setCustomerData(prev => ({ ...prev, companyName: e.target.value }))}
-                      className={validationErrors.companyName ? styles.fieldError : ''}
+                      onChange={(e) =>
+                        setCustomerData((prev) => ({
+                          ...prev,
+                          companyName: e.target.value,
+                        }))
+                      }
+                      className={
+                        validationErrors.companyName ? styles.fieldError : ''
+                      }
                     />
                     {validationErrors.companyName && (
-                      <div className={styles.errorMessage}>{validationErrors.companyName}</div>
+                      <div className={styles.errorMessage}>
+                        {validationErrors.companyName}
+                      </div>
                     )}
                   </div>
                 )}
@@ -647,7 +849,12 @@ export default function NewOpportunity() {
                   <select
                     id="source"
                     value={customerData.source}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, source: e.target.value as any }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        source: e.target.value as any,
+                      }))
+                    }
                   >
                     <option value="website">Website</option>
                     <option value="referral">Referral</option>
@@ -659,11 +866,21 @@ export default function NewOpportunity() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="preferredContact">Preferred Contact Method *</label>
+                  <label htmlFor="preferredContact">
+                    Preferred Contact Method *
+                  </label>
                   <select
                     id="preferredContact"
                     value={customerData.preferredContactMethod}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, preferredContactMethod: e.target.value as 'email' | 'phone' | 'text' }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        preferredContactMethod: e.target.value as
+                          | 'email'
+                          | 'phone'
+                          | 'text',
+                      }))
+                    }
                   >
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
@@ -677,42 +894,54 @@ export default function NewOpportunity() {
                     <label>
                       <input
                         type="checkbox"
-                        checked={customerData.communicationPreferences?.allowMarketing}
-                        onChange={(e) => setCustomerData(prev => ({
-                          ...prev,
-                          communicationPreferences: {
-                            ...prev.communicationPreferences!,
-                            allowMarketing: e.target.checked
-                          }
-                        }))}
+                        checked={
+                          customerData.communicationPreferences?.allowMarketing
+                        }
+                        onChange={(e) =>
+                          setCustomerData((prev) => ({
+                            ...prev,
+                            communicationPreferences: {
+                              ...prev.communicationPreferences!,
+                              allowMarketing: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Allow Marketing Communications
                     </label>
                     <label>
                       <input
                         type="checkbox"
-                        checked={customerData.communicationPreferences?.allowSms}
-                        onChange={(e) => setCustomerData(prev => ({
-                          ...prev,
-                          communicationPreferences: {
-                            ...prev.communicationPreferences!,
-                            allowSms: e.target.checked
-                          }
-                        }))}
+                        checked={
+                          customerData.communicationPreferences?.allowSms
+                        }
+                        onChange={(e) =>
+                          setCustomerData((prev) => ({
+                            ...prev,
+                            communicationPreferences: {
+                              ...prev.communicationPreferences!,
+                              allowSms: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Allow SMS Messages
                     </label>
                     <label>
                       <input
                         type="checkbox"
-                        checked={customerData.communicationPreferences?.allowEmail}
-                        onChange={(e) => setCustomerData(prev => ({
-                          ...prev,
-                          communicationPreferences: {
-                            ...prev.communicationPreferences!,
-                            allowEmail: e.target.checked
-                          }
-                        }))}
+                        checked={
+                          customerData.communicationPreferences?.allowEmail
+                        }
+                        onChange={(e) =>
+                          setCustomerData((prev) => ({
+                            ...prev,
+                            communicationPreferences: {
+                              ...prev.communicationPreferences!,
+                              allowEmail: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Allow Email
                     </label>
@@ -724,7 +953,12 @@ export default function NewOpportunity() {
                   <textarea
                     id="notes"
                     value={customerData.notes}
-                    onChange={(e) => setCustomerData(prev => ({ ...prev, notes: e.target.value }))}
+                    onChange={(e) =>
+                      setCustomerData((prev) => ({
+                        ...prev,
+                        notes: e.target.value,
+                      }))
+                    }
                     rows={3}
                     placeholder="Additional information about the customer..."
                   />
@@ -744,7 +978,12 @@ export default function NewOpportunity() {
                   <select
                     id="service"
                     value={moveDetails.service}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, service: e.target.value as any }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        service: e.target.value as any,
+                      }))
+                    }
                   >
                     <option value="local">Local Move</option>
                     <option value="long_distance">Long Distance</option>
@@ -757,12 +996,26 @@ export default function NewOpportunity() {
                   <input
                     id="moveDate"
                     type="date"
-                    value={typeof moveDetails.moveDate === 'string' ? moveDetails.moveDate : moveDetails.moveDate?.toISOString().split('T')[0] || ''}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, moveDate: new Date(e.target.value) }))}
-                    className={validationErrors.moveDate ? styles.fieldError : ''}
+                    value={
+                      typeof moveDetails.moveDate === 'string'
+                        ? moveDetails.moveDate
+                        : moveDetails.moveDate?.toISOString().split('T')[0] ||
+                          ''
+                    }
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        moveDate: new Date(e.target.value),
+                      }))
+                    }
+                    className={
+                      validationErrors.moveDate ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.moveDate && (
-                    <div className={styles.errorMessage}>{validationErrors.moveDate}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.moveDate}
+                    </div>
                   )}
                 </div>
 
@@ -776,15 +1029,21 @@ export default function NewOpportunity() {
                     id="pickupAddress"
                     type="text"
                     value={moveDetails.pickup?.address}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      pickup: { ...prev.pickup!, address: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        pickup: { ...prev.pickup!, address: e.target.value },
+                      }))
+                    }
                     placeholder="123 Main St, City, State ZIP"
-                    className={validationErrors.pickupAddress ? styles.fieldError : ''}
+                    className={
+                      validationErrors.pickupAddress ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.pickupAddress && (
-                    <div className={styles.errorMessage}>{validationErrors.pickupAddress}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.pickupAddress}
+                    </div>
                   )}
                 </div>
 
@@ -794,10 +1053,15 @@ export default function NewOpportunity() {
                     id="pickupFloor"
                     type="number"
                     value={moveDetails.pickup?.floorLevel}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      pickup: { ...prev.pickup!, floorLevel: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        pickup: {
+                          ...prev.pickup!,
+                          floorLevel: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="1"
                   />
                 </div>
@@ -808,10 +1072,15 @@ export default function NewOpportunity() {
                     id="pickupStairs"
                     type="number"
                     value={moveDetails.pickup?.stairsCount}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      pickup: { ...prev.pickup!, stairsCount: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        pickup: {
+                          ...prev.pickup!,
+                          stairsCount: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="0"
                   />
                 </div>
@@ -821,10 +1090,15 @@ export default function NewOpportunity() {
                   <select
                     id="pickupAccess"
                     value={moveDetails.pickup?.accessDifficulty}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      pickup: { ...prev.pickup!, accessDifficulty: e.target.value as any }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        pickup: {
+                          ...prev.pickup!,
+                          accessDifficulty: e.target.value as any,
+                        },
+                      }))
+                    }
                   >
                     <option value="easy">Easy</option>
                     <option value="moderate">Moderate</option>
@@ -839,10 +1113,15 @@ export default function NewOpportunity() {
                     id="pickupParking"
                     type="number"
                     value={moveDetails.pickup?.parkingDistance}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      pickup: { ...prev.pickup!, parkingDistance: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        pickup: {
+                          ...prev.pickup!,
+                          parkingDistance: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="0"
                   />
                 </div>
@@ -852,10 +1131,15 @@ export default function NewOpportunity() {
                     <input
                       type="checkbox"
                       checked={moveDetails.pickup?.elevatorAccess}
-                      onChange={(e) => setMoveDetails(prev => ({
-                        ...prev,
-                        pickup: { ...prev.pickup!, elevatorAccess: e.target.checked }
-                      }))}
+                      onChange={(e) =>
+                        setMoveDetails((prev) => ({
+                          ...prev,
+                          pickup: {
+                            ...prev.pickup!,
+                            elevatorAccess: e.target.checked,
+                          },
+                        }))
+                      }
                     />
                     Elevator Access
                   </label>
@@ -871,15 +1155,24 @@ export default function NewOpportunity() {
                     id="deliveryAddress"
                     type="text"
                     value={moveDetails.delivery?.address}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      delivery: { ...prev.delivery!, address: e.target.value }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        delivery: {
+                          ...prev.delivery!,
+                          address: e.target.value,
+                        },
+                      }))
+                    }
                     placeholder="456 Oak Ave, City, State ZIP"
-                    className={validationErrors.deliveryAddress ? styles.fieldError : ''}
+                    className={
+                      validationErrors.deliveryAddress ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.deliveryAddress && (
-                    <div className={styles.errorMessage}>{validationErrors.deliveryAddress}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.deliveryAddress}
+                    </div>
                   )}
                 </div>
 
@@ -889,10 +1182,15 @@ export default function NewOpportunity() {
                     id="deliveryFloor"
                     type="number"
                     value={moveDetails.delivery?.floorLevel}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      delivery: { ...prev.delivery!, floorLevel: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        delivery: {
+                          ...prev.delivery!,
+                          floorLevel: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="1"
                   />
                 </div>
@@ -903,10 +1201,15 @@ export default function NewOpportunity() {
                     id="deliveryStairs"
                     type="number"
                     value={moveDetails.delivery?.stairsCount}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      delivery: { ...prev.delivery!, stairsCount: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        delivery: {
+                          ...prev.delivery!,
+                          stairsCount: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="0"
                   />
                 </div>
@@ -916,10 +1219,15 @@ export default function NewOpportunity() {
                   <select
                     id="deliveryAccess"
                     value={moveDetails.delivery?.accessDifficulty}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      delivery: { ...prev.delivery!, accessDifficulty: e.target.value as any }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        delivery: {
+                          ...prev.delivery!,
+                          accessDifficulty: e.target.value as any,
+                        },
+                      }))
+                    }
                   >
                     <option value="easy">Easy</option>
                     <option value="moderate">Moderate</option>
@@ -929,15 +1237,22 @@ export default function NewOpportunity() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="deliveryParking">Parking Distance (feet)</label>
+                  <label htmlFor="deliveryParking">
+                    Parking Distance (feet)
+                  </label>
                   <input
                     id="deliveryParking"
                     type="number"
                     value={moveDetails.delivery?.parkingDistance}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      delivery: { ...prev.delivery!, parkingDistance: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        delivery: {
+                          ...prev.delivery!,
+                          parkingDistance: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="0"
                   />
                 </div>
@@ -947,10 +1262,15 @@ export default function NewOpportunity() {
                     <input
                       type="checkbox"
                       checked={moveDetails.delivery?.elevatorAccess}
-                      onChange={(e) => setMoveDetails(prev => ({
-                        ...prev,
-                        delivery: { ...prev.delivery!, elevatorAccess: e.target.checked }
-                      }))}
+                      onChange={(e) =>
+                        setMoveDetails((prev) => ({
+                          ...prev,
+                          delivery: {
+                            ...prev.delivery!,
+                            elevatorAccess: e.target.checked,
+                          },
+                        }))
+                      }
                     />
                     Elevator Access
                   </label>
@@ -962,12 +1282,21 @@ export default function NewOpportunity() {
                     id="distance"
                     type="number"
                     value={moveDetails.distance}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, distance: Number(e.target.value) }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        distance: Number(e.target.value),
+                      }))
+                    }
                     min="0"
-                    className={validationErrors.distance ? styles.fieldError : ''}
+                    className={
+                      validationErrors.distance ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.distance && (
-                    <div className={styles.errorMessage}>{validationErrors.distance}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.distance}
+                    </div>
                   )}
                 </div>
               </div>
@@ -981,16 +1310,19 @@ export default function NewOpportunity() {
 
               <div className={styles.formGrid}>
                 <div className={styles.formGroupFull}>
-                  <label htmlFor="moveSize">Select Move Size (or choose manual entry)</label>
+                  <label htmlFor="moveSize">
+                    Select Move Size (or choose manual entry)
+                  </label>
                   <select
                     id="moveSize"
                     value={selectedMoveSize}
                     onChange={(e) => handleMoveSizeChange(e.target.value)}
                   >
                     <option value="">Select a move size...</option>
-                    {MOVE_SIZES.map(moveSize => (
+                    {MOVE_SIZES.map((moveSize) => (
                       <option key={moveSize.id} value={moveSize.id}>
-                        {moveSize.name} - {moveSize.description} ({moveSize.weight} lbs, {moveSize.cubicFeet} cu ft)
+                        {moveSize.name} - {moveSize.description} (
+                        {moveSize.weight} lbs, {moveSize.cubicFeet} cu ft)
                       </option>
                     ))}
                     <option value="manual">Manual Entry</option>
@@ -1003,13 +1335,22 @@ export default function NewOpportunity() {
                     id="totalWeight"
                     type="number"
                     value={moveDetails.totalWeight}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, totalWeight: Number(e.target.value) }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        totalWeight: Number(e.target.value),
+                      }))
+                    }
                     min="1"
                     disabled={!manualEntry && selectedMoveSize !== ''}
-                    className={validationErrors.totalWeight ? styles.fieldError : ''}
+                    className={
+                      validationErrors.totalWeight ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.totalWeight && (
-                    <div className={styles.errorMessage}>{validationErrors.totalWeight}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.totalWeight}
+                    </div>
                   )}
                 </div>
 
@@ -1019,13 +1360,22 @@ export default function NewOpportunity() {
                     id="totalVolume"
                     type="number"
                     value={moveDetails.totalVolume}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, totalVolume: Number(e.target.value) }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        totalVolume: Number(e.target.value),
+                      }))
+                    }
                     min="1"
                     disabled={!manualEntry && selectedMoveSize !== ''}
-                    className={validationErrors.totalVolume ? styles.fieldError : ''}
+                    className={
+                      validationErrors.totalVolume ? styles.fieldError : ''
+                    }
                   />
                   {validationErrors.totalVolume && (
-                    <div className={styles.errorMessage}>{validationErrors.totalVolume}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.totalVolume}
+                    </div>
                   )}
                 </div>
 
@@ -1034,7 +1384,12 @@ export default function NewOpportunity() {
                   <select
                     id="crewSize"
                     value={moveDetails.crewSize}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, crewSize: Number(e.target.value) }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        crewSize: Number(e.target.value),
+                      }))
+                    }
                   >
                     <option value={2}>2 movers</option>
                     <option value={3}>3 movers</option>
@@ -1045,18 +1400,31 @@ export default function NewOpportunity() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="estimatedDuration">Estimated Duration (hours) *</label>
+                  <label htmlFor="estimatedDuration">
+                    Estimated Duration (hours) *
+                  </label>
                   <input
                     id="estimatedDuration"
                     type="number"
                     value={moveDetails.estimatedDuration}
-                    onChange={(e) => setMoveDetails(prev => ({ ...prev, estimatedDuration: Number(e.target.value) }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        estimatedDuration: Number(e.target.value),
+                      }))
+                    }
                     min="1"
                     step="0.5"
-                    className={validationErrors.estimatedDuration ? styles.fieldError : ''}
+                    className={
+                      validationErrors.estimatedDuration
+                        ? styles.fieldError
+                        : ''
+                    }
                   />
                   {validationErrors.estimatedDuration && (
-                    <div className={styles.errorMessage}>{validationErrors.estimatedDuration}</div>
+                    <div className={styles.errorMessage}>
+                      {validationErrors.estimatedDuration}
+                    </div>
                   )}
                 </div>
 
@@ -1067,10 +1435,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.specialItems?.piano}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          specialItems: { ...prev.specialItems!, piano: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            specialItems: {
+                              ...prev.specialItems!,
+                              piano: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Piano
                     </label>
@@ -1078,10 +1451,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.specialItems?.antiques}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          specialItems: { ...prev.specialItems!, antiques: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            specialItems: {
+                              ...prev.specialItems!,
+                              antiques: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Antiques
                     </label>
@@ -1089,10 +1467,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.specialItems?.artwork}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          specialItems: { ...prev.specialItems!, artwork: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            specialItems: {
+                              ...prev.specialItems!,
+                              artwork: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Artwork
                     </label>
@@ -1105,10 +1488,15 @@ export default function NewOpportunity() {
                     id="fragileItems"
                     type="number"
                     value={moveDetails.specialItems?.fragileItems}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      specialItems: { ...prev.specialItems!, fragileItems: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        specialItems: {
+                          ...prev.specialItems!,
+                          fragileItems: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="0"
                   />
                 </div>
@@ -1119,10 +1507,15 @@ export default function NewOpportunity() {
                     id="valuableItems"
                     type="number"
                     value={moveDetails.specialItems?.valuableItems}
-                    onChange={(e) => setMoveDetails(prev => ({
-                      ...prev,
-                      specialItems: { ...prev.specialItems!, valuableItems: Number(e.target.value) }
-                    }))}
+                    onChange={(e) =>
+                      setMoveDetails((prev) => ({
+                        ...prev,
+                        specialItems: {
+                          ...prev.specialItems!,
+                          valuableItems: Number(e.target.value),
+                        },
+                      }))
+                    }
                     min="0"
                   />
                 </div>
@@ -1134,10 +1527,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.additionalServices?.packing}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          additionalServices: { ...prev.additionalServices!, packing: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            additionalServices: {
+                              ...prev.additionalServices!,
+                              packing: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Packing
                     </label>
@@ -1145,10 +1543,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.additionalServices?.unpacking}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          additionalServices: { ...prev.additionalServices!, unpacking: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            additionalServices: {
+                              ...prev.additionalServices!,
+                              unpacking: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Unpacking
                     </label>
@@ -1156,10 +1559,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.additionalServices?.assembly}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          additionalServices: { ...prev.additionalServices!, assembly: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            additionalServices: {
+                              ...prev.additionalServices!,
+                              assembly: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Assembly/Disassembly
                     </label>
@@ -1167,10 +1575,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.additionalServices?.storage}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          additionalServices: { ...prev.additionalServices!, storage: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            additionalServices: {
+                              ...prev.additionalServices!,
+                              storage: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Storage
                     </label>
@@ -1178,10 +1591,15 @@ export default function NewOpportunity() {
                       <input
                         type="checkbox"
                         checked={moveDetails.additionalServices?.cleaning}
-                        onChange={(e) => setMoveDetails(prev => ({
-                          ...prev,
-                          additionalServices: { ...prev.additionalServices!, cleaning: e.target.checked }
-                        }))}
+                        onChange={(e) =>
+                          setMoveDetails((prev) => ({
+                            ...prev,
+                            additionalServices: {
+                              ...prev.additionalServices!,
+                              cleaning: e.target.checked,
+                            },
+                          }))
+                        }
                       />
                       Cleaning
                     </label>
@@ -1199,34 +1617,74 @@ export default function NewOpportunity() {
               <div className={styles.reviewSection}>
                 <h4>Customer Information</h4>
                 <div className={styles.reviewGrid}>
-                  <div><strong>Name:</strong> {customerData.firstName} {customerData.lastName}</div>
-                  <div><strong>Email:</strong> {customerData.email}</div>
-                  <div><strong>Phone:</strong> {customerData.phone}</div>
-                  <div><strong>Type:</strong> {customerData.type}</div>
-                  {customerData.companyName && <div><strong>Company:</strong> {customerData.companyName}</div>}
-                  <div><strong>Source:</strong> {customerData.source}</div>
-                  <div><strong>Contact Method:</strong> {customerData.preferredContactMethod}</div>
+                  <div>
+                    <strong>Name:</strong> {customerData.firstName}{' '}
+                    {customerData.lastName}
+                  </div>
+                  <div>
+                    <strong>Email:</strong> {customerData.email}
+                  </div>
+                  <div>
+                    <strong>Phone:</strong> {customerData.phone}
+                  </div>
+                  <div>
+                    <strong>Type:</strong> {customerData.type}
+                  </div>
+                  {customerData.companyName && (
+                    <div>
+                      <strong>Company:</strong> {customerData.companyName}
+                    </div>
+                  )}
+                  <div>
+                    <strong>Source:</strong> {customerData.source}
+                  </div>
+                  <div>
+                    <strong>Contact Method:</strong>{' '}
+                    {customerData.preferredContactMethod}
+                  </div>
                 </div>
               </div>
 
               <div className={styles.reviewSection}>
                 <h4>Move Details</h4>
                 <div className={styles.reviewGrid}>
-                  <div><strong>Service:</strong> {moveDetails.service}</div>
-                  <div><strong>Date:</strong> {moveDetails.moveDate instanceof Date ? moveDetails.moveDate.toLocaleDateString() : 'N/A'}</div>
-                  <div><strong>Pickup:</strong> {moveDetails.pickup?.address}</div>
-                  <div><strong>Delivery:</strong> {moveDetails.delivery?.address}</div>
-                  <div><strong>Distance:</strong> {moveDetails.distance} miles</div>
-                  <div><strong>Duration:</strong> {moveDetails.estimatedDuration} hours</div>
+                  <div>
+                    <strong>Service:</strong> {moveDetails.service}
+                  </div>
+                  <div>
+                    <strong>Date:</strong>{' '}
+                    {moveDetails.moveDate instanceof Date
+                      ? moveDetails.moveDate.toLocaleDateString()
+                      : 'N/A'}
+                  </div>
+                  <div>
+                    <strong>Pickup:</strong> {moveDetails.pickup?.address}
+                  </div>
+                  <div>
+                    <strong>Delivery:</strong> {moveDetails.delivery?.address}
+                  </div>
+                  <div>
+                    <strong>Distance:</strong> {moveDetails.distance} miles
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {moveDetails.estimatedDuration}{' '}
+                    hours
+                  </div>
                 </div>
               </div>
 
               <div className={styles.reviewSection}>
                 <h4>Inventory Summary</h4>
                 <div className={styles.reviewGrid}>
-                  <div><strong>Weight:</strong> {moveDetails.totalWeight} lbs</div>
-                  <div><strong>Volume:</strong> {moveDetails.totalVolume} cu ft</div>
-                  <div><strong>Crew Size:</strong> {moveDetails.crewSize} movers</div>
+                  <div>
+                    <strong>Weight:</strong> {moveDetails.totalWeight} lbs
+                  </div>
+                  <div>
+                    <strong>Volume:</strong> {moveDetails.totalVolume} cu ft
+                  </div>
+                  <div>
+                    <strong>Crew Size:</strong> {moveDetails.crewSize} movers
+                  </div>
                 </div>
               </div>
             </div>
@@ -1282,7 +1740,11 @@ export default function NewOpportunity() {
               <div className={styles.finalPrice}>
                 <div className={styles.priceLabel}>Estimated Total</div>
                 <div className={styles.priceValue}>
-                  ${estimateResult.calculations.finalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $
+                  {estimateResult.calculations.finalPrice.toLocaleString(
+                    'en-US',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                  )}
                 </div>
               </div>
 
@@ -1290,40 +1752,65 @@ export default function NewOpportunity() {
                 <h4>Price Breakdown</h4>
                 <div className={styles.breakdownItem}>
                   <span>Base Labor</span>
-                  <span>${estimateResult.calculations.breakdown.baseLabor.toFixed(2)}</span>
+                  <span>
+                    $
+                    {estimateResult.calculations.breakdown.baseLabor.toFixed(2)}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Materials</span>
-                  <span>${estimateResult.calculations.breakdown.materials.toFixed(2)}</span>
+                  <span>
+                    $
+                    {estimateResult.calculations.breakdown.materials.toFixed(2)}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Transportation</span>
-                  <span>${estimateResult.calculations.breakdown.transportation.toFixed(2)}</span>
+                  <span>
+                    $
+                    {estimateResult.calculations.breakdown.transportation.toFixed(
+                      2,
+                    )}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Location Handicaps</span>
-                  <span>${estimateResult.calculations.breakdown.locationHandicaps.toFixed(2)}</span>
+                  <span>
+                    $
+                    {estimateResult.calculations.breakdown.locationHandicaps.toFixed(
+                      2,
+                    )}
+                  </span>
                 </div>
                 <div className={styles.breakdownItem}>
                   <span>Special Services</span>
-                  <span>${estimateResult.calculations.breakdown.specialServices.toFixed(2)}</span>
+                  <span>
+                    $
+                    {estimateResult.calculations.breakdown.specialServices.toFixed(
+                      2,
+                    )}
+                  </span>
                 </div>
               </div>
 
               {estimateResult.calculations.appliedRules.length > 0 && (
                 <div className={styles.appliedRules}>
                   <h4>Applied Pricing Rules</h4>
-                  {estimateResult.calculations.appliedRules.slice(0, 5).map((rule, index) => (
-                    <div key={index} className={styles.ruleItem}>
-                      <div className={styles.ruleName}>{rule.ruleName}</div>
-                      <div className={styles.ruleImpact}>
-                        {rule.priceImpact >= 0 ? '+' : ''}${rule.priceImpact.toFixed(2)}
+                  {estimateResult.calculations.appliedRules
+                    .slice(0, 5)
+                    .map((rule, index) => (
+                      <div key={index} className={styles.ruleItem}>
+                        <div className={styles.ruleName}>{rule.ruleName}</div>
+                        <div className={styles.ruleImpact}>
+                          {rule.priceImpact >= 0 ? '+' : ''}$
+                          {rule.priceImpact.toFixed(2)}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                   {estimateResult.calculations.appliedRules.length > 5 && (
                     <div className={styles.moreRules}>
-                      +{estimateResult.calculations.appliedRules.length - 5} more rules
+                      +{estimateResult.calculations.appliedRules.length - 5}{' '}
+                      more rules
                     </div>
                   )}
                 </div>
@@ -1336,7 +1823,9 @@ export default function NewOpportunity() {
                 </div>
                 <div className={styles.metadataItem}>
                   <strong>Deterministic:</strong>
-                  <span>{estimateResult.metadata.deterministic ? 'Yes' : 'No'}</span>
+                  <span>
+                    {estimateResult.metadata.deterministic ? 'Yes' : 'No'}
+                  </span>
                 </div>
               </div>
             </>

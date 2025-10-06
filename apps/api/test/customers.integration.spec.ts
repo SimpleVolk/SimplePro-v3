@@ -78,7 +78,12 @@ describe('Customer Management Integration Tests', () => {
           status: 'lead',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(201);
 
@@ -107,7 +112,12 @@ describe('Customer Management Integration Tests', () => {
           },
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(201);
 
@@ -121,7 +131,12 @@ describe('Customer Management Integration Tests', () => {
           // Missing required fields
         };
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(incompleteData)
           .expect(400);
 
@@ -134,7 +149,12 @@ describe('Customer Management Integration Tests', () => {
           email: 'invalid-email-format',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(400);
 
@@ -147,7 +167,12 @@ describe('Customer Management Integration Tests', () => {
           phone: '123', // Invalid phone format
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(400);
 
@@ -160,7 +185,12 @@ describe('Customer Management Integration Tests', () => {
           type: 'invalid-type',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(400);
 
@@ -173,7 +203,12 @@ describe('Customer Management Integration Tests', () => {
           status: 'invalid-status',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(400);
 
@@ -187,23 +222,42 @@ describe('Customer Management Integration Tests', () => {
         });
 
         // Create first customer
-        await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(201);
 
         // Attempt to create second customer with same email
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        )
           .send(customerData)
           .expect(409);
 
-        ResponseAssertions.assertErrorResponse(response, 409, /email.*already.*exists/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          409,
+          /email.*already.*exists/i,
+        );
       });
 
       it('should require appropriate permissions', async () => {
         const customerData = TestDataFactories.createCustomerData();
 
         // Crew member should not be able to create customers
-        const response = await authenticatedRequest(app, 'post', '/customers', crewAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          crewAuth.accessToken,
+        )
           .send(customerData)
           .expect(403);
 
@@ -215,7 +269,12 @@ describe('Customer Management Integration Tests', () => {
           email: 'dispatcher-created@example.com',
         });
 
-        const response = await authenticatedRequest(app, 'post', '/customers', dispatcherAuth.accessToken)
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          dispatcherAuth.accessToken,
+        )
           .send(customerData)
           .expect(201);
 
@@ -263,16 +322,24 @@ describe('Customer Management Integration Tests', () => {
       ];
 
       for (const customerData of customersData) {
-        const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-          .send(customerData);
+        const response = await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        ).send(customerData);
         testCustomers.push(response.body.data);
       }
     });
 
     describe('GET /customers', () => {
       it('should retrieve all customers for admin', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(testCustomers.length);
@@ -280,23 +347,35 @@ describe('Customer Management Integration Tests', () => {
       });
 
       it('should allow dispatchers to read customers', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers', dispatcherAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers',
+          dispatcherAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(testCustomers.length);
       });
 
       it('should deny access to crew members', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers', crewAuth.accessToken)
-          .expect(403);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers',
+          crewAuth.accessToken,
+        ).expect(403);
 
         ResponseAssertions.assertErrorResponse(response, 403);
       });
 
       it('should filter customers by status', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers?status=active', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers?status=active',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(1);
@@ -304,8 +383,12 @@ describe('Customer Management Integration Tests', () => {
       });
 
       it('should filter customers by type', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers?type=commercial', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers?type=commercial',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(2);
@@ -315,8 +398,12 @@ describe('Customer Management Integration Tests', () => {
       });
 
       it('should search customers by name', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers?search=Alice', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers?search=Alice',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(1);
@@ -324,8 +411,12 @@ describe('Customer Management Integration Tests', () => {
       });
 
       it('should search customers by email', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers?search=bob.smith', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers?search=bob.smith',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(1);
@@ -337,7 +428,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           '/customers?type=residential&status=prospect',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
@@ -347,8 +438,12 @@ describe('Customer Management Integration Tests', () => {
       });
 
       it('should support pagination', async () => {
-        const response = await authenticatedRequest(app, 'get', '/customers?page=1&limit=2', adminAuth.accessToken)
-          .expect(200);
+        const response = await authenticatedRequest(
+          app,
+          'get',
+          '/customers?page=1&limit=2',
+          adminAuth.accessToken,
+        ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
         expect(response.body.data.items.length).toBe(2);
@@ -362,7 +457,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           '/customers?search=nonexistent',
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertPaginationResponse(response);
@@ -379,7 +474,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           `/customers/${customer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -398,7 +493,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           `/customers/${nonExistentId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(404);
 
         ResponseAssertions.assertErrorResponse(response, 404, /not.*found/i);
@@ -411,7 +506,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           `/customers/${invalidId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(400);
 
         ResponseAssertions.assertErrorResponse(response, 400);
@@ -424,7 +519,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           `/customers/${customer.id}`,
-          crewAuth.accessToken
+          crewAuth.accessToken,
         ).expect(403);
 
         ResponseAssertions.assertErrorResponse(response, 403);
@@ -441,8 +536,12 @@ describe('Customer Management Integration Tests', () => {
         status: 'lead',
       });
 
-      const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-        .send(customerData);
+      const response = await authenticatedRequest(
+        app,
+        'post',
+        '/customers',
+        adminAuth.accessToken,
+      ).send(customerData);
       testCustomer = response.body.data;
     });
 
@@ -458,7 +557,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(updateData)
           .expect(200);
@@ -483,7 +582,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(updateData)
           .expect(200);
@@ -500,7 +599,7 @@ describe('Customer Management Integration Tests', () => {
             app,
             'patch',
             `/customers/${testCustomer.id}`,
-            adminAuth.accessToken
+            adminAuth.accessToken,
           )
             .send({ status })
             .expect(200);
@@ -520,7 +619,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send(invalidUpdateData)
           .expect(400);
@@ -533,20 +632,28 @@ describe('Customer Management Integration Tests', () => {
         const otherCustomerData = TestDataFactories.createCustomerData({
           email: 'other@example.com',
         });
-        await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-          .send(otherCustomerData);
+        await authenticatedRequest(
+          app,
+          'post',
+          '/customers',
+          adminAuth.accessToken,
+        ).send(otherCustomerData);
 
         // Try to update first customer with second customer's email
         const response = await authenticatedRequest(
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send({ email: 'other@example.com' })
           .expect(409);
 
-        ResponseAssertions.assertErrorResponse(response, 409, /email.*already.*exists/i);
+        ResponseAssertions.assertErrorResponse(
+          response,
+          409,
+          /email.*already.*exists/i,
+        );
       });
 
       it('should require appropriate permissions', async () => {
@@ -556,7 +663,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          crewAuth.accessToken
+          crewAuth.accessToken,
         )
           .send(updateData)
           .expect(403);
@@ -569,7 +676,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send({ firstName: 'OnlyFirstName' })
           .expect(200);
@@ -583,21 +690,21 @@ describe('Customer Management Integration Tests', () => {
         const originalUpdatedAt = testCustomer.updatedAt;
 
         // Wait a moment to ensure timestamp difference
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         const response = await authenticatedRequest(
           app,
           'patch',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send({ firstName: 'TimestampTest' })
           .expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
-        expect(new Date(response.body.data.updatedAt).getTime()).toBeGreaterThan(
-          new Date(originalUpdatedAt).getTime()
-        );
+        expect(
+          new Date(response.body.data.updatedAt).getTime(),
+        ).toBeGreaterThan(new Date(originalUpdatedAt).getTime());
       });
     });
   });
@@ -610,8 +717,12 @@ describe('Customer Management Integration Tests', () => {
         email: 'delete-test@example.com',
       });
 
-      const response = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-        .send(customerData);
+      const response = await authenticatedRequest(
+        app,
+        'post',
+        '/customers',
+        adminAuth.accessToken,
+      ).send(customerData);
       testCustomer = response.body.data;
     });
 
@@ -621,7 +732,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'delete',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         ResponseAssertions.assertSuccessResponse(response);
@@ -632,7 +743,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           `/customers/${testCustomer.id}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         expect(getResponse.body.data.status).toBe('inactive');
@@ -643,7 +754,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'delete',
           `/customers/${testCustomer.id}`,
-          dispatcherAuth.accessToken
+          dispatcherAuth.accessToken,
         ).expect(403);
 
         ResponseAssertions.assertErrorResponse(response, 403);
@@ -656,7 +767,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'delete',
           `/customers/${nonExistentId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(404);
 
         ResponseAssertions.assertErrorResponse(response, 404);
@@ -675,21 +786,30 @@ describe('Customer Management Integration Tests', () => {
         });
 
         operations.push(
-          authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken).send(customerData)
+          authenticatedRequest(
+            app,
+            'post',
+            '/customers',
+            adminAuth.accessToken,
+          ).send(customerData),
         );
       }
 
       const responses = await Promise.all(operations);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(201);
         ResponseAssertions.assertSuccessResponse(response);
       });
 
       // Verify all customers were created
-      const listResponse = await authenticatedRequest(app, 'get', '/customers', adminAuth.accessToken)
-        .expect(200);
+      const listResponse = await authenticatedRequest(
+        app,
+        'get',
+        '/customers',
+        adminAuth.accessToken,
+      ).expect(200);
 
       expect(listResponse.body.data.total).toBe(10);
     }, 15000);
@@ -704,7 +824,12 @@ describe('Customer Management Integration Tests', () => {
         });
 
         createPromises.push(
-          authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken).send(customerData)
+          authenticatedRequest(
+            app,
+            'post',
+            '/customers',
+            adminAuth.accessToken,
+          ).send(customerData),
         );
       }
 
@@ -713,8 +838,12 @@ describe('Customer Management Integration Tests', () => {
       const startTime = Date.now();
 
       // Retrieve all customers
-      const response = await authenticatedRequest(app, 'get', '/customers?limit=100', adminAuth.accessToken)
-        .expect(200);
+      const response = await authenticatedRequest(
+        app,
+        'get',
+        '/customers?limit=100',
+        adminAuth.accessToken,
+      ).expect(200);
 
       const endTime = Date.now();
 
@@ -734,8 +863,12 @@ describe('Customer Management Integration Tests', () => {
         status: 'lead',
       });
 
-      const createResponse = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-        .send(customerData);
+      const createResponse = await authenticatedRequest(
+        app,
+        'post',
+        '/customers',
+        adminAuth.accessToken,
+      ).send(customerData);
 
       const customerId = createResponse.body.data.id;
 
@@ -747,7 +880,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'patch',
           `/customers/${customerId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         )
           .send({ status })
           .expect(200);
@@ -759,7 +892,7 @@ describe('Customer Management Integration Tests', () => {
           app,
           'get',
           `/customers/${customerId}`,
-          adminAuth.accessToken
+          adminAuth.accessToken,
         ).expect(200);
 
         expect(getResponse.body.data.status).toBe(status);
@@ -771,25 +904,41 @@ describe('Customer Management Integration Tests', () => {
         email: 'concurrent-update@example.com',
       });
 
-      const createResponse = await authenticatedRequest(app, 'post', '/customers', adminAuth.accessToken)
-        .send(customerData);
+      const createResponse = await authenticatedRequest(
+        app,
+        'post',
+        '/customers',
+        adminAuth.accessToken,
+      ).send(customerData);
 
       const customerId = createResponse.body.data.id;
 
       // Make concurrent updates
       const updatePromises = [
-        authenticatedRequest(app, 'patch', `/customers/${customerId}`, adminAuth.accessToken)
-          .send({ firstName: 'Update1' }),
-        authenticatedRequest(app, 'patch', `/customers/${customerId}`, adminAuth.accessToken)
-          .send({ lastName: 'Update2' }),
-        authenticatedRequest(app, 'patch', `/customers/${customerId}`, adminAuth.accessToken)
-          .send({ status: 'prospect' }),
+        authenticatedRequest(
+          app,
+          'patch',
+          `/customers/${customerId}`,
+          adminAuth.accessToken,
+        ).send({ firstName: 'Update1' }),
+        authenticatedRequest(
+          app,
+          'patch',
+          `/customers/${customerId}`,
+          adminAuth.accessToken,
+        ).send({ lastName: 'Update2' }),
+        authenticatedRequest(
+          app,
+          'patch',
+          `/customers/${customerId}`,
+          adminAuth.accessToken,
+        ).send({ status: 'prospect' }),
       ];
 
       const responses = await Promise.all(updatePromises);
 
       // All should succeed (last write wins)
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
       });
 
@@ -798,7 +947,7 @@ describe('Customer Management Integration Tests', () => {
         app,
         'get',
         `/customers/${customerId}`,
-        adminAuth.accessToken
+        adminAuth.accessToken,
       ).expect(200);
 
       expect(finalResponse.body.data).toHaveProperty('firstName');

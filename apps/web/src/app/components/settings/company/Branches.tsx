@@ -40,11 +40,11 @@ export default function Branches() {
         street: '123 Main Street',
         city: 'Dallas',
         state: 'TX',
-        zipCode: '75201'
+        zipCode: '75201',
       },
       contact: {
         phone: '(555) 123-4567',
-        email: 'downtown@movecorp.com'
+        email: 'downtown@movecorp.com',
       },
       managerName: 'John Smith',
       isPrimary: true,
@@ -55,10 +55,10 @@ export default function Branches() {
         thursday: { open: '08:00', close: '18:00', enabled: true },
         friday: { open: '08:00', close: '18:00', enabled: true },
         saturday: { open: '09:00', close: '15:00', enabled: true },
-        sunday: { open: '10:00', close: '14:00', enabled: false }
+        sunday: { open: '10:00', close: '14:00', enabled: false },
       },
       serviceRadius: 50,
-      isActive: true
+      isActive: true,
     },
     {
       id: '2',
@@ -67,11 +67,11 @@ export default function Branches() {
         street: '456 Oak Avenue',
         city: 'Plano',
         state: 'TX',
-        zipCode: '75024'
+        zipCode: '75024',
       },
       contact: {
         phone: '(555) 234-5678',
-        email: 'north@movecorp.com'
+        email: 'north@movecorp.com',
       },
       managerName: 'Sarah Johnson',
       isPrimary: false,
@@ -82,11 +82,11 @@ export default function Branches() {
         thursday: { open: '08:00', close: '18:00', enabled: true },
         friday: { open: '08:00', close: '18:00', enabled: true },
         saturday: { open: '09:00', close: '13:00', enabled: true },
-        sunday: { open: '10:00', close: '14:00', enabled: false }
+        sunday: { open: '10:00', close: '14:00', enabled: false },
       },
       serviceRadius: 35,
-      isActive: true
-    }
+      isActive: true,
+    },
   ]);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -108,10 +108,10 @@ export default function Branches() {
         thursday: { open: '08:00', close: '18:00', enabled: true },
         friday: { open: '08:00', close: '18:00', enabled: true },
         saturday: { open: '09:00', close: '15:00', enabled: true },
-        sunday: { open: '10:00', close: '14:00', enabled: false }
+        sunday: { open: '10:00', close: '14:00', enabled: false },
       },
       serviceRadius: 50,
-      isActive: true
+      isActive: true,
     });
     setEditingBranch(null);
     setShowCreateForm(true);
@@ -127,13 +127,19 @@ export default function Branches() {
 
   const handleSave = () => {
     if (editingBranch) {
-      setBranches(prev => prev.map(b => b.id === editingBranch.id ? { ...formData as Branch, id: editingBranch.id } : b));
+      setBranches((prev) =>
+        prev.map((b) =>
+          b.id === editingBranch.id
+            ? { ...(formData as Branch), id: editingBranch.id }
+            : b,
+        ),
+      );
     } else {
       const newBranch: Branch = {
-        ...formData as Branch,
-        id: Date.now().toString()
+        ...(formData as Branch),
+        id: Date.now().toString(),
       };
-      setBranches(prev => [...prev, newBranch]);
+      setBranches((prev) => [...prev, newBranch]);
     }
     setShowCreateForm(false);
     setEditingBranch(null);
@@ -150,19 +156,21 @@ export default function Branches() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this branch?')) {
-      setBranches(prev => prev.filter(b => b.id !== id));
+      setBranches((prev) => prev.filter((b) => b.id !== id));
     }
   };
 
   const togglePrimary = (id: string) => {
-    setBranches(prev => prev.map(b => ({
-      ...b,
-      isPrimary: b.id === id
-    })));
+    setBranches((prev) =>
+      prev.map((b) => ({
+        ...b,
+        isPrimary: b.id === id,
+      })),
+    );
   };
 
   const updateFormData = (path: string[], value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = { ...prev } as any;
       let current = updated;
 
@@ -195,14 +203,18 @@ export default function Branches() {
 
       {activeTab === 'list' && (
         <div className={styles.branchesGrid}>
-          {branches.map(branch => (
+          {branches.map((branch) => (
             <div key={branch.id} className={styles.branchCard}>
               <div className={styles.branchHeader}>
                 <div>
                   <h4>{branch.name}</h4>
-                  {branch.isPrimary && <span className={styles.primaryBadge}>Primary</span>}
+                  {branch.isPrimary && (
+                    <span className={styles.primaryBadge}>Primary</span>
+                  )}
                 </div>
-                <span className={`${styles.status} ${branch.isActive ? styles.active : styles.inactive}`}>
+                <span
+                  className={`${styles.status} ${branch.isActive ? styles.active : styles.inactive}`}
+                >
                   {branch.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -212,7 +224,10 @@ export default function Branches() {
                   <span className={styles.icon}>📍</span>
                   <div>
                     <div>{branch.address.street}</div>
-                    <div>{branch.address.city}, {branch.address.state} {branch.address.zipCode}</div>
+                    <div>
+                      {branch.address.city}, {branch.address.state}{' '}
+                      {branch.address.zipCode}
+                    </div>
                   </div>
                 </div>
 
@@ -236,16 +251,25 @@ export default function Branches() {
               </div>
 
               <div className={styles.branchActions}>
-                <button onClick={() => handleEdit(branch)} className={styles.actionButton}>
+                <button
+                  onClick={() => handleEdit(branch)}
+                  className={styles.actionButton}
+                >
                   ✏️ Edit
                 </button>
                 {!branch.isPrimary && (
-                  <button onClick={() => togglePrimary(branch.id)} className={styles.actionButton}>
+                  <button
+                    onClick={() => togglePrimary(branch.id)}
+                    className={styles.actionButton}
+                  >
                     ⭐ Set as Primary
                   </button>
                 )}
                 {!branch.isPrimary && (
-                  <button onClick={() => handleDelete(branch.id)} className={styles.deleteButton}>
+                  <button
+                    onClick={() => handleDelete(branch.id)}
+                    className={styles.deleteButton}
+                  >
                     🗑️ Delete
                   </button>
                 )}
@@ -284,7 +308,9 @@ export default function Branches() {
                 <input
                   type="text"
                   value={formData.managerName || ''}
-                  onChange={(e) => updateFormData(['managerName'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['managerName'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., John Smith"
                 />
@@ -295,7 +321,9 @@ export default function Branches() {
                 <input
                   type="number"
                   value={formData.serviceRadius || 0}
-                  onChange={(e) => updateFormData(['serviceRadius'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(['serviceRadius'], parseInt(e.target.value))
+                  }
                   className={styles.input}
                   placeholder="e.g., 50"
                   min="1"
@@ -312,7 +340,9 @@ export default function Branches() {
                 <input
                   type="text"
                   value={formData.address?.street || ''}
-                  onChange={(e) => updateFormData(['address', 'street'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['address', 'street'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., 123 Main Street"
                 />
@@ -323,7 +353,9 @@ export default function Branches() {
                 <input
                   type="text"
                   value={formData.address?.city || ''}
-                  onChange={(e) => updateFormData(['address', 'city'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['address', 'city'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., Dallas"
                 />
@@ -334,7 +366,9 @@ export default function Branches() {
                 <input
                   type="text"
                   value={formData.address?.state || ''}
-                  onChange={(e) => updateFormData(['address', 'state'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['address', 'state'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., TX"
                   maxLength={2}
@@ -346,7 +380,9 @@ export default function Branches() {
                 <input
                   type="text"
                   value={formData.address?.zipCode || ''}
-                  onChange={(e) => updateFormData(['address', 'zipCode'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['address', 'zipCode'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="e.g., 75201"
                 />
@@ -362,7 +398,9 @@ export default function Branches() {
                 <input
                   type="tel"
                   value={formData.contact?.phone || ''}
-                  onChange={(e) => updateFormData(['contact', 'phone'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['contact', 'phone'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="(555) 123-4567"
                 />
@@ -373,7 +411,9 @@ export default function Branches() {
                 <input
                   type="email"
                   value={formData.contact?.email || ''}
-                  onChange={(e) => updateFormData(['contact', 'email'], e.target.value)}
+                  onChange={(e) =>
+                    updateFormData(['contact', 'email'], e.target.value)
+                  }
                   className={styles.input}
                   placeholder="branch@movecorp.com"
                 />
@@ -384,38 +424,54 @@ export default function Branches() {
           <div className={styles.formSection}>
             <h5>Operating Hours</h5>
             <div className={styles.businessHours}>
-              {formData.operatingHours && Object.entries(formData.operatingHours).map(([day, hours]) => (
-                <div key={day} className={styles.businessHourRow}>
-                  <div className={styles.dayName}>
-                    {day.charAt(0).toUpperCase() + day.slice(1)}
-                  </div>
-                  <div className={styles.hourInputs}>
-                    <input
-                      type="time"
-                      value={hours.open}
-                      onChange={(e) => updateFormData(['operatingHours', day, 'open'], e.target.value)}
-                      className={styles.timeInput}
-                      disabled={!hours.enabled}
-                    />
-                    <span>to</span>
-                    <input
-                      type="time"
-                      value={hours.close}
-                      onChange={(e) => updateFormData(['operatingHours', day, 'close'], e.target.value)}
-                      className={styles.timeInput}
-                      disabled={!hours.enabled}
-                    />
-                    <label className={styles.checkboxLabel}>
+              {formData.operatingHours &&
+                Object.entries(formData.operatingHours).map(([day, hours]) => (
+                  <div key={day} className={styles.businessHourRow}>
+                    <div className={styles.dayName}>
+                      {day.charAt(0).toUpperCase() + day.slice(1)}
+                    </div>
+                    <div className={styles.hourInputs}>
                       <input
-                        type="checkbox"
-                        checked={hours.enabled}
-                        onChange={(e) => updateFormData(['operatingHours', day, 'enabled'], e.target.checked)}
+                        type="time"
+                        value={hours.open}
+                        onChange={(e) =>
+                          updateFormData(
+                            ['operatingHours', day, 'open'],
+                            e.target.value,
+                          )
+                        }
+                        className={styles.timeInput}
+                        disabled={!hours.enabled}
                       />
-                      Open
-                    </label>
+                      <span>to</span>
+                      <input
+                        type="time"
+                        value={hours.close}
+                        onChange={(e) =>
+                          updateFormData(
+                            ['operatingHours', day, 'close'],
+                            e.target.value,
+                          )
+                        }
+                        className={styles.timeInput}
+                        disabled={!hours.enabled}
+                      />
+                      <label className={styles.checkboxLabel}>
+                        <input
+                          type="checkbox"
+                          checked={hours.enabled}
+                          onChange={(e) =>
+                            updateFormData(
+                              ['operatingHours', day, 'enabled'],
+                              e.target.checked,
+                            )
+                          }
+                        />
+                        Open
+                      </label>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
 
@@ -426,7 +482,9 @@ export default function Branches() {
                 <input
                   type="checkbox"
                   checked={formData.isPrimary || false}
-                  onChange={(e) => updateFormData(['isPrimary'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['isPrimary'], e.target.checked)
+                  }
                 />
                 Set as Primary Branch
               </label>
@@ -435,7 +493,9 @@ export default function Branches() {
                 <input
                   type="checkbox"
                   checked={formData.isActive !== false}
-                  onChange={(e) => updateFormData(['isActive'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['isActive'], e.target.checked)
+                  }
                 />
                 Active
               </label>

@@ -9,13 +9,17 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
-  Query
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { PricingRulesService } from './pricing-rules.service';
-import { CreatePricingRuleDto, UpdatePricingRuleDto, TestRuleDto } from './dto/pricing-rules.dto';
+import {
+  CreatePricingRuleDto,
+  UpdatePricingRuleDto,
+  TestRuleDto,
+} from './dto/pricing-rules.dto';
 
 @Controller('pricing-rules')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -30,18 +34,18 @@ export class PricingRulesController {
   async getAllRules(
     @Query('category') category?: string,
     @Query('isActive') isActive?: boolean,
-    @Query('service') service?: string
+    @Query('service') service?: string,
   ) {
     try {
       return await this.pricingRulesService.getAllRules({
         category: category as any,
         isActive,
-        service: service as any
+        service: service as any,
       });
     } catch (error) {
       throw new HttpException(
         'Failed to retrieve pricing rules',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -64,7 +68,7 @@ export class PricingRulesController {
       }
       throw new HttpException(
         'Failed to retrieve pricing rule',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -78,10 +82,11 @@ export class PricingRulesController {
     try {
       return await this.pricingRulesService.createRule(createRuleDto);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to create pricing rule',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -93,10 +98,13 @@ export class PricingRulesController {
   @Roles('super_admin')
   async updateRule(
     @Param('id') id: string,
-    @Body() updateRuleDto: UpdatePricingRuleDto
+    @Body() updateRuleDto: UpdatePricingRuleDto,
   ) {
     try {
-      const updatedRule = await this.pricingRulesService.updateRule(id, updateRuleDto);
+      const updatedRule = await this.pricingRulesService.updateRule(
+        id,
+        updateRuleDto,
+      );
       if (!updatedRule) {
         throw new HttpException('Pricing rule not found', HttpStatus.NOT_FOUND);
       }
@@ -105,10 +113,11 @@ export class PricingRulesController {
       if (error instanceof HttpException) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to update pricing rule',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -131,7 +140,7 @@ export class PricingRulesController {
       }
       throw new HttpException(
         'Failed to delete pricing rule',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -145,10 +154,11 @@ export class PricingRulesController {
     try {
       return await this.pricingRulesService.testRule(testRuleDto);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to test pricing rule',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -191,7 +201,7 @@ export class PricingRulesController {
     } catch (error) {
       throw new HttpException(
         'Failed to export pricing rules',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -205,10 +215,11 @@ export class PricingRulesController {
     try {
       return await this.pricingRulesService.importRules(rulesData);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new HttpException(
         errorMessage || 'Failed to import pricing rules',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -224,7 +235,7 @@ export class PricingRulesController {
     } catch (error) {
       throw new HttpException(
         'Failed to retrieve rule history',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -240,7 +251,7 @@ export class PricingRulesController {
     } catch (error) {
       throw new HttpException(
         'Failed to create rules backup',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

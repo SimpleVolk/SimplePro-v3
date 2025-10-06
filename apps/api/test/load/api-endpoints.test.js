@@ -13,20 +13,20 @@ const errorRate = new Rate('error_rate');
 
 export let options = {
   stages: [
-    { duration: '1m', target: 50 },    // Ramp up to 50 users
-    { duration: '3m', target: 100 },   // Ramp up to 100 users
-    { duration: '5m', target: 100 },   // Stay at 100 for 5 minutes
-    { duration: '1m', target: 200 },   // Spike to 200 users
-    { duration: '3m', target: 200 },   // Hold at 200
-    { duration: '2m', target: 0 },     // Ramp down
+    { duration: '1m', target: 50 }, // Ramp up to 50 users
+    { duration: '3m', target: 100 }, // Ramp up to 100 users
+    { duration: '5m', target: 100 }, // Stay at 100 for 5 minutes
+    { duration: '1m', target: 200 }, // Spike to 200 users
+    { duration: '3m', target: 200 }, // Hold at 200
+    { duration: '2m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<500'],           // 95% of requests < 500ms
+    http_req_duration: ['p(95)<500'], // 95% of requests < 500ms
     'http_req_duration{endpoint:estimate}': ['p(95)<1000'], // Estimates < 1s
-    'http_req_failed': ['rate<0.01'],             // Error rate < 1%
-    'error_rate': ['rate<0.01'],                  // Custom error rate < 1%
-    'estimate_calculation_time': ['p(95)<800'],   // Estimate calculations < 800ms
-    'job_query_time': ['p(95)<200'],              // Job queries < 200ms
+    http_req_failed: ['rate<0.01'], // Error rate < 1%
+    error_rate: ['rate<0.01'], // Custom error rate < 1%
+    estimate_calculation_time: ['p(95)<800'], // Estimate calculations < 800ms
+    job_query_time: ['p(95)<200'], // Job queries < 200ms
   },
 };
 
@@ -35,7 +35,7 @@ const JWT_TOKEN = __ENV.JWT_TOKEN;
 
 const headers = {
   'Content-Type': 'application/json',
-  'Authorization': `Bearer ${JWT_TOKEN}`,
+  Authorization: `Bearer ${JWT_TOKEN}`,
 };
 
 export function setup() {
@@ -47,7 +47,7 @@ export function setup() {
         username: 'admin',
         password: 'Admin123!',
       }),
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json' } },
     );
 
     if (loginRes.status === 200) {
@@ -62,7 +62,7 @@ export default function (data) {
   const token = data.token;
   const authHeaders = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   };
 
   // Use virtual user ID to create unique data
@@ -91,7 +91,7 @@ export default function (data) {
     const createCustomerRes = http.post(
       `${API_BASE_URL}/api/customers`,
       customerPayload,
-      { headers: authHeaders, tags: { endpoint: 'customer_create' } }
+      { headers: authHeaders, tags: { endpoint: 'customer_create' } },
     );
 
     const customerCreated = check(createCustomerRes, {
@@ -113,7 +113,7 @@ export default function (data) {
       // Get customer details
       const getCustomerRes = http.get(
         `${API_BASE_URL}/api/customers/${customerId}`,
-        { headers: authHeaders, tags: { endpoint: 'customer_get' } }
+        { headers: authHeaders, tags: { endpoint: 'customer_get' } },
       );
 
       check(getCustomerRes, {
@@ -131,7 +131,7 @@ export default function (data) {
       const updateCustomerRes = http.patch(
         `${API_BASE_URL}/api/customers/${customerId}`,
         updatePayload,
-        { headers: authHeaders, tags: { endpoint: 'customer_update' } }
+        { headers: authHeaders, tags: { endpoint: 'customer_update' } },
       );
 
       check(updateCustomerRes, {
@@ -150,18 +150,23 @@ export default function (data) {
       cubicFeet: 400 + Math.random() * 600,
       pickupLocation: {
         address: '123 Main St, San Francisco, CA 94102',
-        accessDifficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random() * 3)],
+        accessDifficulty: ['easy', 'medium', 'hard'][
+          Math.floor(Math.random() * 3)
+        ],
         stairs: Math.floor(Math.random() * 4),
         elevator: Math.random() > 0.5,
       },
       deliveryLocation: {
         address: '456 Oak Ave, San Francisco, CA 94110',
-        accessDifficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random() * 3)],
+        accessDifficulty: ['easy', 'medium', 'hard'][
+          Math.floor(Math.random() * 3)
+        ],
         stairs: Math.floor(Math.random() * 3),
         elevator: Math.random() > 0.7,
       },
       specialItems: Math.random() > 0.3 ? ['piano'] : [],
-      additionalServices: Math.random() > 0.5 ? ['packing', 'assembly'] : ['packing'],
+      additionalServices:
+        Math.random() > 0.5 ? ['packing', 'assembly'] : ['packing'],
       estimatedCrewSize: 2 + Math.floor(Math.random() * 3),
       estimatedHours: 4 + Math.floor(Math.random() * 8),
     });
@@ -170,7 +175,7 @@ export default function (data) {
     const estimateRes = http.post(
       `${API_BASE_URL}/api/estimates/calculate`,
       estimatePayload,
-      { headers: authHeaders, tags: { endpoint: 'estimate' } }
+      { headers: authHeaders, tags: { endpoint: 'estimate' } },
     );
     const estimateDuration = Date.now() - startEstimate;
 
@@ -178,9 +183,12 @@ export default function (data) {
 
     const estimateSuccess = check(estimateRes, {
       'estimate calculated successfully': (r) => r.status === 200,
-      'estimate has price': (r) => r.json('estimate.calculations.finalPrice') > 0,
-      'estimate is deterministic': (r) => r.json('estimate.metadata.deterministic') === true,
-      'estimate has hash': (r) => r.json('estimate.metadata.hash') !== undefined,
+      'estimate has price': (r) =>
+        r.json('estimate.calculations.finalPrice') > 0,
+      'estimate is deterministic': (r) =>
+        r.json('estimate.metadata.deterministic') === true,
+      'estimate has hash': (r) =>
+        r.json('estimate.metadata.hash') !== undefined,
       'response time < 1000ms': (r) => r.timings.duration < 1000,
     });
 
@@ -201,7 +209,9 @@ export default function (data) {
       serviceType: 'local',
       status: 'scheduled',
       priority: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-      scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      scheduledDate: new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
       pickupAddress: {
         street: '123 Main St',
         city: 'San Francisco',
@@ -219,11 +229,10 @@ export default function (data) {
       requiresCDL: Math.random() > 0.5,
     });
 
-    const createJobRes = http.post(
-      `${API_BASE_URL}/api/jobs`,
-      jobPayload,
-      { headers: authHeaders, tags: { endpoint: 'job_create' } }
-    );
+    const createJobRes = http.post(`${API_BASE_URL}/api/jobs`, jobPayload, {
+      headers: authHeaders,
+      tags: { endpoint: 'job_create' },
+    });
 
     const jobCreated = check(createJobRes, {
       'job created successfully': (r) => r.status === 201,
@@ -243,10 +252,10 @@ export default function (data) {
     if (jobId) {
       // Query job details
       const startQuery = Date.now();
-      const getJobRes = http.get(
-        `${API_BASE_URL}/api/jobs/${jobId}`,
-        { headers: authHeaders, tags: { endpoint: 'job_get' } }
-      );
+      const getJobRes = http.get(`${API_BASE_URL}/api/jobs/${jobId}`, {
+        headers: authHeaders,
+        tags: { endpoint: 'job_get' },
+      });
       const queryDuration = Date.now() - startQuery;
 
       jobQueryTime.add(queryDuration);
@@ -261,7 +270,7 @@ export default function (data) {
       const statusUpdateRes = http.patch(
         `${API_BASE_URL}/api/jobs/${jobId}/status`,
         JSON.stringify({ status: 'in_progress' }),
-        { headers: authHeaders, tags: { endpoint: 'job_status_update' } }
+        { headers: authHeaders, tags: { endpoint: 'job_status_update' } },
       );
 
       check(statusUpdateRes, {
@@ -275,10 +284,10 @@ export default function (data) {
 
   group('Job Listing and Search', () => {
     // Get all jobs
-    const listJobsRes = http.get(
-      `${API_BASE_URL}/api/jobs`,
-      { headers: authHeaders, tags: { endpoint: 'job_list' } }
-    );
+    const listJobsRes = http.get(`${API_BASE_URL}/api/jobs`, {
+      headers: authHeaders,
+      tags: { endpoint: 'job_list' },
+    });
 
     check(listJobsRes, {
       'jobs listed successfully': (r) => r.status === 200,
@@ -289,7 +298,7 @@ export default function (data) {
     // Search jobs by status
     const searchJobsRes = http.get(
       `${API_BASE_URL}/api/jobs?status=scheduled&priority=high`,
-      { headers: authHeaders, tags: { endpoint: 'job_search' } }
+      { headers: authHeaders, tags: { endpoint: 'job_search' } },
     );
 
     check(searchJobsRes, {
@@ -301,7 +310,7 @@ export default function (data) {
     const weekStart = new Date().toISOString().split('T')[0];
     const calendarRes = http.get(
       `${API_BASE_URL}/api/jobs/calendar/week/${weekStart}`,
-      { headers: authHeaders, tags: { endpoint: 'calendar' } }
+      { headers: authHeaders, tags: { endpoint: 'calendar' } },
     );
 
     check(calendarRes, {
@@ -317,18 +326,28 @@ export function handleSummary(data) {
   const stats = {
     total_customers_created: data.metrics.customer_creations?.values.count || 0,
     total_jobs_created: data.metrics.job_creations?.values.count || 0,
-    total_estimates_calculated: data.metrics.estimate_calculations?.values.count || 0,
+    total_estimates_calculated:
+      data.metrics.estimate_calculations?.values.count || 0,
     total_api_errors: data.metrics.api_errors?.values.count || 0,
-    avg_estimate_time: data.metrics.estimate_calculation_time?.values.avg.toFixed(2) || 0,
-    p95_estimate_time: data.metrics.estimate_calculation_time?.values['p(95)'].toFixed(2) || 0,
+    avg_estimate_time:
+      data.metrics.estimate_calculation_time?.values.avg.toFixed(2) || 0,
+    p95_estimate_time:
+      data.metrics.estimate_calculation_time?.values['p(95)'].toFixed(2) || 0,
     avg_job_query_time: data.metrics.job_query_time?.values.avg.toFixed(2) || 0,
-    p95_job_query_time: data.metrics.job_query_time?.values['p(95)'].toFixed(2) || 0,
+    p95_job_query_time:
+      data.metrics.job_query_time?.values['p(95)'].toFixed(2) || 0,
     error_rate: ((data.metrics.error_rate?.values.rate || 0) * 100).toFixed(2),
-    http_req_failed_rate: ((data.metrics.http_req_failed?.values.rate || 0) * 100).toFixed(2),
+    http_req_failed_rate: (
+      (data.metrics.http_req_failed?.values.rate || 0) * 100
+    ).toFixed(2),
   };
 
   return {
-    'load-test-results.json': JSON.stringify({ ...data, custom_stats: stats }, null, 2),
+    'load-test-results.json': JSON.stringify(
+      { ...data, custom_stats: stats },
+      null,
+      2,
+    ),
     stdout: `
       ============================================
       API Load Test Summary

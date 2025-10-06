@@ -92,10 +92,7 @@ export class ConversionTrackingService {
   }
 
   // Conversion funnel
-  async getConversionFunnel(
-    startDate: Date,
-    endDate: Date,
-  ): Promise<any> {
+  async getConversionFunnel(startDate: Date, endDate: Date): Promise<any> {
     const events = await this.conversionEventModel
       .find({
         eventDate: { $gte: startDate, $lte: endDate },
@@ -157,13 +154,14 @@ export class ConversionTrackingService {
     const result = funnelStages.map((stage, index) => {
       let conversionRate = null;
       if (index > 0 && funnelStages[index - 1].count > 0) {
-        conversionRate =
-          (stage.count / funnelStages[index - 1].count) * 100;
+        conversionRate = (stage.count / funnelStages[index - 1].count) * 100;
       }
 
       return {
         ...stage,
-        conversionRate: conversionRate ? parseFloat(conversionRate.toFixed(1)) : null,
+        conversionRate: conversionRate
+          ? parseFloat(conversionRate.toFixed(1))
+          : null,
       };
     });
 
@@ -180,8 +178,10 @@ export class ConversionTrackingService {
     const leads = stages.find((s: any) => s.stage === 'Leads')?.count || 0;
     const opportunities =
       stages.find((s: any) => s.stage === 'Opportunities')?.count || 0;
-    const quotes = stages.find((s: any) => s.stage === 'Quotes Sent')?.count || 0;
-    const jobs = stages.find((s: any) => s.stage === 'Jobs Created')?.count || 0;
+    const quotes =
+      stages.find((s: any) => s.stage === 'Quotes Sent')?.count || 0;
+    const jobs =
+      stages.find((s: any) => s.stage === 'Jobs Created')?.count || 0;
 
     return {
       leadToOpportunityRate:
@@ -664,7 +664,8 @@ export class ConversionTrackingService {
     const performers = Array.from(performanceMap.values())
       .map((p) => ({
         ...p,
-        winRate: p.quotes > 0 ? parseFloat(((p.jobs / p.quotes) * 100).toFixed(1)) : 0,
+        winRate:
+          p.quotes > 0 ? parseFloat(((p.jobs / p.quotes) * 100).toFixed(1)) : 0,
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, limit);

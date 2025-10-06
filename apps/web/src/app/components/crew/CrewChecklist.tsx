@@ -21,7 +21,10 @@ interface ChecklistTemplate {
   id: string;
   name: string;
   jobType: 'local' | 'long_distance' | 'storage' | 'packing_only' | 'all';
-  items: Omit<ChecklistItem, 'id' | 'completed' | 'completedAt' | 'completedBy' | 'photoUrl' | 'notes'>[];
+  items: Omit<
+    ChecklistItem,
+    'id' | 'completed' | 'completedAt' | 'completedBy' | 'photoUrl' | 'notes'
+  >[];
 }
 
 interface JobChecklist {
@@ -39,12 +42,16 @@ export function CrewChecklist() {
   const { user } = useAuth();
   const [checklists, setChecklists] = useState<JobChecklist[]>([]);
   const [templates, setTemplates] = useState<ChecklistTemplate[]>([]);
-  const [selectedChecklist, setSelectedChecklist] = useState<JobChecklist | null>(null);
+  const [selectedChecklist, setSelectedChecklist] =
+    useState<JobChecklist | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [photoUpload, setPhotoUpload] = useState<{ itemId: string; file: File | null }>({ itemId: '', file: null });
+  const [photoUpload, setPhotoUpload] = useState<{
+    itemId: string;
+    file: File | null;
+  }>({ itemId: '', file: null });
 
   useEffect(() => {
     fetchChecklists();
@@ -73,12 +80,42 @@ export function CrewChecklist() {
           name: 'Standard Local Move',
           jobType: 'local',
           items: [
-            { title: 'Truck inspection', description: 'Check fuel, tire pressure, lights', category: 'vehicle', required: true },
-            { title: 'Moving blankets (12)', description: 'Verify count and condition', category: 'equipment', required: true },
-            { title: 'Dolly (2)', description: 'Check wheels and handles', category: 'equipment', required: true },
-            { title: 'Straps and ropes', description: 'At least 6 straps, 2 ropes', category: 'equipment', required: true },
-            { title: 'Work order signed', description: 'Customer signature required', category: 'paperwork', required: true },
-            { title: 'Safety gear', description: 'Gloves, back supports, safety shoes', category: 'safety', required: true },
+            {
+              title: 'Truck inspection',
+              description: 'Check fuel, tire pressure, lights',
+              category: 'vehicle',
+              required: true,
+            },
+            {
+              title: 'Moving blankets (12)',
+              description: 'Verify count and condition',
+              category: 'equipment',
+              required: true,
+            },
+            {
+              title: 'Dolly (2)',
+              description: 'Check wheels and handles',
+              category: 'equipment',
+              required: true,
+            },
+            {
+              title: 'Straps and ropes',
+              description: 'At least 6 straps, 2 ropes',
+              category: 'equipment',
+              required: true,
+            },
+            {
+              title: 'Work order signed',
+              description: 'Customer signature required',
+              category: 'paperwork',
+              required: true,
+            },
+            {
+              title: 'Safety gear',
+              description: 'Gloves, back supports, safety shoes',
+              category: 'safety',
+              required: true,
+            },
           ],
         },
         {
@@ -86,11 +123,36 @@ export function CrewChecklist() {
           name: 'Long Distance Move',
           jobType: 'long_distance',
           items: [
-            { title: 'Truck inspection', description: 'Full mechanical check', category: 'vehicle', required: true },
-            { title: 'GPS and route planning', description: 'Enter destination, check route', category: 'vehicle', required: true },
-            { title: 'Inventory list', description: 'Complete item-by-item list', category: 'paperwork', required: true },
-            { title: 'Insurance documents', description: 'Verify coverage and paperwork', category: 'paperwork', required: true },
-            { title: 'Emergency kit', description: 'First aid, flashlight, tools', category: 'safety', required: true },
+            {
+              title: 'Truck inspection',
+              description: 'Full mechanical check',
+              category: 'vehicle',
+              required: true,
+            },
+            {
+              title: 'GPS and route planning',
+              description: 'Enter destination, check route',
+              category: 'vehicle',
+              required: true,
+            },
+            {
+              title: 'Inventory list',
+              description: 'Complete item-by-item list',
+              category: 'paperwork',
+              required: true,
+            },
+            {
+              title: 'Insurance documents',
+              description: 'Verify coverage and paperwork',
+              category: 'paperwork',
+              required: true,
+            },
+            {
+              title: 'Emergency kit',
+              description: 'First aid, flashlight, tools',
+              category: 'safety',
+              required: true,
+            },
           ],
         },
       ]);
@@ -181,15 +243,15 @@ export function CrewChecklist() {
   };
 
   const toggleItem = async (checklistId: string, itemId: string) => {
-    const checklist = checklists.find(c => c.id === checklistId);
+    const checklist = checklists.find((c) => c.id === checklistId);
     if (!checklist) return;
 
-    const item = checklist.items.find(i => i.id === itemId);
+    const item = checklist.items.find((i) => i.id === itemId);
     if (!item) return;
 
-    const updatedChecklists = checklists.map(c => {
+    const updatedChecklists = checklists.map((c) => {
       if (c.id === checklistId) {
-        const updatedItems = c.items.map(i => {
+        const updatedItems = c.items.map((i) => {
           if (i.id === itemId) {
             return {
               ...i,
@@ -201,7 +263,7 @@ export function CrewChecklist() {
           return i;
         });
 
-        const completedCount = updatedItems.filter(i => i.completed).length;
+        const completedCount = updatedItems.filter((i) => i.completed).length;
         const completionRate = (completedCount / updatedItems.length) * 100;
 
         return { ...c, items: updatedItems, completionRate };
@@ -212,7 +274,9 @@ export function CrewChecklist() {
     setChecklists(updatedChecklists);
 
     if (selectedChecklist && selectedChecklist.id === checklistId) {
-      setSelectedChecklist(updatedChecklists.find(c => c.id === checklistId) || null);
+      setSelectedChecklist(
+        updatedChecklists.find((c) => c.id === checklistId) || null,
+      );
     }
   };
 
@@ -220,14 +284,14 @@ export function CrewChecklist() {
     if (!photoUpload.file) return;
 
     // In a real app, upload to server
-    const updatedChecklists = checklists.map(c => {
+    const updatedChecklists = checklists.map((c) => {
       if (c.id === checklistId) {
         return {
           ...c,
-          items: c.items.map(i =>
+          items: c.items.map((i) =>
             i.id === itemId
               ? { ...i, photoUrl: URL.createObjectURL(photoUpload.file!) }
-              : i
+              : i,
           ),
         };
       }
@@ -277,7 +341,10 @@ export function CrewChecklist() {
           <p className={styles.subtitle}>Pre-job checklists for crew members</p>
         </div>
 
-        <button onClick={() => setShowTemplateModal(true)} className={styles.primaryButton}>
+        <button
+          onClick={() => setShowTemplateModal(true)}
+          className={styles.primaryButton}
+        >
           Create from Template
         </button>
       </div>
@@ -310,12 +377,16 @@ export function CrewChecklist() {
                 <div
                   key={checklist.id}
                   className={`${styles.checklistCard} ${
-                    selectedChecklist?.id === checklist.id ? styles.selected : ''
+                    selectedChecklist?.id === checklist.id
+                      ? styles.selected
+                      : ''
                   }`}
                   onClick={() => setSelectedChecklist(checklist)}
                 >
                   <div className={styles.checklistHeader}>
-                    <div className={styles.jobNumber}>{checklist.jobNumber}</div>
+                    <div className={styles.jobNumber}>
+                      {checklist.jobNumber}
+                    </div>
                     <div className={styles.completionBadge}>
                       {checklist.completionRate}%
                     </div>
@@ -331,7 +402,8 @@ export function CrewChecklist() {
                   </div>
                   <div className={styles.checklistFooter}>
                     <span className={styles.itemCount}>
-                      {checklist.items.filter(i => i.completed).length}/{checklist.items.length} complete
+                      {checklist.items.filter((i) => i.completed).length}/
+                      {checklist.items.length} complete
                     </span>
                   </div>
                 </div>
@@ -358,14 +430,18 @@ export function CrewChecklist() {
                   <strong>Assigned to:</strong> {selectedChecklist.assignedTo}
                 </div>
                 <div className={styles.infoItem}>
-                  <strong>Due:</strong> {new Date(selectedChecklist.dueDate).toLocaleString()}
+                  <strong>Due:</strong>{' '}
+                  {new Date(selectedChecklist.dueDate).toLocaleString()}
                 </div>
                 <div className={styles.infoItem}>
                   <strong>Completion:</strong>
                   <span
                     className={styles.completionRate}
                     style={{
-                      color: selectedChecklist.completionRate === 100 ? '#10b981' : '#f59e0b',
+                      color:
+                        selectedChecklist.completionRate === 100
+                          ? '#10b981'
+                          : '#f59e0b',
                     }}
                   >
                     {selectedChecklist.completionRate}%
@@ -383,12 +459,16 @@ export function CrewChecklist() {
                       <input
                         type="checkbox"
                         checked={item.completed}
-                        onChange={() => toggleItem(selectedChecklist.id, item.id)}
+                        onChange={() =>
+                          toggleItem(selectedChecklist.id, item.id)
+                        }
                         className={styles.checkbox}
                       />
                       <div className={styles.itemTitle}>
                         <span>{item.title}</span>
-                        {item.required && <span className={styles.requiredBadge}>Required</span>}
+                        {item.required && (
+                          <span className={styles.requiredBadge}>Required</span>
+                        )}
                       </div>
                       <div
                         className={styles.categoryBadge}
@@ -398,12 +478,15 @@ export function CrewChecklist() {
                       </div>
                     </div>
 
-                    <div className={styles.itemDescription}>{item.description}</div>
+                    <div className={styles.itemDescription}>
+                      {item.description}
+                    </div>
 
                     {item.completed && (
                       <div className={styles.completionInfo}>
                         ✓ Completed by {item.completedBy} at{' '}
-                        {item.completedAt && new Date(item.completedAt).toLocaleTimeString()}
+                        {item.completedAt &&
+                          new Date(item.completedAt).toLocaleTimeString()}
                       </div>
                     )}
 
@@ -419,12 +502,17 @@ export function CrewChecklist() {
                           className={styles.fileInput}
                           id={`photo-${item.id}`}
                         />
-                        <label htmlFor={`photo-${item.id}`} className={styles.fileLabel}>
+                        <label
+                          htmlFor={`photo-${item.id}`}
+                          className={styles.fileLabel}
+                        >
                           📷 Upload Photo
                         </label>
                         {photoUpload.itemId === item.id && photoUpload.file && (
                           <button
-                            onClick={() => handlePhotoUpload(selectedChecklist.id, item.id)}
+                            onClick={() =>
+                              handlePhotoUpload(selectedChecklist.id, item.id)
+                            }
                             className={styles.uploadButton}
                           >
                             Save Photo
@@ -434,7 +522,10 @@ export function CrewChecklist() {
 
                       {item.photoUrl && (
                         <div className={styles.photoPreview}>
-                          <img src={item.photoUrl} alt="Checklist item verification" />
+                          <img
+                            src={item.photoUrl}
+                            alt="Checklist item verification"
+                          />
                         </div>
                       )}
                     </div>
@@ -451,8 +542,14 @@ export function CrewChecklist() {
       </div>
 
       {showTemplateModal && (
-        <div className={styles.modal} onClick={() => setShowTemplateModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modal}
+          onClick={() => setShowTemplateModal(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h3>Select Checklist Template</h3>
               <button onClick={() => setShowTemplateModal(false)}>×</button>
@@ -462,8 +559,12 @@ export function CrewChecklist() {
               {templates.map((template) => (
                 <div key={template.id} className={styles.templateCard}>
                   <h4>{template.name}</h4>
-                  <p className={styles.templateType}>Job Type: {template.jobType}</p>
-                  <p className={styles.templateItems}>{template.items.length} items</p>
+                  <p className={styles.templateType}>
+                    Job Type: {template.jobType}
+                  </p>
+                  <p className={styles.templateItems}>
+                    {template.items.length} items
+                  </p>
                   <button
                     onClick={() => {
                       alert(`Template "${template.name}" selected`);

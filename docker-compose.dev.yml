@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     # Port exposure for development (API running on host needs access)
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
@@ -19,7 +19,7 @@ services:
     networks:
       - storage-network
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,7 +38,7 @@ services:
     networks:
       - storage-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,8 +50,8 @@ services:
     restart: unless-stopped
     # Expose both API and console ports for development (API running on host needs access)
     ports:
-      - "9000:9000"  # API port for host access
-      - "127.0.0.1:9001:9001"  # Console only accessible from localhost
+      - '9000:9000' # API port for host access
+      - '127.0.0.1:9001:9001' # Console only accessible from localhost
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -61,11 +61,10 @@ services:
     networks:
       - storage-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 30s
       timeout: 20s
       retries: 3
-
 
 volumes:
   mongodb_data:

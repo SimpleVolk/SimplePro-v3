@@ -13,9 +13,9 @@ groups:
           severity: critical
           component: database
         annotations:
-          summary: "MongoDB replica set member is down"
-          description: "MongoDB replica set member {{ $labels.name }} is in state {{ $labels.state }} (not PRIMARY/SECONDARY/ARBITER)"
-          action: "Check logs with: docker logs {{ $labels.instance }}"
+          summary: 'MongoDB replica set member is down'
+          description: 'MongoDB replica set member {{ $labels.name }} is in state {{ $labels.state }} (not PRIMARY/SECONDARY/ARBITER)'
+          action: 'Check logs with: docker logs {{ $labels.instance }}'
 
       - alert: MongoDBNoPrimary
         expr: sum(mongodb_rs_members_health{state="PRIMARY"}) == 0
@@ -24,9 +24,9 @@ groups:
           severity: critical
           component: database
         annotations:
-          summary: "MongoDB replica set has no primary"
-          description: "No PRIMARY node found in replica set. Election may be in progress."
-          action: "Check replica set status: ./scripts/mongodb/check-replica-health.sh"
+          summary: 'MongoDB replica set has no primary'
+          description: 'No PRIMARY node found in replica set. Election may be in progress.'
+          action: 'Check replica set status: ./scripts/mongodb/check-replica-health.sh'
 
       # Replication Lag
       - alert: MongoDBHighReplicationLag
@@ -36,9 +36,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "High replication lag detected"
-          description: "Secondary {{ $labels.name }} is lagging {{ $value }} seconds behind primary"
-          action: "Check secondary performance and network connectivity"
+          summary: 'High replication lag detected'
+          description: 'Secondary {{ $labels.name }} is lagging {{ $value }} seconds behind primary'
+          action: 'Check secondary performance and network connectivity'
 
       - alert: MongoDBCriticalReplicationLag
         expr: mongodb_rs_members_optimeDate{state="SECONDARY"} > 300
@@ -47,9 +47,9 @@ groups:
           severity: critical
           component: database
         annotations:
-          summary: "Critical replication lag (>5 minutes)"
-          description: "Secondary {{ $labels.name }} is lagging {{ $value }} seconds behind primary"
-          action: "Immediate investigation required. Check: docker logs {{ $labels.instance }}"
+          summary: 'Critical replication lag (>5 minutes)'
+          description: 'Secondary {{ $labels.name }} is lagging {{ $value }} seconds behind primary'
+          action: 'Immediate investigation required. Check: docker logs {{ $labels.instance }}'
 
       # Connection Pool
       - alert: MongoDBHighConnections
@@ -59,9 +59,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "High number of MongoDB connections"
-          description: "Current connections: {{ $value }} (threshold: 800)"
-          action: "Review connection pool settings and check for connection leaks"
+          summary: 'High number of MongoDB connections'
+          description: 'Current connections: {{ $value }} (threshold: 800)'
+          action: 'Review connection pool settings and check for connection leaks'
 
       - alert: MongoDBConnectionPoolExhausted
         expr: mongodb_connections{state="current"} / mongodb_connections{state="available"} > 0.9
@@ -70,9 +70,9 @@ groups:
           severity: critical
           component: database
         annotations:
-          summary: "MongoDB connection pool nearly exhausted"
-          description: "Connection pool utilization: {{ $value | humanizePercentage }}"
-          action: "Increase pool size or investigate connection leaks"
+          summary: 'MongoDB connection pool nearly exhausted'
+          description: 'Connection pool utilization: {{ $value | humanizePercentage }}'
+          action: 'Increase pool size or investigate connection leaks'
 
       # Performance
       - alert: MongoDBSlowQueries
@@ -82,9 +82,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "MongoDB queries are slow"
-          description: "Average read latency: {{ $value | humanizeDuration }}"
-          action: "Enable profiling and analyze slow queries"
+          summary: 'MongoDB queries are slow'
+          description: 'Average read latency: {{ $value | humanizeDuration }}'
+          action: 'Enable profiling and analyze slow queries'
 
       - alert: MongoDBHighMemoryUsage
         expr: mongodb_memory{type="resident"} / 1024 / 1024 > 3072
@@ -93,9 +93,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "High MongoDB memory usage"
-          description: "Resident memory: {{ $value }} MB (threshold: 3072 MB)"
-          action: "Review WiredTiger cache settings and query patterns"
+          summary: 'High MongoDB memory usage'
+          description: 'Resident memory: {{ $value }} MB (threshold: 3072 MB)'
+          action: 'Review WiredTiger cache settings and query patterns'
 
       # Disk Space
       - alert: MongoDBLowDiskSpace
@@ -105,9 +105,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "MongoDB disk space running low"
-          description: "Available disk space: {{ $value | humanizePercentage }}"
-          action: "Clean up old data or expand disk"
+          summary: 'MongoDB disk space running low'
+          description: 'Available disk space: {{ $value | humanizePercentage }}'
+          action: 'Clean up old data or expand disk'
 
       - alert: MongoDBCriticalDiskSpace
         expr: node_filesystem_avail_bytes{mountpoint="/data/db"} / node_filesystem_size_bytes{mountpoint="/data/db"} < 0.1
@@ -116,9 +116,9 @@ groups:
           severity: critical
           component: database
         annotations:
-          summary: "MongoDB disk space critically low (<10%)"
-          description: "Available disk space: {{ $value | humanizePercentage }}"
-          action: "Immediate action required. Compact collections or expand disk."
+          summary: 'MongoDB disk space critically low (<10%)'
+          description: 'Available disk space: {{ $value | humanizePercentage }}'
+          action: 'Immediate action required. Compact collections or expand disk.'
 
       # Operations
       - alert: MongoDBHighInsertRate
@@ -128,9 +128,9 @@ groups:
           severity: info
           component: database
         annotations:
-          summary: "High MongoDB insert rate"
-          description: "Insert rate: {{ $value }} inserts/sec"
-          action: "Monitor for performance impact"
+          summary: 'High MongoDB insert rate'
+          description: 'Insert rate: {{ $value }} inserts/sec'
+          action: 'Monitor for performance impact'
 
       - alert: MongoDBHighErrorRate
         expr: rate(mongodb_asserts_total{type="msg"}[5m]) > 10
@@ -139,9 +139,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "High MongoDB error rate"
-          description: "Error rate: {{ $value }} errors/sec"
-          action: "Check MongoDB logs for error details"
+          summary: 'High MongoDB error rate'
+          description: 'Error rate: {{ $value }} errors/sec'
+          action: 'Check MongoDB logs for error details'
 
       # Cache Performance
       - alert: MongoDBLowCacheHitRatio
@@ -151,9 +151,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "Low MongoDB cache hit ratio"
-          description: "Cache miss rate: {{ $value | humanizePercentage }}"
-          action: "Consider increasing WiredTiger cache size"
+          summary: 'Low MongoDB cache hit ratio'
+          description: 'Cache miss rate: {{ $value | humanizePercentage }}'
+          action: 'Consider increasing WiredTiger cache size'
 
       # Backup Health
       - alert: MongoDBBackupNotRecent
@@ -163,9 +163,9 @@ groups:
           severity: critical
           component: backup
         annotations:
-          summary: "MongoDB backup is not recent"
-          description: "Last successful backup was {{ $value | humanizeDuration }} ago"
-          action: "Check backup script and cron schedule"
+          summary: 'MongoDB backup is not recent'
+          description: 'Last successful backup was {{ $value | humanizeDuration }} ago'
+          action: 'Check backup script and cron schedule'
 
   - name: mongodb_oplog
     interval: 1m
@@ -177,9 +177,9 @@ groups:
           severity: warning
           component: database
         annotations:
-          summary: "MongoDB oplog window is small"
-          description: "Oplog window: {{ $value | humanizeDuration }} (threshold: 24h)"
-          action: "Consider increasing oplog size"
+          summary: 'MongoDB oplog window is small'
+          description: 'Oplog window: {{ $value | humanizeDuration }} (threshold: 24h)'
+          action: 'Consider increasing oplog size'
 
       - alert: MongoDBOplogWindowCritical
         expr: mongodb_oplog_stats_window_seconds < 3600
@@ -188,6 +188,6 @@ groups:
           severity: critical
           component: database
         annotations:
-          summary: "MongoDB oplog window critically small (<1 hour)"
-          description: "Oplog window: {{ $value | humanizeDuration }}"
-          action: "Increase oplog size immediately to prevent sync issues"
+          summary: 'MongoDB oplog window critically small (<1 hour)'
+          description: 'Oplog window: {{ $value | humanizeDuration }}'
+          action: 'Increase oplog size immediately to prevent sync issues'

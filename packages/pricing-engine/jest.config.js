@@ -6,11 +6,11 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.test.ts',
-    '!src/test-data/**'
+    '!src/test-data/**',
   ],
   moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: [],
-  testTimeout: 10000
+  testTimeout: 10000,
 };

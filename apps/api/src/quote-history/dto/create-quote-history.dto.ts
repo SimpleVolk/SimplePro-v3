@@ -1,4 +1,13 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsEnum, IsDateString, IsObject, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  IsObject,
+  IsArray,
+} from 'class-validator';
 import { QuoteStatus } from '../schemas/quote-history.schema';
 
 export class CreateQuoteHistoryDto {

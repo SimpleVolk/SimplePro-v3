@@ -7,7 +7,11 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
-import { DocumentEntity, DocumentType, EntityType } from './schemas/document.schema';
+import {
+  DocumentEntity,
+  DocumentType,
+  EntityType,
+} from './schemas/document.schema';
 import { MinioService } from './services/minio.service';
 import { Types } from 'mongoose';
 
@@ -477,9 +481,9 @@ describe('DocumentsService', () => {
     it('should throw NotFoundException for non-existent document', async () => {
       mockDocumentModel.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.createShareLink(mockDocumentId, {}),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.createShareLink(mockDocumentId, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

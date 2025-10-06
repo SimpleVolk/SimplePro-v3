@@ -1,4 +1,5 @@
 # SimplePro-v3 Test Coverage Report
+
 **Generated:** 2025-10-02
 **Analysis Date:** October 2025
 
@@ -7,13 +8,16 @@
 ## Executive Summary
 
 ### Current State
+
 - **Pricing Engine Coverage:** 45.66% statements, 36.13% branches, 58.18% functions (38/38 tests passing)
 - **API Coverage:** ~12% overall (3 passing tests, 4 failing tests with compilation errors)
 - **Web Coverage:** Test infrastructure broken (missing jest.setup.js)
 - **Overall Project Coverage:** **~18% estimated**
 
 ### Critical Finding
+
 **The CLAUDE.md claims are INCORRECT:**
+
 - Claims "58% API coverage" → **Actual: ~12%**
 - Claims "100% pricing engine coverage" → **Actual: 45.66%**
 - Claims "15% frontend coverage" → **Actual: 0% (tests broken)**
@@ -23,11 +27,12 @@
 ## 1. Coverage Summary by Module
 
 ### Pricing Engine (`packages/pricing-engine`)
-| File | Statements | Branches | Functions | Lines | Status |
-|------|-----------|----------|-----------|-------|--------|
-| estimator.ts | 46.9% | 36.13% | 60.37% | 48.34% | ⚠️ Medium |
-| index.ts | 0% | 100% | 0% | 0% | ❌ Critical |
-| rules.schema.ts | 0% | 100% | 100% | 0% | ✅ Low Priority |
+
+| File            | Statements | Branches | Functions | Lines  | Status          |
+| --------------- | ---------- | -------- | --------- | ------ | --------------- |
+| estimator.ts    | 46.9%      | 36.13%   | 60.37%    | 48.34% | ⚠️ Medium       |
+| index.ts        | 0%         | 100%     | 0%        | 0%     | ❌ Critical     |
+| rules.schema.ts | 0%         | 100%     | 100%      | 0%     | ✅ Low Priority |
 
 **Test Status:** ✅ 38 tests passing
 **Issues:** Large portions of estimator.ts uncovered (lines 17-85, 254-260, 268-272, etc.)
@@ -37,70 +42,76 @@
 ### API Backend (`apps/api`)
 
 #### High Coverage Modules (>40%)
-| Module | Coverage | Test Files | Status |
-|--------|----------|-----------|--------|
-| tariff-settings/seed-data | 44.06% | 1 spec | ⚠️ Needs improvement |
-| estimates.controller | ~60% | 1 spec | ✅ Good |
-| health.service | ~70% | 1 spec | ✅ Good |
+
+| Module                    | Coverage | Test Files | Status               |
+| ------------------------- | -------- | ---------- | -------------------- |
+| tariff-settings/seed-data | 44.06%   | 1 spec     | ⚠️ Needs improvement |
+| estimates.controller      | ~60%     | 1 spec     | ✅ Good              |
+| health.service            | ~70%     | 1 spec     | ✅ Good              |
 
 #### Zero Coverage Modules (0% - CRITICAL)
-| Module | Lines | Controllers | Services | Test Files | Priority |
-|--------|-------|------------|----------|-----------|----------|
-| **documents** | 1000+ | 1 | 1 (MinioService) | 0 | 🔴 P0 |
-| **crew-schedule** | 800+ | 1 | 4 services | 0 | 🔴 P0 |
-| **messages** | 600+ | 1 | 3 services | 0 | 🔴 P0 |
-| **notifications** | 800+ | 1 | 4 services | 0 | 🔴 P0 |
-| **customers** | 400+ | 1 | 1 | 1 (broken) | 🔴 P0 |
-| **jobs** | 500+ | 1 | 1 | 1 (broken) | 🔴 P0 |
-| **analytics** | 600+ | 1 | 3 services | 1 (broken) | 🔴 P0 |
-| **tariff-settings** | 1431 | 1 | 1 | 0 | 🔴 P1 |
-| **opportunities** | 400+ | 1 | 1 | 0 | 🔴 P1 |
-| **lead-activities** | 300+ | 1 | 1 | 0 | 🔴 P1 |
-| **follow-up-rules** | 300+ | 1 | 1 | 0 | 🔴 P1 |
-| **follow-up-scheduler** | 200+ | 0 | 1 | 0 | 🟠 P2 |
-| **partners** | 300+ | 1 | 1 | 0 | 🟠 P2 |
-| **referrals** | 500+ | 1 | 1 | 0 | 🟠 P2 |
-| **quote-history** | 300+ | 1 | 1 | 0 | 🟠 P2 |
-| **conversion-tracking** | 200+ | 1 | 1 | 0 | 🟠 P2 |
-| **company** | 200+ | 1 | 1 | 0 | 🟠 P2 |
-| **audit-logs** | 200+ | 1 | 1 | 0 | 🟠 P3 |
-| **pricing-rules** | 150+ | 1 | 1 | 0 | 🟠 P3 |
-| **websocket** | 300+ | 1 (gateway) | 1 | 0 | 🔴 P1 |
-| **security** | 16 | 0 | 1 | 0 | 🟢 P4 |
+
+| Module                  | Lines | Controllers | Services         | Test Files | Priority |
+| ----------------------- | ----- | ----------- | ---------------- | ---------- | -------- |
+| **documents**           | 1000+ | 1           | 1 (MinioService) | 0          | 🔴 P0    |
+| **crew-schedule**       | 800+  | 1           | 4 services       | 0          | 🔴 P0    |
+| **messages**            | 600+  | 1           | 3 services       | 0          | 🔴 P0    |
+| **notifications**       | 800+  | 1           | 4 services       | 0          | 🔴 P0    |
+| **customers**           | 400+  | 1           | 1                | 1 (broken) | 🔴 P0    |
+| **jobs**                | 500+  | 1           | 1                | 1 (broken) | 🔴 P0    |
+| **analytics**           | 600+  | 1           | 3 services       | 1 (broken) | 🔴 P0    |
+| **tariff-settings**     | 1431  | 1           | 1                | 0          | 🔴 P1    |
+| **opportunities**       | 400+  | 1           | 1                | 0          | 🔴 P1    |
+| **lead-activities**     | 300+  | 1           | 1                | 0          | 🔴 P1    |
+| **follow-up-rules**     | 300+  | 1           | 1                | 0          | 🔴 P1    |
+| **follow-up-scheduler** | 200+  | 0           | 1                | 0          | 🟠 P2    |
+| **partners**            | 300+  | 1           | 1                | 0          | 🟠 P2    |
+| **referrals**           | 500+  | 1           | 1                | 0          | 🟠 P2    |
+| **quote-history**       | 300+  | 1           | 1                | 0          | 🟠 P2    |
+| **conversion-tracking** | 200+  | 1           | 1                | 0          | 🟠 P2    |
+| **company**             | 200+  | 1           | 1                | 0          | 🟠 P2    |
+| **audit-logs**          | 200+  | 1           | 1                | 0          | 🟠 P3    |
+| **pricing-rules**       | 150+  | 1           | 1                | 0          | 🟠 P3    |
+| **websocket**           | 300+  | 1 (gateway) | 1                | 0          | 🔴 P1    |
+| **security**            | 16    | 0           | 1                | 0          | 🟢 P4    |
 
 #### Partially Covered Modules (Low Coverage)
-| Module | Coverage | Status |
-|--------|----------|--------|
-| websocket.gateway | 8.73% | ❌ Critical |
-| realtime.service | 9.25% | ❌ Critical |
-| auth.service | ~15% | ❌ Critical |
+
+| Module            | Coverage | Status      |
+| ----------------- | -------- | ----------- |
+| websocket.gateway | 8.73%    | ❌ Critical |
+| realtime.service  | 9.25%    | ❌ Critical |
+| auth.service      | ~15%     | ❌ Critical |
 
 ---
 
 ### Web Frontend (`apps/web`)
 
 #### Test Infrastructure Status: ❌ BROKEN
+
 **Error:** `Module <rootDir>/jest.setup.js in the setupFilesAfterEnv option was not found`
 
 #### Existing Test Files (Non-Functional)
-| Test File | Component | Status |
-|-----------|-----------|--------|
-| index.spec.tsx | Root | ❌ Broken |
-| MoveSizes.test.tsx | Settings | ❌ Broken |
-| DistanceRates.test.tsx | Settings | ❌ Broken |
+
+| Test File               | Component     | Status    |
+| ----------------------- | ------------- | --------- |
+| index.spec.tsx          | Root          | ❌ Broken |
+| MoveSizes.test.tsx      | Settings      | ❌ Broken |
+| DistanceRates.test.tsx  | Settings      | ❌ Broken |
 | NewOpportunity.test.tsx | Opportunities | ❌ Broken |
 
 #### Components with ZERO Tests (92 components)
-| Category | Count | Examples |
-|----------|-------|----------|
-| **Core Business** | 15 | EstimateForm, CustomerManagement, JobManagement, CalendarDispatch, AnalyticsDashboard |
-| **Settings** | 35 | TariffSettings, CompanySettings, UserManagement, RolesPermissions |
-| **Documents** | 5 | DocumentManagement, DocumentUpload, DocumentViewer, ShareDialog |
-| **Crew Management** | 6 | CrewSchedule, CrewAvailability, CrewWorkload, AutoAssignment |
-| **Messaging** | 4 | MessageThread, NotificationCenter, NotificationBell |
-| **Partners/Leads** | 8 | PartnerManagement, LeadActivities, FollowUpRules |
-| **Conversion** | 5 | ConversionFunnel, SalesPerformance, QuoteTimeline |
-| **UI Components** | 14 | AppLayout, Sidebar, TopBar, LoadingSkeleton, ErrorBoundary |
+
+| Category            | Count | Examples                                                                              |
+| ------------------- | ----- | ------------------------------------------------------------------------------------- |
+| **Core Business**   | 15    | EstimateForm, CustomerManagement, JobManagement, CalendarDispatch, AnalyticsDashboard |
+| **Settings**        | 35    | TariffSettings, CompanySettings, UserManagement, RolesPermissions                     |
+| **Documents**       | 5     | DocumentManagement, DocumentUpload, DocumentViewer, ShareDialog                       |
+| **Crew Management** | 6     | CrewSchedule, CrewAvailability, CrewWorkload, AutoAssignment                          |
+| **Messaging**       | 4     | MessageThread, NotificationCenter, NotificationBell                                   |
+| **Partners/Leads**  | 8     | PartnerManagement, LeadActivities, FollowUpRules                                      |
+| **Conversion**      | 5     | ConversionFunnel, SalesPerformance, QuoteTimeline                                     |
+| **UI Components**   | 14    | AppLayout, Sidebar, TopBar, LoadingSkeleton, ErrorBoundary                            |
 
 **Total Components:** ~92
 **Tested Components:** 0 (all tests broken)
@@ -111,6 +122,7 @@
 ## 2. Critical Untested Files (Top 20)
 
 ### Priority 0 (MUST FIX - Security/Data Loss Risk)
+
 1. **`apps/api/src/customers/customers.service.ts`** (400+ lines)
    - **Risk:** MongoDB data operations, duplicate detection, business logic
    - **Impact:** Customer data integrity, CRM functionality
@@ -132,6 +144,7 @@
    - **Impact:** Communication reliability
 
 ### Priority 1 (High Business Impact)
+
 6. **`apps/api/src/tariff-settings/tariff-settings.service.ts`** (1431 lines)
    - **Risk:** Dynamic pricing configuration, rate calculations
    - **Impact:** Pricing accuracy, revenue
@@ -153,6 +166,7 @@
     - **Impact:** Real-time features, user experience
 
 ### Priority 2 (Core Business Logic)
+
 11. **`apps/api/src/opportunities/opportunities.service.ts`** (400+ lines)
 12. **`apps/api/src/lead-activities/lead-activities.service.ts`** (300+ lines)
 13. **`apps/api/src/partners/partners.service.ts`** (300+ lines)
@@ -160,6 +174,7 @@
 15. **`apps/api/src/follow-up-rules/follow-up-rules.service.ts`** (300+ lines)
 
 ### Priority 3 (Supporting Features)
+
 16. **`apps/api/src/conversion-tracking/conversion-tracking.service.ts`** (200+ lines)
 17. **`apps/api/src/quote-history/quote-history.service.ts`** (300+ lines)
 18. **`apps/api/src/company/company.service.ts`** (200+ lines)
@@ -171,16 +186,19 @@
 ## 3. Test Issues Found
 
 ### Broken Test Files
+
 1. **`customers.service.spec.ts`** - TypeScript compilation errors (lines 118, 169, 821)
 2. **`analytics.service.spec.ts`** - Dependency injection issues (CustomerModel not available)
 3. **`jobs.service.spec.ts`** - Similar dependency issues
 4. **Web tests (all)** - Missing `jest.setup.js` file
 
 ### Mongoose Schema Warnings
+
 - Duplicate index definitions on 13 schemas (jobId, revenue, email, tags, etc.)
 - Should consolidate schema index declarations
 
 ### Integration Test Issues
+
 - 6 integration test files exist but have limited coverage
 - Most integration tests focus on happy paths only
 - Missing edge case and error scenario testing
@@ -190,6 +208,7 @@
 ## 4. Test Improvement Plan
 
 ### Phase 1: Fix Broken Infrastructure (Week 1)
+
 **Effort: 8 hours**
 
 1. **Web Test Setup** (2 hours)
@@ -207,6 +226,7 @@
    - Add unique constraints where missing
 
 ### Phase 2: Critical Security Tests (Week 2-3)
+
 **Effort: 40 hours**
 
 1. **Authentication & Authorization** (12 hours)
@@ -224,6 +244,7 @@
    - `jobs.service.spec.ts` - Job lifecycle, crew assignment, WebSocket events
 
 ### Phase 3: Business Logic Tests (Week 4-6)
+
 **Effort: 60 hours**
 
 1. **Pricing & Tariffs** (16 hours)
@@ -246,6 +267,7 @@
    - `follow-up-rules.service.spec.ts` - Automation rules
 
 ### Phase 4: Frontend Testing (Week 7-9)
+
 **Effort: 80 hours**
 
 1. **Critical UI Components** (24 hours)
@@ -270,6 +292,7 @@
    - Messaging & notifications (threads, preferences)
 
 ### Phase 5: Integration & E2E Tests (Week 10-12)
+
 **Effort: 60 hours**
 
 1. **API Integration Tests** (24 hours)
@@ -292,6 +315,7 @@
 ## 5. Sample Test Structures
 
 ### Example 1: Customer Service Unit Tests
+
 **File:** `apps/api/src/customers/customers.service.spec.ts`
 
 ```typescript
@@ -365,10 +389,12 @@ describe('CustomersService', () => {
         phone: '555-5678',
       };
 
-      mockCustomerModel.findOne.mockResolvedValue({ email: 'existing@example.com' });
+      mockCustomerModel.findOne.mockResolvedValue({
+        email: 'existing@example.com',
+      });
 
       await expect(service.create(createDto, 'user123')).rejects.toThrow(
-        ConflictException
+        ConflictException,
       );
     });
 
@@ -382,11 +408,11 @@ describe('CustomersService', () => {
       };
 
       mockCustomerModel.findOne.mockResolvedValue({
-        email: 'john@example.com'
+        email: 'john@example.com',
       });
 
       await expect(service.create(createDto, 'user123')).rejects.toThrow(
-        ConflictException
+        ConflictException,
       );
     });
   });
@@ -433,7 +459,7 @@ describe('CustomersService', () => {
             expect.objectContaining({ lastName: expect.any(RegExp) }),
             expect.objectContaining({ email: expect.any(RegExp) }),
           ]),
-        })
+        }),
       );
     });
   });
@@ -462,7 +488,7 @@ describe('CustomersService', () => {
       mockCustomerModel.findById.mockResolvedValue(null);
 
       await expect(service.update('invalid', {}, 'user123')).rejects.toThrow(
-        NotFoundException
+        NotFoundException,
       );
     });
   });
@@ -493,6 +519,7 @@ describe('CustomersService', () => {
 ---
 
 ### Example 2: Job Service Tests with WebSocket Integration
+
 **File:** `apps/api/src/jobs/jobs.service.spec.ts`
 
 ```typescript
@@ -570,7 +597,7 @@ describe('JobsService', () => {
       const createDto = { type: 'local' } as any;
 
       await expect(service.create(createDto, 'user123')).rejects.toThrow(
-        'Customer ID is required'
+        'Customer ID is required',
       );
     });
 
@@ -591,7 +618,7 @@ describe('JobsService', () => {
       expect(mockRealtimeService.emitJobUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           jobNumber: 'JOB-2025-0001',
-        })
+        }),
       );
     });
   });
@@ -627,7 +654,7 @@ describe('JobsService', () => {
       mockJobModel.findById.mockResolvedValue(job);
 
       await expect(
-        service.updateStatus('job123', 'scheduled', 'user123')
+        service.updateStatus('job123', 'scheduled', 'user123'),
       ).rejects.toThrow('Invalid status transition');
     });
   });
@@ -656,7 +683,7 @@ describe('JobsService', () => {
       expect(job.crew).toHaveLength(1);
       expect(mockRealtimeService.notifyCrewAssignment).toHaveBeenCalledWith(
         'crew1',
-        expect.objectContaining({ id: 'job123' })
+        expect.objectContaining({ id: 'job123' }),
       );
     });
   });
@@ -680,7 +707,7 @@ describe('JobsService', () => {
       // Next job should be 0043
       const newJob = await service.create(
         { customerId: 'test', type: 'local' } as any,
-        'user123'
+        'user123',
       );
 
       expect(newJob.jobNumber).toContain('0043');
@@ -696,6 +723,7 @@ describe('JobsService', () => {
 ---
 
 ### Example 3: Analytics Dashboard Component Tests
+
 **File:** `apps/web/src/app/components/AnalyticsDashboard.spec.tsx`
 
 ```typescript
@@ -909,21 +937,23 @@ describe('AnalyticsDashboard', () => {
 
 ### Total Effort Breakdown
 
-| Phase | Duration | Effort (hours) | Priority |
-|-------|----------|---------------|----------|
-| **Phase 1: Infrastructure** | Week 1 | 8 | P0 |
-| **Phase 2: Security Tests** | Week 2-3 | 40 | P0 |
-| **Phase 3: Business Logic** | Week 4-6 | 60 | P1 |
-| **Phase 4: Frontend Tests** | Week 7-9 | 80 | P1 |
-| **Phase 5: Integration/E2E** | Week 10-12 | 60 | P2 |
-| **TOTAL** | **12 weeks** | **248 hours** | - |
+| Phase                        | Duration     | Effort (hours) | Priority |
+| ---------------------------- | ------------ | -------------- | -------- |
+| **Phase 1: Infrastructure**  | Week 1       | 8              | P0       |
+| **Phase 2: Security Tests**  | Week 2-3     | 40             | P0       |
+| **Phase 3: Business Logic**  | Week 4-6     | 60             | P1       |
+| **Phase 4: Frontend Tests**  | Week 7-9     | 80             | P1       |
+| **Phase 5: Integration/E2E** | Week 10-12   | 60             | P2       |
+| **TOTAL**                    | **12 weeks** | **248 hours**  | -        |
 
 ### Resource Requirements
+
 - **1 Senior QA Engineer** (full-time, 12 weeks)
 - **OR 2 Mid-level QA Engineers** (6 weeks each, parallel work)
 - **Code Review Support:** 1-2 hours/week from Tech Lead
 
 ### Expected Coverage After Completion
+
 - **API:** 80%+ (from current ~12%)
 - **Pricing Engine:** 90%+ (from current 46%)
 - **Web:** 70%+ (from current 0%)
@@ -960,6 +990,7 @@ describe('AnalyticsDashboard', () => {
 ## 8. Recommended Testing Tools & Libraries
 
 ### Backend Testing Stack
+
 - **Jest** (current) - Unit test framework
 - **@nestjs/testing** (current) - NestJS test utilities
 - **Supertest** - HTTP integration testing
@@ -967,6 +998,7 @@ describe('AnalyticsDashboard', () => {
 - **faker** - Generate realistic test data
 
 ### Frontend Testing Stack
+
 - **Jest** (current) - Test runner
 - **@testing-library/react** - Component testing
 - **@testing-library/user-event** - User interaction simulation
@@ -974,6 +1006,7 @@ describe('AnalyticsDashboard', () => {
 - **Playwright** - E2E testing (replace Cypress)
 
 ### Additional Tools
+
 - **Istanbul/NYC** - Enhanced coverage reporting
 - **Codecov** - Coverage tracking and PR checks
 - **Stryker** - Mutation testing (validate test quality)
@@ -984,6 +1017,7 @@ describe('AnalyticsDashboard', () => {
 ## 9. CI/CD Integration Recommendations
 
 ### Test Execution Strategy
+
 ```yaml
 # .github/workflows/test.yml
 jobs:
@@ -1004,6 +1038,7 @@ jobs:
 ```
 
 ### Quality Gates
+
 - **PR Requirements:**
   - All tests pass
   - Coverage ≥ 80% overall
@@ -1015,12 +1050,14 @@ jobs:
 ## 10. Maintenance Strategy
 
 ### Ongoing Test Maintenance
+
 1. **Test-First Development:** Write tests before implementing new features
 2. **Coverage Monitoring:** Weekly coverage reports in team meetings
 3. **Flaky Test Tracking:** Automated detection and notification
 4. **Test Performance:** Monitor and optimize slow tests (>500ms)
 
 ### Test Documentation
+
 - Maintain test plan document for each module
 - Document complex test scenarios and edge cases
 - Create testing guidelines for new developers
@@ -1032,6 +1069,7 @@ jobs:
 ### Appendix A: Test File Inventory
 
 **API Test Files (14 total):**
+
 - ✅ `estimates.controller.spec.ts` (passing)
 - ✅ `health.service.spec.ts` (passing)
 - ✅ `tariff-settings/seed-data/seed-tariff-settings.spec.ts` (passing)
@@ -1048,6 +1086,7 @@ jobs:
 - ✅ `simple-integration.spec.ts` (integration)
 
 **Web Test Files (4 total - all broken):**
+
 - ❌ `index.spec.tsx` (broken - missing jest.setup.js)
 - ❌ `MoveSizes.test.tsx` (broken - missing jest.setup.js)
 - ❌ `DistanceRates.test.tsx` (broken - missing jest.setup.js)
@@ -1055,14 +1094,14 @@ jobs:
 
 ### Appendix B: Coverage by File Type
 
-| File Type | Total Files | With Tests | Coverage % |
-|-----------|------------|-----------|------------|
-| Services | 42 | 4 | 9.5% |
-| Controllers | 24 | 1 | 4.2% |
-| React Components | 92 | 0 | 0% |
-| Schemas | 30+ | 0 | N/A |
-| DTOs | 50+ | 0 | N/A |
-| Interfaces | 40+ | 0 | N/A |
+| File Type        | Total Files | With Tests | Coverage % |
+| ---------------- | ----------- | ---------- | ---------- |
+| Services         | 42          | 4          | 9.5%       |
+| Controllers      | 24          | 1          | 4.2%       |
+| React Components | 92          | 0          | 0%         |
+| Schemas          | 30+         | 0          | N/A        |
+| DTOs             | 50+         | 0          | N/A        |
+| Interfaces       | 40+         | 0          | N/A        |
 
 ---
 

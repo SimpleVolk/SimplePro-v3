@@ -150,7 +150,9 @@ describe('NotificationsService', () => {
         'job_assigned',
         createDto.data,
       );
-      expect(mockPreferenceService.getPreferences).toHaveBeenCalledWith(mockUserId);
+      expect(mockPreferenceService.getPreferences).toHaveBeenCalledWith(
+        mockUserId,
+      );
       expect(result).toBeDefined();
       expect(result.title).toBe('Rendered Title');
       expect(result.message).toBe('Rendered message');
@@ -264,10 +266,18 @@ describe('NotificationsService', () => {
 
       await service.sendNotification(notification);
 
-      expect(mockDeliveryService.sendInAppNotification).toHaveBeenCalledWith(notification);
-      expect(mockDeliveryService.sendEmailNotification).toHaveBeenCalledWith(notification);
-      expect(mockDeliveryService.sendSmsNotification).toHaveBeenCalledWith(notification);
-      expect(mockDeliveryService.sendPushNotification).toHaveBeenCalledWith(notification);
+      expect(mockDeliveryService.sendInAppNotification).toHaveBeenCalledWith(
+        notification,
+      );
+      expect(mockDeliveryService.sendEmailNotification).toHaveBeenCalledWith(
+        notification,
+      );
+      expect(mockDeliveryService.sendSmsNotification).toHaveBeenCalledWith(
+        notification,
+      );
+      expect(mockDeliveryService.sendPushNotification).toHaveBeenCalledWith(
+        notification,
+      );
     });
 
     it('should send only to in-app channel when others disabled', async () => {
@@ -303,7 +313,9 @@ describe('NotificationsService', () => {
       );
 
       // Should not throw error
-      await expect(service.sendNotification(notification)).resolves.not.toThrow();
+      await expect(
+        service.sendNotification(notification),
+      ).resolves.not.toThrow();
 
       // In-app should still be sent
       expect(mockDeliveryService.sendInAppNotification).toHaveBeenCalled();
@@ -312,8 +324,13 @@ describe('NotificationsService', () => {
 
   describe('findAll', () => {
     it('should return all notifications for user', async () => {
-      const mockNotifications = [createMockNotification(), createMockNotification()];
-      mockNotificationModel.find.mockReturnValue(createMockQuery(mockNotifications));
+      const mockNotifications = [
+        createMockNotification(),
+        createMockNotification(),
+      ];
+      mockNotificationModel.find.mockReturnValue(
+        createMockQuery(mockNotifications),
+      );
 
       const result = await service.findAll(mockUserId, {});
 
@@ -327,7 +344,9 @@ describe('NotificationsService', () => {
 
     it('should filter unread notifications', async () => {
       const mockNotifications = [createMockNotification({ isRead: false })];
-      mockNotificationModel.find.mockReturnValue(createMockQuery(mockNotifications));
+      mockNotificationModel.find.mockReturnValue(
+        createMockQuery(mockNotifications),
+      );
 
       await service.findAll(mockUserId, { unreadOnly: true });
 
@@ -339,8 +358,12 @@ describe('NotificationsService', () => {
     });
 
     it('should filter by type', async () => {
-      const mockNotifications = [createMockNotification({ type: 'job_assigned' })];
-      mockNotificationModel.find.mockReturnValue(createMockQuery(mockNotifications));
+      const mockNotifications = [
+        createMockNotification({ type: 'job_assigned' }),
+      ];
+      mockNotificationModel.find.mockReturnValue(
+        createMockQuery(mockNotifications),
+      );
 
       await service.findAll(mockUserId, { type: 'job_assigned' });
 
@@ -352,8 +375,12 @@ describe('NotificationsService', () => {
     });
 
     it('should filter by priority', async () => {
-      const mockNotifications = [createMockNotification({ priority: 'urgent' })];
-      mockNotificationModel.find.mockReturnValue(createMockQuery(mockNotifications));
+      const mockNotifications = [
+        createMockNotification({ priority: 'urgent' }),
+      ];
+      mockNotificationModel.find.mockReturnValue(
+        createMockQuery(mockNotifications),
+      );
 
       await service.findAll(mockUserId, { priority: 'urgent' });
 
@@ -403,7 +430,9 @@ describe('NotificationsService', () => {
         exec: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(service.findById(mockNotificationId)).rejects.toThrow(NotFoundException);
+      await expect(service.findById(mockNotificationId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -422,18 +451,18 @@ describe('NotificationsService', () => {
     it('should throw NotFoundException when notification not found', async () => {
       mockNotificationModel.findOne.mockResolvedValue(null);
 
-      await expect(service.markAsRead(mockNotificationId, mockUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.markAsRead(mockNotificationId, mockUserId),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should only mark notifications belonging to user', async () => {
       const otherUserId = new Types.ObjectId().toString();
       mockNotificationModel.findOne.mockResolvedValue(null);
 
-      await expect(service.markAsRead(mockNotificationId, otherUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.markAsRead(mockNotificationId, otherUserId),
+      ).rejects.toThrow(NotFoundException);
 
       expect(mockNotificationModel.findOne).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -495,18 +524,18 @@ describe('NotificationsService', () => {
     it('should throw NotFoundException when notification not found', async () => {
       mockNotificationModel.deleteOne.mockResolvedValue({ deletedCount: 0 });
 
-      await expect(service.deleteNotification(mockNotificationId, mockUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.deleteNotification(mockNotificationId, mockUserId),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should only delete notifications belonging to user', async () => {
       const otherUserId = new Types.ObjectId().toString();
       mockNotificationModel.deleteOne.mockResolvedValue({ deletedCount: 0 });
 
-      await expect(service.deleteNotification(mockNotificationId, otherUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.deleteNotification(mockNotificationId, otherUserId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -549,18 +578,18 @@ describe('NotificationsService', () => {
     it('should throw NotFoundException when notification not found', async () => {
       mockNotificationModel.findOne.mockResolvedValue(null);
 
-      await expect(service.archiveNotification(mockNotificationId, mockUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.archiveNotification(mockNotificationId, mockUserId),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should only archive notifications belonging to user', async () => {
       const otherUserId = new Types.ObjectId().toString();
       mockNotificationModel.findOne.mockResolvedValue(null);
 
-      await expect(service.archiveNotification(mockNotificationId, otherUserId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.archiveNotification(mockNotificationId, otherUserId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -615,8 +644,12 @@ describe('NotificationsService', () => {
     });
 
     it('should handle bulk operations efficiently', async () => {
-      const notifications = Array.from({ length: 100 }, () => createMockNotification());
-      mockNotificationModel.find.mockReturnValue(createMockQuery(notifications));
+      const notifications = Array.from({ length: 100 }, () =>
+        createMockNotification(),
+      );
+      mockNotificationModel.find.mockReturnValue(
+        createMockQuery(notifications),
+      );
 
       const result = await service.findAll(mockUserId, { limit: 100 });
 

@@ -43,7 +43,7 @@ declare module 'react-native-push-notification' {
     localNotification(notification: PushNotificationObject): void;
     createChannel(
       channel: ChannelObject,
-      callback?: (created: boolean) => void
+      callback?: (created: boolean) => void,
     ): void;
     cancelAllLocalNotifications(): void;
     getApplicationIconBadgeNumber(callback: (count: number) => void): void;

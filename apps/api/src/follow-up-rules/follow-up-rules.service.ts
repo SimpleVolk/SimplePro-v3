@@ -24,7 +24,10 @@ export class FollowUpRulesService {
     private activitiesService: LeadActivitiesService,
   ) {}
 
-  async createRule(dto: CreateRuleDto, userId: string): Promise<FollowUpRuleDocument> {
+  async createRule(
+    dto: CreateRuleDto,
+    userId: string,
+  ): Promise<FollowUpRuleDocument> {
     const ruleId = dto.ruleId || uuidv4();
 
     const rule = new this.ruleModel({
@@ -40,7 +43,9 @@ export class FollowUpRulesService {
     return this.ruleModel.find().sort({ priority: 1 }).exec();
   }
 
-  async findActiveRules(eventType?: EventType): Promise<FollowUpRuleDocument[]> {
+  async findActiveRules(
+    eventType?: EventType,
+  ): Promise<FollowUpRuleDocument[]> {
     const filter: any = { isActive: true };
 
     if (eventType) {
@@ -63,13 +68,13 @@ export class FollowUpRulesService {
   async updateRule(
     ruleId: string,
     dto: UpdateRuleDto,
-    userId: string
+    userId: string,
   ): Promise<FollowUpRuleDocument> {
     const rule = await this.ruleModel
       .findOneAndUpdate(
         { ruleId },
         { ...dto, updatedBy: userId },
-        { new: true }
+        { new: true },
       )
       .exec();
 
@@ -91,7 +96,10 @@ export class FollowUpRulesService {
   async testRule(ruleId: string, sampleData: any): Promise<any> {
     const rule = await this.findById(ruleId);
 
-    const matches = this.evaluateConditions(rule.trigger.conditions, sampleData);
+    const matches = this.evaluateConditions(
+      rule.trigger.conditions,
+      sampleData,
+    );
 
     return {
       ruleId: rule.ruleId,
@@ -130,14 +138,19 @@ export class FollowUpRulesService {
       const rules = await this.findActiveRules(eventType);
 
       this.logger.log(
-        `Evaluating ${rules.length} rules for event type: ${eventType}`
+        `Evaluating ${rules.length} rules for event type: ${eventType}`,
       );
 
       for (const rule of rules) {
-        const matches = this.evaluateConditions(rule.trigger.conditions, eventData);
+        const matches = this.evaluateConditions(
+          rule.trigger.conditions,
+          eventData,
+        );
 
         if (matches) {
-          this.logger.log(`Rule "${rule.name}" (${rule.ruleId}) matched. Executing actions...`);
+          this.logger.log(
+            `Rule "${rule.name}" (${rule.ruleId}) matched. Executing actions...`,
+          );
           await this.executeActions(rule.actions, eventData, rule.ruleId);
         }
       }
@@ -166,9 +179,13 @@ export class FollowUpRulesService {
         case 'less_than':
           return Number(value) < Number(condition.value);
         case 'in':
-          return Array.isArray(condition.value) && condition.value.includes(value);
+          return (
+            Array.isArray(condition.value) && condition.value.includes(value)
+          );
         case 'not_in':
-          return Array.isArray(condition.value) && !condition.value.includes(value);
+          return (
+            Array.isArray(condition.value) && !condition.value.includes(value)
+          );
         default:
           return false;
       }
@@ -182,7 +199,7 @@ export class FollowUpRulesService {
   private async executeActions(
     actions: any[],
     eventData: any,
-    ruleId: string
+    ruleId: string,
   ): Promise<void> {
     for (const action of actions) {
       try {
@@ -192,7 +209,12 @@ export class FollowUpRulesService {
 
         switch (action.actionType) {
           case ActionType.CREATE_ACTIVITY:
-            await this.createActivityAction(action, eventData, executionTime, ruleId);
+            await this.createActivityAction(
+              action,
+              eventData,
+              executionTime,
+              ruleId,
+            );
             break;
 
           case ActionType.SEND_EMAIL:
@@ -219,7 +241,10 @@ export class FollowUpRulesService {
             this.logger.warn(`Unknown action type: ${action.actionType}`);
         }
       } catch (error) {
-        this.logger.error(`Error executing action ${action.actionType}:`, error);
+        this.logger.error(
+          `Error executing action ${action.actionType}:`,
+          error,
+        );
       }
     }
   }
@@ -228,13 +253,17 @@ export class FollowUpRulesService {
     action: any,
     eventData: any,
     executionTime: Date,
-    ruleId: string
+    ruleId: string,
   ): Promise<void> {
-    const opportunityId = eventData.opportunity?._id || eventData.opportunity?.id;
-    const customerId = eventData.opportunity?.customerId || eventData.customerId;
+    const opportunityId =
+      eventData.opportunity?._id || eventData.opportunity?.id;
+    const customerId =
+      eventData.opportunity?.customerId || eventData.customerId;
 
     if (!opportunityId || !customerId) {
-      this.logger.warn('Missing opportunityId or customerId for CREATE_ACTIVITY action');
+      this.logger.warn(
+        'Missing opportunityId or customerId for CREATE_ACTIVITY action',
+      );
       return;
     }
 
@@ -255,11 +284,11 @@ export class FollowUpRulesService {
           automatedAction: true,
         },
       },
-      'system'
+      'system',
     );
 
     this.logger.log(
-      `Created activity for opportunity ${opportunityId}, due at ${executionTime.toISOString()}`
+      `Created activity for opportunity ${opportunityId}, due at ${executionTime.toISOString()}`,
     );
   }
 
@@ -269,24 +298,36 @@ export class FollowUpRulesService {
     // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
   }
 
-  private async sendNotificationAction(_action: any, _eventData: any): Promise<void> {
+  private async sendNotificationAction(
+    _action: any,
+    _eventData: any,
+  ): Promise<void> {
     // Placeholder for notification logic
     this.logger.log(`Notification action triggered`);
     // TODO: Integrate with notification service (WebSocket, Push, etc.)
   }
 
-  private resolveAssignment(assignTo: string | undefined, eventData: any): string {
+  private resolveAssignment(
+    assignTo: string | undefined,
+    eventData: any,
+  ): string {
     if (!assignTo || assignTo === 'lead_owner') {
-      return eventData.opportunity?.assignedSalesRep ||
-             eventData.opportunity?.createdBy ||
-             eventData.userId ||
-             'system';
+      return (
+        eventData.opportunity?.assignedSalesRep ||
+        eventData.opportunity?.createdBy ||
+        eventData.userId ||
+        'system'
+      );
     }
 
     if (assignTo === 'round_robin') {
       // TODO: Implement round-robin assignment logic
-      this.logger.log('Round-robin assignment not yet implemented, using lead owner');
-      return eventData.opportunity?.assignedSalesRep || eventData.userId || 'system';
+      this.logger.log(
+        'Round-robin assignment not yet implemented, using lead owner',
+      );
+      return (
+        eventData.opportunity?.assignedSalesRep || eventData.userId || 'system'
+      );
     }
 
     return assignTo;

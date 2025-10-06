@@ -595,35 +595,35 @@ erDiagram
 
 ```javascript
 // Customer indexes
-Customer.index({ email: 1 }, { unique: true })
-Customer.index({ assignedSalesperson: 1, status: 1 })
-Customer.index({ createdAt: -1 })
+Customer.index({ email: 1 }, { unique: true });
+Customer.index({ assignedSalesperson: 1, status: 1 });
+Customer.index({ createdAt: -1 });
 
 // Estimate indexes
-Estimate.index({ estimateNumber: 1 }, { unique: true })
-Estimate.index({ customerId: 1, createdAt: -1 })
-Estimate.index({ status: 1, expiresAt: 1 })
-Estimate.index({ createdBy: 1, createdAt: -1 })
+Estimate.index({ estimateNumber: 1 }, { unique: true });
+Estimate.index({ customerId: 1, createdAt: -1 });
+Estimate.index({ status: 1, expiresAt: 1 });
+Estimate.index({ createdBy: 1, createdAt: -1 });
 
 // Job indexes
-Job.index({ jobNumber: 1 }, { unique: true })
-Job.index({ estimateId: 1 })
-Job.index({ customerId: 1 })
-Job.index({ status: 1, scheduledDate: 1 })
-Job.index({ assignedCrews: 1, scheduledDate: 1 })
+Job.index({ jobNumber: 1 }, { unique: true });
+Job.index({ estimateId: 1 });
+Job.index({ customerId: 1 });
+Job.index({ status: 1, scheduledDate: 1 });
+Job.index({ assignedCrews: 1, scheduledDate: 1 });
 
 // Crew indexes
-Crew.index({ status: 1, isActive: 1 })
-Crew.index({ 'availability.date': 1, 'availability.status': 1 })
+Crew.index({ status: 1, isActive: 1 });
+Crew.index({ 'availability.date': 1, 'availability.status': 1 });
 
 // Audit indexes
-AuditLog.index({ entityType: 1, entityId: 1, timestamp: -1 })
-AuditLog.index({ userId: 1, timestamp: -1 })
-AuditLog.index({ timestamp: -1 })
+AuditLog.index({ entityType: 1, entityId: 1, timestamp: -1 });
+AuditLog.index({ userId: 1, timestamp: -1 });
+AuditLog.index({ timestamp: -1 });
 
 // Pricing Rule indexes
-PricingRule.index({ type: 1, isActive: 1, priority: 1 })
-PricingRule.index({ effectiveFrom: 1, effectiveTo: 1, isActive: 1 })
+PricingRule.index({ type: 1, isActive: 1, priority: 1 });
+PricingRule.index({ effectiveFrom: 1, effectiveTo: 1, isActive: 1 });
 ```
 
 ## Data Relationships & Constraints

@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards, Request } from '@nestjs/common';
 import { JobsService } from '../../jobs/jobs.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -10,7 +17,7 @@ import type {
   CreateJobDto,
   UpdateJobDto,
   JobFilters,
-  CrewAssignment
+  CrewAssignment,
 } from '../../jobs/interfaces/job.interface';
 
 @Resolver('Job')
@@ -20,7 +27,7 @@ export class JobsResolver {
     private readonly jobsService: JobsService,
     private readonly customerDataLoader: CustomerDataLoader,
     private readonly estimateDataLoader: EstimateDataLoader,
-    private readonly crewDataLoader: CrewDataLoader
+    private readonly crewDataLoader: CrewDataLoader,
   ) {}
 
   // Queries
@@ -30,7 +37,9 @@ export class JobsResolver {
   }
 
   @Query('jobByNumber')
-  async getJobByNumber(@Args('jobNumber') jobNumber: string): Promise<Job | null> {
+  async getJobByNumber(
+    @Args('jobNumber') jobNumber: string,
+  ): Promise<Job | null> {
     return this.jobsService.findByJobNumber(jobNumber);
   }
 
@@ -39,7 +48,7 @@ export class JobsResolver {
     @Args('filters') filters?: JobFilters,
     @Args('sortBy') sortBy?: { field: string; order: 'asc' | 'desc' },
     @Args('first') first?: number,
-    @Args('after') after?: string
+    @Args('after') after?: string,
   ): Promise<any> {
     // Fetch all jobs (use large limit for GraphQL compatibility)
     const result = await this.jobsService.findAll(filters, 0, 1000);
@@ -57,12 +66,14 @@ export class JobsResolver {
 
     // Implement cursor-based pagination
     const limit = first || 20;
-    const startIndex = after ? jobs.findIndex((j: any) => j.id === after) + 1 : 0;
+    const startIndex = after
+      ? jobs.findIndex((j: any) => j.id === after) + 1
+      : 0;
     const paginatedJobs = jobs.slice(startIndex, startIndex + limit);
 
     const edges = paginatedJobs.map((job: Job) => ({
       node: job,
-      cursor: job.id
+      cursor: job.id,
     }));
 
     return {
@@ -71,16 +82,16 @@ export class JobsResolver {
         hasNextPage: startIndex + limit < jobs.length,
         hasPreviousPage: startIndex > 0,
         startCursor: edges[0]?.cursor,
-        endCursor: edges[edges.length - 1]?.cursor
+        endCursor: edges[edges.length - 1]?.cursor,
       },
-      totalCount: jobs.length
+      totalCount: jobs.length,
     };
   }
 
   @Query('jobsWithDetails')
   async getJobsWithDetails(
     @Args('filters') filters?: JobFilters,
-    @Args('sortBy') sortBy?: { field: string; order: 'asc' | 'desc' }
+    @Args('sortBy') sortBy?: { field: string; order: 'asc' | 'desc' },
   ): Promise<any[]> {
     // Fetch all jobs (use large limit for GraphQL compatibility)
     const result = await this.jobsService.findAll(filters, 0, 1000);
@@ -109,7 +120,7 @@ export class JobsResolver {
   @Mutation('createJob')
   async createJob(
     @Args('input') input: CreateJobDto,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
     return this.jobsService.create(input, userId);
@@ -119,7 +130,7 @@ export class JobsResolver {
   async updateJob(
     @Args('id') id: string,
     @Args('input') input: UpdateJobDto,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
     return this.jobsService.update(id, input, userId);
@@ -129,7 +140,7 @@ export class JobsResolver {
   async updateJobStatus(
     @Args('id') id: string,
     @Args('status') status: Job['status'],
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
     return this.jobsService.updateStatus(id, status, userId);
@@ -145,7 +156,7 @@ export class JobsResolver {
   async assignCrew(
     @Args('jobId') jobId: string,
     @Args('crew') crew: Omit<CrewAssignment, 'assignedAt' | 'status'>[],
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
     return this.jobsService.assignCrew(jobId, crew, userId);
@@ -156,10 +167,15 @@ export class JobsResolver {
     @Args('jobId') jobId: string,
     @Args('crewMemberId') crewMemberId: string,
     @Args('status') status: CrewAssignment['status'],
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
-    return this.jobsService.updateCrewStatus(jobId, crewMemberId, status, userId);
+    return this.jobsService.updateCrewStatus(
+      jobId,
+      crewMemberId,
+      status,
+      userId,
+    );
   }
 
   @Mutation('addJobNote')
@@ -167,14 +183,10 @@ export class JobsResolver {
     @Args('jobId') jobId: string,
     @Args('content') content: string,
     @Args('isPinned') _isPinned = false,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
-    return this.jobsService.addNote(
-      jobId,
-      { content } as any,
-      userId
-    );
+    return this.jobsService.addNote(jobId, { content } as any, userId);
   }
 
   @Mutation('updateMilestone')
@@ -182,10 +194,15 @@ export class JobsResolver {
     @Args('jobId') jobId: string,
     @Args('milestoneId') milestoneId: string,
     @Args('status') status: string,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Job> {
     const userId = req.user?.userId || 'system';
-    return this.jobsService.updateMilestone(jobId, milestoneId, status as any, userId);
+    return this.jobsService.updateMilestone(
+      jobId,
+      milestoneId,
+      status as any,
+      userId,
+    );
   }
 
   // Field Resolvers (use DataLoaders for N+1 optimization)
@@ -206,7 +223,7 @@ export class JobsResolver {
     if (!job.assignedCrew || job.assignedCrew.length === 0) return [];
 
     // Extract crew member IDs
-    const crewMemberIds = job.assignedCrew.map(c => c.crewMemberId);
+    const crewMemberIds = job.assignedCrew.map((c) => c.crewMemberId);
 
     // Load crew members using DataLoader
     const crewMembers = await this.crewDataLoader.loadMany(crewMemberIds);
@@ -216,7 +233,7 @@ export class JobsResolver {
       ...assignment,
       crewMemberName: crewMembers[index]
         ? `${crewMembers[index].firstName} ${crewMembers[index].lastName}`
-        : 'Unknown'
+        : 'Unknown',
     }));
   }
 
@@ -233,7 +250,7 @@ export class JobWithDetailsResolver {
   constructor(
     private readonly customerDataLoader: CustomerDataLoader,
     private readonly estimateDataLoader: EstimateDataLoader,
-    private readonly crewDataLoader: CrewDataLoader
+    private readonly crewDataLoader: CrewDataLoader,
   ) {}
 
   @ResolveField('customer')
@@ -250,7 +267,7 @@ export class JobWithDetailsResolver {
   @ResolveField('assignedCrew')
   async getAssignedCrew(@Parent() job: Job) {
     if (!job.assignedCrew || job.assignedCrew.length === 0) return [];
-    const crewMemberIds = job.assignedCrew.map(c => c.crewMemberId);
+    const crewMemberIds = job.assignedCrew.map((c) => c.crewMemberId);
     return this.crewDataLoader.loadMany(crewMemberIds);
   }
 

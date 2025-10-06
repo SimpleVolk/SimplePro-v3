@@ -93,7 +93,7 @@ describe('CacheService', () => {
       expect(immediate).toEqual(value);
 
       // Wait 1.5 seconds
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Should be expired
       const expired = await service.get(key);
@@ -179,7 +179,9 @@ describe('CacheService', () => {
 
     it('should clear customer caches', async () => {
       await service.set('customer:1', 'value1', { tags: ['customers'] });
-      await service.set('customers:list:page1', 'list1', { tags: ['customers'] });
+      await service.set('customers:list:page1', 'list1', {
+        tags: ['customers'],
+      });
 
       await service.clearCustomerCaches();
 
@@ -192,7 +194,9 @@ describe('CacheService', () => {
 
     it('should clear job caches', async () => {
       await service.set('job:1', 'value1', { tags: ['jobs'] });
-      await service.set('jobs:calendar:2025-01', 'calendar', { tags: ['jobs'] });
+      await service.set('jobs:calendar:2025-01', 'calendar', {
+        tags: ['jobs'],
+      });
 
       await service.clearJobCaches();
 

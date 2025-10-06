@@ -32,7 +32,7 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
     acceptedNotBooked: 0,
     staleOpportunities: 0,
     customerServiceTickets: 0,
-    inventorySubmissions: 0
+    inventorySubmissions: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +47,9 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
         'Content-Type': 'application/json',
       };
 
-      const response = await fetch(getApiUrl('analytics/open-items'), { headers });
+      const response = await fetch(getApiUrl('analytics/open-items'), {
+        headers,
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -60,10 +62,9 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
           acceptedNotBooked: Math.floor(Math.random() * 3),
           staleOpportunities: Math.floor(Math.random() * 4) + 1,
           customerServiceTickets: Math.floor(Math.random() * 2),
-          inventorySubmissions: Math.floor(Math.random() * 3) + 1
+          inventorySubmissions: Math.floor(Math.random() * 3) + 1,
         });
       }
-
     } catch (error) {
       console.error('Failed to fetch open items:', error);
       // Set fallback data
@@ -73,7 +74,7 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
         acceptedNotBooked: 0,
         staleOpportunities: 2,
         customerServiceTickets: 0,
-        inventorySubmissions: 1
+        inventorySubmissions: 1,
       });
     } finally {
       setLoading(false);
@@ -95,15 +96,20 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
       count: openItems.unassignedLeads,
       priority: openItems.unassignedLeads > 0 ? 'high' : 'low',
       icon: '👤',
-      description: 'Leads waiting for assignment'
+      description: 'Leads waiting for assignment',
     },
     {
       id: 'new_leads',
       title: 'New Leads',
       count: openItems.newLeads,
-      priority: openItems.newLeads > 3 ? 'high' : openItems.newLeads > 0 ? 'medium' : 'low',
+      priority:
+        openItems.newLeads > 3
+          ? 'high'
+          : openItems.newLeads > 0
+            ? 'medium'
+            : 'low',
       icon: '✨',
-      description: 'Fresh leads requiring attention'
+      description: 'Fresh leads requiring attention',
     },
     {
       id: 'accepted_not_booked',
@@ -111,15 +117,20 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
       count: openItems.acceptedNotBooked,
       priority: openItems.acceptedNotBooked > 0 ? 'medium' : 'low',
       icon: '📅',
-      description: 'Estimates accepted but not scheduled'
+      description: 'Estimates accepted but not scheduled',
     },
     {
       id: 'stale_opportunities',
       title: 'Stale Opportunities',
       count: openItems.staleOpportunities,
-      priority: openItems.staleOpportunities > 2 ? 'high' : openItems.staleOpportunities > 0 ? 'medium' : 'low',
+      priority:
+        openItems.staleOpportunities > 2
+          ? 'high'
+          : openItems.staleOpportunities > 0
+            ? 'medium'
+            : 'low',
       icon: '⏰',
-      description: 'Opportunities requiring follow-up'
+      description: 'Opportunities requiring follow-up',
     },
     {
       id: 'customer_service_tickets',
@@ -127,7 +138,7 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
       count: openItems.customerServiceTickets,
       priority: openItems.customerServiceTickets > 0 ? 'high' : 'low',
       icon: '🎧',
-      description: 'Open customer support requests'
+      description: 'Open customer support requests',
     },
     {
       id: 'inventory_submissions',
@@ -135,8 +146,8 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
       count: openItems.inventorySubmissions,
       priority: openItems.inventorySubmissions > 2 ? 'medium' : 'low',
       icon: '📦',
-      description: 'Pending inventory reviews'
-    }
+      description: 'Pending inventory reviews',
+    },
   ];
 
   const getPriorityColor = (priority: string) => {
@@ -150,7 +161,10 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
     }
   };
 
-  const totalItems = Object.values(openItems).reduce((sum, count) => sum + count, 0);
+  const totalItems = Object.values(openItems).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
 
   return (
     <div className={styles.openItemsSection}>
@@ -171,26 +185,25 @@ export const OpenItemsSection = memo(function OpenItemsSection() {
             role={item.action ? 'button' : undefined}
             tabIndex={item.action ? 0 : undefined}
           >
-            <div className={styles.itemIcon}>
-              {item.icon}
-            </div>
+            <div className={styles.itemIcon}>{item.icon}</div>
 
             <div className={styles.itemContent}>
               <div className={styles.itemHeader}>
-                <div className={styles.itemTitle}>
-                  {item.title}
-                </div>
+                <div className={styles.itemTitle}>{item.title}</div>
                 <div
                   className={styles.itemCount}
-                  style={{ color: item.count > 0 ? getPriorityColor(item.priority) : '#6c757d' }}
+                  style={{
+                    color:
+                      item.count > 0
+                        ? getPriorityColor(item.priority)
+                        : '#6c757d',
+                  }}
                 >
                   {loading ? '...' : item.count}
                 </div>
               </div>
 
-              <div className={styles.itemDescription}>
-                {item.description}
-              </div>
+              <div className={styles.itemDescription}>{item.description}</div>
             </div>
 
             {item.count > 0 && (

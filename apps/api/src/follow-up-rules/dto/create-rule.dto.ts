@@ -11,7 +11,12 @@ import {
   IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventType, ActionType, RuleTrigger, RuleAction } from '../schemas/follow-up-rule.schema';
+import {
+  EventType,
+  ActionType,
+  RuleTrigger,
+  RuleAction,
+} from '../schemas/follow-up-rule.schema';
 
 class TriggerDto implements RuleTrigger {
   @IsEnum(EventType)
@@ -31,7 +36,14 @@ class ConditionDto {
 
   @IsString()
   @IsNotEmpty()
-  operator!: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'in' | 'not_in';
+  operator!:
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'greater_than'
+    | 'less_than'
+    | 'in'
+    | 'not_in';
 
   @IsNotEmpty()
   value!: any;

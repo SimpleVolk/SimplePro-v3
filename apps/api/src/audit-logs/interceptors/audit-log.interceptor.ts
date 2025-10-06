@@ -9,7 +9,10 @@ import { Reflector } from '@nestjs/core';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { AuditLogsService } from '../audit-logs.service';
-import { AUDIT_LOG_KEY, AuditLogMetadata } from '../decorators/audit-log.decorator';
+import {
+  AUDIT_LOG_KEY,
+  AuditLogMetadata,
+} from '../decorators/audit-log.decorator';
 
 /**
  * Interceptor for automatic audit logging
@@ -61,7 +64,8 @@ export class AuditLogInterceptor implements NestInterceptor {
           resource: auditMetadata.resource,
           resourceId: this.extractResourceId(request, response),
           severity: auditMetadata.severity || 'info',
-          ipAddress: request.ip || request.connection?.remoteAddress || 'unknown',
+          ipAddress:
+            request.ip || request.connection?.remoteAddress || 'unknown',
           userAgent: request.headers['user-agent'],
           sessionId: request.sessionId,
           outcome: 'success',
@@ -78,29 +82,32 @@ export class AuditLogInterceptor implements NestInterceptor {
         // Log failed action
         const duration = Date.now() - startTime;
 
-        this.auditLogsService.createLog({
-          timestamp: new Date(),
-          userId: user.id || user._id?.toString(),
-          userName: user.fullName || user.username,
-          action: auditMetadata.action,
-          resource: auditMetadata.resource,
-          resourceId: this.extractResourceId(request, null),
-          severity: 'error',
-          ipAddress: request.ip || request.connection?.remoteAddress || 'unknown',
-          userAgent: request.headers['user-agent'],
-          sessionId: request.sessionId,
-          outcome: 'failure',
-          errorMessage: error.message,
-          errorStack: error.stack,
-          metadata: {
-            method: request.method,
-            path: request.path,
-            duration: `${duration}ms`,
-            statusCode: error.status || 500,
-          },
-        }).catch((logError) => {
-          this.logger.error('Failed to create audit log for error', logError);
-        });
+        this.auditLogsService
+          .createLog({
+            timestamp: new Date(),
+            userId: user.id || user._id?.toString(),
+            userName: user.fullName || user.username,
+            action: auditMetadata.action,
+            resource: auditMetadata.resource,
+            resourceId: this.extractResourceId(request, null),
+            severity: 'error',
+            ipAddress:
+              request.ip || request.connection?.remoteAddress || 'unknown',
+            userAgent: request.headers['user-agent'],
+            sessionId: request.sessionId,
+            outcome: 'failure',
+            errorMessage: error.message,
+            errorStack: error.stack,
+            metadata: {
+              method: request.method,
+              path: request.path,
+              duration: `${duration}ms`,
+              statusCode: error.status || 500,
+            },
+          })
+          .catch((logError) => {
+            this.logger.error('Failed to create audit log for error', logError);
+          });
 
         return throwError(() => error);
       }),

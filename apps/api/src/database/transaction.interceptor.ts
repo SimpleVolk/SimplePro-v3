@@ -36,7 +36,7 @@ export class TransactionInterceptor implements NestInterceptor {
     // Reserved for future transaction management functionality
     // @ts-expect-error - Service injected for future use
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private readonly transactionService: TransactionService
+    private readonly transactionService: TransactionService,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {

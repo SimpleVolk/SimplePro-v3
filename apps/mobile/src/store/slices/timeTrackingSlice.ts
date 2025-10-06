@@ -56,7 +56,7 @@ export const clockIn = createAsyncThunk(
       throw new Error('No access token');
     }
     return await timeTrackingApi.clockIn(auth.accessToken, jobId);
-  }
+  },
 );
 
 export const clockOut = createAsyncThunk(
@@ -74,15 +74,18 @@ export const clockOut = createAsyncThunk(
       throw new Error('No access token');
     }
     return await timeTrackingApi.clockOut(auth.accessToken, entryId);
-  }
+  },
 );
 
 export const addBreak = createAsyncThunk(
   'timeTracking/addBreak',
-  async ({ entryId, duration }: { entryId: string; duration: number }, { getState }: any) => {
+  async (
+    { entryId, duration }: { entryId: string; duration: number },
+    { getState }: any,
+  ) => {
     const { auth } = getState();
     return await timeTrackingApi.addBreak(auth.accessToken, entryId, duration);
-  }
+  },
 );
 
 export const fetchTimeEntries = createAsyncThunk(
@@ -90,7 +93,7 @@ export const fetchTimeEntries = createAsyncThunk(
   async (_, { getState }: any) => {
     const { auth } = getState();
     return await timeTrackingApi.getTimeEntries(auth.accessToken);
-  }
+  },
 );
 
 // Slice
@@ -127,20 +130,25 @@ const timeTrackingSlice = createSlice({
       })
       .addCase(clockOut.fulfilled, (state, action) => {
         state.activeEntry = null;
-        const index = state.entries.findIndex((e) => e.entryId === action.payload.entryId);
+        const index = state.entries.findIndex(
+          (e) => e.entryId === action.payload.entryId,
+        );
         if (index !== -1) {
           state.entries[index] = action.payload;
         }
       })
       .addCase(addBreak.fulfilled, (state, action) => {
-        const index = state.entries.findIndex((e) => e.entryId === action.payload.entryId);
+        const index = state.entries.findIndex(
+          (e) => e.entryId === action.payload.entryId,
+        );
         if (index !== -1) {
           state.entries[index] = action.payload;
         }
       })
       .addCase(fetchTimeEntries.fulfilled, (state, action) => {
         state.entries = action.payload;
-        state.activeEntry = action.payload.find((e: TimeEntry) => e.status === 'active') || null;
+        state.activeEntry =
+          action.payload.find((e: TimeEntry) => e.status === 'active') || null;
       });
   },
 });

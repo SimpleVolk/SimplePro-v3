@@ -62,7 +62,9 @@ export class CircuitBreakerService {
 
     if (this.failureCount >= this.config.failureThreshold) {
       this.state = CircuitState.OPEN;
-      this.logger.warn(`Circuit breaker state changed to OPEN after ${this.failureCount} failures`);
+      this.logger.warn(
+        `Circuit breaker state changed to OPEN after ${this.failureCount} failures`,
+      );
     }
   }
 

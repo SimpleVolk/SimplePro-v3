@@ -109,9 +109,15 @@ export class TariffSettingsController {
   @HttpCode(HttpStatus.CREATED)
   @RequirePermissions({ resource: 'tariff_settings', action: 'create' })
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  async create(@Body() dto: CreateTariffSettingsDto, @CurrentUser() user: User) {
+  async create(
+    @Body() dto: CreateTariffSettingsDto,
+    @CurrentUser() user: User,
+  ) {
     try {
-      const tariffSettings = await this.tariffSettingsService.create(dto, user.id);
+      const tariffSettings = await this.tariffSettingsService.create(
+        dto,
+        user.id,
+      );
 
       return {
         success: true,
@@ -133,7 +139,11 @@ export class TariffSettingsController {
     @CurrentUser() user: User,
   ) {
     try {
-      const tariffSettings = await this.tariffSettingsService.update(id, dto, user.id);
+      const tariffSettings = await this.tariffSettingsService.update(
+        id,
+        dto,
+        user.id,
+      );
 
       return {
         success: true,
@@ -191,7 +201,11 @@ export class TariffSettingsController {
         throw new BadRequestException('Name is required for cloning');
       }
 
-      const cloned = await this.tariffSettingsService.clone(id, body.name, user.id);
+      const cloned = await this.tariffSettingsService.clone(
+        id,
+        body.name,
+        user.id,
+      );
 
       return {
         success: true,
@@ -342,7 +356,11 @@ export class TariffSettingsController {
         throw new BadRequestException('Invalid crew size');
       }
 
-      await this.tariffSettingsService.deleteHourlyRate(id, crewSizeNum, user.id);
+      await this.tariffSettingsService.deleteHourlyRate(
+        id,
+        crewSizeNum,
+        user.id,
+      );
     } catch (error) {
       this.logger.error(`Error in deleteHourlyRate for ID ${id}`, error);
       throw error;
@@ -452,7 +470,10 @@ export class TariffSettingsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getMaterials(@Param('id') id: string, @Query() query: any) {
     try {
-      const materials = await this.tariffSettingsService.getMaterials(id, query);
+      const materials = await this.tariffSettingsService.getMaterials(
+        id,
+        query,
+      );
 
       return {
         success: true,
@@ -468,9 +489,15 @@ export class TariffSettingsController {
   @Get(':id/materials/:materialId')
   @RequirePermissions({ resource: 'tariff_settings', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
-  async getMaterial(@Param('id') id: string, @Param('materialId') materialId: string) {
+  async getMaterial(
+    @Param('id') id: string,
+    @Param('materialId') materialId: string,
+  ) {
     try {
-      const material = await this.tariffSettingsService.getMaterial(id, materialId);
+      const material = await this.tariffSettingsService.getMaterial(
+        id,
+        materialId,
+      );
 
       return {
         success: true,
@@ -492,7 +519,11 @@ export class TariffSettingsController {
     @CurrentUser() user: User,
   ) {
     try {
-      const material = await this.tariffSettingsService.addMaterial(id, dto, user.id);
+      const material = await this.tariffSettingsService.addMaterial(
+        id,
+        dto,
+        user.id,
+      );
 
       return {
         success: true,
@@ -589,7 +620,10 @@ export class TariffSettingsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getMoveSizes(@Param('id') id: string, @Query() query: any) {
     try {
-      const moveSizes = await this.tariffSettingsService.getMoveSizes(id, query);
+      const moveSizes = await this.tariffSettingsService.getMoveSizes(
+        id,
+        query,
+      );
 
       return {
         success: true,
@@ -605,9 +639,15 @@ export class TariffSettingsController {
   @Get(':id/move-sizes/:moveSizeId')
   @RequirePermissions({ resource: 'tariff_settings', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
-  async getMoveSize(@Param('id') id: string, @Param('moveSizeId') moveSizeId: string) {
+  async getMoveSize(
+    @Param('id') id: string,
+    @Param('moveSizeId') moveSizeId: string,
+  ) {
     try {
-      const moveSize = await this.tariffSettingsService.getMoveSize(id, moveSizeId);
+      const moveSize = await this.tariffSettingsService.getMoveSize(
+        id,
+        moveSizeId,
+      );
 
       return {
         success: true,
@@ -629,7 +669,11 @@ export class TariffSettingsController {
     @CurrentUser() user: User,
   ) {
     try {
-      const moveSize = await this.tariffSettingsService.addMoveSize(id, dto, user.id);
+      const moveSize = await this.tariffSettingsService.addMoveSize(
+        id,
+        dto,
+        user.id,
+      );
 
       return {
         success: true,
@@ -696,7 +740,10 @@ export class TariffSettingsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getRoomSizes(@Param('id') id: string, @Query() query: any) {
     try {
-      const roomSizes = await this.tariffSettingsService.getRoomSizes(id, query);
+      const roomSizes = await this.tariffSettingsService.getRoomSizes(
+        id,
+        query,
+      );
 
       return {
         success: true,
@@ -712,9 +759,15 @@ export class TariffSettingsController {
   @Get(':id/room-sizes/:roomSizeId')
   @RequirePermissions({ resource: 'tariff_settings', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
-  async getRoomSize(@Param('id') id: string, @Param('roomSizeId') roomSizeId: string) {
+  async getRoomSize(
+    @Param('id') id: string,
+    @Param('roomSizeId') roomSizeId: string,
+  ) {
     try {
-      const roomSize = await this.tariffSettingsService.getRoomSize(id, roomSizeId);
+      const roomSize = await this.tariffSettingsService.getRoomSize(
+        id,
+        roomSizeId,
+      );
 
       return {
         success: true,
@@ -736,7 +789,11 @@ export class TariffSettingsController {
     @CurrentUser() user: User,
   ) {
     try {
-      const roomSize = await this.tariffSettingsService.addRoomSize(id, dto, user.id);
+      const roomSize = await this.tariffSettingsService.addRoomSize(
+        id,
+        dto,
+        user.id,
+      );
 
       return {
         success: true,
@@ -803,7 +860,10 @@ export class TariffSettingsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getHandicaps(@Param('id') id: string, @Query() query: any) {
     try {
-      const handicaps = await this.tariffSettingsService.getHandicaps(id, query);
+      const handicaps = await this.tariffSettingsService.getHandicaps(
+        id,
+        query,
+      );
 
       return {
         success: true,
@@ -819,9 +879,15 @@ export class TariffSettingsController {
   @Get(':id/handicaps/:handicapId')
   @RequirePermissions({ resource: 'tariff_settings', action: 'read' })
   @Throttle({ default: { limit: 50, ttl: 60000 } })
-  async getHandicap(@Param('id') id: string, @Param('handicapId') handicapId: string) {
+  async getHandicap(
+    @Param('id') id: string,
+    @Param('handicapId') handicapId: string,
+  ) {
     try {
-      const handicap = await this.tariffSettingsService.getHandicap(id, handicapId);
+      const handicap = await this.tariffSettingsService.getHandicap(
+        id,
+        handicapId,
+      );
 
       return {
         success: true,
@@ -843,7 +909,11 @@ export class TariffSettingsController {
     @CurrentUser() user: User,
   ) {
     try {
-      const handicap = await this.tariffSettingsService.addHandicap(id, dto, user.id);
+      const handicap = await this.tariffSettingsService.addHandicap(
+        id,
+        dto,
+        user.id,
+      );
 
       return {
         success: true,
@@ -910,7 +980,10 @@ export class TariffSettingsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getDistanceRates(@Param('id') id: string, @Query() query: any) {
     try {
-      const distanceRates = await this.tariffSettingsService.getDistanceRates(id, query);
+      const distanceRates = await this.tariffSettingsService.getDistanceRates(
+        id,
+        query,
+      );
 
       return {
         success: true,
@@ -1011,7 +1084,11 @@ export class TariffSettingsController {
     @CurrentUser() user: User,
   ) {
     try {
-      await this.tariffSettingsService.deleteDistanceRate(id, distanceRateId, user.id);
+      await this.tariffSettingsService.deleteDistanceRate(
+        id,
+        distanceRateId,
+        user.id,
+      );
     } catch (error) {
       this.logger.error(`Error in deleteDistanceRate for ID ${id}`, error);
       throw error;

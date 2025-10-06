@@ -37,14 +37,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (!secret) {
           throw new Error(
             'JWT_SECRET configuration failed. ' +
-            'For production: ensure secrets are configured via production-secrets.sh script. ' +
-            'For development: set JWT_SECRET environment variable.'
+              'For production: ensure secrets are configured via production-secrets.sh script. ' +
+              'For development: set JWT_SECRET environment variable.',
           );
         }
         if (secret.length < 32) {
           throw new Error(
             'JWT_SECRET must be at least 32 characters long for security. ' +
-            'Please use a strong, randomly generated secret key.'
+              'Please use a strong, randomly generated secret key.',
           );
         }
         return secret;
@@ -58,15 +58,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     try {
       const user = await this.authService.validateUser(payload);
       if (!user) {
-        this.logger.warn(`JWT validation failed: User ${payload.sub} not found or deactivated`);
+        this.logger.warn(
+          `JWT validation failed: User ${payload.sub} not found or deactivated`,
+        );
         throw new UnauthorizedException('Invalid token or user deactivated');
       }
 
       this.logger.debug(`JWT validation successful for user: ${payload.sub}`);
       return user;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`JWT validation error for user ${payload.sub}:`, errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `JWT validation error for user ${payload.sub}:`,
+        errorMessage,
+      );
       throw error;
     }
   }

@@ -5,9 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
 
 // Import resolvers
-import { JobsResolver, JobWithDetailsResolver } from './resolvers/jobs.resolver';
+import {
+  JobsResolver,
+  JobWithDetailsResolver,
+} from './resolvers/jobs.resolver';
 import { CustomersResolver } from './resolvers/customers.resolver';
-import { AnalyticsResolver, CrewResolver } from './resolvers/analytics.resolver';
+import {
+  AnalyticsResolver,
+  CrewResolver,
+} from './resolvers/analytics.resolver';
 import { EstimatesResolver } from './resolvers/estimates.resolver';
 import { OpportunitiesResolver } from './resolvers/opportunities.resolver';
 import { DocumentsResolver } from './resolvers/documents.resolver';
@@ -33,8 +39,14 @@ import { AuthModule } from '../auth/auth.module';
 // Import schemas for DataLoaders
 import { Customer, CustomerSchema } from '../customers/schemas/customer.schema';
 import { User, UserSchema } from '../auth/schemas/user.schema';
-import { Opportunity, OpportunitySchema } from '../opportunities/schemas/opportunity.schema';
-import { DocumentEntity, DocumentSchema } from '../documents/schemas/document.schema';
+import {
+  Opportunity,
+  OpportunitySchema,
+} from '../opportunities/schemas/opportunity.schema';
+import {
+  DocumentEntity,
+  DocumentSchema,
+} from '../documents/schemas/document.schema';
 
 @Module({
   imports: [

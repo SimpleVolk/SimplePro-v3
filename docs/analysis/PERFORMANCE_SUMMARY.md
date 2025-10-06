@@ -32,25 +32,25 @@
 
 ## Quick Wins (Week 1 - High ROI)
 
-| Task | Effort | Impact | Files |
-|------|--------|--------|-------|
-| Fix N+1 queries | 4h | 60% faster dashboard | analytics.service.ts |
-| Add compression | 1h | 70% smaller responses | main.ts |
-| Implement caching | 6h | 80% DB load reduction | customers/jobs services |
-| React Query setup | 8h | Eliminate duplicate calls | Web app |
+| Task              | Effort | Impact                    | Files                   |
+| ----------------- | ------ | ------------------------- | ----------------------- |
+| Fix N+1 queries   | 4h     | 60% faster dashboard      | analytics.service.ts    |
+| Add compression   | 1h     | 70% smaller responses     | main.ts                 |
+| Implement caching | 6h     | 80% DB load reduction     | customers/jobs services |
+| React Query setup | 8h     | Eliminate duplicate calls | Web app                 |
 
 **Total Effort:** 19 hours (~2.5 days)
 **Expected Impact:** 40-60% improvement across all metrics
 
 ## Performance Benchmarks
 
-| Metric | Current | Optimized | Improvement |
-|--------|---------|-----------|-------------|
-| Dashboard Load | 800ms | 180ms | **77% faster** |
-| Customer List | 150ms | 20ms | **87% faster** |
-| Job List | 180ms | 25ms | **86% faster** |
-| Analytics Query | 500ms | 120ms | **76% faster** |
-| Initial Page Load | 2.8s | 1.6s | **43% faster** |
+| Metric            | Current | Optimized | Improvement    |
+| ----------------- | ------- | --------- | -------------- |
+| Dashboard Load    | 800ms   | 180ms     | **77% faster** |
+| Customer List     | 150ms   | 20ms      | **87% faster** |
+| Job List          | 180ms   | 25ms      | **86% faster** |
+| Analytics Query   | 500ms   | 120ms     | **76% faster** |
+| Initial Page Load | 2.8s    | 1.6s      | **43% faster** |
 
 ## Architecture Strengths
 
@@ -64,18 +64,21 @@
 ## Recommended Action Plan
 
 ### Phase 1: Foundation (Week 1-2)
+
 - Fix N+1 queries in analytics
 - Add response compression
 - Implement cache-first strategy for lists
 - Setup React Query for client-side caching
 
 ### Phase 2: Optimization (Week 3-4)
+
 - Dashboard KPI caching with event-driven invalidation
 - Field projection for large documents (80% payload reduction)
 - WebSocket memory management & Redis adapter
 - Component code splitting for 33 settings pages
 
 ### Phase 3: Scale Preparation (Month 2+)
+
 - Cursor-based pagination for deep scrolling
 - Pricing calculation caching
 - Separate large arrays to collections
@@ -84,6 +87,7 @@
 ## Monitoring Recommendations
 
 **Track These Metrics:**
+
 - Request latency (p50, p95, p99)
 - Database query time
 - Cache hit rate (target: 70-85%)
@@ -92,6 +96,7 @@
 - Time to Interactive (TTI)
 
 **Recommended Tools:**
+
 - Prometheus + Grafana (free, self-hosted)
 - Sentry (error tracking + performance)
 - New Relic or Datadog (comprehensive APM)

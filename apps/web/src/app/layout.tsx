@@ -7,7 +7,8 @@ export const revalidate = 0;
 
 export const metadata = {
   title: 'SimplePro - Moving Company Management',
-  description: 'Professional moving company management system with deterministic pricing',
+  description:
+    'Professional moving company management system with deterministic pricing',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -21,7 +22,8 @@ export const metadata = {
     type: 'website',
     siteName: 'SimplePro',
     title: 'SimplePro - Moving Company Management',
-    description: 'Professional moving company management system with deterministic pricing',
+    description:
+      'Professional moving company management system with deterministic pricing',
   },
   robots: {
     index: false, // Internal application

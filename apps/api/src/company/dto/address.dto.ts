@@ -11,11 +11,15 @@ export class AddressDto {
 
   @IsString()
   @Length(2, 2)
-  @Matches(/^[A-Z]{2}$/, { message: 'State must be a 2-letter uppercase code (e.g., NY, CA)' })
+  @Matches(/^[A-Z]{2}$/, {
+    message: 'State must be a 2-letter uppercase code (e.g., NY, CA)',
+  })
   state!: string;
 
   @IsString()
-  @Matches(/^\d{5}(-\d{4})?$/, { message: 'Zip code must be in format 12345 or 12345-6789' })
+  @Matches(/^\d{5}(-\d{4})?$/, {
+    message: 'Zip code must be in format 12345 or 12345-6789',
+  })
   zipCode!: string;
 
   @IsOptional()

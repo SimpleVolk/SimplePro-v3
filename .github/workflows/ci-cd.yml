@@ -32,10 +32,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Lint code
-        run: npm run lint || echo "ESLint found warnings (acceptable)"
+        run: npm run lint
 
       - name: Format check
         run: npx prettier --check "**/*.{ts,tsx,js,jsx,json,md}"
@@ -99,7 +99,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Run pricing engine tests
         run: npx nx test pricing-engine --coverage --watchAll=false

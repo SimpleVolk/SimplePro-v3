@@ -19,24 +19,24 @@ This document outlines the disaster recovery (DR) procedures for SimplePro-v3 to
 
 Maximum acceptable downtime for system restoration:
 
-| System Component | RTO Target | Priority |
-|------------------|------------|----------|
-| **API Server** | 15 minutes | P0 - Critical |
-| **Web Application** | 30 minutes | P0 - Critical |
-| **Database (MongoDB)** | 15 minutes | P0 - Critical |
-| **Document Storage (MinIO)** | 1 hour | P1 - High |
-| **Monitoring Systems** | 2 hours | P2 - Medium |
+| System Component             | RTO Target | Priority      |
+| ---------------------------- | ---------- | ------------- |
+| **API Server**               | 15 minutes | P0 - Critical |
+| **Web Application**          | 30 minutes | P0 - Critical |
+| **Database (MongoDB)**       | 15 minutes | P0 - Critical |
+| **Document Storage (MinIO)** | 1 hour     | P1 - High     |
+| **Monitoring Systems**       | 2 hours    | P2 - Medium   |
 
 ### Recovery Point Objective (RPO)
 
 Maximum acceptable data loss:
 
-| Data Type | RPO Target | Backup Frequency |
-|-----------|------------|------------------|
-| **Business Data** (customers, jobs, estimates) | 1 hour | Hourly backups |
-| **Documents** | 24 hours | Daily backups |
-| **System Configurations** | Last change | On-demand |
-| **Application Logs** | 1 week | Weekly backups |
+| Data Type                                      | RPO Target  | Backup Frequency |
+| ---------------------------------------------- | ----------- | ---------------- |
+| **Business Data** (customers, jobs, estimates) | 1 hour      | Hourly backups   |
+| **Documents**                                  | 24 hours    | Daily backups    |
+| **System Configurations**                      | Last change | On-demand        |
+| **Application Logs**                           | 1 week      | Weekly backups   |
 
 ### Service Level Objectives (SLO)
 
@@ -368,12 +368,12 @@ aws elb deregister-instances-from-load-balancer \
 
 ### DR Drill Schedule
 
-| Test Type | Frequency | Scope | Duration |
-|-----------|-----------|-------|----------|
-| **Backup Verification** | Weekly | Checksum validation | 15 min |
-| **Restore Test** | Monthly | Database restore to staging | 1 hour |
-| **Tabletop Exercise** | Quarterly | Walk through DR procedures | 2 hours |
-| **Full DR Drill** | Annually | Complete recovery simulation | 4 hours |
+| Test Type               | Frequency | Scope                        | Duration |
+| ----------------------- | --------- | ---------------------------- | -------- |
+| **Backup Verification** | Weekly    | Checksum validation          | 15 min   |
+| **Restore Test**        | Monthly   | Database restore to staging  | 1 hour   |
+| **Tabletop Exercise**   | Quarterly | Walk through DR procedures   | 2 hours  |
+| **Full DR Drill**       | Annually  | Complete recovery simulation | 4 hours  |
 
 ### Monthly Restore Test Procedure
 
@@ -421,24 +421,26 @@ After any recovery procedure:
 
 ### Incident Response Team
 
-| Role | Primary | Backup | Responsibilities |
-|------|---------|--------|------------------|
-| **Incident Commander** | DevOps Lead | CTO | Overall coordination, decision-making |
-| **Database Administrator** | DBA | Senior Dev | Database recovery, data integrity |
-| **Systems Engineer** | SysOps | DevOps | Infrastructure, networking, servers |
-| **Application Owner** | Tech Lead | Senior Dev | Application functionality, testing |
-| **Security Officer** | CISO | Security Analyst | Security assessment, threat mitigation |
-| **Communications** | Product Manager | VP Engineering | Stakeholder communication, status updates |
+| Role                       | Primary         | Backup           | Responsibilities                          |
+| -------------------------- | --------------- | ---------------- | ----------------------------------------- |
+| **Incident Commander**     | DevOps Lead     | CTO              | Overall coordination, decision-making     |
+| **Database Administrator** | DBA             | Senior Dev       | Database recovery, data integrity         |
+| **Systems Engineer**       | SysOps          | DevOps           | Infrastructure, networking, servers       |
+| **Application Owner**      | Tech Lead       | Senior Dev       | Application functionality, testing        |
+| **Security Officer**       | CISO            | Security Analyst | Security assessment, threat mitigation    |
+| **Communications**         | Product Manager | VP Engineering   | Stakeholder communication, status updates |
 
 ### Contact Information
 
 **Emergency Contacts:**
+
 - On-call Engineer: +1-555-0100 (PagerDuty)
 - DevOps Lead: devops-lead@simplepro.com
 - CTO: cto@simplepro.com
 - Support Hotline: +1-555-0911
 
 **Escalation Path:**
+
 1. On-call Engineer (0-15 min)
 2. DevOps Lead (15-30 min)
 3. CTO (30+ min or critical incidents)
@@ -553,9 +555,9 @@ exit 0
 
 ## Version History
 
-| Version | Date | Changes | Author |
-|---------|------|---------|--------|
-| 1.0 | 2025-01-02 | Initial DR plan | DevOps Team |
+| Version | Date       | Changes         | Author      |
+| ------- | ---------- | --------------- | ----------- |
+| 1.0     | 2025-01-02 | Initial DR plan | DevOps Team |
 
 ## Appendix
 
@@ -588,14 +590,14 @@ docker stats --no-stream
 
 Based on typical infrastructure:
 
-| Operation | Time Estimate |
-|-----------|---------------|
-| Container restart | 30 seconds |
-| Database restore (10GB) | 5-10 minutes |
-| MinIO restore (50GB) | 15-30 minutes |
-| Full system rebuild | 1-2 hours |
-| SSL certificate renewal | 15 minutes |
-| DNS propagation | 5-30 minutes |
+| Operation               | Time Estimate |
+| ----------------------- | ------------- |
+| Container restart       | 30 seconds    |
+| Database restore (10GB) | 5-10 minutes  |
+| MinIO restore (50GB)    | 15-30 minutes |
+| Full system rebuild     | 1-2 hours     |
+| SSL certificate renewal | 15 minutes    |
+| DNS propagation         | 5-30 minutes  |
 
 ### Support Resources
 

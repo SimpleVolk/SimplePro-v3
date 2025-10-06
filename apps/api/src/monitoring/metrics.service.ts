@@ -85,7 +85,11 @@ export class MetricsService {
   /**
    * Record a histogram value (for durations, sizes, etc.)
    */
-  recordHistogram(name: string, value: number, labels?: Record<string, string>): void {
+  recordHistogram(
+    name: string,
+    value: number,
+    labels?: Record<string, string>,
+  ): void {
     const key = this.getMetricKey(name, labels);
     const existing = this.metrics.get(key);
 
@@ -107,7 +111,12 @@ export class MetricsService {
   /**
    * Record HTTP request metrics
    */
-  recordHttpRequest(method: string, path: string, statusCode: number, duration: number): void {
+  recordHttpRequest(
+    method: string,
+    path: string,
+    statusCode: number,
+    duration: number,
+  ): void {
     this.httpRequestsTotal++;
     this.httpRequestDurations.push(duration);
 
@@ -140,7 +149,9 @@ export class MetricsService {
   /**
    * Record business event
    */
-  recordBusinessEvent(event: 'estimate_created' | 'job_created' | 'customer_created'): void {
+  recordBusinessEvent(
+    event: 'estimate_created' | 'job_created' | 'customer_created',
+  ): void {
     switch (event) {
       case 'estimate_created':
         this.estimatesCreated++;
@@ -173,7 +184,9 @@ export class MetricsService {
     // Uptime
     lines.push('# HELP process_uptime_seconds Process uptime in seconds');
     lines.push('# TYPE process_uptime_seconds gauge');
-    lines.push(`process_uptime_seconds ${(Date.now() - this.startTime) / 1000}`);
+    lines.push(
+      `process_uptime_seconds ${(Date.now() - this.startTime) / 1000}`,
+    );
 
     // HTTP metrics
     lines.push('# HELP http_requests_total Total HTTP requests');
@@ -186,7 +199,8 @@ export class MetricsService {
 
     if (this.httpRequestDurations.length > 0) {
       const avgDuration =
-        this.httpRequestDurations.reduce((a, b) => a + b, 0) / this.httpRequestDurations.length;
+        this.httpRequestDurations.reduce((a, b) => a + b, 0) /
+        this.httpRequestDurations.length;
       lines.push('# HELP http_request_duration_seconds HTTP request duration');
       lines.push('# TYPE http_request_duration_seconds histogram');
       lines.push(`http_request_duration_seconds ${avgDuration / 1000}`);
@@ -199,7 +213,9 @@ export class MetricsService {
     lines.push(`database_connected ${dbConnected ? 1 : 0}`);
 
     // Business metrics
-    lines.push('# HELP business_estimates_created_total Total estimates created');
+    lines.push(
+      '# HELP business_estimates_created_total Total estimates created',
+    );
     lines.push('# TYPE business_estimates_created_total counter');
     lines.push(`business_estimates_created_total ${this.estimatesCreated}`);
 
@@ -207,7 +223,9 @@ export class MetricsService {
     lines.push('# TYPE business_jobs_created_total counter');
     lines.push(`business_jobs_created_total ${this.jobsCreated}`);
 
-    lines.push('# HELP business_customers_created_total Total customers created');
+    lines.push(
+      '# HELP business_customers_created_total Total customers created',
+    );
     lines.push('# TYPE business_customers_created_total counter');
     lines.push(`business_customers_created_total ${this.customersCreated}`);
 
@@ -219,7 +237,9 @@ export class MetricsService {
             .join(',')
         : '';
 
-      lines.push(`${metric.name}${labelsStr ? `{${labelsStr}}` : ''} ${metric.value}`);
+      lines.push(
+        `${metric.name}${labelsStr ? `{${labelsStr}}` : ''} ${metric.value}`,
+      );
     }
 
     return lines.join('\n');

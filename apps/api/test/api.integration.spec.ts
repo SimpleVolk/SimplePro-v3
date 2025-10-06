@@ -76,21 +76,21 @@ describe('SimplePro API Integration Tests', () => {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane.smith@example.com',
-        phone: '(555) 987-6543'
+        phone: '(555) 987-6543',
       },
       pickupLocation: {
         address: '123 Old Street, Springfield, IL 62701',
         accessDifficulty: 'easy',
         floorNumber: 1,
         elevatorAccess: true,
-        parkingDistance: 50
+        parkingDistance: 50,
       },
       deliveryLocation: {
         address: '456 New Avenue, Springfield, IL 62703',
         accessDifficulty: 'medium',
         floorNumber: 2,
         elevatorAccess: false,
-        parkingDistance: 100
+        parkingDistance: 100,
       },
       moveDetails: {
         serviceType: 'local',
@@ -99,14 +99,32 @@ describe('SimplePro API Integration Tests', () => {
         estimatedVolume: 800,
         crewSize: 3,
         truckSize: 'medium',
-        isWeekend: false
+        isWeekend: false,
       },
       inventory: [
-        { name: 'Sofa', category: 'Furniture', weight: 150, volume: 80, specialHandling: false },
-        { name: 'Refrigerator', category: 'Appliances', weight: 300, volume: 60, specialHandling: true },
-        { name: 'Bedroom Set', category: 'Furniture', weight: 400, volume: 200, specialHandling: false }
+        {
+          name: 'Sofa',
+          category: 'Furniture',
+          weight: 150,
+          volume: 80,
+          specialHandling: false,
+        },
+        {
+          name: 'Refrigerator',
+          category: 'Appliances',
+          weight: 300,
+          volume: 60,
+          specialHandling: true,
+        },
+        {
+          name: 'Bedroom Set',
+          category: 'Furniture',
+          weight: 400,
+          volume: 200,
+          specialHandling: false,
+        },
       ],
-      additionalServices: ['packing', 'assembly']
+      additionalServices: ['packing', 'assembly'],
     };
 
     it('should calculate estimate for local move', () => {
@@ -122,7 +140,10 @@ describe('SimplePro API Integration Tests', () => {
           expect(res.body.estimate.calculations).toHaveProperty('finalPrice');
           expect(res.body.estimate.calculations.finalPrice).toBeGreaterThan(0);
           expect(res.body.estimate).toHaveProperty('metadata');
-          expect(res.body.estimate.metadata).toHaveProperty('deterministic', true);
+          expect(res.body.estimate.metadata).toHaveProperty(
+            'deterministic',
+            true,
+          );
           expect(res.body.estimate.metadata).toHaveProperty('hash');
         });
     });
@@ -146,19 +167,19 @@ describe('SimplePro API Integration Tests', () => {
         .expect(200);
 
       // Should have same final price and hash (deterministic)
-      expect(response1.body.estimate.calculations.finalPrice)
-        .toBe(response2.body.estimate.calculations.finalPrice);
+      expect(response1.body.estimate.calculations.finalPrice).toBe(
+        response2.body.estimate.calculations.finalPrice,
+      );
 
-      expect(response1.body.estimate.metadata.hash)
-        .toBe(response2.body.estimate.metadata.hash);
+      expect(response1.body.estimate.metadata.hash).toBe(
+        response2.body.estimate.metadata.hash,
+      );
     });
   });
 
   describe('Error Handling', () => {
     it('should handle 404 for non-existent routes', () => {
-      return request(app.getHttpServer())
-        .get('/api/nonexistent')
-        .expect(404);
+      return request(app.getHttpServer()).get('/api/nonexistent').expect(404);
     });
   });
 
@@ -169,21 +190,21 @@ describe('SimplePro API Integration Tests', () => {
           firstName: 'Load',
           lastName: 'Test',
           email: 'load.test@example.com',
-          phone: '(555) 111-2222'
+          phone: '(555) 111-2222',
         },
         pickupLocation: {
           address: '100 Test Lane, Springfield, IL 62701',
           accessDifficulty: 'easy',
           floorNumber: 1,
           elevatorAccess: true,
-          parkingDistance: 25
+          parkingDistance: 25,
         },
         deliveryLocation: {
           address: '200 New Street, Springfield, IL 62703',
           accessDifficulty: 'easy',
           floorNumber: 1,
           elevatorAccess: true,
-          parkingDistance: 25
+          parkingDistance: 25,
         },
         moveDetails: {
           serviceType: 'local',
@@ -192,32 +213,40 @@ describe('SimplePro API Integration Tests', () => {
           estimatedVolume: 500,
           crewSize: 2,
           truckSize: 'small',
-          isWeekend: false
+          isWeekend: false,
         },
         inventory: [
-          { name: 'Small Couch', category: 'Furniture', weight: 100, volume: 50, specialHandling: false }
+          {
+            name: 'Small Couch',
+            category: 'Furniture',
+            weight: 100,
+            volume: 50,
+            specialHandling: false,
+          },
         ],
-        additionalServices: []
+        additionalServices: [],
       };
 
       const promises = Array.from({ length: 5 }, () =>
         request(app.getHttpServer())
           .post('/estimates/calculate')
           .send(testEstimate)
-          .expect(200)
+          .expect(200),
       );
 
       const responses = await Promise.all(promises);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.body.success).toBe(true);
-        expect(response.body.estimate.calculations.finalPrice).toBeGreaterThan(0);
+        expect(response.body.estimate.calculations.finalPrice).toBeGreaterThan(
+          0,
+        );
       });
 
       // All should produce identical results (deterministic)
       const firstPrice = responses[0].body.estimate.calculations.finalPrice;
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.body.estimate.calculations.finalPrice).toBe(firstPrice);
       });
     }, 15000); // 15 second timeout for load test

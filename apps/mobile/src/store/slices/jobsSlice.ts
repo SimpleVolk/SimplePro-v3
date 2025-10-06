@@ -82,7 +82,7 @@ export const fetchJobs = createAsyncThunk(
   async (_, { getState }: any) => {
     const { auth } = getState();
     return await jobsApi.getJobs(auth.accessToken);
-  }
+  },
 );
 
 export const fetchJobDetails = createAsyncThunk(
@@ -90,7 +90,7 @@ export const fetchJobDetails = createAsyncThunk(
   async (jobId: string, { getState }: any) => {
     const { auth } = getState();
     return await jobsApi.getJobById(auth.accessToken, jobId);
-  }
+  },
 );
 
 export const checkInToJob = createAsyncThunk(
@@ -109,7 +109,7 @@ export const checkInToJob = createAsyncThunk(
       throw new Error('No access token');
     }
     return await jobsApi.checkIn(auth.accessToken, data);
-  }
+  },
 );
 
 export const checkOutFromJob = createAsyncThunk(
@@ -128,12 +128,15 @@ export const checkOutFromJob = createAsyncThunk(
       throw new Error('No access token');
     }
     return await jobsApi.checkOut(auth.accessToken, data);
-  }
+  },
 );
 
 export const updateJobStatus = createAsyncThunk(
   'jobs/updateStatus',
-  async ({ jobId, status }: { jobId: string; status: string }, { getState, dispatch }: any) => {
+  async (
+    { jobId, status }: { jobId: string; status: string },
+    { getState, dispatch }: any,
+  ) => {
     const state = getState() as RootState;
 
     // If offline, queue the action
@@ -147,7 +150,7 @@ export const updateJobStatus = createAsyncThunk(
       throw new Error('No access token');
     }
     return await jobsApi.updateJobStatus(auth.accessToken, jobId, status);
-  }
+  },
 );
 
 // Slice
@@ -159,7 +162,9 @@ const jobsSlice = createSlice({
       state.currentJob = null;
     },
     updateJobLocally: (state, action: PayloadAction<Job>) => {
-      const index = state.jobs.findIndex((job) => job.jobId === action.payload.jobId);
+      const index = state.jobs.findIndex(
+        (job) => job.jobId === action.payload.jobId,
+      );
       if (index !== -1) {
         state.jobs[index] = action.payload;
       }

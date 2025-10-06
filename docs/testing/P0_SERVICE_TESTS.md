@@ -12,16 +12,19 @@ This document describes the comprehensive test suites implemented for the 5 high
 ## Services Tested
 
 ### 1. Estimates Service (42 tests)
+
 **File**: `apps/api/src/estimates/estimates.service.spec.ts`
 **Service**: `apps/api/src/estimates/estimates.service.ts`
 
 #### Test Coverage Areas:
 
 **Initialization (2 tests)**
+
 - Service definition
 - Deterministic estimator initialization
 
 **Basic Functionality (5 tests)**
+
 - Calculate estimate for base local move
 - Calculate estimate for large move with special items
 - Calculate estimate for minimal move
@@ -29,6 +32,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Include metadata with timestamp
 
 **Pricing Rules Application (6 tests)**
+
 - Apply weekend surcharge
 - Apply peak season pricing
 - Apply off-season pricing
@@ -36,6 +40,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Apply multiple special items surcharges
 
 **Location Handicap Calculations (5 tests)**
+
 - Apply stairs surcharge
 - Apply long carry surcharge
 - Handle difficult access scenarios
@@ -43,33 +48,39 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Handle narrow hallways condition
 
 **Additional Services (4 tests)**
+
 - Apply packing service fee
 - Apply assembly service fee
 - Apply storage service fee
 - Apply multiple additional services
 
 **Crew Size Impact (3 tests)**
+
 - Calculate based on crew size
 - Handle single crew member edge case
 - Handle large crew size
 
 **Weight and Volume Calculations (4 tests)**
+
 - Scale price with weight
 - Scale price with volume
 - Handle zero weight edge case
 - Handle zero volume edge case
 
 **Private Helper Methods (7 tests)**
+
 - Correctly identify weekends
 - Determine seasonal period (peak/off-peak)
 - Map difficulty levels (easy/moderate/difficult/extreme)
 
 **Deterministic Pricing Verification (3 tests)**
+
 - Produce identical results for identical inputs
 - Produce deterministic hash for verification
 - Produce different results for different inputs
 
 **Edge Cases and Error Handling (5 tests)**
+
 - Handle moves with all optional fields set to zero
 - Handle past move dates
 - Handle far future move dates
@@ -79,12 +90,14 @@ This document describes the comprehensive test suites implemented for the 5 high
 ---
 
 ### 2. Opportunities Service (40 tests)
+
 **File**: `apps/api/src/opportunities/opportunities.service.spec.ts`
 **Service**: `apps/api/src/opportunities/opportunities.service.ts`
 
 #### Test Coverage Areas:
 
 **CRUD Operations (11 tests)**
+
 - Create opportunity successfully
 - Set status to open by default
 - Assign creating user
@@ -98,6 +111,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Delete opportunity
 
 **Filtering and Querying (6 tests)**
+
 - Filter by status
 - Filter by lead source
 - Filter by customer ID
@@ -106,17 +120,20 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Sort by createdAt descending
 
 **Status Management (4 tests)**
+
 - Update opportunity status
 - Emit status change event
 - Handle status update when not found
 - Handle update failure
 
 **Statistics (3 tests)**
+
 - Return statistics for all opportunities
 - Return statistics filtered by user
 - Handle empty statistics
 
 **Transaction Management (5 tests)**
+
 - Mark as won using transaction
 - Throw NotFoundException when not found
 - Emit conversion event after transaction
@@ -124,12 +141,14 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Rollback on transaction failure
 
 **Edge Cases (4 tests)**
+
 - Handle opportunity with null optional fields
 - Handle very high estimated values
 - Handle zero probability
 - Handle 100% probability
 
 **Error Handling (7 tests)**
+
 - Throw NotFoundException when opportunity not found
 - Throw NotFoundException when updating non-existent
 - Throw NotFoundException when deleting non-existent
@@ -138,12 +157,14 @@ This document describes the comprehensive test suites implemented for the 5 high
 ---
 
 ### 3. Pricing Rules Service (41 tests)
+
 **File**: `apps/api/src/pricing-rules/pricing-rules.service.spec.ts`
 **Service**: `apps/api/src/pricing-rules/pricing-rules.service.ts`
 
 #### Test Coverage Areas:
 
 **Rule Management (8 tests)**
+
 - Return all rules with pagination
 - Filter by category
 - Filter by active status
@@ -154,6 +175,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Handle custom sort order
 
 **CRUD Operations (8 tests)**
+
 - Return rule by ID
 - Return null when rule not found
 - Create new rule successfully
@@ -164,6 +186,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Update rule successfully
 
 **Rule Testing (5 tests)**
+
 - Test rule against sample data
 - Return match result when conditions are met
 - Return no match when conditions are not met
@@ -171,23 +194,27 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Evaluate all conditions
 
 **Metadata Operations (3 tests)**
+
 - Return all available categories
 - Return all available operators
 - Return all available action types
 
 **Import/Export (4 tests)**
+
 - Export all active rules
 - Only export active rules
 - Import rules successfully
 - Validate import data structure
 
 **History and Backup (4 tests)**
+
 - Return rule change history
 - Limit history to 50 entries
 - Sort history by timestamp descending
 - Create backup of active rules
 
 **Validation (6 tests)**
+
 - Handle priority conflict detection
 - Validate condition structure
 - Validate action structure
@@ -196,6 +223,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Increment version numbers
 
 **Soft Delete (3 tests)**
+
 - Soft delete rule
 - Return false when rule not found
 - Log deletion in history
@@ -203,12 +231,14 @@ This document describes the comprehensive test suites implemented for the 5 high
 ---
 
 ### 4. Tariff Settings Service (32 tests)
+
 **File**: `apps/api/src/tariff-settings/tariff-settings.service.spec.ts`
 **Service**: `apps/api/src/tariff-settings/tariff-settings.service.ts`
 
 #### Test Coverage Areas:
 
 **Basic CRUD Operations (8 tests)**
+
 - Return all tariff settings
 - Filter by active status
 - Filter by status
@@ -219,14 +249,17 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Create new tariff settings
 
 **Activation and Deletion (3 tests)**
+
 - Activate tariff and deactivate others
 - Delete inactive tariff
 - Not delete active tariff
 
 **Cloning (1 test)**
+
 - Clone tariff settings with new name
 
 **Hourly Rates Operations (6 tests)**
+
 - Get hourly rates
 - Update hourly rates
 - Add new hourly rate
@@ -235,6 +268,7 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Delete hourly rate
 
 **Materials Operations (5 tests)**
+
 - Get all materials
 - Filter materials by category
 - Add new material
@@ -242,23 +276,28 @@ This document describes the comprehensive test suites implemented for the 5 high
 - Delete material
 
 **Handicaps Operations (2 tests)**
+
 - Get all handicaps
 - Add new handicap
 
 **Move Sizes Operations (2 tests)**
+
 - Get all move sizes
 - Add new move size
 
 **Distance Rates Operations (1 test)**
+
 - Get all distance rates
 
 **Validation (4 tests)**
+
 - Validate tariff settings successfully
 - Detect invalid date range
 - Detect missing default pricing method
 - Detect empty hourly rates
 
 **Cache Management (3 tests)**
+
 - Invalidate cache on create
 - Invalidate cache on update
 - Invalidate cache on activate
@@ -268,9 +307,11 @@ This document describes the comprehensive test suites implemented for the 5 high
 ## Test Infrastructure
 
 ### Test Utilities
+
 **Location**: `apps/api/test/utils/test-helpers.ts`
 
 **Utilities Provided**:
+
 - `generateObjectId()` - Generate valid MongoDB ObjectIds
 - `createMockUser()` - Create mock user objects
 - `mockDateOffset()` - Create dates offset by days
@@ -282,9 +323,11 @@ This document describes the comprehensive test suites implemented for the 5 high
 - `datesEqualIgnoreMs()` - Compare dates ignoring milliseconds
 
 ### Mock Factories
+
 **Location**: `apps/api/test/mocks/model.factory.ts`
 
 **Factories Provided**:
+
 - `createMockModel()` - Mock Mongoose models
 - `createMockDocument()` - Mock Mongoose documents
 - `createMockQueryChain()` - Mock query chains
@@ -294,9 +337,11 @@ This document describes the comprehensive test suites implemented for the 5 high
 - `createMockLogger()` - Mock logger
 
 ### Test Fixtures
+
 **Location**: `apps/api/test/fixtures/`
 
 **Fixture Files**:
+
 1. `estimates.fixture.ts` - Estimate test data
 2. `opportunities.fixture.ts` - Opportunity test data
 3. `pricing-rules.fixture.ts` - Pricing rule test data
@@ -305,11 +350,13 @@ This document describes the comprehensive test suites implemented for the 5 high
 ## Running Tests
 
 ### Run All P0 Service Tests
+
 ```bash
 npm run test:api
 ```
 
 ### Run Specific Service Tests
+
 ```bash
 # Estimates Service
 npm run test:api -- estimates.service.spec
@@ -325,11 +372,13 @@ npm run test:api -- tariff-settings.service.spec
 ```
 
 ### Run with Coverage
+
 ```bash
 npm run test:coverage:api
 ```
 
 ### Watch Mode (for development)
+
 ```bash
 npm run test:api -- --watch
 ```
@@ -337,6 +386,7 @@ npm run test:api -- --watch
 ## Test Patterns and Best Practices
 
 ### AAA Pattern (Arrange-Act-Assert)
+
 All tests follow the AAA pattern:
 
 ```typescript
@@ -354,12 +404,14 @@ it('should create a new opportunity', async () => {
 ```
 
 ### Mock Strategy
+
 - **Mock external dependencies**: All MongoDB models and external services are mocked
 - **Use factories**: Reusable mock factories for consistency
 - **Reset between tests**: `afterEach(() => jest.clearAllMocks())`
 - **Isolate units**: Each test tests one specific behavior
 
 ### Test Organization
+
 ```
 describe('ServiceName', () => {
   describe('methodName', () => {
@@ -373,17 +425,20 @@ describe('ServiceName', () => {
 ## Coverage Goals and Results
 
 ### Target Coverage
+
 - **Line Coverage**: 80%+
 - **Branch Coverage**: 75%+
 - **Function Coverage**: 90%+
 - **Statement Coverage**: 80%+
 
 ### Current Results
+
 Run `npm run test:coverage:api` to see current coverage metrics.
 
 ## Known Issues and Notes
 
 ### Test Failures
+
 Some tests in the Estimates service may fail due to the pricing engine returning results in a slightly different format than expected. These are being addressed:
 
 **Issue**: `result.estimate.totalPrice` is undefined
@@ -407,12 +462,14 @@ Some tests in the Estimates service may fail due to the pricing engine returning
 ### To add tests for a new service:
 
 1. **Create fixture file**:
+
 ```typescript
 // apps/api/test/fixtures/new-service.fixture.ts
 export const mockData = { ... };
 ```
 
 2. **Create test file**:
+
 ```typescript
 // apps/api/src/new-service/new-service.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
@@ -425,6 +482,7 @@ describe('NewService', () => {
 ```
 
 3. **Run tests**:
+
 ```bash
 npm run test:api -- new-service.service.spec
 ```
@@ -432,12 +490,14 @@ npm run test:api -- new-service.service.spec
 ## Maintenance
 
 ### When to Update Tests
+
 - **When adding new features**: Add tests for new functionality
 - **When fixing bugs**: Add regression tests
 - **When refactoring**: Ensure tests still pass
 - **When APIs change**: Update test expectations
 
 ### Test Maintenance Checklist
+
 - [ ] All tests pass
 - [ ] Coverage meets thresholds
 - [ ] No skipped tests without justification
@@ -455,6 +515,7 @@ This comprehensive test suite provides **155+ test cases** covering the 4 most c
 4. **Tariff Settings Service**: 32 tests - Rate and fee management
 
 The test infrastructure includes:
+
 - Reusable mock factories
 - Comprehensive test fixtures
 - Utility helper functions

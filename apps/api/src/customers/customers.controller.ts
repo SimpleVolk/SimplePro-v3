@@ -50,7 +50,10 @@ export class CustomersController {
     @CurrentUser() user: User,
     @Req() req: any,
   ) {
-    const customer = await this.customersService.create(createCustomerDto, user.id);
+    const customer = await this.customersService.create(
+      createCustomerDto,
+      user.id,
+    );
 
     // Log customer creation
     await this.auditLogsService.log(
@@ -71,10 +74,10 @@ export class CustomersController {
             firstName: customer.firstName,
             lastName: customer.lastName,
             email: customer.email,
-            type: customer.type
+            type: customer.type,
           },
         },
-      }
+      },
     );
 
     return {
@@ -98,18 +101,30 @@ export class CustomersController {
       type: query.type,
       source: query.source,
       assignedSalesRep: query.assignedSalesRep,
-      tags: query.tags ? (Array.isArray(query.tags) ? query.tags : [query.tags]) : undefined,
+      tags: query.tags
+        ? Array.isArray(query.tags)
+          ? query.tags
+          : [query.tags]
+        : undefined,
       leadScoreMin: query.leadScoreMin,
       leadScoreMax: query.leadScoreMax,
-      createdAfter: query.createdAfter ? new Date(query.createdAfter) : undefined,
-      createdBefore: query.createdBefore ? new Date(query.createdBefore) : undefined,
-      lastContactAfter: query.lastContactAfter ? new Date(query.lastContactAfter) : undefined,
-      lastContactBefore: query.lastContactBefore ? new Date(query.lastContactBefore) : undefined,
+      createdAfter: query.createdAfter
+        ? new Date(query.createdAfter)
+        : undefined,
+      createdBefore: query.createdBefore
+        ? new Date(query.createdBefore)
+        : undefined,
+      lastContactAfter: query.lastContactAfter
+        ? new Date(query.lastContactAfter)
+        : undefined,
+      lastContactBefore: query.lastContactBefore
+        ? new Date(query.lastContactBefore)
+        : undefined,
       search: query.search,
     };
 
     // Remove undefined values
-    Object.keys(filters).forEach(key => {
+    Object.keys(filters).forEach((key) => {
       if (filters[key as keyof CustomerFilters] === undefined) {
         delete filters[key as keyof CustomerFilters];
       }
@@ -163,7 +178,11 @@ export class CustomersController {
     @CurrentUser() user: User,
     @Req() req: any,
   ) {
-    const customer = await this.customersService.update(id, updateCustomerDto, user.id);
+    const customer = await this.customersService.update(
+      id,
+      updateCustomerDto,
+      user.id,
+    );
 
     // Log customer update
     await this.auditLogsService.log(
@@ -182,7 +201,7 @@ export class CustomersController {
         changes: {
           after: updateCustomerDto,
         },
-      }
+      },
     );
 
     return {
@@ -196,7 +215,11 @@ export class CustomersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequirePermissions({ resource: 'customers', action: 'delete' })
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  async remove(@Param('id') id: string, @CurrentUser() user: User, @Req() req: any) {
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+    @Req() req: any,
+  ) {
     await this.customersService.remove(id);
 
     // Log customer deletion
@@ -213,7 +236,7 @@ export class CustomersController {
         resourceId: id,
         severity: 'warning',
         outcome: 'success',
-      }
+      },
     );
   }
 
@@ -237,7 +260,10 @@ export class CustomersController {
     @Param('id') customerId: string,
     @Param('estimateId') estimateId: string,
   ) {
-    const customer = await this.customersService.addEstimate(customerId, estimateId);
+    const customer = await this.customersService.addEstimate(
+      customerId,
+      estimateId,
+    );
 
     return {
       success: true,
@@ -249,10 +275,7 @@ export class CustomersController {
   @Post(':id/jobs/:jobId')
   @RequirePermissions({ resource: 'customers', action: 'update' })
   @Throttle({ default: { limit: 15, ttl: 60000 } })
-  async addJob(
-    @Param('id') customerId: string,
-    @Param('jobId') jobId: string,
-  ) {
+  async addJob(@Param('id') customerId: string, @Param('jobId') jobId: string) {
     const customer = await this.customersService.addJob(customerId, jobId);
 
     return {

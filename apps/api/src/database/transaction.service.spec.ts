@@ -72,7 +72,9 @@ describe('TransactionService', () => {
       const testError = new Error('Operation failed');
       const operation = jest.fn().mockRejectedValue(testError);
 
-      await expect(service.withTransaction(operation)).rejects.toThrow('Operation failed');
+      await expect(service.withTransaction(operation)).rejects.toThrow(
+        'Operation failed',
+      );
 
       expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
       expect(mockSession.commitTransaction).not.toHaveBeenCalled();
@@ -121,9 +123,9 @@ describe('TransactionService', () => {
       };
       const operation = jest.fn().mockRejectedValue(transientError);
 
-      await expect(service.withTransaction(operation, undefined, 3)).rejects.toEqual(
-        transientError,
-      );
+      await expect(
+        service.withTransaction(operation, undefined, 3),
+      ).rejects.toEqual(transientError);
 
       expect(mockConnection.startSession).toHaveBeenCalledTimes(3);
       expect(mockSession.abortTransaction).toHaveBeenCalledTimes(3);
@@ -134,7 +136,9 @@ describe('TransactionService', () => {
       const nonTransientError = new Error('Validation error');
       const operation = jest.fn().mockRejectedValue(nonTransientError);
 
-      await expect(service.withTransaction(operation)).rejects.toThrow('Validation error');
+      await expect(service.withTransaction(operation)).rejects.toThrow(
+        'Validation error',
+      );
 
       expect(mockConnection.startSession).toHaveBeenCalledTimes(1);
       expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
@@ -160,7 +164,9 @@ describe('TransactionService', () => {
       const operation = jest.fn().mockRejectedValue(operationError);
       mockSession.abortTransaction.mockRejectedValueOnce(abortError);
 
-      await expect(service.withTransaction(operation)).rejects.toThrow('Operation failed');
+      await expect(service.withTransaction(operation)).rejects.toThrow(
+        'Operation failed',
+      );
 
       expect(mockSession.abortTransaction).toHaveBeenCalled();
       expect(mockSession.endSession).toHaveBeenCalled();
@@ -191,7 +197,9 @@ describe('TransactionService', () => {
 
     it('should return null on error', async () => {
       const adminMock = mockConnection.db.admin() as any;
-      adminMock.serverStatus.mockRejectedValueOnce(new Error('Stats unavailable'));
+      adminMock.serverStatus.mockRejectedValueOnce(
+        new Error('Stats unavailable'),
+      );
 
       const stats = await service.getTransactionStats();
 
@@ -204,7 +212,10 @@ describe('TransactionService', () => {
       const error = {
         errorLabels: ['TransientTransactionError'],
       };
-      const operation = jest.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
+      const operation = jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue('success');
 
       await service.withTransaction(operation);
 
@@ -215,7 +226,10 @@ describe('TransactionService', () => {
       const error = {
         errorLabels: ['UnknownTransactionCommitResult'],
       };
-      const operation = jest.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
+      const operation = jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue('success');
 
       await service.withTransaction(operation);
 
@@ -227,7 +241,10 @@ describe('TransactionService', () => {
         code: 246,
         message: 'SnapshotUnavailable',
       };
-      const operation = jest.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
+      const operation = jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue('success');
 
       await service.withTransaction(operation);
 
@@ -239,7 +256,10 @@ describe('TransactionService', () => {
         code: 50,
         message: 'LockTimeout',
       };
-      const operation = jest.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
+      const operation = jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue('success');
 
       await service.withTransaction(operation);
 

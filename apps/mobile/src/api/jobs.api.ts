@@ -41,13 +41,17 @@ export const jobsApi = {
       jobId: string;
       location: { latitude: number; longitude: number };
       timestamp: string;
-    }
+    },
   ) => {
-    const response = await apiClient.post(`/jobs/${data.jobId}/check-in`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await apiClient.post(
+      `/jobs/${data.jobId}/check-in`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
     return response.data;
   },
 
@@ -60,13 +64,17 @@ export const jobsApi = {
       jobId: string;
       timestamp: string;
       notes?: string;
-    }
+    },
   ) => {
-    const response = await apiClient.post(`/jobs/${data.jobId}/check-out`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await apiClient.post(
+      `/jobs/${data.jobId}/check-out`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
     return response.data;
   },
 
@@ -81,7 +89,7 @@ export const jobsApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },
@@ -97,7 +105,7 @@ export const jobsApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },
@@ -109,7 +117,7 @@ export const jobsApi = {
     token: string,
     jobId: string,
     itemId: string,
-    status: string
+    status: string,
   ) => {
     const response = await apiClient.patch(
       `/jobs/${jobId}/items/${itemId}`,
@@ -118,7 +126,7 @@ export const jobsApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response.data;
   },

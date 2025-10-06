@@ -78,15 +78,35 @@ if (role.name === 'super_admin') {
     // Customers (4 permissions) ✅
     { id: 'perm_all_customers', resource: 'customers', action: 'create' },
     { id: 'perm_all_customers_read', resource: 'customers', action: 'read' },
-    { id: 'perm_all_customers_update', resource: 'customers', action: 'update' },
-    { id: 'perm_all_customers_delete', resource: 'customers', action: 'delete' },
+    {
+      id: 'perm_all_customers_update',
+      resource: 'customers',
+      action: 'update',
+    },
+    {
+      id: 'perm_all_customers_delete',
+      resource: 'customers',
+      action: 'delete',
+    },
 
     // Estimates (5 permissions) ✅
     { id: 'perm_all_estimates', resource: 'estimates', action: 'create' },
     { id: 'perm_all_estimates_read', resource: 'estimates', action: 'read' },
-    { id: 'perm_all_estimates_update', resource: 'estimates', action: 'update' },
-    { id: 'perm_all_estimates_delete', resource: 'estimates', action: 'delete' },
-    { id: 'perm_all_estimates_approve', resource: 'estimates', action: 'approve' },
+    {
+      id: 'perm_all_estimates_update',
+      resource: 'estimates',
+      action: 'update',
+    },
+    {
+      id: 'perm_all_estimates_delete',
+      resource: 'estimates',
+      action: 'delete',
+    },
+    {
+      id: 'perm_all_estimates_approve',
+      resource: 'estimates',
+      action: 'approve',
+    },
 
     // Jobs (5 permissions) ✅
     { id: 'perm_all_jobs', resource: 'jobs', action: 'create' },
@@ -104,22 +124,50 @@ if (role.name === 'super_admin') {
 
     // System Settings (2 permissions) ✅
     { id: 'perm_all_system', resource: 'system_settings', action: 'read' },
-    { id: 'perm_all_system_update', resource: 'system_settings', action: 'update' },
+    {
+      id: 'perm_all_system_update',
+      resource: 'system_settings',
+      action: 'update',
+    },
 
     // Pricing Rules (2 permissions) ✅
     { id: 'perm_all_pricing', resource: 'pricing_rules', action: 'read' },
-    { id: 'perm_all_pricing_update', resource: 'pricing_rules', action: 'update' },
+    {
+      id: 'perm_all_pricing_update',
+      resource: 'pricing_rules',
+      action: 'update',
+    },
 
     // Reports (2 permissions) ✅
     { id: 'perm_all_reports', resource: 'reports', action: 'read' },
     { id: 'perm_all_reports_export', resource: 'reports', action: 'export' },
 
     // ⚠️ ADD THESE 5 LINES ⚠️
-    { id: 'perm_all_tariff_settings', resource: 'tariff_settings', action: 'read' },
-    { id: 'perm_all_tariff_settings_create', resource: 'tariff_settings', action: 'create' },
-    { id: 'perm_all_tariff_settings_update', resource: 'tariff_settings', action: 'update' },
-    { id: 'perm_all_tariff_settings_delete', resource: 'tariff_settings', action: 'delete' },
-    { id: 'perm_all_tariff_settings_activate', resource: 'tariff_settings', action: 'activate' },
+    {
+      id: 'perm_all_tariff_settings',
+      resource: 'tariff_settings',
+      action: 'read',
+    },
+    {
+      id: 'perm_all_tariff_settings_create',
+      resource: 'tariff_settings',
+      action: 'create',
+    },
+    {
+      id: 'perm_all_tariff_settings_update',
+      resource: 'tariff_settings',
+      action: 'update',
+    },
+    {
+      id: 'perm_all_tariff_settings_delete',
+      resource: 'tariff_settings',
+      action: 'delete',
+    },
+    {
+      id: 'perm_all_tariff_settings_activate',
+      resource: 'tariff_settings',
+      action: 'activate',
+    },
   ];
   role.permissions = allPermissions;
 }
@@ -127,19 +175,20 @@ if (role.name === 'super_admin') {
 
 ## Permission Coverage Matrix
 
-| Resource Type    | Create | Read | Update | Delete | Activate | Approve | Assign | Export |
-|-----------------|--------|------|--------|--------|----------|---------|--------|--------|
-| users           | ✅     | ✅   | ✅     | ✅     | -        | -       | -      | -      |
-| customers       | ✅     | ✅   | ✅     | ✅     | -        | -       | -      | -      |
-| estimates       | ✅     | ✅   | ✅     | ✅     | -        | ✅      | -      | -      |
-| jobs            | ✅     | ✅   | ✅     | ✅     | -        | -       | ✅     | -      |
-| crews           | ✅     | ✅   | ✅     | ✅     | -        | -       | ✅     | -      |
-| system_settings | -      | ✅   | ✅     | -      | -        | -       | -      | -      |
-| pricing_rules   | -      | ✅   | ✅     | -      | -        | -       | -      | -      |
-| reports         | -      | ✅   | -      | -      | -        | -       | -      | ✅     |
-| **tariff_settings** | ❌ | ❌   | ❌     | ❌     | ❌       | -       | -      | -      |
+| Resource Type       | Create | Read | Update | Delete | Activate | Approve | Assign | Export |
+| ------------------- | ------ | ---- | ------ | ------ | -------- | ------- | ------ | ------ |
+| users               | ✅     | ✅   | ✅     | ✅     | -        | -       | -      | -      |
+| customers           | ✅     | ✅   | ✅     | ✅     | -        | -       | -      | -      |
+| estimates           | ✅     | ✅   | ✅     | ✅     | -        | ✅      | -      | -      |
+| jobs                | ✅     | ✅   | ✅     | ✅     | -        | -       | ✅     | -      |
+| crews               | ✅     | ✅   | ✅     | ✅     | -        | -       | ✅     | -      |
+| system_settings     | -      | ✅   | ✅     | -      | -        | -       | -      | -      |
+| pricing_rules       | -      | ✅   | ✅     | -      | -        | -       | -      | -      |
+| reports             | -      | ✅   | -      | -      | -        | -       | -      | ✅     |
+| **tariff_settings** | ❌     | ❌   | ❌     | ❌     | ❌       | -       | -      | -      |
 
 **Legend:**
+
 - ✅ = Permission granted (working)
 - ❌ = Permission missing (BUG!)
 - `-` = Not applicable for this resource
@@ -333,31 +382,37 @@ Settings → Tariffs →
 ## Summary for Non-Technical Stakeholders
 
 **What's broken:**
+
 - Settings → Tariffs pages don't work
 - Users can't configure pricing
 - All tariff-related features are blocked
 
 **Why it's broken:**
+
 - Developer forgot to give admin users permission to access tariff settings
 - It's like having a key to the building but not to a specific room
 
 **How to fix it:**
+
 - Add 5 lines of code to give admins the missing permissions
 - Restart the system
 - 10 minutes of work
 
 **Testing after fix:**
+
 - Verify users can view/edit packing rates
 - Verify users can view/edit location handicaps
 - Verify settings persist across page refreshes
 - 30-45 minutes of testing
 
 **Business impact:**
+
 - HIGH: Cannot deploy to production without this fix
 - Blocks all pricing configuration functionality
 - No workaround available
 
 **Risk level:**
+
 - LOW: Simple configuration change
 - Well-understood permission system
 - No side effects expected

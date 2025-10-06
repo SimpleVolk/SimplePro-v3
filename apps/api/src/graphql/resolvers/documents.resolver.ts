@@ -24,7 +24,7 @@ export class DocumentsResolver {
   @Query('documentsByEntity')
   async getDocumentsByEntity(
     @Args('entityType') entityType: string,
-    @Args('entityId') entityId: string
+    @Args('entityId') entityId: string,
   ) {
     return this.documentsService.findByEntity(entityType as any, entityId);
   }
@@ -37,10 +37,7 @@ export class DocumentsResolver {
 
   // Mutations
   @Mutation('updateDocument')
-  async updateDocument(
-    @Args('id') id: string,
-    @Args('input') input: any
-  ) {
+  async updateDocument(@Args('id') id: string, @Args('input') input: any) {
     return this.documentsService.updateDocument(id, input);
   }
 
@@ -48,7 +45,7 @@ export class DocumentsResolver {
   @Roles('super_admin', 'admin')
   async deleteDocument(
     @Args('id') id: string,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<boolean> {
     const userId = req.user?.userId || 'system';
     await this.documentsService.deleteDocument(id, userId);
@@ -58,7 +55,7 @@ export class DocumentsResolver {
   @Mutation('createDocumentShareLink')
   async createShareLink(
     @Args('documentId') documentId: string,
-    @Args('input') input: any
+    @Args('input') input: any,
   ) {
     return this.documentsService.createShareLink(documentId, input);
   }

@@ -14,7 +14,7 @@ export const sampleInputs = {
       parkingDistance: 25,
       accessDifficulty: 'moderate',
       stairsCount: 1,
-      narrowHallways: false
+      narrowHallways: false,
     },
     delivery: {
       address: '456 Oak Ave, Springfield, IL 62702',
@@ -24,7 +24,7 @@ export const sampleInputs = {
       parkingDistance: 15,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     distance: 12,
     estimatedDuration: 4,
@@ -36,8 +36,8 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 2500,
-        totalVolume: 400
-      }
+        totalVolume: 400,
+      },
     ],
     totalWeight: 2500,
     totalVolume: 400,
@@ -46,20 +46,20 @@ export const sampleInputs = {
       antiques: false,
       artwork: false,
       fragileItems: 3,
-      valuableItems: 2
+      valuableItems: 2,
     },
     additionalServices: {
       packing: false,
       unpacking: false,
       assembly: false,
       storage: false,
-      cleaning: false
+      cleaning: false,
     },
     isWeekend: false,
     isHoliday: false,
     seasonalPeriod: 'standard',
     crewSize: 2,
-    specialtyCrewRequired: false
+    specialtyCrewRequired: false,
   } as EstimateInput,
 
   // Large local move with piano and stairs
@@ -75,7 +75,7 @@ export const sampleInputs = {
       parkingDistance: 85,
       accessDifficulty: 'difficult',
       stairsCount: 3,
-      narrowHallways: true
+      narrowHallways: true,
     },
     delivery: {
       address: '321 Pine Road, Springfield, IL 62704',
@@ -85,7 +85,7 @@ export const sampleInputs = {
       parkingDistance: 30,
       accessDifficulty: 'moderate',
       stairsCount: 2,
-      narrowHallways: false
+      narrowHallways: false,
     },
     distance: 8,
     estimatedDuration: 8,
@@ -97,7 +97,7 @@ export const sampleInputs = {
         items: [],
         packingRequired: false,
         totalWeight: 3500,
-        totalVolume: 650
+        totalVolume: 650,
       },
       {
         id: 'room-2',
@@ -106,8 +106,8 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 2800,
-        totalVolume: 450
-      }
+        totalVolume: 450,
+      },
     ],
     totalWeight: 6300,
     totalVolume: 1100,
@@ -116,20 +116,20 @@ export const sampleInputs = {
       antiques: true,
       artwork: false,
       fragileItems: 8,
-      valuableItems: 5
+      valuableItems: 5,
     },
     additionalServices: {
       packing: true,
       unpacking: false,
       assembly: true,
       storage: false,
-      cleaning: false
+      cleaning: false,
     },
     isWeekend: true,
     isHoliday: false,
     seasonalPeriod: 'peak',
     crewSize: 4,
-    specialtyCrewRequired: true
+    specialtyCrewRequired: true,
   } as EstimateInput,
 
   // Long distance move - heavy shipment
@@ -145,7 +145,7 @@ export const sampleInputs = {
       parkingDistance: 20,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     delivery: {
       address: '777 Cedar Lane, Denver, CO 80202',
@@ -155,7 +155,7 @@ export const sampleInputs = {
       parkingDistance: 35,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     distance: 920,
     estimatedDuration: 12,
@@ -167,7 +167,7 @@ export const sampleInputs = {
         items: [],
         packingRequired: false,
         totalWeight: 4500,
-        totalVolume: 800
+        totalVolume: 800,
       },
       {
         id: 'room-2',
@@ -176,7 +176,7 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 4200,
-        totalVolume: 750
+        totalVolume: 750,
       },
       {
         id: 'room-3',
@@ -185,8 +185,8 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 3800,
-        totalVolume: 650
-      }
+        totalVolume: 650,
+      },
     ],
     totalWeight: 12500,
     totalVolume: 2200,
@@ -195,20 +195,20 @@ export const sampleInputs = {
       antiques: false,
       artwork: false,
       fragileItems: 2,
-      valuableItems: 3
+      valuableItems: 3,
     },
     additionalServices: {
       packing: true,
       unpacking: true,
       assembly: true,
       storage: true,
-      cleaning: false
+      cleaning: false,
     },
     isWeekend: false,
     isHoliday: false,
     seasonalPeriod: 'standard',
     crewSize: 3,
-    specialtyCrewRequired: false
+    specialtyCrewRequired: false,
   } as EstimateInput,
 
   // Weekend local move with multiple challenges
@@ -225,7 +225,7 @@ export const sampleInputs = {
       accessDifficulty: 'extreme',
       stairsCount: 4,
       narrowHallways: true,
-      specialRequirements: ['Narrow stairwell', 'No parking permit area']
+      specialRequirements: ['Narrow stairwell', 'No parking permit area'],
     },
     delivery: {
       address: '111 Valley Road, Springfield, IL 62706',
@@ -235,7 +235,7 @@ export const sampleInputs = {
       parkingDistance: 10,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     distance: 15,
     estimatedDuration: 6,
@@ -247,8 +247,8 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 2200,
-        totalVolume: 450
-      }
+        totalVolume: 450,
+      },
     ],
     totalWeight: 4800,
     totalVolume: 850,
@@ -257,20 +257,20 @@ export const sampleInputs = {
       antiques: true,
       artwork: true,
       fragileItems: 12,
-      valuableItems: 8
+      valuableItems: 8,
     },
     additionalServices: {
       packing: true,
       unpacking: false,
       assembly: false,
       storage: false,
-      cleaning: false
+      cleaning: false,
     },
     isWeekend: true,
     isHoliday: false,
     seasonalPeriod: 'standard',
     crewSize: 3,
-    specialtyCrewRequired: false
+    specialtyCrewRequired: false,
   } as EstimateInput,
 
   // Minimum charge scenario
@@ -286,7 +286,7 @@ export const sampleInputs = {
       parkingDistance: 10,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     delivery: {
       address: '333 Near Ave, Springfield, IL 62701',
@@ -296,7 +296,7 @@ export const sampleInputs = {
       parkingDistance: 15,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     distance: 2,
     estimatedDuration: 1.5, // Less than minimum
@@ -308,8 +308,8 @@ export const sampleInputs = {
         items: [],
         packingRequired: false,
         totalWeight: 800,
-        totalVolume: 150
-      }
+        totalVolume: 150,
+      },
     ],
     totalWeight: 800,
     totalVolume: 150,
@@ -318,20 +318,20 @@ export const sampleInputs = {
       antiques: false,
       artwork: false,
       fragileItems: 0,
-      valuableItems: 0
+      valuableItems: 0,
     },
     additionalServices: {
       packing: false,
       unpacking: false,
       assembly: false,
       storage: false,
-      cleaning: false
+      cleaning: false,
     },
     isWeekend: false,
     isHoliday: false,
     seasonalPeriod: 'standard',
     crewSize: 2,
-    specialtyCrewRequired: false
+    specialtyCrewRequired: false,
   } as EstimateInput,
 
   // Packing only service
@@ -347,7 +347,7 @@ export const sampleInputs = {
       parkingDistance: 20,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     delivery: {
       address: '444 Pack Street, Springfield, IL 62702', // Same location
@@ -357,7 +357,7 @@ export const sampleInputs = {
       parkingDistance: 20,
       accessDifficulty: 'easy',
       stairsCount: 0,
-      narrowHallways: false
+      narrowHallways: false,
     },
     distance: 0,
     estimatedDuration: 6,
@@ -369,7 +369,7 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 1200,
-        totalVolume: 300
+        totalVolume: 300,
       },
       {
         id: 'room-2',
@@ -378,8 +378,8 @@ export const sampleInputs = {
         items: [],
         packingRequired: true,
         totalWeight: 800,
-        totalVolume: 200
-      }
+        totalVolume: 200,
+      },
     ],
     totalWeight: 2000,
     totalVolume: 500,
@@ -388,19 +388,19 @@ export const sampleInputs = {
       antiques: false,
       artwork: true,
       fragileItems: 15,
-      valuableItems: 5
+      valuableItems: 5,
     },
     additionalServices: {
       packing: true,
       unpacking: false,
       assembly: false,
       storage: false,
-      cleaning: false
+      cleaning: false,
     },
     isWeekend: false,
     isHoliday: false,
     seasonalPeriod: 'standard',
     crewSize: 2,
-    specialtyCrewRequired: false
-  } as EstimateInput
+    specialtyCrewRequired: false,
+  } as EstimateInput,
 };

@@ -26,25 +26,27 @@ SimplePro-v3 uses GitHub Actions for continuous integration and deployment with 
 ### CI Pipeline (ci.yml)
 
 **Triggers:**
+
 - Push to `main` or `develop` branches
 - Pull requests to `main` or `develop`
 
 **Jobs:**
 
-| Job | Description | Duration |
-|-----|-------------|----------|
-| **install** | Install and cache dependencies | ~2 min |
-| **lint** | ESLint and Prettier checks | ~1 min |
-| **type-check** | TypeScript compilation | ~1 min |
-| **security** | npm audit and Snyk scanning | ~2 min |
-| **test-pricing-engine** | Unit tests for pricing engine | ~1 min |
-| **test-api** | API unit tests with MongoDB | ~3 min |
-| **test-web** | Web component tests | ~2 min |
-| **build** | Build all applications | ~5 min |
+| Job                     | Description                    | Duration |
+| ----------------------- | ------------------------------ | -------- |
+| **install**             | Install and cache dependencies | ~2 min   |
+| **lint**                | ESLint and Prettier checks     | ~1 min   |
+| **type-check**          | TypeScript compilation         | ~1 min   |
+| **security**            | npm audit and Snyk scanning    | ~2 min   |
+| **test-pricing-engine** | Unit tests for pricing engine  | ~1 min   |
+| **test-api**            | API unit tests with MongoDB    | ~3 min   |
+| **test-web**            | Web component tests            | ~2 min   |
+| **build**               | Build all applications         | ~5 min   |
 
 **Total Duration:** ~10-15 minutes
 
 **Features:**
+
 - Parallel job execution for speed
 - Dependency caching (node_modules)
 - Test coverage reporting to Codecov
@@ -54,20 +56,22 @@ SimplePro-v3 uses GitHub Actions for continuous integration and deployment with 
 ### CD Pipeline (cd.yml)
 
 **Triggers:**
+
 - Push to `main` (production) or `develop` (staging)
 - Manual workflow dispatch
 
 **Jobs:**
 
-| Job | Description |
-|-----|-------------|
-| **build-images** | Build and push Docker images to GHCR |
-| **security-scan** | Trivy vulnerability scanning |
-| **deploy-staging** | Deploy to staging environment |
-| **deploy-production** | Deploy to production (main branch only) |
-| **post-deployment-check** | Monitor metrics for 5 minutes |
+| Job                       | Description                             |
+| ------------------------- | --------------------------------------- |
+| **build-images**          | Build and push Docker images to GHCR    |
+| **security-scan**         | Trivy vulnerability scanning            |
+| **deploy-staging**        | Deploy to staging environment           |
+| **deploy-production**     | Deploy to production (main branch only) |
+| **post-deployment-check** | Monitor metrics for 5 minutes           |
 
 **Features:**
+
 - Multi-stage Docker builds with layer caching
 - Security scanning with Trivy
 - Rolling deployments with health checks
@@ -78,21 +82,23 @@ SimplePro-v3 uses GitHub Actions for continuous integration and deployment with 
 ### Release Pipeline (release.yml)
 
 **Triggers:**
+
 - Git tags matching `v*.*.*` (e.g., v1.2.3)
 - Manual workflow dispatch
 
 **Jobs:**
 
-| Job | Description |
-|-----|-------------|
-| **create-release** | Generate changelog and GitHub release |
-| **build-artifacts** | Build production artifacts |
-| **build-production-images** | Tag Docker images with version |
-| **security-scan-production** | Scan production images |
-| **deploy-production** | Deploy to production |
-| **post-release** | Post-deployment tasks |
+| Job                          | Description                           |
+| ---------------------------- | ------------------------------------- |
+| **create-release**           | Generate changelog and GitHub release |
+| **build-artifacts**          | Build production artifacts            |
+| **build-production-images**  | Tag Docker images with version        |
+| **security-scan-production** | Scan production images                |
+| **deploy-production**        | Deploy to production                  |
+| **post-release**             | Post-deployment tasks                 |
 
 **Features:**
+
 - Automatic changelog generation
 - Semantic versioning
 - Production artifact archives
@@ -156,14 +162,14 @@ Slack/Email/PagerDuty
 
 ### Components
 
-| Component | Purpose | Port | URL |
-|-----------|---------|------|-----|
-| **Prometheus** | Metrics collection | 9090 | http://localhost:9090 |
-| **Grafana** | Visualization | 3033 | http://localhost:3033 |
-| **Loki** | Log aggregation | 3100 | http://localhost:3100 |
-| **AlertManager** | Alert routing | 9093 | http://localhost:9093 |
-| **Node Exporter** | System metrics | 9100 | - |
-| **cAdvisor** | Container metrics | 8080 | - |
+| Component         | Purpose            | Port | URL                   |
+| ----------------- | ------------------ | ---- | --------------------- |
+| **Prometheus**    | Metrics collection | 9090 | http://localhost:9090 |
+| **Grafana**       | Visualization      | 3033 | http://localhost:3033 |
+| **Loki**          | Log aggregation    | 3100 | http://localhost:3100 |
+| **AlertManager**  | Alert routing      | 9093 | http://localhost:9093 |
+| **Node Exporter** | System metrics     | 9100 | -                     |
+| **cAdvisor**      | Container metrics  | 8080 | -                     |
 
 ### Starting Monitoring Stack
 
@@ -188,6 +194,7 @@ docker-compose -f docker-compose.monitoring.yml logs -f grafana
 ### Available Dashboards
 
 **SimplePro Overview:**
+
 - API health status
 - Request rate and response time
 - Error rates and totals
@@ -215,16 +222,19 @@ curl http://localhost:3001/metrics/system
 ### Available Metrics
 
 **System Metrics:**
+
 - `process_memory_bytes` - Memory usage (rss, heap_used, heap_total)
 - `process_uptime_seconds` - Process uptime
 - `database_connected` - Database connection status (1=connected, 0=disconnected)
 
 **HTTP Metrics:**
+
 - `http_requests_total` - Total HTTP requests (counter)
 - `http_errors_total` - Total HTTP errors (counter)
 - `http_request_duration_seconds` - Request duration (histogram)
 
 **Business Metrics:**
+
 - `business_estimates_created_total` - Total estimates created
 - `business_jobs_created_total` - Total jobs created
 - `business_customers_created_total` - Total customers created
@@ -233,16 +243,16 @@ curl http://localhost:3001/metrics/system
 
 Configured alerts in `monitoring/prometheus/rules/alerts.yml`:
 
-| Alert | Trigger | Severity |
-|-------|---------|----------|
-| **APIDown** | API unavailable for 1 minute | Critical |
-| **HighErrorRate** | Error rate > 5% for 5 minutes | Warning |
-| **HighResponseTime** | Response time > 2s for 5 minutes | Warning |
-| **DatabaseDisconnected** | DB connection lost for 1 minute | Critical |
-| **HighMemoryUsage** | Memory > 90% for 5 minutes | Warning |
-| **HighSystemCPU** | CPU > 80% for 5 minutes | Warning |
-| **DiskSpaceLow** | Disk space < 10% | Warning |
-| **NoRecentEstimates** | No estimates for 2 hours | Info |
+| Alert                    | Trigger                          | Severity |
+| ------------------------ | -------------------------------- | -------- |
+| **APIDown**              | API unavailable for 1 minute     | Critical |
+| **HighErrorRate**        | Error rate > 5% for 5 minutes    | Warning  |
+| **HighResponseTime**     | Response time > 2s for 5 minutes | Warning  |
+| **DatabaseDisconnected** | DB connection lost for 1 minute  | Critical |
+| **HighMemoryUsage**      | Memory > 90% for 5 minutes       | Warning  |
+| **HighSystemCPU**        | CPU > 80% for 5 minutes          | Warning  |
+| **DiskSpaceLow**         | Disk space < 10%                 | Warning  |
+| **NoRecentEstimates**    | No estimates for 2 hours         | Info     |
 
 ### Configuring Alerts
 
@@ -272,22 +282,22 @@ docker-compose -f docker-compose.monitoring.yml restart alertmanager
 
 SimplePro-v3 backups include:
 
-| Component | Criticality | Frequency | Retention |
-|-----------|-------------|-----------|-----------|
-| **MongoDB** | Critical | Hourly | 30 days |
-| **MinIO S3** | High | Daily | 30 days |
-| **Configuration** | Medium | On change | 90 days |
-| **Logs** | Low | Weekly | 30 days |
+| Component         | Criticality | Frequency | Retention |
+| ----------------- | ----------- | --------- | --------- |
+| **MongoDB**       | Critical    | Hourly    | 30 days   |
+| **MinIO S3**      | High        | Daily     | 30 days   |
+| **Configuration** | Medium      | On change | 90 days   |
+| **Logs**          | Low         | Weekly    | 30 days   |
 
 ### Backup Scripts
 
 Located in `scripts/backup/`:
 
-| Script | Purpose |
-|--------|---------|
-| `backup-all.sh` | Complete system backup |
-| `backup-mongodb.sh` | MongoDB database backup |
-| `backup-minio.sh` | MinIO S3 bucket backup |
+| Script               | Purpose                     |
+| -------------------- | --------------------------- |
+| `backup-all.sh`      | Complete system backup      |
+| `backup-mongodb.sh`  | MongoDB database backup     |
+| `backup-minio.sh`    | MinIO S3 bucket backup      |
 | `restore-mongodb.sh` | Restore MongoDB from backup |
 
 ### Manual Backup
@@ -305,6 +315,7 @@ RETENTION_DAYS=90 ./scripts/backup/backup-mongodb.sh
 ```
 
 Backups are stored in `./backups/`:
+
 - `backups/mongodb/` - Database backups
 - `backups/minio/` - S3 bucket backups
 - `backups/config/` - Configuration backups
@@ -360,11 +371,13 @@ mongosh mongodb://localhost:27017/simplepro --eval "
 ### Recovery Objectives
 
 **RTO (Recovery Time Objective):**
+
 - API Server: 15 minutes
 - Database: 15 minutes
 - Document Storage: 1 hour
 
 **RPO (Recovery Point Objective):**
+
 - Business Data: 1 hour (hourly backups)
 - Documents: 24 hours (daily backups)
 - Configuration: Last change
@@ -493,8 +506,8 @@ Edit `monitoring/prometheus/rules/alerts.yml`:
   labels:
     severity: warning
   annotations:
-    summary: "Custom alert fired"
-    description: "Custom alert description"
+    summary: 'Custom alert fired'
+    description: 'Custom alert description'
 ```
 
 **Add Custom Dashboard:**
@@ -533,6 +546,7 @@ gsutil -m rsync -r ./backups gs://simplepro-backups/
 ### CI/CD Issues
 
 **Pipeline fails with "npm install" error:**
+
 ```bash
 # Clear GitHub Actions cache
 # Repository Settings → Actions → Caches → Delete all caches
@@ -540,6 +554,7 @@ gsutil -m rsync -r ./backups gs://simplepro-backups/
 ```
 
 **Docker build fails:**
+
 ```bash
 # Check Dockerfile syntax
 docker build -f apps/api/Dockerfile .
@@ -549,6 +564,7 @@ ls apps/api/
 ```
 
 **Deployment fails:**
+
 ```bash
 # Check SSH connectivity
 ssh -i ~/.ssh/id_rsa user@production-host
@@ -560,6 +576,7 @@ ssh user@production-host 'docker ps'
 ### Monitoring Issues
 
 **Grafana not loading:**
+
 ```bash
 # Check service status
 docker-compose -f docker-compose.monitoring.yml ps grafana
@@ -572,6 +589,7 @@ docker-compose -f docker-compose.monitoring.yml restart grafana
 ```
 
 **Prometheus not scraping:**
+
 ```bash
 # Check Prometheus targets
 open http://localhost:9090/targets
@@ -584,6 +602,7 @@ docker exec simplepro-prometheus cat /etc/prometheus/prometheus.yml
 ```
 
 **Alerts not firing:**
+
 ```bash
 # Check alert rules
 open http://localhost:9090/alerts
@@ -598,6 +617,7 @@ curl -X POST http://localhost:9093/api/v1/alerts
 ### Backup Issues
 
 **Backup script fails:**
+
 ```bash
 # Check disk space
 df -h
@@ -613,6 +633,7 @@ bash -x scripts/backup/backup-mongodb.sh
 ```
 
 **Restore fails:**
+
 ```bash
 # Verify backup file exists
 ls -lh backups/mongodb/backup_*.tar.gz
@@ -636,12 +657,13 @@ docker-compose -f docker-compose.prod.yml stop api
 ## Support
 
 For issues or questions:
+
 - **GitHub Issues**: https://github.com/yourorg/simplepro-v3/issues
 - **DevOps Team**: devops@simplepro.com
 - **On-call**: +1-555-0100 (PagerDuty)
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2025-01-02 | Initial CI/CD, monitoring, and backup setup |
+| Version | Date       | Changes                                     |
+| ------- | ---------- | ------------------------------------------- |
+| 1.0.0   | 2025-01-02 | Initial CI/CD, monitoring, and backup setup |

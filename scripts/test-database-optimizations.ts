@@ -16,7 +16,9 @@ import { getDocumentSizeInfo } from '../apps/api/src/database/document-size-moni
  */
 
 async function connectToDatabase() {
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://admin:password123@localhost:27017/simplepro-test?authSource=admin';
+  const mongoUri =
+    process.env.MONGODB_URI ||
+    'mongodb://admin:password123@localhost:27017/simplepro-test?authSource=admin';
 
   try {
     await mongoose.connect(mongoUri);
@@ -113,17 +115,21 @@ async function testForeignKeyValidation() {
         console.log('✅ Test 2 PASSED: Invalid customerId rejected');
         console.log('   Error message:', (error as Error).message);
       } else {
-        console.log('❌ Test 2 FAILED: Wrong error type:', (error as Error).message);
+        console.log(
+          '❌ Test 2 FAILED: Wrong error type:',
+          (error as Error).message,
+        );
       }
     }
 
     // Clean up
     console.log('\nCleaning up test data...');
     await JobModel.deleteMany({ jobNumber: { $regex: /^TEST-/ } });
-    await CustomerModel.deleteMany({ email: { $regex: /^customer-.*@example\.com$/ } });
+    await CustomerModel.deleteMany({
+      email: { $regex: /^customer-.*@example\.com$/ },
+    });
     await UserModel.deleteMany({ username: { $regex: /^test-user-/ } });
     console.log('✅ Test data cleaned up');
-
   } catch (error) {
     console.error('❌ Test failed:', error);
   }
@@ -207,7 +213,9 @@ async function testDocumentSizeMonitoring() {
     });
 
     const sizeInfo = getDocumentSizeInfo(normalJob);
-    console.log(`   Document size: ${sizeInfo.formatted} (${sizeInfo.percentOf16MB.toFixed(2)}% of 16MB MongoDB limit)`);
+    console.log(
+      `   Document size: ${sizeInfo.formatted} (${sizeInfo.percentOf16MB.toFixed(2)}% of 16MB MongoDB limit)`,
+    );
 
     await normalJob.save();
     console.log('✅ Test 1 PASSED: Normal-sized document accepted');
@@ -219,7 +227,9 @@ async function testDocumentSizeMonitoring() {
   }
 
   // Test 2: Array size limit (should fail)
-  console.log('\nTest 2: Attempting to create job with too many internal notes...');
+  console.log(
+    '\nTest 2: Attempting to create job with too many internal notes...',
+  );
   try {
     const largeArrayJob = new JobModel({
       jobNumber: 'LARGE-ARRAY-' + Date.now(),
@@ -247,7 +257,8 @@ async function testDocumentSizeMonitoring() {
       estimatedCost: 1000,
       createdBy: testUser._id.toString(),
       lastModifiedBy: testUser._id.toString(),
-      internalNotes: Array(600).fill({ // Exceeds 500 limit
+      internalNotes: Array(600).fill({
+        // Exceeds 500 limit
         note: 'Test note ' + 'x'.repeat(100),
         timestamp: new Date(),
         author: testUser._id.toString(),
@@ -261,13 +272,18 @@ async function testDocumentSizeMonitoring() {
       console.log('✅ Test 2 PASSED: Array size limit enforced');
       console.log('   Error message:', (error as Error).message);
     } else {
-      console.log('❌ Test 2 FAILED: Wrong error type:', (error as Error).message);
+      console.log(
+        '❌ Test 2 FAILED: Wrong error type:',
+        (error as Error).message,
+      );
     }
   }
 
   // Clean up
   console.log('\nCleaning up test data...');
-  await JobModel.deleteMany({ jobNumber: { $regex: /^(SIZE-TEST-|LARGE-ARRAY-)/ } });
+  await JobModel.deleteMany({
+    jobNumber: { $regex: /^(SIZE-TEST-|LARGE-ARRAY-)/ },
+  });
   await CustomerModel.deleteMany({ email: { $regex: /^sizetest-customer-/ } });
   await UserModel.deleteMany({ username: { $regex: /^size-test-/ } });
   console.log('✅ Test data cleaned up');
@@ -275,7 +291,9 @@ async function testDocumentSizeMonitoring() {
 
 async function main() {
   console.log('=== DATABASE OPTIMIZATION TESTS ===\n');
-  console.log('Testing foreign key validation, document size monitoring, and array size limits\n');
+  console.log(
+    'Testing foreign key validation, document size monitoring, and array size limits\n',
+  );
 
   try {
     await connectToDatabase();
@@ -288,7 +306,6 @@ async function main() {
     console.log('✅ Document size monitoring working correctly');
     console.log('✅ Array size limits enforced');
     console.log('\nDatabase optimizations are functioning as expected!');
-
   } catch (error) {
     console.error('\n❌ Test suite failed:', error);
     process.exit(1);

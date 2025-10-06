@@ -18,11 +18,13 @@
 ## Overview
 
 ### Backup Objectives
+
 - **RPO (Recovery Point Objective):** < 5 minutes
 - **RTO (Recovery Time Objective):** < 30 minutes
 - **Retention:** 30 days (daily), 90 days (weekly), 1 year (monthly)
 
 ### Backup Locations
+
 - **Primary:** `/backups/mongodb/` (local server)
 - **Secondary:** AWS S3 bucket `simplepro-backups` (optional)
 - **Offsite:** Encrypted backups to separate region
@@ -34,6 +36,7 @@
 ### Backup Types
 
 #### 1. Continuous Oplog Backup
+
 - **Frequency:** Continuous (every 5 minutes)
 - **Purpose:** Point-in-time recovery (PITR)
 - **Retention:** 7 days
@@ -41,6 +44,7 @@
 - **Location:** `/backups/mongodb/oplog/`
 
 #### 2. Daily Full Backup
+
 - **Schedule:** 2:00 AM UTC daily
 - **Method:** mongodump with compression
 - **Retention:** 30 days
@@ -48,6 +52,7 @@
 - **Location:** `/backups/mongodb/daily/YYYYMMDD_HHMMSS/`
 
 #### 3. Weekly Full Backup with Verification
+
 - **Schedule:** Sunday 3:00 AM UTC
 - **Method:** mongodump + integrity check
 - **Retention:** 90 days
@@ -55,6 +60,7 @@
 - **Location:** `/backups/mongodb/weekly/YYYYMMDD_HHMMSS/`
 
 #### 4. Monthly Archive
+
 - **Schedule:** 1st of month, 4:00 AM UTC
 - **Method:** Full dump + metadata
 - **Retention:** 1 year
@@ -427,6 +433,7 @@ docker stop mongo-temp && docker rm mongo-temp
 **Scenario:** Primary data center completely unavailable
 
 #### Prerequisites
+
 - Offsite backups (S3) up to date
 - DR environment provisioned
 - DNS failover configured
@@ -572,6 +579,7 @@ docker start simplepro-api
    - Report results to stakeholders
 
 #### Success Criteria
+
 - [ ] DR site operational within RTO (2 hours)
 - [ ] Data loss within RPO (5 minutes)
 - [ ] All critical functionality working
@@ -649,9 +657,9 @@ echo "=== Test Complete ==="
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-10-02 | DevOps Team | Initial creation |
+| Version | Date       | Author      | Changes          |
+| ------- | ---------- | ----------- | ---------------- |
+| 1.0     | 2025-10-02 | DevOps Team | Initial creation |
 
 ---
 

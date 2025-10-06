@@ -122,6 +122,7 @@ SimplePro-v3/
 Basic application settings.
 
 #### PORT
+
 - **Type**: Number
 - **Default**: `3001` (API), `3009` (Web)
 - **Required**: No
@@ -129,6 +130,7 @@ Basic application settings.
 - **Example**: `PORT=3001`
 
 #### NODE_ENV
+
 - **Type**: Enum (`development`, `staging`, `production`, `test`)
 - **Default**: None
 - **Required**: Yes
@@ -137,6 +139,7 @@ Basic application settings.
 - **Production Value**: `production`
 
 #### APP_NAME
+
 - **Type**: String
 - **Default**: `SimplePro-v3`
 - **Required**: No
@@ -144,6 +147,7 @@ Basic application settings.
 - **Example**: `APP_NAME=SimplePro-v3`
 
 #### API_BASE_URL
+
 - **Type**: URL
 - **Default**: None
 - **Required**: Yes (staging/production)
@@ -152,6 +156,7 @@ Basic application settings.
 - **Production Requirements**: Must use HTTPS
 
 #### WEB_APP_URL
+
 - **Type**: URL
 - **Default**: None
 - **Required**: Yes (staging/production)
@@ -162,6 +167,7 @@ Basic application settings.
 ### 2. Database Configuration (MongoDB)
 
 #### MONGODB_URI
+
 - **Type**: Connection String
 - **Default**: None
 - **Required**: Yes
@@ -179,6 +185,7 @@ Basic application settings.
   - Set write concern (`w=majority`)
 
 #### MONGODB_POOL_SIZE
+
 - **Type**: Number
 - **Default**: `50`
 - **Required**: No
@@ -191,6 +198,7 @@ Basic application settings.
 ### 3. Redis Cache Configuration
 
 #### REDIS_HOST
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes
@@ -198,6 +206,7 @@ Basic application settings.
 - **Example**: `REDIS_HOST=redis.yourdomain.com`
 
 #### REDIS_PORT
+
 - **Type**: Number
 - **Default**: `6379`
 - **Required**: No
@@ -205,6 +214,7 @@ Basic application settings.
 - **Example**: `REDIS_PORT=6379`
 
 #### REDIS_PASSWORD
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes
@@ -216,6 +226,7 @@ Basic application settings.
 - **Generate**: `openssl rand -base64 32 | tr -d '\n'`
 
 #### REDIS_TLS_ENABLED
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -224,17 +235,18 @@ Basic application settings.
 
 #### Cache TTL Settings
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| REDIS_TTL | 300 | Default cache TTL (5 minutes) |
-| REDIS_SHORT_TTL | 60 | Short-lived cache (1 minute) |
-| REDIS_MEDIUM_TTL | 300 | Medium-lived cache (5 minutes) |
-| REDIS_LONG_TTL | 3600 | Long-lived cache (1 hour) |
-| REDIS_EXTRA_LONG_TTL | 86400 | Extra long cache (24 hours) |
+| Variable             | Default | Description                    |
+| -------------------- | ------- | ------------------------------ |
+| REDIS_TTL            | 300     | Default cache TTL (5 minutes)  |
+| REDIS_SHORT_TTL      | 60      | Short-lived cache (1 minute)   |
+| REDIS_MEDIUM_TTL     | 300     | Medium-lived cache (5 minutes) |
+| REDIS_LONG_TTL       | 3600    | Long-lived cache (1 hour)      |
+| REDIS_EXTRA_LONG_TTL | 86400   | Extra long cache (24 hours)    |
 
 ### 4. JWT Authentication
 
 #### JWT_SECRET
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes
@@ -247,6 +259,7 @@ Basic application settings.
 - **Generate**: `openssl rand -base64 64 | tr -d '\n'`
 
 #### JWT_REFRESH_SECRET
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes
@@ -257,6 +270,7 @@ Basic application settings.
 - **Generate**: `openssl rand -base64 64 | tr -d '\n'`
 
 #### JWT_EXPIRES_IN
+
 - **Type**: Duration String
 - **Default**: `1h`
 - **Required**: No
@@ -268,6 +282,7 @@ Basic application settings.
   - Production: `15m` - `1h`
 
 #### JWT_REFRESH_EXPIRES_IN
+
 - **Type**: Duration String
 - **Default**: `7d`
 - **Required**: No
@@ -281,6 +296,7 @@ Basic application settings.
 ### 5. CORS Configuration
 
 #### ALLOWED_ORIGINS
+
 - **Type**: Comma-separated URLs
 - **Default**: All origins (development only)
 - **Required**: Yes (production)
@@ -295,12 +311,14 @@ Basic application settings.
 ### 6. Object Storage (S3/MinIO)
 
 #### STORAGE_PROVIDER
+
 - **Type**: Enum (`s3`, `minio`, `spaces`)
 - **Default**: `s3`
 - **Required**: No
 - **Description**: Storage provider type
 
 #### STORAGE_ENDPOINT
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes (for MinIO/Spaces)
@@ -311,18 +329,21 @@ Basic application settings.
   - MinIO: `minio.yourdomain.com`
 
 #### STORAGE_ACCESS_KEY
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes
 - **Description**: Storage access key / AWS Access Key ID
 
 #### STORAGE_SECRET_KEY
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes
 - **Description**: Storage secret key / AWS Secret Access Key
 
 #### STORAGE_BUCKET_NAME
+
 - **Type**: String
 - **Default**: `simplepro-storage`
 - **Required**: No
@@ -332,6 +353,7 @@ Basic application settings.
   - Example: `simplepro-prod-storage`, `simplepro-staging-storage`
 
 #### STORAGE_USE_SSL
+
 - **Type**: Boolean
 - **Default**: `true`
 - **Required**: No
@@ -341,6 +363,7 @@ Basic application settings.
 ### 7. Email Configuration (SMTP)
 
 #### SMTP_HOST
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes (if email enabled)
@@ -352,6 +375,7 @@ Basic application settings.
   - Postmark: `smtp.postmarkapp.com`
 
 #### SMTP_PORT
+
 - **Type**: Number
 - **Default**: `587`
 - **Required**: No
@@ -362,6 +386,7 @@ Basic application settings.
   - `25` - Unencrypted (not recommended)
 
 #### SMTP_SECURE
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -371,18 +396,21 @@ Basic application settings.
   - `false` - Use STARTTLS (port 587)
 
 #### SMTP_USER
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes (if email enabled)
 - **Description**: SMTP username or API key
 
 #### SMTP_PASSWORD
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes (if email enabled)
 - **Description**: SMTP password or API key
 
 #### SMTP_FROM_EMAIL
+
 - **Type**: Email Address
 - **Default**: None
 - **Required**: Yes (if email enabled)
@@ -391,6 +419,7 @@ Basic application settings.
 - **Example**: `noreply@yourdomain.com`
 
 #### EMAIL_NOTIFICATIONS_ENABLED
+
 - **Type**: Boolean
 - **Default**: `true`
 - **Required**: No
@@ -399,18 +428,21 @@ Basic application settings.
 ### 8. SMS Configuration (Twilio)
 
 #### TWILIO_ACCOUNT_SID
+
 - **Type**: String (starts with AC)
 - **Default**: None
 - **Required**: Yes (if SMS enabled)
 - **Description**: Twilio account SID
 
 #### TWILIO_AUTH_TOKEN
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes (if SMS enabled)
 - **Description**: Twilio authentication token
 
 #### TWILIO_PHONE_NUMBER
+
 - **Type**: Phone Number (E.164 format)
 - **Default**: None
 - **Required**: Yes (if SMS enabled)
@@ -418,6 +450,7 @@ Basic application settings.
 - **Format**: `+15555551234`
 
 #### SMS_NOTIFICATIONS_ENABLED
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -426,12 +459,14 @@ Basic application settings.
 ### 9. Push Notifications (Firebase)
 
 #### FIREBASE_PROJECT_ID
+
 - **Type**: String
 - **Default**: None
 - **Required**: Yes (if push enabled)
 - **Description**: Firebase project ID
 
 #### FIREBASE_PRIVATE_KEY
+
 - **Type**: String (multiline)
 - **Default**: None
 - **Required**: Yes (if push enabled)
@@ -439,12 +474,14 @@ Basic application settings.
 - **Format**: Keep `\n` characters for line breaks
 
 #### FIREBASE_CLIENT_EMAIL
+
 - **Type**: Email Address
 - **Default**: None
 - **Required**: Yes (if push enabled)
 - **Description**: Firebase service account email
 
 #### PUSH_NOTIFICATIONS_ENABLED
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -452,20 +489,21 @@ Basic application settings.
 
 ### 10. Rate Limiting
 
-| Variable | Default | Dev | Staging | Production |
-|----------|---------|-----|---------|------------|
-| RATE_LIMIT_GLOBAL | 1000 | 2000 | 2000 | 1000 |
-| RATE_LIMIT_AUTH | 10 | 20 | 20 | 10 |
-| RATE_LIMIT_LOGIN | 5 | 10 | 10 | 5 |
-| RATE_LIMIT_TIER1 | 20 | 50 | 50 | 20 |
-| RATE_LIMIT_TIER2 | 100 | 200 | 200 | 100 |
-| RATE_LIMIT_TIER3 | 500 | 1000 | 1000 | 500 |
+| Variable          | Default | Dev  | Staging | Production |
+| ----------------- | ------- | ---- | ------- | ---------- |
+| RATE_LIMIT_GLOBAL | 1000    | 2000 | 2000    | 1000       |
+| RATE_LIMIT_AUTH   | 10      | 20   | 20      | 10         |
+| RATE_LIMIT_LOGIN  | 5       | 10   | 10      | 5          |
+| RATE_LIMIT_TIER1  | 20      | 50   | 50      | 20         |
+| RATE_LIMIT_TIER2  | 100     | 200  | 200     | 100        |
+| RATE_LIMIT_TIER3  | 500     | 1000 | 1000    | 500        |
 
 All values are requests per time window.
 
 ### 11. Logging Configuration
 
 #### LOG_LEVEL
+
 - **Type**: Enum (`error`, `warn`, `info`, `debug`, `verbose`)
 - **Default**: `info`
 - **Required**: No
@@ -476,6 +514,7 @@ All values are requests per time window.
   - Production: `warn` or `error`
 
 #### LOG_FORMAT
+
 - **Type**: Enum (`json`, `simple`)
 - **Default**: `json`
 - **Required**: No
@@ -487,6 +526,7 @@ All values are requests per time window.
 ### 12. Security Configuration
 
 #### BCRYPT_ROUNDS
+
 - **Type**: Number
 - **Default**: `12`
 - **Required**: No
@@ -497,6 +537,7 @@ All values are requests per time window.
   - Production: `12` (higher = more secure but slower)
 
 #### PASSWORD_MIN_LENGTH
+
 - **Type**: Number
 - **Default**: `8`
 - **Required**: No
@@ -507,12 +548,14 @@ All values are requests per time window.
   - Production: `12`
 
 #### ACCOUNT_LOCKOUT_ENABLED
+
 - **Type**: Boolean
 - **Default**: `true`
 - **Required**: No
 - **Description**: Enable account lockout after failed attempts
 
 #### ACCOUNT_LOCKOUT_ATTEMPTS
+
 - **Type**: Number
 - **Default**: `5`
 - **Required**: No
@@ -525,6 +568,7 @@ All values are requests per time window.
 ### 13. Feature Flags
 
 #### ENABLE_SWAGGER
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -532,6 +576,7 @@ All values are requests per time window.
 - **Production Value**: `false` (or require authentication)
 
 #### DEBUG_MODE
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -539,6 +584,7 @@ All values are requests per time window.
 - **Production Value**: `false`
 
 #### SEED_DATA
+
 - **Type**: Boolean
 - **Default**: `false`
 - **Required**: No
@@ -642,17 +688,18 @@ STORAGE_USE_SSL=true
 
 ### Secret Strength Requirements
 
-| Secret Type | Min Length (Dev) | Min Length (Prod) | Pattern Requirements |
-|------------|------------------|-------------------|---------------------|
-| JWT_SECRET | 32 | 64 | Base64, no dev patterns |
-| JWT_REFRESH_SECRET | 32 | 64 | Base64, different from JWT_SECRET |
-| SESSION_SECRET | 32 | 64 | Base64, no dev patterns |
-| Database Password | 12 | 32 | Alphanumeric + special chars |
-| Redis Password | 12 | 32 | Alphanumeric + special chars |
+| Secret Type        | Min Length (Dev) | Min Length (Prod) | Pattern Requirements              |
+| ------------------ | ---------------- | ----------------- | --------------------------------- |
+| JWT_SECRET         | 32               | 64                | Base64, no dev patterns           |
+| JWT_REFRESH_SECRET | 32               | 64                | Base64, different from JWT_SECRET |
+| SESSION_SECRET     | 32               | 64                | Base64, no dev patterns           |
+| Database Password  | 12               | 32                | Alphanumeric + special chars      |
+| Redis Password     | 12               | 32                | Alphanumeric + special chars      |
 
 ### Prohibited Patterns
 
 Production secrets must NOT contain:
+
 - `dev`, `test`, `development`, `example`
 - `admin`, `password`, `123`, `root`
 - `changeme`, `default`, `demo`
@@ -660,6 +707,7 @@ Production secrets must NOT contain:
 ### HTTPS Requirements
 
 Production must use HTTPS for:
+
 - API_BASE_URL
 - WEB_APP_URL
 - All external service connections (when available)
@@ -667,6 +715,7 @@ Production must use HTTPS for:
 ### Cookie Security
 
 Production requirements:
+
 ```bash
 SESSION_COOKIE_SECURE=true      # Only send over HTTPS
 SESSION_COOKIE_HTTP_ONLY=true   # Not accessible via JavaScript
@@ -727,6 +776,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `MongoServerError: Authentication failed`
 
 **Solutions**:
+
 1. Check username/password are correct
 2. Verify database name in URI
 3. Check `authSource` parameter (usually `admin`)
@@ -738,6 +788,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `Error: connect ECONNREFUSED`
 
 **Solutions**:
+
 1. Verify Redis is running: `redis-cli ping`
 2. Check host and port are correct
 3. Test password: `redis-cli -h HOST -p PORT -a PASSWORD ping`
@@ -748,6 +799,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `JsonWebTokenError: invalid signature`
 
 **Solutions**:
+
 1. Ensure JWT_SECRET matches across all instances
 2. Check secret hasn't been changed mid-session
 3. Verify no trailing spaces or newlines in secret
@@ -758,6 +810,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `Access to XMLHttpRequest has been blocked by CORS policy`
 
 **Solutions**:
+
 1. Add frontend URL to ALLOWED_ORIGINS
 2. Ensure protocol matches (http vs https)
 3. Include port if non-standard
@@ -769,6 +822,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `Too Many Requests`
 
 **Solutions**:
+
 1. Increase rate limits for your environment
 2. Implement retry logic with exponential backoff
 3. Use authentication to get higher limits
@@ -779,6 +833,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `Error uploading file`
 
 **Solutions**:
+
 1. Check MAX_FILE_SIZE setting
 2. Verify ALLOWED_FILE_TYPES includes your file type
 3. Test storage credentials
@@ -790,6 +845,7 @@ redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping
 **Error**: `Error sending email`
 
 **Solutions**:
+
 1. Verify SMTP credentials
 2. Check from address is verified
 3. Test SMTP connection: `telnet smtp.host 587`

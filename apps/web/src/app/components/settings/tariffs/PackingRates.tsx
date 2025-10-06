@@ -25,14 +25,14 @@ export default function PackingRates() {
     name: '',
     rateType: 'hourly' as 'hourly' | 'per_item' | 'per_box' | 'flat_rate',
     baseRate: 0,
-    description: ''
+    description: '',
   });
 
   const rateTypes = [
     { value: 'hourly', label: 'Hourly Rate' },
     { value: 'per_item', label: 'Per Item' },
     { value: 'per_box', label: 'Per Box' },
-    { value: 'flat_rate', label: 'Flat Rate' }
+    { value: 'flat_rate', label: 'Flat Rate' },
   ];
 
   // Fetch active tariff settings and packing rates on mount
@@ -44,7 +44,7 @@ export default function PackingRates() {
     const token = localStorage.getItem('token');
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     };
   };
 
@@ -54,9 +54,12 @@ export default function PackingRates() {
       setError(null);
 
       // First, get active tariff settings ID
-      const settingsResponse = await fetch(`${API_BASE_URL}/tariff-settings/active`, {
-        headers: getAuthHeaders()
-      });
+      const settingsResponse = await fetch(
+        `${API_BASE_URL}/tariff-settings/active`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (!settingsResponse.ok) {
         throw new Error('Failed to fetch tariff settings');
@@ -67,9 +70,12 @@ export default function PackingRates() {
       setTariffSettingsId(settingsId);
 
       // Then fetch packing rates
-      const ratesResponse = await fetch(`${API_BASE_URL}/tariff-settings/${settingsId}/packing-rates`, {
-        headers: getAuthHeaders()
-      });
+      const ratesResponse = await fetch(
+        `${API_BASE_URL}/tariff-settings/${settingsId}/packing-rates`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
 
       if (!ratesResponse.ok) {
         throw new Error('Failed to fetch packing rates');
@@ -78,18 +84,26 @@ export default function PackingRates() {
       const ratesData = await ratesResponse.json();
 
       // Map API data to component state format
-      const mappedRates: PackingRate[] = (ratesData.rates || []).map((rate: any) => ({
-        id: rate.itemType, // Use itemType as unique ID
-        name: rate.itemType,
-        rateType: rate.category as 'hourly' | 'per_item' | 'per_box' | 'flat_rate',
-        baseRate: rate.rate,
-        description: rate.description || ''
-      }));
+      const mappedRates: PackingRate[] = (ratesData.rates || []).map(
+        (rate: any) => ({
+          id: rate.itemType, // Use itemType as unique ID
+          name: rate.itemType,
+          rateType: rate.category as
+            | 'hourly'
+            | 'per_item'
+            | 'per_box'
+            | 'flat_rate',
+          baseRate: rate.rate,
+          description: rate.description || '',
+        }),
+      );
 
       setPackingRates(mappedRates);
     } catch (err) {
       console.error('Error fetching packing rates:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load packing rates');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load packing rates',
+      );
     } finally {
       setLoading(false);
     }
@@ -107,14 +121,17 @@ export default function PackingRates() {
       name: rate.name,
       rateType: rate.rateType,
       baseRate: rate.baseRate,
-      description: rate.description || ''
+      description: rate.description || '',
     });
     setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
-    const rate = packingRates.find(r => r.id === id);
-    if (!rate || !window.confirm(`Are you sure you want to delete "${rate.name}"?`)) {
+    const rate = packingRates.find((r) => r.id === id);
+    if (
+      !rate ||
+      !window.confirm(`Are you sure you want to delete "${rate.name}"?`)
+    ) {
       return;
     }
 
@@ -125,11 +142,13 @@ export default function PackingRates() {
 
     try {
       // Remove the rate from the array and update via API
-      const updatedRates = packingRates.filter(r => r.id !== id);
+      const updatedRates = packingRates.filter((r) => r.id !== id);
       await savePackingRates(updatedRates);
     } catch (err) {
       console.error('Error deleting packing rate:', err);
-      alert(err instanceof Error ? err.message : 'Failed to delete packing rate');
+      alert(
+        err instanceof Error ? err.message : 'Failed to delete packing rate',
+      );
     }
   };
 
@@ -139,22 +158,32 @@ export default function PackingRates() {
     }
 
     // Map component state to API format
-    const apiRates = rates.map(rate => ({
+    const apiRates = rates.map((rate) => ({
       itemType: rate.name,
       description: rate.description || '',
       rate: rate.baseRate,
-      unit: rate.rateType === 'hourly' ? 'hour' : rate.rateType === 'per_item' ? 'item' : rate.rateType === 'per_box' ? 'box' : 'flat',
-      category: rate.rateType
+      unit:
+        rate.rateType === 'hourly'
+          ? 'hour'
+          : rate.rateType === 'per_item'
+            ? 'item'
+            : rate.rateType === 'per_box'
+              ? 'box'
+              : 'flat',
+      category: rate.rateType,
     }));
 
-    const response = await fetch(`${API_BASE_URL}/tariff-settings/${tariffSettingsId}/packing-rates`, {
-      method: 'PATCH',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        enabled: true,
-        rates: apiRates
-      })
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/tariff-settings/${tariffSettingsId}/packing-rates`,
+      {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          enabled: true,
+          rates: apiRates,
+        }),
+      },
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -178,16 +207,14 @@ export default function PackingRates() {
 
       if (editingRate) {
         // Update existing rate
-        updatedRates = packingRates.map(rate =>
-          rate.id === editingRate.id
-            ? { ...rate, ...formData }
-            : rate
+        updatedRates = packingRates.map((rate) =>
+          rate.id === editingRate.id ? { ...rate, ...formData } : rate,
         );
       } else {
         // Add new rate
         const newRate: PackingRate = {
           id: formData.name, // Use name as ID
-          ...formData
+          ...formData,
         };
         updatedRates = [...packingRates, newRate];
       }
@@ -195,7 +222,12 @@ export default function PackingRates() {
       await savePackingRates(updatedRates);
 
       setShowForm(false);
-      setFormData({ name: '', rateType: 'hourly', baseRate: 0, description: '' });
+      setFormData({
+        name: '',
+        rateType: 'hourly',
+        baseRate: 0,
+        description: '',
+      });
       setEditingRate(null);
     } catch (err) {
       console.error('Error saving packing rate:', err);
@@ -210,7 +242,7 @@ export default function PackingRates() {
   };
 
   const formatRateType = (type: string) => {
-    return rateTypes.find(t => t.value === type)?.label || type;
+    return rateTypes.find((t) => t.value === type)?.label || type;
   };
 
   const formatRate = (rate: number, type: string) => {
@@ -276,7 +308,9 @@ export default function PackingRates() {
                     id="name"
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="e.g., Professional Packing - Hourly"
                     required
                     className={styles.input}
@@ -288,14 +322,20 @@ export default function PackingRates() {
                   <select
                     id="rateType"
                     value={formData.rateType}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      rateType: e.target.value as 'hourly' | 'per_item' | 'per_box' | 'flat_rate'
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        rateType: e.target.value as
+                          | 'hourly'
+                          | 'per_item'
+                          | 'per_box'
+                          | 'flat_rate',
+                      })
+                    }
                     className={styles.select}
                     required
                   >
-                    {rateTypes.map(type => (
+                    {rateTypes.map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
                       </option>
@@ -311,19 +351,29 @@ export default function PackingRates() {
                     min="0"
                     step="0.01"
                     value={formData.baseRate}
-                    onChange={(e) => setFormData({ ...formData, baseRate: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        baseRate: parseFloat(e.target.value) || 0,
+                      })
+                    }
                     placeholder="0.00"
                     required
                     className={styles.input}
                   />
                 </div>
 
-                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <div
+                  className={styles.formGroup}
+                  style={{ gridColumn: '1 / -1' }}
+                >
                   <label htmlFor="description">Description (Optional)</label>
                   <textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Add a description for this packing rate..."
                     className={styles.textarea}
                     rows={3}
@@ -332,7 +382,11 @@ export default function PackingRates() {
               </div>
 
               <div className={styles.formActions}>
-                <button type="button" onClick={handleCancel} className={styles.cancelButton}>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className={styles.cancelButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.saveButton}>
@@ -369,7 +423,9 @@ export default function PackingRates() {
                     <div className={styles.nameCell}>
                       <span className={styles.rateName}>{rate.name}</span>
                       {rate.description && (
-                        <span className={styles.rateDescription}>{rate.description}</span>
+                        <span className={styles.rateDescription}>
+                          {rate.description}
+                        </span>
                       )}
                     </div>
                   </td>
@@ -413,19 +469,31 @@ export default function PackingRates() {
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
             <h5>Hourly Rate</h5>
-            <p>Charge by the hour for professional packing services. Best for flexible, on-demand packing needs.</p>
+            <p>
+              Charge by the hour for professional packing services. Best for
+              flexible, on-demand packing needs.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Per Item</h5>
-            <p>Individual item pricing for fragile, valuable, or specialty items requiring extra care and custom packing.</p>
+            <p>
+              Individual item pricing for fragile, valuable, or specialty items
+              requiring extra care and custom packing.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Per Box</h5>
-            <p>Fixed rate per box or container, including materials. Ideal for standardized packing services.</p>
+            <p>
+              Fixed rate per box or container, including materials. Ideal for
+              standardized packing services.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Flat Rate</h5>
-            <p>Single fixed price for complete packing packages. Simple pricing for full-service packing jobs.</p>
+            <p>
+              Single fixed price for complete packing packages. Simple pricing
+              for full-service packing jobs.
+            </p>
           </div>
         </div>
       </div>

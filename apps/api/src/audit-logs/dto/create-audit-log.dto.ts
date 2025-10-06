@@ -5,7 +5,7 @@ import {
   IsObject,
   IsDate,
   IsNotEmpty,
-  MaxLength
+  MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 

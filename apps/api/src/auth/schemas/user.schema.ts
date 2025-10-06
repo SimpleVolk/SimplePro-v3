@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import type { UserRole, UserPreferences, Permission } from '../interfaces/user.interface';
+import type {
+  UserRole,
+  UserPreferences,
+  Permission,
+} from '../interfaces/user.interface';
 
 export type UserDocument = User & Document;
 
@@ -77,23 +81,23 @@ UserSchema.index({ department: 1 }); // Department filtering
 UserSchema.index({ crewId: 1 }); // Crew member lookups
 
 // Add virtual for full name
-UserSchema.virtual('fullName').get(function(this: UserDocument) {
+UserSchema.virtual('fullName').get(function (this: UserDocument) {
   return `${this.firstName} ${this.lastName}`;
 });
 
 // Ensure virtual fields are serialized
 UserSchema.set('toJSON', {
   virtuals: true,
-  transform: function(_doc, ret: any) {
+  transform: function (_doc, ret: any) {
     delete ret.passwordHash; // Never include password hash in JSON output
     return ret;
-  }
+  },
 });
 
 UserSchema.set('toObject', {
   virtuals: true,
-  transform: function(_doc, ret: any) {
+  transform: function (_doc, ret: any) {
     delete ret.passwordHash; // Never include password hash in object output
     return ret;
-  }
+  },
 });

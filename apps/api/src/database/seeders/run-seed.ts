@@ -34,28 +34,41 @@ async function main() {
   const shouldReset = process.env.RESET_TARIFFS === 'true';
 
   if (!mongoUri) {
-    console.error('❌ Error: MONGODB_URI or DATABASE_URL environment variable is required');
+    console.error(
+      '❌ Error: MONGODB_URI or DATABASE_URL environment variable is required',
+    );
     console.error('');
     console.error('Usage:');
-    console.error('  MONGODB_URI=mongodb://localhost:27017/simplepro npm run seed:tariffs');
+    console.error(
+      '  MONGODB_URI=mongodb://localhost:27017/simplepro npm run seed:tariffs',
+    );
     process.exit(1);
   }
 
-  console.log('╔════════════════════════════════════════════════════════════════════╗');
-  console.log('║           SimplePro - Tariff Settings Seeder                      ║');
-  console.log('╚════════════════════════════════════════════════════════════════════╝');
+  console.log(
+    '╔════════════════════════════════════════════════════════════════════╗',
+  );
+  console.log(
+    '║           SimplePro - Tariff Settings Seeder                      ║',
+  );
+  console.log(
+    '╚════════════════════════════════════════════════════════════════════╝',
+  );
   console.log('');
 
   try {
     // Connect to MongoDB
     console.log('🔌 Connecting to MongoDB...');
-    console.log(`   URI: ${mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`); // Hide credentials in log
+    console.log(
+      `   URI: ${mongoUri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`,
+    ); // Hide credentials in log
     await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB');
     console.log('');
 
     // Register the schema
-    const TariffModel: any = mongoose.models.TariffSettings ||
+    const TariffModel: any =
+      mongoose.models.TariffSettings ||
       mongoose.model('TariffSettings', TariffSettingsSchema, 'tariff_settings');
 
     // Check for existing tariff
@@ -75,11 +88,15 @@ async function main() {
         console.log('Options:');
         console.log('  1. Use RESET_TARIFFS=true to delete and recreate');
         console.log('  2. Manually delete the existing tariff from MongoDB');
-        console.log('  3. Skip seeding (recommended if tariff has custom modifications)');
+        console.log(
+          '  3. Skip seeding (recommended if tariff has custom modifications)',
+        );
         console.log('');
 
         // Show existing tariff info
-        const existing: any = await TariffModel.findOne({ name: 'Default Tariff Settings' });
+        const existing: any = await TariffModel.findOne({
+          name: 'Default Tariff Settings',
+        });
         if (existing) {
           console.log('📋 Existing Tariff Info:');
           console.log(`   ID: ${existing._id}`);
@@ -119,9 +136,15 @@ async function main() {
     console.log('');
 
     // Summary
-    console.log('╔════════════════════════════════════════════════════════════════════╗');
-    console.log('║                    Seeding Completed Successfully                  ║');
-    console.log('╚════════════════════════════════════════════════════════════════════╝');
+    console.log(
+      '╔════════════════════════════════════════════════════════════════════╗',
+    );
+    console.log(
+      '║                    Seeding Completed Successfully                  ║',
+    );
+    console.log(
+      '╚════════════════════════════════════════════════════════════════════╝',
+    );
     console.log('');
     console.log('Next Steps:');
     console.log('  1. Start the API server: npm run dev');
@@ -138,9 +161,15 @@ async function main() {
     process.exit(0);
   } catch (error) {
     console.error('');
-    console.error('╔════════════════════════════════════════════════════════════════════╗');
-    console.error('║                       Seeding Failed                               ║');
-    console.error('╚════════════════════════════════════════════════════════════════════╝');
+    console.error(
+      '╔════════════════════════════════════════════════════════════════════╗',
+    );
+    console.error(
+      '║                       Seeding Failed                               ║',
+    );
+    console.error(
+      '╚════════════════════════════════════════════════════════════════════╝',
+    );
     console.error('');
     console.error('Error Details:');
     console.error(error);

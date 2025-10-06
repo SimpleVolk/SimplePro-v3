@@ -9,11 +9,11 @@ import { RuleHistory, RuleHistorySchema } from './schemas/rule-history.schema';
   imports: [
     MongooseModule.forFeature([
       { name: PricingRule.name, schema: PricingRuleSchema },
-      { name: RuleHistory.name, schema: RuleHistorySchema }
-    ])
+      { name: RuleHistory.name, schema: RuleHistorySchema },
+    ]),
   ],
   controllers: [PricingRulesController],
   providers: [PricingRulesService],
-  exports: [PricingRulesService]
+  exports: [PricingRulesService],
 })
 export class PricingRulesModule {}

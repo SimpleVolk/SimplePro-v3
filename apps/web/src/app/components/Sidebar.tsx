@@ -11,7 +11,12 @@ interface SidebarProps {
   onMobileToggle: () => void;
 }
 
-export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }: SidebarProps) {
+export function Sidebar({
+  activeTab,
+  onTabChange,
+  isMobileOpen,
+  onMobileToggle,
+}: SidebarProps) {
   const { user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -20,90 +25,90 @@ export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }
       id: 'dashboard',
       label: 'Dashboard',
       icon: '📊',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'opportunities',
       label: 'New Opportunity',
       icon: '✨',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'estimates',
       label: 'Estimates',
       icon: '📋',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'customers',
       label: 'Customers',
       icon: '👥',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'jobs',
       label: 'Jobs',
       icon: '📦',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'calendar',
       label: 'Calendar',
       icon: '📅',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'leads',
       label: 'Leads & Follow-up',
       icon: '🎯',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'partners',
       label: 'Partners',
       icon: '🤝',
-      roles: ['super_admin', 'admin']
+      roles: ['super_admin', 'admin'],
     },
     {
       id: 'documents',
       label: 'Documents',
       icon: '📁',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'crew',
       label: 'Crew Schedule',
       icon: '👷',
-      roles: ['super_admin', 'admin', 'dispatcher']
+      roles: ['super_admin', 'admin', 'dispatcher'],
     },
     {
       id: 'notifications',
       label: 'Notifications',
       icon: '🔔',
-      roles: ['super_admin', 'admin', 'dispatcher', 'crew']
+      roles: ['super_admin', 'admin', 'dispatcher', 'crew'],
     },
     {
       id: 'conversion',
       label: 'Conversion Analytics',
       icon: '📊',
-      roles: ['super_admin', 'admin']
+      roles: ['super_admin', 'admin'],
     },
     {
       id: 'reports',
       label: 'Reports',
       icon: '📈',
-      roles: ['super_admin', 'admin']
+      roles: ['super_admin', 'admin'],
     },
     {
       id: 'settings',
       label: 'Settings',
       icon: '⚙️',
-      roles: ['super_admin', 'admin']
+      roles: ['super_admin', 'admin'],
     },
   ];
 
-  const availableItems = navigationItems.filter(item =>
-    item.roles.includes(user?.role?.name || '')
+  const availableItems = navigationItems.filter((item) =>
+    item.roles.includes(user?.role?.name || ''),
   );
 
   // Handle navigation item click - close mobile menu
@@ -167,9 +172,13 @@ export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }
               if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                 e.preventDefault();
                 const direction = e.key === 'ArrowUp' ? -1 : 1;
-                const newIndex = (index + direction + availableItems.length) % availableItems.length;
+                const newIndex =
+                  (index + direction + availableItems.length) %
+                  availableItems.length;
                 handleNavItemClick(availableItems[newIndex].id);
-                document.getElementById(`tab-${availableItems[newIndex].id}`)?.focus();
+                document
+                  .getElementById(`tab-${availableItems[newIndex].id}`)
+                  ?.focus();
               }
             }}
           >
@@ -177,9 +186,7 @@ export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }
               {item.icon}
             </span>
             {!isCollapsed && (
-              <span className={styles.navLabel}>
-                {item.label}
-              </span>
+              <span className={styles.navLabel}>{item.label}</span>
             )}
           </button>
         ))}
@@ -189,7 +196,8 @@ export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }
         {!isCollapsed && (
           <div className={styles.userInfo}>
             <div className={styles.userAvatar}>
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
             </div>
             <div className={styles.userDetails}>
               <div className={styles.userName}>
@@ -203,7 +211,8 @@ export function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileToggle }
         )}
         {isCollapsed && (
           <div className={styles.userAvatarCollapsed}>
-            {user?.firstName?.[0]}{user?.lastName?.[0]}
+            {user?.firstName?.[0]}
+            {user?.lastName?.[0]}
           </div>
         )}
       </div>

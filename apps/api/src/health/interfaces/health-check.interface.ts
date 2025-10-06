@@ -71,5 +71,5 @@ export interface ExternalServiceHealthInfo {
 export enum HealthCheckLevel {
   BASIC = 'basic',
   DETAILED = 'detailed',
-  FULL = 'full'
+  FULL = 'full',
 }

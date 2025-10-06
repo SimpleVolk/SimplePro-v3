@@ -14,43 +14,43 @@ This document defines performance targets, measurement procedures, and optimizat
 
 ### Core Web Vitals (Mobile)
 
-| Metric | Good | Needs Improvement | Poor | SimplePro Target |
-|--------|------|-------------------|------|------------------|
-| **Largest Contentful Paint (LCP)** | ≤2.5s | 2.5s-4.0s | >4.0s | **≤2.5s** |
-| **First Input Delay (FID)** | ≤100ms | 100ms-300ms | >300ms | **≤100ms** |
-| **Cumulative Layout Shift (CLS)** | ≤0.1 | 0.1-0.25 | >0.25 | **≤0.1** |
-| **Interaction to Next Paint (INP)** | ≤200ms | 200ms-500ms | >500ms | **≤200ms** |
+| Metric                              | Good   | Needs Improvement | Poor   | SimplePro Target |
+| ----------------------------------- | ------ | ----------------- | ------ | ---------------- |
+| **Largest Contentful Paint (LCP)**  | ≤2.5s  | 2.5s-4.0s         | >4.0s  | **≤2.5s**        |
+| **First Input Delay (FID)**         | ≤100ms | 100ms-300ms       | >300ms | **≤100ms**       |
+| **Cumulative Layout Shift (CLS)**   | ≤0.1   | 0.1-0.25          | >0.25  | **≤0.1**         |
+| **Interaction to Next Paint (INP)** | ≤200ms | 200ms-500ms       | >500ms | **≤200ms**       |
 
 ### Additional Metrics
 
-| Metric | WiFi Target | 4G Target | 3G Target |
-|--------|-------------|-----------|-----------|
-| **First Contentful Paint (FCP)** | ≤1.5s | ≤2.5s | ≤4.0s |
-| **Time to Interactive (TTI)** | ≤2.0s | ≤3.5s | ≤5.0s |
-| **Speed Index** | ≤2.0s | ≤3.5s | ≤5.5s |
-| **Total Blocking Time (TBT)** | ≤150ms | ≤200ms | ≤300ms |
+| Metric                           | WiFi Target | 4G Target | 3G Target |
+| -------------------------------- | ----------- | --------- | --------- |
+| **First Contentful Paint (FCP)** | ≤1.5s       | ≤2.5s     | ≤4.0s     |
+| **Time to Interactive (TTI)**    | ≤2.0s       | ≤3.5s     | ≤5.0s     |
+| **Speed Index**                  | ≤2.0s       | ≤3.5s     | ≤5.5s     |
+| **Total Blocking Time (TBT)**    | ≤150ms      | ≤200ms    | ≤300ms    |
 
 ### Animation Performance
 
-| Metric | Target | Notes |
-|--------|--------|-------|
-| **Frame Rate** | 60fps | Sidebar, transitions |
-| **Frame Drops** | <5% | Acceptable variance |
-| **Animation Duration** | 200-400ms | Not too fast or slow |
-| **Jank Score** | 0 | No visible stuttering |
+| Metric                 | Target    | Notes                 |
+| ---------------------- | --------- | --------------------- |
+| **Frame Rate**         | 60fps     | Sidebar, transitions  |
+| **Frame Drops**        | <5%       | Acceptable variance   |
+| **Animation Duration** | 200-400ms | Not too fast or slow  |
+| **Jank Score**         | 0         | No visible stuttering |
 
 ### Resource Metrics
 
-| Metric | Target | Budget |
-|--------|--------|--------|
-| **JavaScript Bundle** | <300KB (gzipped) | Total JS |
-| **CSS Bundle** | <100KB (gzipped) | Total CSS |
-| **Images** | <500KB | Total images per page |
-| **Fonts** | <200KB | Web fonts |
-| **Total Page Weight** | <1MB | Initial load |
-| **API Response Time** | <500ms | Backend APIs |
-| **Memory Usage** | <100MB | Peak on mobile |
-| **DOM Nodes** | <1500 | Per page |
+| Metric                | Target           | Budget                |
+| --------------------- | ---------------- | --------------------- |
+| **JavaScript Bundle** | <300KB (gzipped) | Total JS              |
+| **CSS Bundle**        | <100KB (gzipped) | Total CSS             |
+| **Images**            | <500KB           | Total images per page |
+| **Fonts**             | <200KB           | Web fonts             |
+| **Total Page Weight** | <1MB             | Initial load          |
+| **API Response Time** | <500ms           | Backend APIs          |
+| **Memory Usage**      | <100MB           | Peak on mobile        |
+| **DOM Nodes**         | <1500            | Per page              |
 
 ---
 
@@ -62,12 +62,14 @@ This document defines performance targets, measurement procedures, and optimizat
 **Access:** Chrome DevTools → Lighthouse tab
 
 **Configuration:**
+
 - Device: Mobile
 - Throttling: Simulated 4G
 - CPU: 4x slowdown
 - Categories: Performance, Accessibility
 
 **Run Test:**
+
 ```
 1. Open DevTools (F12)
 2. Navigate to Lighthouse tab
@@ -78,13 +80,14 @@ This document defines performance targets, measurement procedures, and optimizat
 
 **Interpret Results:**
 
-| Score | Rating | Action |
-|-------|--------|--------|
-| 90-100 | Excellent | Maintain performance |
-| 50-89 | Needs Work | Investigate red/orange items |
-| 0-49 | Poor | Major optimization needed |
+| Score  | Rating     | Action                       |
+| ------ | ---------- | ---------------------------- |
+| 90-100 | Excellent  | Maintain performance         |
+| 50-89  | Needs Work | Investigate red/orange items |
+| 0-49   | Poor       | Major optimization needed    |
 
 **Key Sections:**
+
 - **Metrics:** LCP, TTI, TBT, CLS, Speed Index
 - **Opportunities:** Suggestions to improve load time
 - **Diagnostics:** Issues affecting performance
@@ -95,6 +98,7 @@ This document defines performance targets, measurement procedures, and optimizat
 **When to Use:** Investigating specific performance issues
 
 **Recording:**
+
 ```
 1. Open DevTools → Performance tab
 2. Click record button (●)
@@ -104,6 +108,7 @@ This document defines performance targets, measurement procedures, and optimizat
 ```
 
 **What to Look For:**
+
 - **Long Tasks:** Tasks >50ms (turn yellow/red)
 - **Layout Thrashing:** Multiple forced reflows
 - **Paint Operations:** Large paint areas
@@ -112,6 +117,7 @@ This document defines performance targets, measurement procedures, and optimizat
 - **FPS:** Consistent 60fps during animations
 
 **Frame Analysis:**
+
 ```
 1. Hover over frames in timeline
 2. Green = good (<16.67ms per frame)
@@ -125,6 +131,7 @@ This document defines performance targets, measurement procedures, and optimizat
 **URL:** webpagetest.org
 
 **Configuration:**
+
 ```
 Test Location: Dulles, VA - iPhone 13
 Browser: Chrome, Safari
@@ -137,6 +144,7 @@ Advanced:
 ```
 
 **Key Metrics:**
+
 - **Load Time:** Total page load
 - **First Byte:** Server response time
 - **Start Render:** When page starts displaying
@@ -154,11 +162,13 @@ Visual progression of page load - should show content quickly.
 **Access:** PageSpeed Insights API or Chrome DevTools
 
 **What It Shows:**
+
 - Real user data from Chrome users who visit your site
 - 75th percentile of user experiences
 - Actual device/network conditions
 
 **Field Data vs Lab Data:**
+
 - **Lab Data:** Controlled, consistent, reproducible (Lighthouse)
 - **Field Data:** Real users, varied conditions, actual experience (CrUX)
 - **Goal:** Both should be good
@@ -166,12 +176,14 @@ Visual progression of page load - should show content quickly.
 ### 5. Real User Monitoring (RUM)
 
 **Tools:**
+
 - Google Analytics 4 (Web Vitals)
 - New Relic Browser
 - Datadog RUM
 - Sentry Performance
 
 **Setup Example (Web Vitals):**
+
 ```typescript
 // Install
 npm install web-vitals
@@ -201,6 +213,7 @@ getTTFB(sendToAnalytics);
 **Frequency:** Before each release, weekly during development
 
 **Steps:**
+
 1. Clear browser cache
 2. Open Chrome DevTools
 3. Navigate to Lighthouse tab
@@ -214,10 +227,12 @@ getTTFB(sendToAnalytics);
 7. Document regressions
 
 **Template:**
+
 ```markdown
 ## Performance Audit - [Date]
 
 ### Dashboard Page
+
 - **LCP:** 1.8s (target: ≤2.5s) ✅
 - **FID:** 50ms (target: ≤100ms) ✅
 - **CLS:** 0.02 (target: ≤0.1) ✅
@@ -227,10 +242,12 @@ getTTFB(sendToAnalytics);
 - **Lighthouse Score:** 96/100 ✅
 
 **Issues:**
+
 - TTI slightly over target (0.1s)
 - Caused by: [investigation needed]
 
 **Action Items:**
+
 - [ ] Investigate TTI regression
 - [ ] Code-split large components
 ```
@@ -240,6 +257,7 @@ getTTFB(sendToAnalytics);
 **Frequency:** After any UI animation changes
 
 **Steps:**
+
 1. Open DevTools → Performance tab
 2. Start recording
 3. Open mobile sidebar (multiple times)
@@ -249,12 +267,14 @@ getTTFB(sendToAnalytics);
 7. Analyze FPS
 
 **Acceptance Criteria:**
+
 - All frames <16.67ms (60fps)
 - Frame drops <5%
 - No long tasks during animation
 - GPU-accelerated (use transform, not left/top)
 
 **Code Check:**
+
 ```css
 /* ✅ Good - GPU accelerated */
 .sidebar {
@@ -274,12 +294,14 @@ getTTFB(sendToAnalytics);
 **Frequency:** Weekly, before release
 
 **Network Conditions:**
+
 1. **WiFi (50 Mbps)** - Baseline, best case
 2. **Fast 4G (10 Mbps, 50ms latency)** - Target users
 3. **Slow 4G (1.6 Mbps, 150ms latency)** - Budget users
 4. **Slow 3G (400 Kbps, 400ms latency)** - Worst case
 
 **Throttling in Chrome:**
+
 ```
 1. DevTools → Network tab
 2. Throttling dropdown
@@ -289,6 +311,7 @@ getTTFB(sendToAnalytics);
 ```
 
 **Custom Throttling:**
+
 ```
 Add custom profile:
 - Download: [X] Kbps
@@ -299,17 +322,18 @@ Add custom profile:
 **Test Matrix:**
 
 | Network | LCP Target | TTI Target | Status |
-|---------|------------|------------|--------|
-| WiFi | ≤1.5s | ≤2.0s | |
-| Fast 4G | ≤2.5s | ≤3.5s | |
-| Slow 4G | ≤4.0s | ≤5.0s | |
-| Slow 3G | ≤6.0s | ≤7.0s | |
+| ------- | ---------- | ---------- | ------ |
+| WiFi    | ≤1.5s      | ≤2.0s      |        |
+| Fast 4G | ≤2.5s      | ≤3.5s      |        |
+| Slow 4G | ≤4.0s      | ≤5.0s      |        |
+| Slow 3G | ≤6.0s      | ≤7.0s      |        |
 
 ### Procedure 4: Memory Leak Detection
 
 **Frequency:** After major features, before release
 
 **Steps:**
+
 1. DevTools → Memory tab
 2. Take heap snapshot (Snapshot 1)
 3. Navigate through app:
@@ -326,11 +350,13 @@ Add custom profile:
    - Growing objects
 
 **Red Flags:**
+
 - Detached DOM count increasing
 - Memory usage increasing >20MB
 - Objects not garbage collected
 
 **Fix Example:**
+
 ```typescript
 // ❌ Memory leak
 useEffect(() => {
@@ -356,6 +382,7 @@ useEffect(() => {
 **Target:** ≤2.5s
 
 **Common Issues:**
+
 - Large images
 - Render-blocking JavaScript
 - Slow server response
@@ -364,6 +391,7 @@ useEffect(() => {
 **Solutions:**
 
 **A. Optimize Images**
+
 ```typescript
 // Use Next.js Image component
 import Image from 'next/image';
@@ -378,14 +406,22 @@ import Image from 'next/image';
 ```
 
 **B. Preload Critical Resources**
+
 ```html
 <head>
-  <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/api/dashboard" as="fetch" crossorigin>
+  <link
+    rel="preload"
+    href="/fonts/inter.woff2"
+    as="font"
+    type="font/woff2"
+    crossorigin
+  />
+  <link rel="preload" href="/api/dashboard" as="fetch" crossorigin />
 </head>
 ```
 
 **C. Server-Side Rendering (Next.js)**
+
 ```typescript
 // Use getServerSideProps for critical pages
 export async function getServerSideProps(context) {
@@ -395,6 +431,7 @@ export async function getServerSideProps(context) {
 ```
 
 **D. Defer Non-Critical JavaScript**
+
 ```typescript
 // Use dynamic imports for heavy components
 const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
@@ -408,6 +445,7 @@ const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
 **Target:** ≤100ms FID, ≤200ms INP
 
 **Common Issues:**
+
 - Long JavaScript tasks
 - Heavy event handlers
 - Synchronous operations
@@ -415,6 +453,7 @@ const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
 **Solutions:**
 
 **A. Code Splitting**
+
 ```typescript
 // Split routes
 const Dashboard = lazy(() => import('./Dashboard'));
@@ -429,6 +468,7 @@ const Reports = lazy(() => import('./Reports'));
 ```
 
 **B. Debounce/Throttle Events**
+
 ```typescript
 // Debounce search input
 import { debounce } from 'lodash';
@@ -441,6 +481,7 @@ const debouncedSearch = debounce((query) => {
 ```
 
 **C. Use Web Workers for Heavy Computation**
+
 ```typescript
 // Move expensive operations off main thread
 const worker = new Worker('/calculation-worker.js');
@@ -456,6 +497,7 @@ worker.onmessage = (e) => {
 **Target:** ≤0.1
 
 **Common Issues:**
+
 - Images without dimensions
 - Dynamic content insertion
 - Web fonts loading
@@ -463,6 +505,7 @@ worker.onmessage = (e) => {
 **Solutions:**
 
 **A. Set Image Dimensions**
+
 ```tsx
 // ❌ Causes layout shift
 <img src="/image.jpg" alt="..." />
@@ -475,6 +518,7 @@ worker.onmessage = (e) => {
 ```
 
 **B. Reserve Space for Dynamic Content**
+
 ```css
 /* Reserve space for loading content */
 .skeleton {
@@ -484,6 +528,7 @@ worker.onmessage = (e) => {
 ```
 
 **C. Font Display Strategy**
+
 ```css
 /* Prevent invisible text during font load */
 @font-face {
@@ -500,6 +545,7 @@ worker.onmessage = (e) => {
 **Solutions:**
 
 **A. Use GPU-Accelerated Properties**
+
 ```css
 /* ✅ GPU accelerated */
 .animated {
@@ -516,6 +562,7 @@ worker.onmessage = (e) => {
 ```
 
 **B. Reduce Paint Area**
+
 ```css
 /* Contain paint to specific layer */
 .sidebar {
@@ -525,6 +572,7 @@ worker.onmessage = (e) => {
 ```
 
 **C. Simplify During Animation**
+
 ```typescript
 // Remove expensive effects during animation
 const [isAnimating, setIsAnimating] = useState(false);
@@ -549,19 +597,20 @@ Performance budget sets limits on metrics to prevent regression.
 
 ### SimplePro-v3 Budget
 
-| Resource | Budget | Current | Status |
-|----------|--------|---------|--------|
-| JavaScript (gzipped) | 300KB | 245KB | ✅ 55KB remaining |
-| CSS (gzipped) | 100KB | 78KB | ✅ 22KB remaining |
-| Images | 500KB | 320KB | ✅ 180KB remaining |
-| Fonts | 200KB | 150KB | ✅ 50KB remaining |
-| Total Page Weight | 1MB | 793KB | ✅ 207KB remaining |
-| LCP | 2.5s | 1.8s | ✅ 0.7s remaining |
-| TBT | 150ms | 120ms | ✅ 30ms remaining |
+| Resource             | Budget | Current | Status             |
+| -------------------- | ------ | ------- | ------------------ |
+| JavaScript (gzipped) | 300KB  | 245KB   | ✅ 55KB remaining  |
+| CSS (gzipped)        | 100KB  | 78KB    | ✅ 22KB remaining  |
+| Images               | 500KB  | 320KB   | ✅ 180KB remaining |
+| Fonts                | 200KB  | 150KB   | ✅ 50KB remaining  |
+| Total Page Weight    | 1MB    | 793KB   | ✅ 207KB remaining |
+| LCP                  | 2.5s   | 1.8s    | ✅ 0.7s remaining  |
+| TBT                  | 150ms  | 120ms   | ✅ 30ms remaining  |
 
 ### Enforcement
 
 **Add to CI/CD:**
+
 ```json
 // package.json
 {
@@ -584,6 +633,7 @@ Performance budget sets limits on metrics to prevent regression.
 ```
 
 **Fail build if budget exceeded:**
+
 ```yaml
 # .github/workflows/performance.yml
 - name: Check Bundle Size
@@ -623,12 +673,14 @@ Performance budget sets limits on metrics to prevent regression.
 ### Lighthouse CI
 
 **Setup:**
+
 ```bash
 npm install -g @lhci/cli
 lhci autorun --config=lighthouserc.json
 ```
 
 **Config (lighthouserc.json):**
+
 ```json
 {
   "ci": {
@@ -638,10 +690,10 @@ lhci autorun --config=lighthouserc.json
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["error", {"minScore": 0.9}],
-        "first-contentful-paint": ["error", {"maxNumericValue": 2500}],
-        "largest-contentful-paint": ["error", {"maxNumericValue": 2500}],
-        "cumulative-layout-shift": ["error", {"maxNumericValue": 0.1}]
+        "categories:performance": ["error", { "minScore": 0.9 }],
+        "first-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
       }
     }
   }
@@ -651,6 +703,7 @@ lhci autorun --config=lighthouserc.json
 ### Performance Dashboard
 
 Create internal dashboard showing:
+
 - Core Web Vitals trends (past 30 days)
 - P75 metrics by device/network
 - Slowest pages
@@ -658,6 +711,7 @@ Create internal dashboard showing:
 - Regression alerts
 
 **Tools:**
+
 - Google Data Studio + BigQuery (Web Vitals)
 - Grafana + InfluxDB (custom metrics)
 - New Relic Browser

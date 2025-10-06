@@ -36,7 +36,7 @@ export class LeadActivity {
   @Prop({
     type: String,
     enum: Object.values(ActivityType),
-    required: true
+    required: true,
   })
   activityType!: ActivityType;
 
@@ -48,7 +48,7 @@ export class LeadActivity {
 
   @Prop({
     type: String,
-    enum: Object.values(ActivityOutcome)
+    enum: Object.values(ActivityOutcome),
   })
   outcome?: ActivityOutcome;
 
@@ -95,11 +95,14 @@ LeadActivitySchema.index({ scheduledDate: 1 });
 LeadActivitySchema.index({ createdAt: -1 });
 
 // Compound index for finding overdue activities
-LeadActivitySchema.index({
-  dueDate: 1,
-  completedDate: 1
-}, {
-  partialFilterExpression: {
-    completedDate: { $exists: false }
-  }
-});
+LeadActivitySchema.index(
+  {
+    dueDate: 1,
+    completedDate: 1,
+  },
+  {
+    partialFilterExpression: {
+      completedDate: { $exists: false },
+    },
+  },
+);

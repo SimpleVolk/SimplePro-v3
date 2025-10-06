@@ -71,7 +71,10 @@ export const RealTimeDashboard: React.FC = () => {
 
     // Connection events
     newSocket.on('connect', () => {
-      console.log('Connected to WebSocket', socket ? 'previous socket exists' : 'first connection');
+      console.log(
+        'Connected to WebSocket',
+        socket ? 'previous socket exists' : 'first connection',
+      );
       setIsConnected(true);
     });
 
@@ -87,36 +90,38 @@ export const RealTimeDashboard: React.FC = () => {
 
     // Real-time event handlers
     newSocket.on('userOnline', (data) => {
-      setConnectedUsers(prev => [
-        ...prev.filter(user => user.userId !== data.userId),
+      setConnectedUsers((prev) => [
+        ...prev.filter((user) => user.userId !== data.userId),
         {
           socketId: 'unknown',
           userId: data.userId,
           userRole: data.role,
           crewId: data.crewId,
           connectedAt: data.timestamp,
-        }
+        },
       ]);
     });
 
     newSocket.on('userOffline', (data) => {
-      setConnectedUsers(prev => prev.filter(user => user.userId !== data.userId));
+      setConnectedUsers((prev) =>
+        prev.filter((user) => user.userId !== data.userId),
+      );
     });
 
     newSocket.on('jobStatusChanged', (data) => {
-      setRecentJobUpdates(prev => [
+      setRecentJobUpdates((prev) => [
         {
           jobId: data.jobId,
           status: data.status,
           message: data.message || `Job status changed to ${data.status}`,
           timestamp: data.timestamp,
         },
-        ...prev.slice(0, 9) // Keep only latest 10
+        ...prev.slice(0, 9), // Keep only latest 10
       ]);
     });
 
     newSocket.on('crewStatusUpdate', (data) => {
-      setCrewStatuses(prev => [
+      setCrewStatuses((prev) => [
         {
           userId: data.userId,
           crewId: data.crewId,
@@ -124,12 +129,12 @@ export const RealTimeDashboard: React.FC = () => {
           message: data.message,
           timestamp: data.timestamp,
         },
-        ...prev.filter(status => status.userId !== data.userId).slice(0, 9)
+        ...prev.filter((status) => status.userId !== data.userId).slice(0, 9),
       ]);
     });
 
     newSocket.on('crewLocationUpdate', (data) => {
-      setLocationUpdates(prev => [
+      setLocationUpdates((prev) => [
         {
           userId: data.userId,
           crewId: data.crewId,
@@ -137,7 +142,7 @@ export const RealTimeDashboard: React.FC = () => {
           jobId: data.jobId,
           timestamp: data.timestamp,
         },
-        ...prev.filter(update => update.userId !== data.userId).slice(0, 19) // Keep latest 20
+        ...prev.filter((update) => update.userId !== data.userId).slice(0, 19), // Keep latest 20
       ]);
     });
 
@@ -146,17 +151,17 @@ export const RealTimeDashboard: React.FC = () => {
     });
 
     newSocket.on('notification', (data) => {
-      setNotifications(prev => [data, ...prev.slice(0, 9)]);
+      setNotifications((prev) => [data, ...prev.slice(0, 9)]);
     });
 
     newSocket.on('emergencyAlert', (data) => {
-      setNotifications(prev => [
+      setNotifications((prev) => [
         {
           ...data,
           type: 'emergency',
           priority: 'urgent',
         },
-        ...prev.slice(0, 9)
+        ...prev.slice(0, 9),
       ]);
     });
 
@@ -185,7 +190,7 @@ export const RealTimeDashboard: React.FC = () => {
   };
 
   const removeNotification = (index: number) => {
-    setNotifications(prev => prev.filter((_, i) => i !== index));
+    setNotifications((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -213,11 +218,15 @@ export const RealTimeDashboard: React.FC = () => {
           </div>
           <div className={styles.statCard}>
             <h3>Pending Estimates</h3>
-            <div className={styles.statNumber}>{systemStats.pendingEstimates}</div>
+            <div className={styles.statNumber}>
+              {systemStats.pendingEstimates}
+            </div>
           </div>
           <div className={styles.statCard}>
             <h3>Daily Revenue</h3>
-            <div className={styles.statNumber}>${systemStats.dailyRevenue.toLocaleString()}</div>
+            <div className={styles.statNumber}>
+              ${systemStats.dailyRevenue.toLocaleString()}
+            </div>
           </div>
         </div>
       )}
@@ -232,7 +241,9 @@ export const RealTimeDashboard: React.FC = () => {
                 <div className={styles.userInfo}>
                   <span className={styles.userId}>User {user.userId}</span>
                   <span className={styles.userRole}>{user.userRole}</span>
-                  {user.crewId && <span className={styles.crewId}>Crew {user.crewId}</span>}
+                  {user.crewId && (
+                    <span className={styles.crewId}>Crew {user.crewId}</span>
+                  )}
                 </div>
                 <span className={styles.connectTime}>
                   {formatTime(user.connectedAt)}
@@ -252,7 +263,9 @@ export const RealTimeDashboard: React.FC = () => {
                   <span className={styles.jobId}>Job {update.jobId}</span>
                   <span className={styles.updateMessage}>{update.message}</span>
                   {update.status && (
-                    <span className={`${styles.status} ${styles[update.status]}`}>
+                    <span
+                      className={`${styles.status} ${styles[update.status]}`}
+                    >
                       {update.status}
                     </span>
                   )}
@@ -302,7 +315,8 @@ export const RealTimeDashboard: React.FC = () => {
                 <div className={styles.locationInfo}>
                   <span className={styles.userId}>User {location.userId}</span>
                   <span className={styles.coordinates}>
-                    {location.location.latitude.toFixed(4)}, {location.location.longitude.toFixed(4)}
+                    {location.location.latitude.toFixed(4)},{' '}
+                    {location.location.longitude.toFixed(4)}
                   </span>
                   {location.location.accuracy && (
                     <span className={styles.accuracy}>

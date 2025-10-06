@@ -10,7 +10,7 @@ export class PartnerQueryDto {
     'storage_facility',
     'corporate_client',
     'referral_network',
-    'other'
+    'other',
   ])
   partnerType?: string;
 

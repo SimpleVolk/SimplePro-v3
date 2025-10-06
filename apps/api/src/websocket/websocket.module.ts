@@ -5,10 +5,7 @@ import { RealtimeService } from './realtime.service';
 import { MessagesModule } from '../messages/messages.module';
 
 @Module({
-  imports: [
-    AuthModule,
-    forwardRef(() => MessagesModule),
-  ],
+  imports: [AuthModule, forwardRef(() => MessagesModule)],
   providers: [WebSocketGateway, RealtimeService],
   exports: [WebSocketGateway, RealtimeService],
 })

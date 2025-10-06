@@ -1,4 +1,15 @@
-import { IsString, IsEmail, IsEnum, IsOptional, IsObject, ValidateNested, IsNumber, IsArray, IsDateString, Min } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsObject,
+  ValidateNested,
+  IsNumber,
+  IsArray,
+  IsDateString,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CustomerInfoDto {

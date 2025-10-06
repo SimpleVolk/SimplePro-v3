@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards, Request } from '@nestjs/common';
 import { CustomersService } from '../../customers/customers.service';
 import { JobsService } from '../../jobs/jobs.service';
@@ -9,7 +16,7 @@ import type {
   Customer,
   CustomerFilters,
   CreateCustomerDto,
-  UpdateCustomerDto
+  UpdateCustomerDto,
 } from '../../customers/interfaces/customer.interface';
 
 @Resolver('Customer')
@@ -17,7 +24,7 @@ import type {
 export class CustomersResolver {
   constructor(
     private readonly customersService: CustomersService,
-    private readonly jobsService: JobsService
+    private readonly jobsService: JobsService,
   ) {}
 
   // Queries
@@ -27,7 +34,9 @@ export class CustomersResolver {
   }
 
   @Query('customerByEmail')
-  async getCustomerByEmail(@Args('email') email: string): Promise<Customer | null> {
+  async getCustomerByEmail(
+    @Args('email') email: string,
+  ): Promise<Customer | null> {
     return this.customersService.findByEmail(email);
   }
 
@@ -36,7 +45,7 @@ export class CustomersResolver {
     @Args('filters') filters?: CustomerFilters,
     @Args('sortBy') sortBy?: { field: string; order: 'asc' | 'desc' },
     @Args('first') first?: number,
-    @Args('after') after?: string
+    @Args('after') after?: string,
   ): Promise<any> {
     // Fetch all customers (use large limit for GraphQL compatibility)
     const result = await this.customersService.findAll(filters, 0, 1000);
@@ -54,12 +63,14 @@ export class CustomersResolver {
 
     // Implement cursor-based pagination
     const limit = first || 20;
-    const startIndex = after ? customers.findIndex((c: any) => c.id === after) + 1 : 0;
+    const startIndex = after
+      ? customers.findIndex((c: any) => c.id === after) + 1
+      : 0;
     const paginatedCustomers = customers.slice(startIndex, startIndex + limit);
 
     const edges = paginatedCustomers.map((customer: Customer) => ({
       node: customer,
-      cursor: customer.id
+      cursor: customer.id,
     }));
 
     return {
@@ -68,9 +79,9 @@ export class CustomersResolver {
         hasNextPage: startIndex + limit < customers.length,
         hasPreviousPage: startIndex > 0,
         startCursor: edges[0]?.cursor,
-        endCursor: edges[edges.length - 1]?.cursor
+        endCursor: edges[edges.length - 1]?.cursor,
       },
-      totalCount: customers.length
+      totalCount: customers.length,
     };
   }
 
@@ -85,9 +96,13 @@ export class CustomersResolver {
     if (!customer.jobs || customer.jobs.length === 0) return [];
 
     // Fetch all jobs for this customer
-    const result = await this.jobsService.findAll({
-      customerId: customer.id
-    }, 0, 100);
+    const result = await this.jobsService.findAll(
+      {
+        customerId: customer.id,
+      },
+      0,
+      100,
+    );
 
     return result.data;
   }
@@ -97,7 +112,7 @@ export class CustomersResolver {
   @Roles('super_admin', 'admin', 'dispatcher')
   async createCustomer(
     @Args('input') input: CreateCustomerDto,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Customer> {
     const userId = req.user?.userId || 'system';
     return this.customersService.create(input, userId);
@@ -108,7 +123,7 @@ export class CustomersResolver {
   async updateCustomer(
     @Args('id') id: string,
     @Args('input') input: UpdateCustomerDto,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Customer> {
     const userId = req.user?.userId || 'system';
     return this.customersService.update(id, input, userId);
@@ -126,7 +141,7 @@ export class CustomersResolver {
   async updateCustomerStatus(
     @Args('id') id: string,
     @Args('status') status: Customer['status'],
-    @Request() req: any
+    @Request() req: any,
   ): Promise<Customer> {
     const userId = req.user?.userId || 'system';
     return this.customersService.update(id, { status }, userId);

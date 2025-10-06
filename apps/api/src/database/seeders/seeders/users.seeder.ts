@@ -24,9 +24,15 @@ export async function seedUsers(UserModel: any): Promise<any[]> {
       phoneNumber: faker.phone.number(),
       permissions: [
         { resource: 'users', actions: ['read', 'create', 'update'] },
-        { resource: 'customers', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'customers',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
         { resource: 'jobs', actions: ['read', 'create', 'update', 'delete'] },
-        { resource: 'estimates', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'estimates',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
         { resource: 'reports', actions: ['read'] },
       ],
     },
@@ -45,7 +51,10 @@ export async function seedUsers(UserModel: any): Promise<any[]> {
       permissions: [
         { resource: 'jobs', actions: ['read', 'create', 'update'] },
         { resource: 'crews', actions: ['read', 'update'] },
-        { resource: 'schedules', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'schedules',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
         { resource: 'customers', actions: ['read'] },
       ],
     },
@@ -81,9 +90,15 @@ export async function seedUsers(UserModel: any): Promise<any[]> {
       phoneNumber: faker.phone.number(),
       permissions: [
         { resource: 'users', actions: ['read', 'create', 'update'] },
-        { resource: 'customers', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'customers',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
         { resource: 'jobs', actions: ['read', 'create', 'update', 'delete'] },
-        { resource: 'estimates', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'estimates',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
         { resource: 'reports', actions: ['read'] },
       ],
     },
@@ -119,11 +134,23 @@ export async function seedUsers(UserModel: any): Promise<any[]> {
       phoneNumber: faker.phone.number(),
       permissions: [
         { resource: 'users', actions: ['read', 'create', 'update', 'delete'] },
-        { resource: 'customers', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'customers',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
         { resource: 'jobs', actions: ['read', 'create', 'update', 'delete'] },
-        { resource: 'estimates', actions: ['read', 'create', 'update', 'delete'] },
-        { resource: 'reports', actions: ['read', 'create', 'update', 'delete'] },
-        { resource: 'settings', actions: ['read', 'create', 'update', 'delete'] },
+        {
+          resource: 'estimates',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
+        {
+          resource: 'reports',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
+        {
+          resource: 'settings',
+          actions: ['read', 'create', 'update', 'delete'],
+        },
       ],
     },
   ];
@@ -171,7 +198,8 @@ export async function seedUsers(UserModel: any): Promise<any[]> {
   for (let i = 0; i < crewCount; i++) {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
-    const username = `${firstName.toLowerCase()}.${lastName.toLowerCase()}`.substring(0, 20);
+    const username =
+      `${firstName.toLowerCase()}.${lastName.toLowerCase()}`.substring(0, 20);
 
     // Check if already exists
     const existing = await UserModel.findOne({ username });

@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
-import { accessSharedDocument, accessPublicDocument, downloadDocument } from '../../../services/documents.service';
+import {
+  accessSharedDocument,
+  accessPublicDocument,
+  downloadDocument,
+} from '../../../services/documents.service';
 import {
   RateLimitError,
   DocumentAccessError,
@@ -22,7 +26,7 @@ export function SharedDocumentAccess({ token }: SharedDocumentAccessProps) {
   const [error, setError] = useState<string | null>(null);
   const [retryAfter, setRetryAfter] = useState<string | null>(null);
   const [document, setDocument] = useState<AccessSharedDocumentResponse | null>(
-    null
+    null,
   );
   const [needsPassword, setNeedsPassword] = useState<boolean | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -181,8 +185,7 @@ export function SharedDocumentAccess({ token }: SharedDocumentAccessProps) {
                 </span>
                 {document.expiresAt && (
                   <span className={styles.metaItem}>
-                    Expires:{' '}
-                    {new Date(document.expiresAt).toLocaleDateString()}
+                    Expires: {new Date(document.expiresAt).toLocaleDateString()}
                   </span>
                 )}
               </div>

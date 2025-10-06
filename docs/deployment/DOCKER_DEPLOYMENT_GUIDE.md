@@ -76,12 +76,14 @@ SimplePro uses a containerized microservices architecture with Docker for consis
 ### System Requirements
 
 **Minimum (Development/Staging):**
+
 - CPU: 4 cores
 - RAM: 8 GB
 - Disk: 50 GB SSD
 - OS: Linux (Ubuntu 22.04 LTS recommended), macOS, or Windows with WSL2
 
 **Recommended (Production):**
+
 - CPU: 8+ cores
 - RAM: 16+ GB
 - Disk: 200+ GB SSD
@@ -97,6 +99,7 @@ SimplePro uses a containerized microservices architecture with Docker for consis
 ### Installation
 
 **Ubuntu/Debian:**
+
 ```bash
 # Install Docker
 curl -fsSL https://get.docker.com | sh
@@ -112,6 +115,7 @@ docker compose version
 ```
 
 **macOS:**
+
 ```bash
 # Install Docker Desktop from https://www.docker.com/products/docker-desktop
 brew install --cask docker
@@ -122,6 +126,7 @@ docker compose version
 ```
 
 **Windows:**
+
 - Install Docker Desktop with WSL2 backend
 - Enable WSL2 integration in Docker Desktop settings
 
@@ -147,6 +152,7 @@ nano .env.production
 ```
 
 **Required Configuration:**
+
 - Change all `CHANGE_ME_*` values
 - Set strong passwords (minimum 32 characters)
 - Configure domain names
@@ -277,6 +283,7 @@ docker history simplepro-web:latest
 ### Environment Files
 
 **`.env.production`** - Production secrets (NEVER commit to git)
+
 ```bash
 # MongoDB
 MONGODB_USERNAME=admin
@@ -301,19 +308,19 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 
 ### Environment Variables Reference
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `MONGODB_USERNAME` | Yes | admin | MongoDB admin username |
-| `MONGODB_PASSWORD` | Yes | - | MongoDB admin password |
-| `REDIS_PASSWORD` | Yes | - | Redis authentication password |
-| `JWT_SECRET` | Yes | - | JWT access token secret |
-| `JWT_REFRESH_SECRET` | Yes | - | JWT refresh token secret |
-| `MINIO_ROOT_USER` | Yes | - | MinIO admin username |
-| `MINIO_ROOT_PASSWORD` | Yes | - | MinIO admin password |
-| `NEXT_PUBLIC_API_URL` | Yes | - | Public API URL for web app |
-| `ALLOWED_ORIGINS` | Yes | - | CORS allowed origins |
-| `LOG_LEVEL` | No | info | Logging level (debug, info, warn, error) |
-| `GRAFANA_ADMIN_PASSWORD` | Yes | - | Grafana admin password |
+| Variable                 | Required | Default | Description                              |
+| ------------------------ | -------- | ------- | ---------------------------------------- |
+| `MONGODB_USERNAME`       | Yes      | admin   | MongoDB admin username                   |
+| `MONGODB_PASSWORD`       | Yes      | -       | MongoDB admin password                   |
+| `REDIS_PASSWORD`         | Yes      | -       | Redis authentication password            |
+| `JWT_SECRET`             | Yes      | -       | JWT access token secret                  |
+| `JWT_REFRESH_SECRET`     | Yes      | -       | JWT refresh token secret                 |
+| `MINIO_ROOT_USER`        | Yes      | -       | MinIO admin username                     |
+| `MINIO_ROOT_PASSWORD`    | Yes      | -       | MinIO admin password                     |
+| `NEXT_PUBLIC_API_URL`    | Yes      | -       | Public API URL for web app               |
+| `ALLOWED_ORIGINS`        | Yes      | -       | CORS allowed origins                     |
+| `LOG_LEVEL`              | No       | info    | Logging level (debug, info, warn, error) |
+| `GRAFANA_ADMIN_PASSWORD` | Yes      | -       | Grafana admin password                   |
 
 ### Secrets Management
 
@@ -324,6 +331,7 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
    - Use environment-specific files
 
 2. **Use external secret management**
+
    ```bash
    # AWS Secrets Manager
    aws secretsmanager get-secret-value --secret-id simplepro/prod/mongodb-password
@@ -333,6 +341,7 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
    ```
 
 3. **Docker Secrets (Swarm)**
+
    ```bash
    # Create secret
    echo "my-secure-password" | docker secret create mongodb_password -
@@ -400,6 +409,7 @@ The GitHub Actions workflow (`.github/workflows/cd.yml`) handles automated deplo
 - **Manual**: Workflow dispatch with environment selection
 
 **Workflow includes:**
+
 - Docker image build and push to GitHub Container Registry
 - Security scanning with Trivy
 - Blue-green deployment with health checks
@@ -416,6 +426,7 @@ The GitHub Actions workflow (`.github/workflows/cd.yml`) handles automated deplo
 **Access:** http://localhost:9090
 
 **Key Metrics:**
+
 - API response times
 - Request rates
 - Error rates
@@ -424,6 +435,7 @@ The GitHub Actions workflow (`.github/workflows/cd.yml`) handles automated deplo
 - Container resource usage
 
 **Sample Queries:**
+
 ```promql
 # API request rate
 rate(http_requests_total[5m])
@@ -441,6 +453,7 @@ histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
 **Default Credentials:** admin / (from GRAFANA_ADMIN_PASSWORD)
 
 **Pre-configured Dashboards:**
+
 1. **SimplePro Overview** - System health, request rates, error rates
 2. **MongoDB Metrics** - Operations/sec, connections, replication lag
 3. **Redis Metrics** - Hit rate, memory usage, commands/sec
@@ -450,6 +463,7 @@ histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
 ### Logging
 
 **View Logs:**
+
 ```bash
 # All services
 docker-compose -f docker-compose.prod.yml logs -f
@@ -465,6 +479,7 @@ docker-compose -f docker-compose.prod.yml logs --since 2025-10-02T10:00:00 api
 ```
 
 **Log Rotation:**
+
 ```bash
 # Configure in docker-compose.yml
 services:
@@ -477,6 +492,7 @@ services:
 ```
 
 **Centralized Logging (Production):**
+
 - Use ELK Stack (Elasticsearch, Logstash, Kibana)
 - Use Loki + Grafana
 - Use cloud provider logging (AWS CloudWatch, Azure Monitor)
@@ -488,6 +504,7 @@ services:
 ### Horizontal Scaling
 
 **API Service:**
+
 ```bash
 # Scale to 3 instances
 docker-compose -f docker-compose.prod.yml up -d --scale api=3
@@ -497,12 +514,14 @@ docker-compose -f docker-compose.prod.yml up -d --scale api=3
 ```
 
 **Web Service:**
+
 ```bash
 # Scale to 2 instances
 docker-compose -f docker-compose.prod.yml up -d --scale web=2
 ```
 
 **MongoDB Replica Set:**
+
 ```bash
 # Convert to replica set (requires custom compose file)
 # See docs/deployment/MONGODB_REPLICATION.md
@@ -511,6 +530,7 @@ docker-compose -f docker-compose.prod.yml up -d --scale web=2
 ### Vertical Scaling
 
 **Update Resource Limits:**
+
 ```yaml
 # docker-compose.prod.yml
 services:
@@ -541,28 +561,31 @@ spec:
   minReplicas: 2
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
 ```
 
 ### Performance Tuning
 
 **Database:**
+
 - Index optimization
 - Connection pooling (default: 10 connections)
 - Query optimization
 - Read replicas for read-heavy workloads
 
 **Redis:**
+
 - Increase maxmemory for caching
 - Configure eviction policy (allkeys-lru)
 - Enable persistence for critical data
 
 **API:**
+
 - Enable cluster mode for multi-core usage
 - Optimize build size (current: ~150MB)
 - Enable compression (gzip)
@@ -656,15 +679,15 @@ docker-compose -f docker-compose.prod.yml build --progress=plain
 
 ### Health Check Endpoints
 
-| Service | Endpoint | Expected Response |
-|---------|----------|-------------------|
-| API | http://localhost:3001/api/health | `{"status":"ok","timestamp":"..."}` |
-| Web | http://localhost:3009/ | HTML page |
-| MongoDB | `mongosh --eval "db.adminCommand('ping')"` | `{ ok: 1 }` |
-| Redis | `redis-cli ping` | `PONG` |
-| MinIO | http://localhost:9000/minio/health/live | HTTP 200 |
-| Prometheus | http://localhost:9090/-/healthy | HTTP 200 |
-| Grafana | http://localhost:3001/api/health | `{"database":"ok"}` |
+| Service    | Endpoint                                   | Expected Response                   |
+| ---------- | ------------------------------------------ | ----------------------------------- |
+| API        | http://localhost:3001/api/health           | `{"status":"ok","timestamp":"..."}` |
+| Web        | http://localhost:3009/                     | HTML page                           |
+| MongoDB    | `mongosh --eval "db.adminCommand('ping')"` | `{ ok: 1 }`                         |
+| Redis      | `redis-cli ping`                           | `PONG`                              |
+| MinIO      | http://localhost:9000/minio/health/live    | HTTP 200                            |
+| Prometheus | http://localhost:9090/-/healthy            | HTTP 200                            |
+| Grafana    | http://localhost:3001/api/health           | `{"database":"ok"}`                 |
 
 ---
 
@@ -691,7 +714,7 @@ networks:
     driver: bridge
   backend:
     driver: bridge
-    internal: true  # No external access
+    internal: true # No external access
 
 services:
   web:
@@ -703,7 +726,7 @@ services:
       - backend
   mongodb:
     networks:
-      - backend  # Only accessible by API
+      - backend # Only accessible by API
 ```
 
 ### 3. Secret Management
@@ -795,6 +818,7 @@ docker-compose -f docker-compose.prod.yml exec mongodb \
 3. **Recovery Point Objective (RPO):** < 24 hours
 
 4. **Recovery Procedure:**
+
    ```bash
    # 1. Restore infrastructure
    docker-compose -f docker-compose.prod.yml up -d mongodb redis minio
@@ -814,6 +838,7 @@ docker-compose -f docker-compose.prod.yml exec mongodb \
 ## Resource Requirements by Environment
 
 ### Development
+
 - **API**: 256MB RAM, 0.5 CPU
 - **Web**: 256MB RAM, 0.5 CPU
 - **MongoDB**: 512MB RAM, 0.5 CPU
@@ -821,6 +846,7 @@ docker-compose -f docker-compose.prod.yml exec mongodb \
 - **Total**: ~2GB RAM, 2 CPU
 
 ### Staging
+
 - **API**: 512MB RAM, 1 CPU
 - **Web**: 512MB RAM, 0.5 CPU
 - **MongoDB**: 1GB RAM, 1 CPU
@@ -828,6 +854,7 @@ docker-compose -f docker-compose.prod.yml exec mongodb \
 - **Total**: ~4GB RAM, 4 CPU
 
 ### Production
+
 - **API**: 1-2GB RAM, 2-4 CPU (scalable)
 - **Web**: 512MB-1GB RAM, 1-2 CPU (scalable)
 - **MongoDB**: 2-4GB RAM, 2-4 CPU

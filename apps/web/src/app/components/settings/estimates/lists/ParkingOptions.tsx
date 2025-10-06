@@ -20,11 +20,46 @@ export default function ParkingOptions() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [parkingOptions, setParkingOptions] = useState<ParkingOption[]>([
-    { id: '1', name: 'Driveway', description: 'Truck can park in driveway', distanceFromTruck: 10, additionalCharge: 0, active: true },
-    { id: '2', name: 'Street Parking', description: 'Street parking available near entrance', distanceFromTruck: 25, additionalCharge: 25, active: true },
-    { id: '3', name: 'Loading Dock', description: 'Building has loading dock access', distanceFromTruck: 0, additionalCharge: 0, active: true },
-    { id: '4', name: 'Reserved Parking', description: 'Reserved spot must be arranged', distanceFromTruck: 50, additionalCharge: 50, active: true },
-    { id: '5', name: 'No Parking', description: 'No parking available, long carry', distanceFromTruck: 100, additionalCharge: 150, active: true },
+    {
+      id: '1',
+      name: 'Driveway',
+      description: 'Truck can park in driveway',
+      distanceFromTruck: 10,
+      additionalCharge: 0,
+      active: true,
+    },
+    {
+      id: '2',
+      name: 'Street Parking',
+      description: 'Street parking available near entrance',
+      distanceFromTruck: 25,
+      additionalCharge: 25,
+      active: true,
+    },
+    {
+      id: '3',
+      name: 'Loading Dock',
+      description: 'Building has loading dock access',
+      distanceFromTruck: 0,
+      additionalCharge: 0,
+      active: true,
+    },
+    {
+      id: '4',
+      name: 'Reserved Parking',
+      description: 'Reserved spot must be arranged',
+      distanceFromTruck: 50,
+      additionalCharge: 50,
+      active: true,
+    },
+    {
+      id: '5',
+      name: 'No Parking',
+      description: 'No parking available, long carry',
+      distanceFromTruck: 100,
+      additionalCharge: 150,
+      active: true,
+    },
   ]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -43,9 +78,9 @@ export default function ParkingOptions() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/parking-options'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -78,7 +113,7 @@ export default function ParkingOptions() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ parkingOptions }),
       });
@@ -95,7 +130,9 @@ export default function ParkingOptions() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving parking options:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -130,9 +167,11 @@ export default function ParkingOptions() {
 
   const handleUpdate = () => {
     if (editingId) {
-      setParkingOptions(parkingOptions.map(opt =>
-        opt.id === editingId ? { ...opt, ...editForm } : opt
-      ));
+      setParkingOptions(
+        parkingOptions.map((opt) =>
+          opt.id === editingId ? { ...opt, ...editForm } : opt,
+        ),
+      );
       setEditingId(null);
       setEditForm({});
       setSuccess('Parking option updated');
@@ -142,7 +181,7 @@ export default function ParkingOptions() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this parking option?')) {
-      setParkingOptions(parkingOptions.filter(opt => opt.id !== id));
+      setParkingOptions(parkingOptions.filter((opt) => opt.id !== id));
       setSuccess('Parking option deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -187,7 +226,9 @@ export default function ParkingOptions() {
                 id="name"
                 type="text"
                 value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., Parking Garage"
               />
@@ -200,7 +241,12 @@ export default function ParkingOptions() {
                 type="number"
                 min="0"
                 value={editForm.distanceFromTruck || 0}
-                onChange={(e) => setEditForm({ ...editForm, distanceFromTruck: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    distanceFromTruck: parseInt(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -212,7 +258,12 @@ export default function ParkingOptions() {
                 type="number"
                 min="0"
                 value={editForm.additionalCharge || 0}
-                onChange={(e) => setEditForm({ ...editForm, additionalCharge: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    additionalCharge: parseFloat(e.target.value),
+                  })
+                }
                 className={styles.input}
               />
             </div>
@@ -224,7 +275,9 @@ export default function ParkingOptions() {
               id="description"
               type="text"
               value={editForm.description || ''}
-              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+              onChange={(e) =>
+                setEditForm({ ...editForm, description: e.target.value })
+              }
               className={styles.input}
               placeholder="Brief description"
             />
@@ -249,14 +302,16 @@ export default function ParkingOptions() {
             </tr>
           </thead>
           <tbody>
-            {parkingOptions.map(option => (
+            {parkingOptions.map((option) => (
               <tr key={option.id}>
                 <td>
                   {editingId === option.id ? (
                     <input
                       type="text"
                       value={editForm.name || ''}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -268,7 +323,12 @@ export default function ParkingOptions() {
                     <input
                       type="text"
                       value={editForm.description || ''}
-                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          description: e.target.value,
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -280,7 +340,12 @@ export default function ParkingOptions() {
                     <input
                       type="number"
                       value={editForm.distanceFromTruck || 0}
-                      onChange={(e) => setEditForm({ ...editForm, distanceFromTruck: parseInt(e.target.value) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          distanceFromTruck: parseInt(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -292,7 +357,12 @@ export default function ParkingOptions() {
                     <input
                       type="number"
                       value={editForm.additionalCharge || 0}
-                      onChange={(e) => setEditForm({ ...editForm, additionalCharge: parseFloat(e.target.value) })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          additionalCharge: parseFloat(e.target.value),
+                        })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -300,7 +370,13 @@ export default function ParkingOptions() {
                   )}
                 </td>
                 <td>
-                  <span className={option.active ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      option.active
+                        ? styles.statusActive
+                        : styles.statusInactive
+                    }
+                  >
                     {option.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -308,19 +384,38 @@ export default function ParkingOptions() {
                   <div className={styles.actions}>
                     {editingId === option.id ? (
                       <>
-                        <button className={styles.actionButton} onClick={handleUpdate} title="Save">
+                        <button
+                          className={styles.actionButton}
+                          onClick={handleUpdate}
+                          title="Save"
+                        >
                           💾
                         </button>
-                        <button className={styles.actionButton} onClick={() => { setEditingId(null); setEditForm({}); }} title="Cancel">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditForm({});
+                          }}
+                          title="Cancel"
+                        >
                           ✕
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className={styles.actionButton} onClick={() => handleEdit(option)} title="Edit">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleEdit(option)}
+                          title="Edit"
+                        >
                           ✏️
                         </button>
-                        <button className={styles.actionButton} onClick={() => handleDelete(option.id)} title="Delete">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(option.id)}
+                          title="Delete"
+                        >
                           🗑️
                         </button>
                       </>
@@ -334,7 +429,11 @@ export default function ParkingOptions() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

@@ -69,9 +69,13 @@ export class JobsController {
         severity: 'info',
         outcome: 'success',
         changes: {
-          after: { customerId: job.customerId, type: job.type, status: job.status },
+          after: {
+            customerId: job.customerId,
+            type: job.type,
+            status: job.status,
+          },
         },
-      }
+      },
     );
 
     return {
@@ -96,15 +100,23 @@ export class JobsController {
       priority: query.priority,
       customerId: query.customerId,
       assignedCrew: query.assignedCrew,
-      scheduledAfter: query.scheduledAfter ? new Date(query.scheduledAfter) : undefined,
-      scheduledBefore: query.scheduledBefore ? new Date(query.scheduledBefore) : undefined,
-      createdAfter: query.createdAfter ? new Date(query.createdAfter) : undefined,
-      createdBefore: query.createdBefore ? new Date(query.createdBefore) : undefined,
+      scheduledAfter: query.scheduledAfter
+        ? new Date(query.scheduledAfter)
+        : undefined,
+      scheduledBefore: query.scheduledBefore
+        ? new Date(query.scheduledBefore)
+        : undefined,
+      createdAfter: query.createdAfter
+        ? new Date(query.createdAfter)
+        : undefined,
+      createdBefore: query.createdBefore
+        ? new Date(query.createdBefore)
+        : undefined,
       search: query.search,
     };
 
     // Remove undefined values
-    Object.keys(filters).forEach(key => {
+    Object.keys(filters).forEach((key) => {
       if (filters[key as keyof JobFilters] === undefined) {
         delete filters[key as keyof JobFilters];
       }
@@ -206,13 +218,25 @@ export class JobsController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async updateStatus(
     @Param('id') id: string,
-    @Body() statusUpdate: { status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold' },
+    @Body()
+    statusUpdate: {
+      status:
+        | 'scheduled'
+        | 'in_progress'
+        | 'completed'
+        | 'cancelled'
+        | 'on_hold';
+    },
     @CurrentUser() user: User,
     @Req() req: any,
   ) {
     // Get old job state for audit trail
     const oldJob = await this.jobsService.findOne(id);
-    const job = await this.jobsService.updateStatus(id, statusUpdate.status, user.id);
+    const job = await this.jobsService.updateStatus(
+      id,
+      statusUpdate.status,
+      user.id,
+    );
 
     // Log status change
     await this.auditLogsService.log(
@@ -232,7 +256,7 @@ export class JobsController {
           before: { status: oldJob.status },
           after: { status: statusUpdate.status },
         },
-      }
+      },
     );
 
     return {
@@ -273,10 +297,23 @@ export class JobsController {
   async updateCrewStatus(
     @Param('id') id: string,
     @Param('crewMemberId') crewMemberId: string,
-    @Body() statusUpdate: { status: 'assigned' | 'confirmed' | 'checked_in' | 'checked_out' | 'absent' },
+    @Body()
+    statusUpdate: {
+      status:
+        | 'assigned'
+        | 'confirmed'
+        | 'checked_in'
+        | 'checked_out'
+        | 'absent';
+    },
     @CurrentUser() user: User,
   ) {
-    const job = await this.jobsService.updateCrewStatus(id, crewMemberId, statusUpdate.status, user.id);
+    const job = await this.jobsService.updateCrewStatus(
+      id,
+      crewMemberId,
+      statusUpdate.status,
+      user.id,
+    );
 
     return {
       success: true,
@@ -293,7 +330,11 @@ export class JobsController {
     @Body() noteData: Omit<InternalNote, 'id' | 'createdAt' | 'createdBy'>,
     @CurrentUser() user: User,
   ) {
-    const job = await this.jobsService.addNote(id, { ...noteData, createdBy: user.id }, user.id);
+    const job = await this.jobsService.addNote(
+      id,
+      { ...noteData, createdBy: user.id },
+      user.id,
+    );
 
     return {
       success: true,
@@ -308,13 +349,19 @@ export class JobsController {
   async updateMilestone(
     @Param('id') id: string,
     @Param('milestoneId') milestoneId: string,
-    @Body() milestoneUpdate: {
+    @Body()
+    milestoneUpdate: {
       status: 'pending' | 'in_progress' | 'completed' | 'skipped';
       notes?: string;
     },
     @CurrentUser() user: User,
   ) {
-    const job = await this.jobsService.updateMilestone(id, milestoneId, milestoneUpdate.status, user.id);
+    const job = await this.jobsService.updateMilestone(
+      id,
+      milestoneId,
+      milestoneUpdate.status,
+      user.id,
+    );
 
     return {
       success: true,
@@ -341,7 +388,11 @@ export class JobsController {
   @RequirePermissions({ resource: 'jobs', action: 'read' })
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async getJobsForCrewMember(@Param('crewMemberId') crewMemberId: string) {
-    const result = await this.jobsService.findAll({ assignedCrew: crewMemberId }, 0, 100);
+    const result = await this.jobsService.findAll(
+      { assignedCrew: crewMemberId },
+      0,
+      100,
+    );
 
     return {
       success: true,

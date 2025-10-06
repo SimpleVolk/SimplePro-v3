@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as Handlebars from 'handlebars';
-import { NotificationTemplate, NotificationTemplateDocument } from '../schemas/notification-template.schema';
+import {
+  NotificationTemplate,
+  NotificationTemplateDocument,
+} from '../schemas/notification-template.schema';
 import { CreateTemplateDto, UpdateTemplateDto } from '../dto';
 
 export interface RenderedNotification {
@@ -72,11 +80,17 @@ export class NotificationTemplateService implements OnModuleInit {
   /**
    * Render a notification from a template
    */
-  async renderNotification(type: string, data: any): Promise<RenderedNotification> {
-    const template = this.templateCache.get(type) || (await this.getTemplate(type));
+  async renderNotification(
+    type: string,
+    data: any,
+  ): Promise<RenderedNotification> {
+    const template =
+      this.templateCache.get(type) || (await this.getTemplate(type));
 
     if (!template) {
-      throw new NotFoundException(`Notification template for type "${type}" not found`);
+      throw new NotFoundException(
+        `Notification template for type "${type}" not found`,
+      );
     }
 
     try {
@@ -91,12 +105,16 @@ export class NotificationTemplateService implements OnModuleInit {
       };
 
       if (template.emailSubjectTemplate) {
-        const emailSubjectTemplate = Handlebars.compile(template.emailSubjectTemplate);
+        const emailSubjectTemplate = Handlebars.compile(
+          template.emailSubjectTemplate,
+        );
         result.emailSubject = emailSubjectTemplate(data);
       }
 
       if (template.emailBodyTemplate) {
-        const emailBodyTemplate = Handlebars.compile(template.emailBodyTemplate);
+        const emailBodyTemplate = Handlebars.compile(
+          template.emailBodyTemplate,
+        );
         result.emailBody = emailBodyTemplate(data);
       }
 
@@ -138,8 +156,13 @@ export class NotificationTemplateService implements OnModuleInit {
   /**
    * Update a template
    */
-  async updateTemplate(type: string, dto: UpdateTemplateDto): Promise<NotificationTemplate> {
-    const template = await this.templateModel.findOneAndUpdate({ type }, dto, { new: true });
+  async updateTemplate(
+    type: string,
+    dto: UpdateTemplateDto,
+  ): Promise<NotificationTemplate> {
+    const template = await this.templateModel.findOneAndUpdate({ type }, dto, {
+      new: true,
+    });
 
     if (!template) {
       throw new NotFoundException(`Template with type "${type}" not found`);
@@ -164,7 +187,8 @@ export class NotificationTemplateService implements OnModuleInit {
       {
         type: 'job_assigned',
         titleTemplate: 'New Job Assignment',
-        messageTemplate: 'You have been assigned to job #{{jobNumber}} on {{formatDate jobDate "short"}}',
+        messageTemplate:
+          'You have been assigned to job #{{jobNumber}} on {{formatDate jobDate "short"}}',
         emailSubjectTemplate: 'New Job Assignment - #{{jobNumber}}',
         emailBodyTemplate: `
           <h2>New Job Assignment</h2>
@@ -178,14 +202,16 @@ export class NotificationTemplateService implements OnModuleInit {
           </ul>
           <p>Please review the job details in the app.</p>
         `,
-        smsTemplate: 'New job assigned: #{{jobNumber}} on {{formatDate jobDate "short"}}. Location: {{jobAddress}}',
+        smsTemplate:
+          'New job assigned: #{{jobNumber}} on {{formatDate jobDate "short"}}. Location: {{jobAddress}}',
         defaultChannels: { inApp: true, email: true, sms: false, push: true },
         defaultPriority: 'high',
       },
       {
         type: 'shift_reminder',
         titleTemplate: 'Shift Reminder',
-        messageTemplate: 'Your shift starts in {{reminderMinutes}} minutes at {{shiftLocation}}',
+        messageTemplate:
+          'Your shift starts in {{reminderMinutes}} minutes at {{shiftLocation}}',
         emailSubjectTemplate: 'Shift Reminder - {{formatDate shiftStart}}',
         emailBodyTemplate: `
           <h2>Shift Reminder</h2>
@@ -197,7 +223,8 @@ export class NotificationTemplateService implements OnModuleInit {
             <li><strong>Duration:</strong> {{shiftDuration}} hours</li>
           </ul>
         `,
-        smsTemplate: 'Shift reminder: Your shift starts in {{reminderMinutes}} minutes at {{shiftLocation}}',
+        smsTemplate:
+          'Shift reminder: Your shift starts in {{reminderMinutes}} minutes at {{shiftLocation}}',
         defaultChannels: { inApp: true, email: false, sms: true, push: true },
         defaultPriority: 'high',
       },
@@ -217,14 +244,16 @@ export class NotificationTemplateService implements OnModuleInit {
             <li><strong>Message:</strong> {{inquiryMessage}}</li>
           </ul>
         `,
-        smsTemplate: 'New inquiry from {{customerName}}. Check your dashboard for details.',
+        smsTemplate:
+          'New inquiry from {{customerName}}. Check your dashboard for details.',
         defaultChannels: { inApp: true, email: true, sms: false, push: true },
         defaultPriority: 'normal',
       },
       {
         type: 'quote_request',
         titleTemplate: 'New Quote Request',
-        messageTemplate: 'Quote request from {{customerName}} for {{serviceType}}',
+        messageTemplate:
+          'Quote request from {{customerName}} for {{serviceType}}',
         emailSubjectTemplate: 'New Quote Request - {{customerName}}',
         emailBodyTemplate: `
           <h2>New Quote Request</h2>
@@ -261,7 +290,8 @@ export class NotificationTemplateService implements OnModuleInit {
       {
         type: 'payment_received',
         titleTemplate: 'Payment Received',
-        messageTemplate: 'Payment of {{formatCurrency amount}} received for job #{{jobNumber}}',
+        messageTemplate:
+          'Payment of {{formatCurrency amount}} received for job #{{jobNumber}}',
         emailSubjectTemplate: 'Payment Received - {{formatCurrency amount}}',
         emailBodyTemplate: `
           <h2>Payment Received</h2>
@@ -308,7 +338,8 @@ export class NotificationTemplateService implements OnModuleInit {
       {
         type: 'time_off_approved',
         titleTemplate: 'Time Off Approved',
-        messageTemplate: 'Your time off request from {{formatDate startDate "short"}} to {{formatDate endDate "short"}} has been approved',
+        messageTemplate:
+          'Your time off request from {{formatDate startDate "short"}} to {{formatDate endDate "short"}} has been approved',
         emailSubjectTemplate: 'Time Off Request Approved',
         emailBodyTemplate: `
           <h2>Time Off Request Approved</h2>
@@ -327,7 +358,8 @@ export class NotificationTemplateService implements OnModuleInit {
       {
         type: 'time_off_denied',
         titleTemplate: 'Time Off Request Denied',
-        messageTemplate: 'Your time off request from {{formatDate startDate "short"}} to {{formatDate endDate "short"}} has been denied',
+        messageTemplate:
+          'Your time off request from {{formatDate startDate "short"}} to {{formatDate endDate "short"}} has been denied',
         emailSubjectTemplate: 'Time Off Request Denied',
         emailBodyTemplate: `
           <h2>Time Off Request Denied</h2>
@@ -347,7 +379,8 @@ export class NotificationTemplateService implements OnModuleInit {
       {
         type: 'schedule_change',
         titleTemplate: 'Schedule Change',
-        messageTemplate: 'Your schedule has been updated for {{formatDate scheduleDate "short"}}',
+        messageTemplate:
+          'Your schedule has been updated for {{formatDate scheduleDate "short"}}',
         emailSubjectTemplate: 'Schedule Change - {{formatDate scheduleDate}}',
         emailBodyTemplate: `
           <h2>Schedule Change</h2>
@@ -360,7 +393,8 @@ export class NotificationTemplateService implements OnModuleInit {
             <li><strong>Notes:</strong> {{changeNotes}}</li>
           </ul>
         `,
-        smsTemplate: 'Schedule change: {{formatDate scheduleDate "short"}} - {{newTime}}. Check app for details.',
+        smsTemplate:
+          'Schedule change: {{formatDate scheduleDate "short"}} - {{newTime}}. Check app for details.',
         defaultChannels: { inApp: true, email: true, sms: true, push: true },
         defaultPriority: 'high',
       },
@@ -385,6 +419,8 @@ export class NotificationTemplateService implements OnModuleInit {
     ];
 
     await this.templateModel.insertMany(defaultTemplates);
-    this.logger.log(`Seeded ${defaultTemplates.length} default notification templates`);
+    this.logger.log(
+      `Seeded ${defaultTemplates.length} default notification templates`,
+    );
   }
 }

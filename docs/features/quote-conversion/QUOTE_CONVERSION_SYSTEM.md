@@ -13,6 +13,7 @@ The Quote History & Conversion Tracking system provides comprehensive analytics 
 **Purpose**: Track complete quote lifecycle with detailed interaction history.
 
 **Key Features**:
+
 - Multi-version quote tracking
 - Customer interaction logging (viewed, downloaded, questioned)
 - Sales activity tracking (calls, emails, meetings)
@@ -21,6 +22,7 @@ The Quote History & Conversion Tracking system provides comprehensive analytics 
 - Timeline metrics (days to decision, days to first view)
 
 **Schema** (`schemas/quote-history.schema.ts`):
+
 ```typescript
 QuoteHistory {
   quoteHistoryId: string (unique)
@@ -105,11 +107,13 @@ QuoteHistory {
 ```
 
 **Indexes**:
+
 - Primary: `quoteHistoryId`, `estimateId`
 - Single: `opportunityId`, `customerId`, `status`, `assignedSalesRep`
 - Compound: `(customerId, createdAt)`, `(assignedSalesRep, status)`, `(status, timeline.daysToDecision)`, `(timeline.quoteSentDate)`
 
 **API Endpoints**:
+
 ```
 POST   /api/quote-history                                    - Create quote version
 GET    /api/quote-history/:id                                - Get quote details
@@ -134,6 +138,7 @@ GET    /api/quote-history/analytics/avg-days-to-decision     - Average decision 
 **Purpose**: Track complete sales funnel with multi-touch attribution.
 
 **Key Features**:
+
 - Event-driven conversion tracking
 - Multi-touch attribution (first-touch, last-touch)
 - Funnel stage analysis
@@ -145,6 +150,7 @@ GET    /api/quote-history/analytics/avg-days-to-decision     - Average decision 
 **Schemas**:
 
 **ConversionEvent** (`schemas/conversion-event.schema.ts`):
+
 ```typescript
 ConversionEvent {
   eventId: string (unique)
@@ -179,6 +185,7 @@ ConversionEvent {
 ```
 
 **ConversionMetrics** (`schemas/conversion-metrics.schema.ts`):
+
 ```typescript
 ConversionMetrics {
   metricsId: string (unique)
@@ -251,6 +258,7 @@ ConversionMetrics {
 ```
 
 **API Endpoints**:
+
 ```
 POST   /api/conversion-tracking/track-event                  - Manual event tracking
 GET    /api/conversion-tracking/funnel                       - Conversion funnel data
@@ -270,6 +278,7 @@ GET    /api/conversion-tracking/dashboard                    - Combined dashboar
 **Automatic Event Tracking**: The system automatically tracks conversion events through event listeners.
 
 **Supported Events**:
+
 - `opportunity.created` → Tracks `OPPORTUNITY_CREATED`
 - `estimate.sent` → Tracks `QUOTE_SENT` + creates QuoteHistory record
 - `estimate.viewed` → Tracks `QUOTE_VIEWED` + updates QuoteHistory
@@ -281,6 +290,7 @@ GET    /api/conversion-tracking/dashboard                    - Combined dashboar
 - `lead.created` → Tracks `LEAD_CREATED` + first touchpoint
 
 **Integration Example**:
+
 ```typescript
 // In your jobs service/controller
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -309,6 +319,7 @@ async createJob(dto: CreateJobDto) {
 #### 4. Automated Metrics Calculation (`conversion-tracking.scheduler.ts`)
 
 **Cron Jobs**:
+
 - **Daily Metrics** (1:00 AM): Calculate previous day's conversion metrics
 - **Weekly Metrics** (2:00 AM Sunday): Calculate previous week's metrics
 - **Monthly Metrics** (3:00 AM 1st): Calculate previous month's metrics
@@ -323,12 +334,14 @@ async createJob(dto: CreateJobDto) {
 **File**: `apps/web/src/app/components/conversion/ConversionFunnel.tsx`
 
 **Features**:
+
 - Visual funnel showing: Leads → Opportunities → Quotes Sent → Quotes Accepted → Jobs Created
 - Conversion rates between each stage
 - Total values at each stage
 - Overall conversion summary
 
 **Props**:
+
 ```typescript
 {
   startDate?: string;  // ISO date string
@@ -337,10 +350,11 @@ async createJob(dto: CreateJobDto) {
 ```
 
 **Usage**:
+
 ```tsx
 import { ConversionFunnel } from '@/components/conversion';
 
-<ConversionFunnel startDate="2024-01-01" endDate="2024-01-31" />
+<ConversionFunnel startDate="2024-01-01" endDate="2024-01-31" />;
 ```
 
 #### 2. WinLossAnalysis Component
@@ -348,12 +362,14 @@ import { ConversionFunnel } from '@/components/conversion';
 **File**: `apps/web/src/app/components/conversion/WinLossAnalysis.tsx`
 
 **Features**:
+
 - Win/loss ratio summary cards
 - Pie charts showing win reasons and loss reasons
 - Detailed breakdown with counts and percentages
 - Recharts integration for interactive visualizations
 
 **Props**:
+
 ```typescript
 {
   startDate?: string;
@@ -362,10 +378,11 @@ import { ConversionFunnel } from '@/components/conversion';
 ```
 
 **Usage**:
+
 ```tsx
 import { WinLossAnalysis } from '@/components/conversion';
 
-<WinLossAnalysis startDate="2024-01-01" endDate="2024-01-31" />
+<WinLossAnalysis startDate="2024-01-01" endDate="2024-01-31" />;
 ```
 
 #### 3. SalesPerformance Component
@@ -373,6 +390,7 @@ import { WinLossAnalysis } from '@/components/conversion';
 **File**: `apps/web/src/app/components/conversion/SalesPerformance.tsx`
 
 **Features**:
+
 - Leaderboard with medal rankings
 - Revenue bar chart by sales rep
 - Performance metrics (quotes, jobs, win rate, revenue)
@@ -380,6 +398,7 @@ import { WinLossAnalysis } from '@/components/conversion';
 - Summary metrics (total revenue, quotes, jobs, avg win rate)
 
 **Props**:
+
 ```typescript
 {
   startDate?: string;
@@ -389,10 +408,11 @@ import { WinLossAnalysis } from '@/components/conversion';
 ```
 
 **Usage**:
+
 ```tsx
 import { SalesPerformance } from '@/components/conversion';
 
-<SalesPerformance startDate="2024-01-01" endDate="2024-01-31" limit={10} />
+<SalesPerformance startDate="2024-01-01" endDate="2024-01-31" limit={10} />;
 ```
 
 #### 4. QuoteHistoryDetail Component
@@ -400,6 +420,7 @@ import { SalesPerformance } from '@/components/conversion';
 **File**: `apps/web/src/app/components/conversion/QuoteHistoryDetail.tsx`
 
 **Features**:
+
 - Complete quote information display
 - Status badges and version tracking
 - Timeline visualization
@@ -409,6 +430,7 @@ import { SalesPerformance } from '@/components/conversion';
 - Competitor information
 
 **Props**:
+
 ```typescript
 {
   quoteHistoryId: string;
@@ -417,13 +439,14 @@ import { SalesPerformance } from '@/components/conversion';
 ```
 
 **Usage**:
+
 ```tsx
 import { QuoteHistoryDetail } from '@/components/conversion';
 
 <QuoteHistoryDetail
   quoteHistoryId="quote-history-uuid"
   onClose={() => setShowDetail(false)}
-/>
+/>;
 ```
 
 #### 5. QuoteTimeline Component (NEW)
@@ -431,6 +454,7 @@ import { QuoteHistoryDetail } from '@/components/conversion';
 **File**: `apps/web/src/app/components/conversion/QuoteTimeline.tsx`
 
 **Features**:
+
 - Chronological timeline of all quote events
 - Interactive event cards with icons
 - Customer engagement heatmap (last 30 days)
@@ -438,6 +462,7 @@ import { QuoteHistoryDetail } from '@/components/conversion';
 - Filterable by opportunity
 
 **Props**:
+
 ```typescript
 {
   opportunityId: string;
@@ -445,10 +470,11 @@ import { QuoteHistoryDetail } from '@/components/conversion';
 ```
 
 **Usage**:
+
 ```tsx
 import { QuoteTimeline } from '@/components/conversion';
 
-<QuoteTimeline opportunityId="opportunity-uuid" />
+<QuoteTimeline opportunityId="opportunity-uuid" />;
 ```
 
 ## Integration Guide
@@ -581,7 +607,7 @@ import {
   ConversionFunnel,
   WinLossAnalysis,
   SalesPerformance,
-  QuoteTimeline
+  QuoteTimeline,
 } from '@/components/conversion';
 
 export default function ConversionAnalyticsDashboard() {
@@ -601,12 +627,16 @@ export default function ConversionAnalyticsDashboard() {
         <input
           type="date"
           value={dateRange.startDate}
-          onChange={(e) => setDateRange({...dateRange, startDate: e.target.value})}
+          onChange={(e) =>
+            setDateRange({ ...dateRange, startDate: e.target.value })
+          }
         />
         <input
           type="date"
           value={dateRange.endDate}
-          onChange={(e) => setDateRange({...dateRange, endDate: e.target.value})}
+          onChange={(e) =>
+            setDateRange({ ...dateRange, endDate: e.target.value })
+          }
         />
       </div>
 
@@ -744,23 +774,19 @@ describe('QuoteHistoryService', () => {
 describe('Conversion Tracking Integration', () => {
   it('should track complete conversion flow', async () => {
     // Create opportunity
-    await request(app)
-      .post('/api/opportunities')
-      .send(opportunityData);
+    await request(app).post('/api/opportunities').send(opportunityData);
 
     // Send quote
-    await request(app)
-      .post('/api/estimates/send/est-123')
-      .send(quoteData);
+    await request(app).post('/api/estimates/send/est-123').send(quoteData);
 
     // Create job
-    await request(app)
-      .post('/api/jobs')
-      .send(jobData);
+    await request(app).post('/api/jobs').send(jobData);
 
     // Verify conversion events
-    const events = await conversionTrackingService
-      .getConversionFunnel(startDate, endDate);
+    const events = await conversionTrackingService.getConversionFunnel(
+      startDate,
+      endDate,
+    );
 
     expect(events.funnelStages[0].count).toBe(1); // Opportunities
     expect(events.funnelStages[1].count).toBe(1); // Quotes Sent
@@ -813,6 +839,7 @@ describe('Conversion Tracking Integration', () => {
 ## Support
 
 For questions or issues:
+
 - Review API logs: `apps/api/logs/`
 - Check cron job execution: Monitor `ConversionTrackingScheduler` logs
 - Database queries: Use MongoDB Compass to inspect collections

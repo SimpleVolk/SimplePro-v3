@@ -132,8 +132,7 @@ export class QuoteHistoryService {
           const sentDate = new Date(quote.timeline.quoteSentDate);
           const viewedDate = new Date(quote.timeline.firstViewedDate);
           quote.timeline.daysToFirstView = Math.ceil(
-            (viewedDate.getTime() - sentDate.getTime()) /
-              (1000 * 60 * 60 * 24),
+            (viewedDate.getTime() - sentDate.getTime()) / (1000 * 60 * 60 * 24),
           );
         }
       }
@@ -241,7 +240,7 @@ export class QuoteHistoryService {
       lessonsLearned: dto.lessonsLearned || '',
       followUpScheduled: dto.followUpScheduled
         ? new Date(dto.followUpScheduled)
-        : undefined as any,
+        : (undefined as any),
     };
 
     if (!quote.timeline.decisionDate) {
@@ -400,8 +399,7 @@ export class QuoteHistoryService {
       totalQuotes: quotes.length,
       quotesWon: wonQuotes.length,
       quotesLost: lostQuotes.length,
-      winRate:
-        quotes.length > 0 ? (wonQuotes.length / quotes.length) * 100 : 0,
+      winRate: quotes.length > 0 ? (wonQuotes.length / quotes.length) * 100 : 0,
       winReasons: Object.entries(winReasons).map(([reason, count]) => ({
         reason,
         count,

@@ -13,7 +13,7 @@ export class NotificationsResolver {
   constructor(
     private readonly notificationsService: NotificationsService,
     private readonly preferenceService: NotificationPreferenceService,
-    private readonly templateService: NotificationTemplateService
+    private readonly templateService: NotificationTemplateService,
   ) {}
 
   // Queries
@@ -23,10 +23,7 @@ export class NotificationsResolver {
   }
 
   @Query('notifications')
-  async getNotifications(
-    @Args('filters') filters: any,
-    @Request() req: any
-  ) {
+  async getNotifications(@Args('filters') filters: any, @Request() req: any) {
     const userId = req.user?.sub || req.user?.userId;
     return this.notificationsService.findAll(userId, filters);
   }
@@ -59,7 +56,7 @@ export class NotificationsResolver {
   @Mutation('markNotificationAsRead')
   async markAsRead(
     @Args('id') id: string,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<boolean> {
     const userId = req.user?.sub || req.user?.userId;
     await this.notificationsService.markAsRead(id, userId);
@@ -76,7 +73,7 @@ export class NotificationsResolver {
   @Mutation('deleteNotification')
   async deleteNotification(
     @Args('id') id: string,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<boolean> {
     const userId = req.user?.sub || req.user?.userId;
     await this.notificationsService.deleteNotification(id, userId);
@@ -86,7 +83,7 @@ export class NotificationsResolver {
   @Mutation('archiveNotification')
   async archiveNotification(
     @Args('id') id: string,
-    @Request() req: any
+    @Request() req: any,
   ): Promise<boolean> {
     const userId = req.user?.sub || req.user?.userId;
     await this.notificationsService.archiveNotification(id, userId);
@@ -94,10 +91,7 @@ export class NotificationsResolver {
   }
 
   @Mutation('updateNotificationPreferences')
-  async updatePreferences(
-    @Args('input') input: any,
-    @Request() req: any
-  ) {
+  async updatePreferences(@Args('input') input: any, @Request() req: any) {
     const userId = req.user?.sub || req.user?.userId;
     return this.preferenceService.updatePreferences(userId, input);
   }
@@ -110,10 +104,7 @@ export class NotificationsResolver {
 
   @Mutation('updateNotificationTemplate')
   @Roles('super_admin')
-  async updateTemplate(
-    @Args('type') type: string,
-    @Args('input') input: any
-  ) {
+  async updateTemplate(@Args('type') type: string, @Args('input') input: any) {
     return this.templateService.updateTemplate(type, input);
   }
 }

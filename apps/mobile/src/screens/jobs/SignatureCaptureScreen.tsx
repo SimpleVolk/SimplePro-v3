@@ -38,7 +38,7 @@ export const SignatureCaptureScreen = ({ route, navigation }: any) => {
           jobId,
           signatureData: signature,
           documentType: 'customer_signature',
-        })
+        }),
       ).unwrap();
 
       if (isOnline) {
@@ -57,7 +57,7 @@ export const SignatureCaptureScreen = ({ route, navigation }: any) => {
               text: 'OK',
               onPress: () => navigation.goBack(),
             },
-          ]
+          ],
         );
       }
     } catch (error: any) {

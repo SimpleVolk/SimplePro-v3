@@ -16,8 +16,8 @@ export default function DistanceRates() {
       id: '1',
       name: 'Distance Rates',
       type: 'by_weight',
-      description: 'Weight-based distance pricing'
-    }
+      description: 'Weight-based distance pricing',
+    },
   ]);
 
   const [showForm, setShowForm] = useState(false);
@@ -25,13 +25,13 @@ export default function DistanceRates() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'by_weight' as 'by_weight' | 'by_distance' | 'flat_rate',
-    description: ''
+    description: '',
   });
 
   const rateTypes = [
     { value: 'by_weight', label: 'By Weight' },
     { value: 'by_distance', label: 'By Distance' },
-    { value: 'flat_rate', label: 'Flat Rate' }
+    { value: 'flat_rate', label: 'Flat Rate' },
   ];
 
   const handleAddNew = () => {
@@ -45,15 +45,18 @@ export default function DistanceRates() {
     setFormData({
       name: rate.name,
       type: rate.type,
-      description: rate.description || ''
+      description: rate.description || '',
     });
     setShowForm(true);
   };
 
   const handleDelete = (id: string) => {
-    const rate = distanceRates.find(r => r.id === id);
-    if (rate && window.confirm(`Are you sure you want to delete "${rate.name}"?`)) {
-      setDistanceRates(distanceRates.filter(r => r.id !== id));
+    const rate = distanceRates.find((r) => r.id === id);
+    if (
+      rate &&
+      window.confirm(`Are you sure you want to delete "${rate.name}"?`)
+    ) {
+      setDistanceRates(distanceRates.filter((r) => r.id !== id));
     }
   };
 
@@ -62,16 +65,16 @@ export default function DistanceRates() {
 
     if (editingRate) {
       // Update existing rate
-      setDistanceRates(distanceRates.map(rate =>
-        rate.id === editingRate.id
-          ? { ...rate, ...formData }
-          : rate
-      ));
+      setDistanceRates(
+        distanceRates.map((rate) =>
+          rate.id === editingRate.id ? { ...rate, ...formData } : rate,
+        ),
+      );
     } else {
       // Add new rate
       const newRate: DistanceRate = {
         id: Date.now().toString(),
-        ...formData
+        ...formData,
       };
       setDistanceRates([...distanceRates, newRate]);
     }
@@ -88,7 +91,7 @@ export default function DistanceRates() {
   };
 
   const formatType = (type: string) => {
-    return rateTypes.find(t => t.value === type)?.label || type;
+    return rateTypes.find((t) => t.value === type)?.label || type;
   };
 
   return (
@@ -119,7 +122,9 @@ export default function DistanceRates() {
                     id="name"
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="e.g., Distance Rates"
                     required
                     className={styles.input}
@@ -131,14 +136,19 @@ export default function DistanceRates() {
                   <select
                     id="type"
                     value={formData.type}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      type: e.target.value as 'by_weight' | 'by_distance' | 'flat_rate'
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        type: e.target.value as
+                          | 'by_weight'
+                          | 'by_distance'
+                          | 'flat_rate',
+                      })
+                    }
                     className={styles.select}
                     required
                   >
-                    {rateTypes.map(type => (
+                    {rateTypes.map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
                       </option>
@@ -146,12 +156,17 @@ export default function DistanceRates() {
                   </select>
                 </div>
 
-                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <div
+                  className={styles.formGroup}
+                  style={{ gridColumn: '1 / -1' }}
+                >
                   <label htmlFor="description">Description (Optional)</label>
                   <textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Add a description for this rate configuration..."
                     className={styles.textarea}
                     rows={3}
@@ -160,7 +175,11 @@ export default function DistanceRates() {
               </div>
 
               <div className={styles.formActions}>
-                <button type="button" onClick={handleCancel} className={styles.cancelButton}>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className={styles.cancelButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.saveButton}>
@@ -196,7 +215,9 @@ export default function DistanceRates() {
                     <div className={styles.nameCell}>
                       <span className={styles.rateName}>{rate.name}</span>
                       {rate.description && (
-                        <span className={styles.rateDescription}>{rate.description}</span>
+                        <span className={styles.rateDescription}>
+                          {rate.description}
+                        </span>
                       )}
                     </div>
                   </td>
@@ -235,15 +256,24 @@ export default function DistanceRates() {
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
             <h5>By Weight</h5>
-            <p>Pricing based on total shipment weight and distance traveled. Common for long-distance moves.</p>
+            <p>
+              Pricing based on total shipment weight and distance traveled.
+              Common for long-distance moves.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>By Distance</h5>
-            <p>Flat rate per mile regardless of weight. Suitable for standardized pricing structures.</p>
+            <p>
+              Flat rate per mile regardless of weight. Suitable for standardized
+              pricing structures.
+            </p>
           </div>
           <div className={styles.infoCard}>
             <h5>Flat Rate</h5>
-            <p>Single fixed price for distance moves within specific ranges. Simple and predictable pricing.</p>
+            <p>
+              Single fixed price for distance moves within specific ranges.
+              Simple and predictable pricing.
+            </p>
           </div>
         </div>
       </div>

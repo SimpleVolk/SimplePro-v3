@@ -11,7 +11,10 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TariffStatus, PricingMethodType } from '../interfaces/tariff-settings.interface';
+import {
+  TariffStatus,
+  PricingMethodType,
+} from '../interfaces/tariff-settings.interface';
 
 /**
  * Nested DTOs for embedded objects

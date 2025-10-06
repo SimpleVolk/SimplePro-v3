@@ -40,7 +40,8 @@ export class NotificationTemplate {
   isActive!: boolean;
 }
 
-export const NotificationTemplateSchema = SchemaFactory.createForClass(NotificationTemplate);
+export const NotificationTemplateSchema =
+  SchemaFactory.createForClass(NotificationTemplate);
 
 // Ensure type is unique
 NotificationTemplateSchema.index({ type: 1 }, { unique: true });

@@ -10,7 +10,7 @@ export default {
   testMatch: [
     '<rootDir>/src/**/*.(test|spec).ts',
     '!<rootDir>/src/**/*.integration.spec.ts',
-    '!<rootDir>/test/**/*.integration.spec.ts'
+    '!<rootDir>/test/**/*.integration.spec.ts',
   ],
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -28,12 +28,13 @@ export default {
       branches: 75,
       functions: 80,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
   setupFilesAfterEnv: ['<rootDir>/test/test-setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@simplepro/pricing-engine$': '<rootDir>/../../packages/pricing-engine/src/index.ts'
+    '^@simplepro/pricing-engine$':
+      '<rootDir>/../../packages/pricing-engine/src/index.ts',
   },
 };

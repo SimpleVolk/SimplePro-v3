@@ -17,7 +17,9 @@ export function getApiUrl(endpoint?: string): string {
     baseUrl = process.env.NEXT_PUBLIC_API_URL;
   } else if (process.env.NODE_ENV === 'production') {
     // Default to localhost in development, production URL in production
-    baseUrl = process.env.NEXT_PUBLIC_PRODUCTION_API_URL || 'https://api.yourdomain.com';
+    baseUrl =
+      process.env.NEXT_PUBLIC_PRODUCTION_API_URL ||
+      'https://api.yourdomain.com';
   } else {
     // Development default
     baseUrl = 'http://localhost:3001';
@@ -30,7 +32,7 @@ export function getApiUrl(endpoint?: string): string {
     NODE_ENV: process.env.NODE_ENV,
     baseUrl,
     typeof_window: typeof window,
-    isClient: typeof window !== 'undefined'
+    isClient: typeof window !== 'undefined',
   });
 
   // If no endpoint provided, return base URL

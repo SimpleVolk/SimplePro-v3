@@ -63,7 +63,9 @@ export class CacheMetricsService {
 
       // Log if hit rate is below threshold
       if (stats.hitRate < 70 && stats.hits + stats.misses > 100) {
-        this.logger.warn(`Cache hit rate below target: ${stats.hitRate.toFixed(2)}% (target: 70%)`);
+        this.logger.warn(
+          `Cache hit rate below target: ${stats.hitRate.toFixed(2)}% (target: 70%)`,
+        );
       }
 
       // Log if errors are increasing
@@ -71,7 +73,9 @@ export class CacheMetricsService {
         this.logger.warn(`Cache errors detected: ${stats.errors}`);
       }
 
-      this.logger.debug(`Cache metrics updated: Hit rate ${stats.hitRate.toFixed(2)}%, Hits ${stats.hits}, Misses ${stats.misses}`);
+      this.logger.debug(
+        `Cache metrics updated: Hit rate ${stats.hitRate.toFixed(2)}%, Hits ${stats.hits}, Misses ${stats.misses}`,
+      );
     } catch (error) {
       this.logger.error('Failed to update cache metrics:', error);
     }
@@ -213,9 +217,10 @@ cache_set_latency_seconds ${(metrics.avgSetLatency / 1000).toFixed(6)}
     }
 
     // Check error rate
-    const errorRate = metrics.totalRequests > 0
-      ? (metrics.errors / metrics.totalRequests) * 100
-      : 0;
+    const errorRate =
+      metrics.totalRequests > 0
+        ? (metrics.errors / metrics.totalRequests) * 100
+        : 0;
 
     if (errorRate > 10) {
       status = 'unhealthy';

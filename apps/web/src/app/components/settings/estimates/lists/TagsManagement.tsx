@@ -20,11 +20,46 @@ export default function TagsManagement() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const [tags, setTags] = useState<Tag[]>([
-    { id: '1', name: 'VIP Customer', category: 'customer', color: '#f59e0b', usageCount: 15, active: true },
-    { id: '2', name: 'Fragile Items', category: 'inventory', color: '#ef4444', usageCount: 42, active: true },
-    { id: '3', name: 'Rush Job', category: 'job', color: '#ec4899', usageCount: 8, active: true },
-    { id: '4', name: 'High Value', category: 'estimate', color: '#8b5cf6', usageCount: 23, active: true },
-    { id: '5', name: 'Corporate Client', category: 'customer', color: '#3b82f6', usageCount: 31, active: true },
+    {
+      id: '1',
+      name: 'VIP Customer',
+      category: 'customer',
+      color: '#f59e0b',
+      usageCount: 15,
+      active: true,
+    },
+    {
+      id: '2',
+      name: 'Fragile Items',
+      category: 'inventory',
+      color: '#ef4444',
+      usageCount: 42,
+      active: true,
+    },
+    {
+      id: '3',
+      name: 'Rush Job',
+      category: 'job',
+      color: '#ec4899',
+      usageCount: 8,
+      active: true,
+    },
+    {
+      id: '4',
+      name: 'High Value',
+      category: 'estimate',
+      color: '#8b5cf6',
+      usageCount: 23,
+      active: true,
+    },
+    {
+      id: '5',
+      name: 'Corporate Client',
+      category: 'customer',
+      color: '#3b82f6',
+      usageCount: 31,
+      active: true,
+    },
   ]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -43,9 +78,9 @@ export default function TagsManagement() {
       const token = localStorage.getItem('access_token');
       const response = await fetch(getApiUrl('settings/tags'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -78,7 +113,7 @@ export default function TagsManagement() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ tags }),
       });
@@ -95,7 +130,9 @@ export default function TagsManagement() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving tags:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update settings');
+      setError(
+        err instanceof Error ? err.message : 'Failed to update settings',
+      );
     } finally {
       setSaving(false);
     }
@@ -130,9 +167,9 @@ export default function TagsManagement() {
 
   const handleUpdate = () => {
     if (editingId) {
-      setTags(tags.map(t =>
-        t.id === editingId ? { ...t, ...editForm } : t
-      ));
+      setTags(
+        tags.map((t) => (t.id === editingId ? { ...t, ...editForm } : t)),
+      );
       setEditingId(null);
       setEditForm({});
       setSuccess('Tag updated');
@@ -142,7 +179,7 @@ export default function TagsManagement() {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this tag?')) {
-      setTags(tags.filter(t => t.id !== id));
+      setTags(tags.filter((t) => t.id !== id));
       setSuccess('Tag deleted');
       setTimeout(() => setSuccess(null), 3000);
     }
@@ -153,7 +190,9 @@ export default function TagsManagement() {
       <div className={styles.header}>
         <div>
           <h2>Tags Management</h2>
-          <p>Create and manage tags for organizing customers, jobs, and estimates</p>
+          <p>
+            Create and manage tags for organizing customers, jobs, and estimates
+          </p>
         </div>
         <button
           className={styles.addButton}
@@ -187,7 +226,9 @@ export default function TagsManagement() {
                 id="name"
                 type="text"
                 value={editForm.name || ''}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 className={styles.input}
                 placeholder="e.g., Priority Customer"
               />
@@ -198,7 +239,9 @@ export default function TagsManagement() {
               <select
                 id="category"
                 value={editForm.category || ''}
-                onChange={(e) => setEditForm({ ...editForm, category: e.target.value as any })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, category: e.target.value as any })
+                }
                 className={styles.select}
               >
                 <option value="">Select category</option>
@@ -215,7 +258,9 @@ export default function TagsManagement() {
                 id="color"
                 type="color"
                 value={editForm.color || '#6b7280'}
-                onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, color: e.target.value })
+                }
                 className={styles.colorPicker}
               />
             </div>
@@ -240,12 +285,15 @@ export default function TagsManagement() {
             </tr>
           </thead>
           <tbody>
-            {tags.map(tag => (
+            {tags.map((tag) => (
               <tr key={tag.id}>
                 <td>
                   <span
                     className={styles.tagBadge}
-                    style={{ backgroundColor: tag.color + '20', color: tag.color }}
+                    style={{
+                      backgroundColor: tag.color + '20',
+                      color: tag.color,
+                    }}
                   >
                     {tag.name}
                   </span>
@@ -255,7 +303,9 @@ export default function TagsManagement() {
                     <input
                       type="text"
                       value={editForm.name || ''}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className={styles.input}
                     />
                   ) : (
@@ -266,7 +316,12 @@ export default function TagsManagement() {
                   {editingId === tag.id ? (
                     <select
                       value={editForm.category || ''}
-                      onChange={(e) => setEditForm({ ...editForm, category: e.target.value as any })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          category: e.target.value as any,
+                        })
+                      }
                       className={styles.select}
                     >
                       <option value="customer">Customer</option>
@@ -280,7 +335,11 @@ export default function TagsManagement() {
                 </td>
                 <td>{tag.usageCount}</td>
                 <td>
-                  <span className={tag.active ? styles.statusActive : styles.statusInactive}>
+                  <span
+                    className={
+                      tag.active ? styles.statusActive : styles.statusInactive
+                    }
+                  >
                     {tag.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -288,19 +347,38 @@ export default function TagsManagement() {
                   <div className={styles.actions}>
                     {editingId === tag.id ? (
                       <>
-                        <button className={styles.actionButton} onClick={handleUpdate} title="Save">
+                        <button
+                          className={styles.actionButton}
+                          onClick={handleUpdate}
+                          title="Save"
+                        >
                           💾
                         </button>
-                        <button className={styles.actionButton} onClick={() => { setEditingId(null); setEditForm({}); }} title="Cancel">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditForm({});
+                          }}
+                          title="Cancel"
+                        >
                           ✕
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className={styles.actionButton} onClick={() => handleEdit(tag)} title="Edit">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleEdit(tag)}
+                          title="Edit"
+                        >
                           ✏️
                         </button>
-                        <button className={styles.actionButton} onClick={() => handleDelete(tag.id)} title="Delete">
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(tag.id)}
+                          title="Delete"
+                        >
                           🗑️
                         </button>
                       </>
@@ -314,7 +392,11 @@ export default function TagsManagement() {
       </div>
 
       <div className={styles.formActions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save All Changes'}
         </button>
       </div>

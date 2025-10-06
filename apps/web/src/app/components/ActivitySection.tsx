@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect, memo, useCallback } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 import { getApiUrl } from '../../lib/config';
 import styles from './ActivitySection.module.css';
@@ -28,7 +36,7 @@ export const ActivitySection = memo(function ActivitySection() {
     leads: 0,
     quotesSent: 0,
     booked: 0,
-    cancellations: 0
+    cancellations: 0,
   });
   const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,8 +60,15 @@ export const ActivitySection = memo(function ActivitySection() {
 
       // Fetch activity metrics based on selected time period
       const [activityResponse, revenueResponse] = await Promise.all([
-        fetch(getApiUrl(`analytics/activity-metrics?period=${activeTab}`), { headers }),
-        fetch(getApiUrl(`analytics/revenue?startDate=${startDateISO}&endDate=${endDate}`), { headers })
+        fetch(getApiUrl(`analytics/activity-metrics?period=${activeTab}`), {
+          headers,
+        }),
+        fetch(
+          getApiUrl(
+            `analytics/revenue?startDate=${startDateISO}&endDate=${endDate}`,
+          ),
+          { headers },
+        ),
       ]);
 
       if (activityResponse.ok) {
@@ -68,7 +83,6 @@ export const ActivitySection = memo(function ActivitySection() {
         console.error('Revenue analytics error:', revenueResponse.status);
         setRevenueData([]);
       }
-
     } catch (error) {
       console.error('Failed to fetch activity data:', error);
       // Set fallback data
@@ -76,13 +90,15 @@ export const ActivitySection = memo(function ActivitySection() {
         leads: Math.floor(Math.random() * 20) + 5,
         quotesSent: Math.floor(Math.random() * 15) + 3,
         booked: Math.floor(Math.random() * 10) + 2,
-        cancellations: Math.floor(Math.random() * 3)
+        cancellations: Math.floor(Math.random() * 3),
       });
 
       const fallbackRevenue = Array.from({ length: 6 }, (_, i) => ({
-        month: new Date(2024, i + 6).toLocaleString('default', { month: 'short' }),
+        month: new Date(2024, i + 6).toLocaleString('default', {
+          month: 'short',
+        }),
         revenue: Math.floor(Math.random() * 50000) + 20000,
-        jobs: Math.floor(Math.random() * 40) + 10
+        jobs: Math.floor(Math.random() * 40) + 10,
       }));
       setRevenueData(fallbackRevenue);
     } finally {
@@ -190,11 +206,7 @@ export const ActivitySection = memo(function ActivitySection() {
                   margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                  <XAxis
-                    dataKey="month"
-                    stroke="#888"
-                    fontSize={12}
-                  />
+                  <XAxis dataKey="month" stroke="#888" fontSize={12} />
                   <YAxis
                     stroke="#888"
                     tickFormatter={(value) => `$${Math.round(value / 1000)}K`}
@@ -202,20 +214,17 @@ export const ActivitySection = memo(function ActivitySection() {
                   />
                   <Tooltip
                     formatter={(value, name) => {
-                      if (name === 'revenue') return [formatCurrency(Number(value)), 'Revenue'];
+                      if (name === 'revenue')
+                        return [formatCurrency(Number(value)), 'Revenue'];
                       return [value, name];
                     }}
                     contentStyle={{
                       backgroundColor: '#2d2d2d',
                       border: '1px solid #444',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
                     }}
                   />
-                  <Bar
-                    dataKey="revenue"
-                    fill="#4caf50"
-                    radius={[2, 2, 0, 0]}
-                  />
+                  <Bar dataKey="revenue" fill="#4caf50" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}

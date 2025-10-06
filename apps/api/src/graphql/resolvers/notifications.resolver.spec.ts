@@ -50,7 +50,8 @@ describe('NotificationsResolver', () => {
     }).compile();
 
     resolver = module.get<NotificationsResolver>(NotificationsResolver);
-    notificationsService = module.get<NotificationsService>(NotificationsService);
+    notificationsService =
+      module.get<NotificationsService>(NotificationsService);
   });
 
   it('should be defined', () => {
@@ -71,7 +72,10 @@ describe('NotificationsResolver', () => {
       const result = await resolver.getNotifications(filters, req);
 
       expect(result).toEqual(mockNotifications);
-      expect(notificationsService.findAll).toHaveBeenCalledWith('user-123', filters);
+      expect(notificationsService.findAll).toHaveBeenCalledWith(
+        'user-123',
+        filters,
+      );
     });
   });
 
@@ -85,7 +89,10 @@ describe('NotificationsResolver', () => {
       const result = await resolver.markAsRead(notificationId, req);
 
       expect(result).toBe(true);
-      expect(notificationsService.markAsRead).toHaveBeenCalledWith(notificationId, 'user-456');
+      expect(notificationsService.markAsRead).toHaveBeenCalledWith(
+        notificationId,
+        'user-456',
+      );
     });
   });
 
@@ -105,7 +112,9 @@ describe('NotificationsResolver', () => {
         ...input,
       };
 
-      mockPreferenceService.updatePreferences.mockResolvedValue(mockUpdatedPreferences);
+      mockPreferenceService.updatePreferences.mockResolvedValue(
+        mockUpdatedPreferences,
+      );
 
       const result = await resolver.updatePreferences(input, req);
 

@@ -26,8 +26,8 @@ const config = {
       branches: 70,
       functions: 75,
       lines: 75,
-      statements: 75
-    }
+      statements: 75,
+    },
   },
   testMatch: [
     '<rootDir>/src/**/*.(test|spec).{ts,tsx}',

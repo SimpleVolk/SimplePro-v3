@@ -1,33 +1,33 @@
 export const darkTheme = {
   // Primary brand colors
-  primary: '#0f172a',         // Dark blue-gray
-  primaryDark: '#020617',     // Darker blue-gray
-  secondary: '#3b82f6',       // Blue
-  accent: '#10b981',          // Green for success states
+  primary: '#0f172a', // Dark blue-gray
+  primaryDark: '#020617', // Darker blue-gray
+  secondary: '#3b82f6', // Blue
+  accent: '#10b981', // Green for success states
 
   // Background colors
-  background: '#1e293b',      // Main background
-  surface: '#334155',         // Card/surface background
-  surfaceLight: '#475569',    // Lighter surface
+  background: '#1e293b', // Main background
+  surface: '#334155', // Card/surface background
+  surfaceLight: '#475569', // Lighter surface
 
   // Text colors
-  textPrimary: '#f8fafc',     // Primary white text
-  textSecondary: '#cbd5e1',   // Secondary gray text
-  textMuted: '#94a3b8',       // Muted text
+  textPrimary: '#f8fafc', // Primary white text
+  textSecondary: '#cbd5e1', // Secondary gray text
+  textMuted: '#94a3b8', // Muted text
 
   // Status colors
-  success: '#10b981',         // Green
-  warning: '#f59e0b',         // Orange
-  error: '#ef4444',           // Red
-  info: '#3b82f6',            // Blue
+  success: '#10b981', // Green
+  warning: '#f59e0b', // Orange
+  error: '#ef4444', // Red
+  info: '#3b82f6', // Blue
 
   // Border and divider colors
   border: '#475569',
   divider: '#374151',
 
   // Interactive states
-  pressable: '#1e40af',       // Pressed state
-  disabled: '#6b7280',        // Disabled state
+  pressable: '#1e40af', // Pressed state
+  disabled: '#6b7280', // Disabled state
 
   // Overlay
   overlay: 'rgba(0, 0, 0, 0.5)',

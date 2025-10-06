@@ -23,7 +23,7 @@ export class TariffSettingsSeeder {
 
   constructor(
     @InjectModel(TariffSettings.name)
-    private readonly tariffModel: Model<TariffSettings>
+    private readonly tariffModel: Model<TariffSettings>,
   ) {}
 
   /**
@@ -43,7 +43,9 @@ export class TariffSettingsSeeder {
       const isValid = validateSeededTariff(tariff);
 
       if (!isValid) {
-        this.logger.warn('⚠️  Tariff validation failed - please review warnings');
+        this.logger.warn(
+          '⚠️  Tariff validation failed - please review warnings',
+        );
       }
 
       // Get and log statistics
@@ -183,7 +185,6 @@ export class TariffSettingsSeeder {
  * @returns Promise<boolean> - True if seeding was successful
  */
 export async function runTariffSeeder(mongoUri: string): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const mongoose = require('mongoose');
 
   try {

@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react';
 import { getApiUrl } from '../../../lib/config';
 import styles from './NotificationPreferences.module.css';
 
-type NotificationType = 'job_assigned' | 'shift_reminder' | 'customer_inquiry' | 'quote_request' | 'job_completed' | 'payment_received' | 'system_alert';
+type NotificationType =
+  | 'job_assigned'
+  | 'shift_reminder'
+  | 'customer_inquiry'
+  | 'quote_request'
+  | 'job_completed'
+  | 'payment_received'
+  | 'system_alert';
 type ChannelType = 'inApp' | 'email' | 'sms' | 'push';
 
 interface NotificationPreferences {
@@ -29,14 +36,46 @@ interface NotificationPreferences {
   updatedAt?: string;
 }
 
-const NOTIFICATION_TYPES: { type: NotificationType; label: string; description: string }[] = [
-  { type: 'job_assigned', label: 'Job Assigned', description: 'When a new job is assigned to you' },
-  { type: 'shift_reminder', label: 'Shift Reminder', description: 'Reminders about upcoming shifts' },
-  { type: 'customer_inquiry', label: 'Customer Inquiry', description: 'New customer messages or inquiries' },
-  { type: 'quote_request', label: 'Quote Request', description: 'New quote requests from customers' },
-  { type: 'job_completed', label: 'Job Completed', description: 'When a job is marked as completed' },
-  { type: 'payment_received', label: 'Payment Received', description: 'Payment confirmation notifications' },
-  { type: 'system_alert', label: 'System Alert', description: 'Important system notifications and alerts' },
+const NOTIFICATION_TYPES: {
+  type: NotificationType;
+  label: string;
+  description: string;
+}[] = [
+  {
+    type: 'job_assigned',
+    label: 'Job Assigned',
+    description: 'When a new job is assigned to you',
+  },
+  {
+    type: 'shift_reminder',
+    label: 'Shift Reminder',
+    description: 'Reminders about upcoming shifts',
+  },
+  {
+    type: 'customer_inquiry',
+    label: 'Customer Inquiry',
+    description: 'New customer messages or inquiries',
+  },
+  {
+    type: 'quote_request',
+    label: 'Quote Request',
+    description: 'New quote requests from customers',
+  },
+  {
+    type: 'job_completed',
+    label: 'Job Completed',
+    description: 'When a job is marked as completed',
+  },
+  {
+    type: 'payment_received',
+    label: 'Payment Received',
+    description: 'Payment confirmation notifications',
+  },
+  {
+    type: 'system_alert',
+    label: 'System Alert',
+    description: 'Important system notifications and alerts',
+  },
 ];
 
 const CHANNELS: { channel: ChannelType; label: string; icon: string }[] = [
@@ -69,7 +108,8 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
 };
 
 export function NotificationPreferences() {
-  const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_PREFERENCES);
+  const [preferences, setPreferences] =
+    useState<NotificationPreferences>(DEFAULT_PREFERENCES);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +130,7 @@ export function NotificationPreferences() {
 
         const response = await fetch(getApiUrl('notifications/preferences'), {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -106,7 +146,9 @@ export function NotificationPreferences() {
           throw new Error('Failed to fetch preferences');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load preferences');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load preferences',
+        );
         console.error('Error fetching preferences:', err);
       } finally {
         setLoading(false);
@@ -132,7 +174,7 @@ export function NotificationPreferences() {
       const response = await fetch(getApiUrl('notifications/preferences'), {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(preferences),
@@ -149,7 +191,9 @@ export function NotificationPreferences() {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save preferences');
+      setError(
+        err instanceof Error ? err.message : 'Failed to save preferences',
+      );
       console.error('Error saving preferences:', err);
     } finally {
       setSaving(false);
@@ -157,8 +201,11 @@ export function NotificationPreferences() {
   };
 
   // Toggle channel for notification type
-  const toggleChannel = (notificationType: NotificationType, channel: ChannelType) => {
-    setPreferences(prev => ({
+  const toggleChannel = (
+    notificationType: NotificationType,
+    channel: ChannelType,
+  ) => {
+    setPreferences((prev) => ({
       ...prev,
       channels: {
         ...prev.channels,
@@ -179,7 +226,7 @@ export function NotificationPreferences() {
       await fetch(getApiUrl('notifications/test'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -205,16 +252,10 @@ export function NotificationPreferences() {
         <p className={styles.subtitle}>Manage how you receive notifications</p>
       </div>
 
-      {error && (
-        <div className={styles.error}>
-          {error}
-        </div>
-      )}
+      {error && <div className={styles.error}>{error}</div>}
 
       {success && (
-        <div className={styles.success}>
-          Preferences saved successfully!
-        </div>
+        <div className={styles.success}>Preferences saved successfully!</div>
       )}
 
       <div className={styles.section}>
@@ -238,7 +279,9 @@ export function NotificationPreferences() {
             <div key={type} className={styles.tableRow}>
               <div className={styles.notificationTypeCell}>
                 <div className={styles.notificationTypeLabel}>{label}</div>
-                <div className={styles.notificationTypeDescription}>{description}</div>
+                <div className={styles.notificationTypeDescription}>
+                  {description}
+                </div>
               </div>
               {CHANNELS.map(({ channel }) => (
                 <div key={channel} className={styles.tableCell}>
@@ -268,10 +311,12 @@ export function NotificationPreferences() {
             <input
               type="checkbox"
               checked={preferences.quietHours.enabled}
-              onChange={(e) => setPreferences(prev => ({
-                ...prev,
-                quietHours: { ...prev.quietHours, enabled: e.target.checked },
-              }))}
+              onChange={(e) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  quietHours: { ...prev.quietHours, enabled: e.target.checked },
+                }))
+              }
               className={styles.checkbox}
             />
             <span>Enable Quiet Hours</span>
@@ -284,10 +329,15 @@ export function NotificationPreferences() {
                 <input
                   type="time"
                   value={preferences.quietHours.startTime}
-                  onChange={(e) => setPreferences(prev => ({
-                    ...prev,
-                    quietHours: { ...prev.quietHours, startTime: e.target.value },
-                  }))}
+                  onChange={(e) =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      quietHours: {
+                        ...prev.quietHours,
+                        startTime: e.target.value,
+                      },
+                    }))
+                  }
                   className={styles.input}
                 />
               </div>
@@ -296,10 +346,15 @@ export function NotificationPreferences() {
                 <input
                   type="time"
                   value={preferences.quietHours.endTime}
-                  onChange={(e) => setPreferences(prev => ({
-                    ...prev,
-                    quietHours: { ...prev.quietHours, endTime: e.target.value },
-                  }))}
+                  onChange={(e) =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      quietHours: {
+                        ...prev.quietHours,
+                        endTime: e.target.value,
+                      },
+                    }))
+                  }
                   className={styles.input}
                 />
               </div>
@@ -319,10 +374,15 @@ export function NotificationPreferences() {
             <input
               type="checkbox"
               checked={preferences.digestSettings.enabled}
-              onChange={(e) => setPreferences(prev => ({
-                ...prev,
-                digestSettings: { ...prev.digestSettings, enabled: e.target.checked },
-              }))}
+              onChange={(e) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  digestSettings: {
+                    ...prev.digestSettings,
+                    enabled: e.target.checked,
+                  },
+                }))
+              }
               className={styles.checkbox}
             />
             <span>Enable Digest Mode</span>
@@ -336,11 +396,18 @@ export function NotificationPreferences() {
                     type="radio"
                     name="frequency"
                     value="immediate"
-                    checked={preferences.digestSettings.frequency === 'immediate'}
-                    onChange={(e) => setPreferences(prev => ({
-                      ...prev,
-                      digestSettings: { ...prev.digestSettings, frequency: e.target.value as 'immediate' },
-                    }))}
+                    checked={
+                      preferences.digestSettings.frequency === 'immediate'
+                    }
+                    onChange={(e) =>
+                      setPreferences((prev) => ({
+                        ...prev,
+                        digestSettings: {
+                          ...prev.digestSettings,
+                          frequency: e.target.value as 'immediate',
+                        },
+                      }))
+                    }
                     className={styles.radio}
                   />
                   <span>Immediate (No digest)</span>
@@ -351,10 +418,15 @@ export function NotificationPreferences() {
                     name="frequency"
                     value="hourly"
                     checked={preferences.digestSettings.frequency === 'hourly'}
-                    onChange={(e) => setPreferences(prev => ({
-                      ...prev,
-                      digestSettings: { ...prev.digestSettings, frequency: e.target.value as 'hourly' },
-                    }))}
+                    onChange={(e) =>
+                      setPreferences((prev) => ({
+                        ...prev,
+                        digestSettings: {
+                          ...prev.digestSettings,
+                          frequency: e.target.value as 'hourly',
+                        },
+                      }))
+                    }
                     className={styles.radio}
                   />
                   <span>Hourly</span>
@@ -365,10 +437,15 @@ export function NotificationPreferences() {
                     name="frequency"
                     value="daily"
                     checked={preferences.digestSettings.frequency === 'daily'}
-                    onChange={(e) => setPreferences(prev => ({
-                      ...prev,
-                      digestSettings: { ...prev.digestSettings, frequency: e.target.value as 'daily' },
-                    }))}
+                    onChange={(e) =>
+                      setPreferences((prev) => ({
+                        ...prev,
+                        digestSettings: {
+                          ...prev.digestSettings,
+                          frequency: e.target.value as 'daily',
+                        },
+                      }))
+                    }
                     className={styles.radio}
                   />
                   <span>Daily</span>
@@ -381,10 +458,15 @@ export function NotificationPreferences() {
                   <input
                     type="time"
                     value={preferences.digestSettings.time || '09:00'}
-                    onChange={(e) => setPreferences(prev => ({
-                      ...prev,
-                      digestSettings: { ...prev.digestSettings, time: e.target.value },
-                    }))}
+                    onChange={(e) =>
+                      setPreferences((prev) => ({
+                        ...prev,
+                        digestSettings: {
+                          ...prev.digestSettings,
+                          time: e.target.value,
+                        },
+                      }))
+                    }
                     className={styles.input}
                   />
                 </div>

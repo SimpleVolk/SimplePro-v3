@@ -56,7 +56,7 @@ export function DocumentUpload({
       const files = Array.from(e.dataTransfer.files);
       handleFiles(files);
     },
-    [tags, description, documentType, entityType, entityId]
+    [tags, description, documentType, entityType, entityId],
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,8 +108,10 @@ export function DocumentUpload({
 
         setUploads((prev) =>
           prev.map((u) =>
-            u.fileId === fileId ? { ...u, progress: 100, status: 'success' } : u
-          )
+            u.fileId === fileId
+              ? { ...u, progress: 100, status: 'success' }
+              : u,
+          ),
         );
       } catch (error) {
         console.error('Upload error:', error);
@@ -117,8 +119,8 @@ export function DocumentUpload({
           prev.map((u) =>
             u.fileId === fileId
               ? { ...u, status: 'error', error: 'Upload failed' }
-              : u
-          )
+              : u,
+          ),
         );
       }
     }
@@ -147,7 +149,10 @@ export function DocumentUpload({
     formData.append('documentType', documentType);
 
     if (tags) {
-      const tagArray = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      const tagArray = tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
       formData.append('tags', JSON.stringify(tagArray));
     }
 
@@ -170,7 +175,7 @@ export function DocumentUpload({
         if (e.lengthComputable) {
           const progress = Math.round((e.loaded / e.total) * 100);
           setUploads((prev) =>
-            prev.map((u) => (u.fileId === fileId ? { ...u, progress } : u))
+            prev.map((u) => (u.fileId === fileId ? { ...u, progress } : u)),
           );
         }
       });
@@ -305,8 +310,8 @@ export function DocumentUpload({
                         upload.status === 'success'
                           ? styles.progressSuccess
                           : upload.status === 'error'
-                          ? styles.progressError
-                          : ''
+                            ? styles.progressError
+                            : ''
                       }`}
                       style={{ width: `${upload.progress}%` }}
                     />

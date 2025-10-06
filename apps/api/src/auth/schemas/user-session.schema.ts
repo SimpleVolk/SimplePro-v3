@@ -58,6 +58,9 @@ UserSessionSchema.index({ userId: 1, isActive: 1 });
 UserSessionSchema.index({ userId: 1, refreshToken: 1, isActive: 1 });
 
 // SECURITY ENHANCEMENT: Additional indexes for race condition protection
-UserSessionSchema.index({ refreshToken: 1, isActive: 1 }, { unique: true, sparse: true });
+UserSessionSchema.index(
+  { refreshToken: 1, isActive: 1 },
+  { unique: true, sparse: true },
+);
 UserSessionSchema.index({ userId: 1, lastTokenRefreshAt: -1 });
 UserSessionSchema.index({ revokedAt: 1 }, { sparse: true });

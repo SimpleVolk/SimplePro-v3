@@ -36,6 +36,7 @@ For SimplePro-v3, we use **Environment Secrets** to maintain separate configurat
 ### Staging Environment
 
 #### Database & Cache
+
 ```
 MONGODB_URI                          # MongoDB connection string
 REDIS_HOST                           # Redis hostname
@@ -44,6 +45,7 @@ REDIS_PASSWORD                       # Redis password (32+ characters)
 ```
 
 #### Authentication
+
 ```
 JWT_SECRET                           # JWT access token secret (64+ characters)
 JWT_REFRESH_SECRET                   # JWT refresh token secret (64+ characters)
@@ -51,6 +53,7 @@ SESSION_SECRET                       # Session cookie secret (64+ characters)
 ```
 
 #### Storage (S3/MinIO)
+
 ```
 STORAGE_ENDPOINT                     # S3/MinIO endpoint
 STORAGE_ACCESS_KEY                   # S3/MinIO access key
@@ -60,6 +63,7 @@ STORAGE_REGION                       # AWS region (for S3)
 ```
 
 #### Email (SMTP)
+
 ```
 SMTP_HOST                            # SMTP server hostname
 SMTP_PORT                            # SMTP port (587 or 465)
@@ -69,6 +73,7 @@ SMTP_FROM_EMAIL                      # From email address
 ```
 
 #### SMS (Twilio) - Optional
+
 ```
 TWILIO_ACCOUNT_SID                   # Twilio account SID
 TWILIO_AUTH_TOKEN                    # Twilio auth token
@@ -76,6 +81,7 @@ TWILIO_PHONE_NUMBER                  # Twilio phone number (E.164 format)
 ```
 
 #### Push Notifications (Firebase) - Optional
+
 ```
 FIREBASE_PROJECT_ID                  # Firebase project ID
 FIREBASE_PRIVATE_KEY                 # Firebase service account private key
@@ -83,6 +89,7 @@ FIREBASE_CLIENT_EMAIL                # Firebase service account email
 ```
 
 #### Monitoring & Logging - Optional
+
 ```
 DATADOG_API_KEY                      # Datadog API key
 CLOUDWATCH_LOG_GROUP                 # AWS CloudWatch log group
@@ -90,6 +97,7 @@ APM_API_KEY                          # APM service API key
 ```
 
 #### Third-Party Integrations - Optional
+
 ```
 GOOGLE_MAPS_API_KEY                  # Google Maps API key
 STRIPE_SECRET_KEY                    # Stripe secret key (test mode)
@@ -154,6 +162,7 @@ If not already created:
    - `production`
 
 For production, configure **protection rules**:
+
 - Required reviewers (at least 1-2 people)
 - Wait timer (optional)
 - Deployment branches (limit to `main` or `production` branch)
@@ -166,6 +175,7 @@ For production, configure **protection rules**:
 4. Click **Add secret** for each required secret:
 
 **Example - Adding MongoDB URI:**
+
 ```
 Name: MONGODB_URI
 Value: mongodb+srv://staging_user:STRONG_PASSWORD@cluster.mongodb.net/simplepro_staging?retryWrites=true&w=majority
@@ -180,6 +190,7 @@ Value: mongodb+srv://staging_user:STRONG_PASSWORD@cluster.mongodb.net/simplepro_
 3. Use **production values** (different from staging)
 
 **Example - Production MongoDB URI:**
+
 ```
 Name: MONGODB_URI
 Value: mongodb+srv://prod_user:DIFFERENT_STRONG_PASSWORD@cluster.mongodb.net/simplepro_prod?retryWrites=true&w=majority
@@ -215,7 +226,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production  # This references the environment
+    environment: production # This references the environment
 
     steps:
       - uses: actions/checkout@v3
@@ -326,22 +337,24 @@ echo "⚠ Remember to rotate JWT_REFRESH_SECRET separately"
 
 ### 2. Secret Strength Requirements
 
-| Secret Type | Minimum Length | Requirements |
-|------------|----------------|--------------|
-| JWT Secrets | 64 characters | Base64, cryptographically random |
-| Database Passwords | 32 characters | Alphanumeric + special chars |
-| Redis Passwords | 32 characters | Alphanumeric + special chars |
-| Session Secrets | 64 characters | Base64, cryptographically random |
-| API Keys | Provider-specific | Use provider-generated keys |
+| Secret Type        | Minimum Length    | Requirements                     |
+| ------------------ | ----------------- | -------------------------------- |
+| JWT Secrets        | 64 characters     | Base64, cryptographically random |
+| Database Passwords | 32 characters     | Alphanumeric + special chars     |
+| Redis Passwords    | 32 characters     | Alphanumeric + special chars     |
+| Session Secrets    | 64 characters     | Base64, cryptographically random |
+| API Keys           | Provider-specific | Use provider-generated keys      |
 
 ### 3. Never Hardcode Secrets
 
 ❌ **Bad**:
+
 ```typescript
 const jwtSecret = 'my-secret-key';
 ```
 
 ✅ **Good**:
+
 ```typescript
 const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) {
@@ -352,6 +365,7 @@ if (!jwtSecret) {
 ### 4. Use Secret Scanning
 
 Enable GitHub's secret scanning:
+
 1. Go to **Settings** → **Code security and analysis**
 2. Enable **Secret scanning**
 3. Enable **Push protection**
@@ -359,6 +373,7 @@ Enable GitHub's secret scanning:
 ### 5. Audit Secret Access
 
 Regularly review who has access:
+
 1. **Settings** → **Secrets and variables** → **Actions**
 2. Check environment protection rules
 3. Review audit logs for secret access
@@ -366,6 +381,7 @@ Regularly review who has access:
 ### 6. Use Secret Management Services
 
 For production, consider using:
+
 - **AWS Secrets Manager**
 - **HashiCorp Vault**
 - **Azure Key Vault**
@@ -380,6 +396,7 @@ Then store only the credentials to access these services in GitHub Secrets.
 **Problem**: Workflow can't access secret
 
 **Solutions**:
+
 1. Verify secret name matches exactly (case-sensitive)
 2. Check environment name is correct in workflow
 3. Ensure workflow has `environment:` key set
@@ -390,6 +407,7 @@ Then store only the credentials to access these services in GitHub Secrets.
 **Problem**: Application fails to start with "invalid secret" error
 
 **Solutions**:
+
 1. Check secret value doesn't have trailing newlines or spaces
 2. For multiline secrets (like Firebase private key), ensure proper formatting
 3. Verify secret meets minimum length requirements
@@ -400,6 +418,7 @@ Then store only the credentials to access these services in GitHub Secrets.
 **Problem**: Can't view or edit production secrets
 
 **Solutions**:
+
 1. Verify you have admin access to repository
 2. Check if environment protection rules are blocking access
 3. Request access from repository owner
@@ -409,6 +428,7 @@ Then store only the credentials to access these services in GitHub Secrets.
 **Problem**: Rotating secrets causes application to fail
 
 **Solutions**:
+
 1. Use rolling deployment strategy
 2. Configure application to accept both old and new secrets temporarily
 3. Deploy new secret before removing old one from infrastructure
@@ -419,6 +439,7 @@ Then store only the credentials to access these services in GitHub Secrets.
 **Problem**: Secret values appear in workflow logs
 
 **Solutions**:
+
 1. Never echo secrets directly: `echo ${{ secrets.JWT_SECRET }}` ❌
 2. GitHub automatically masks secrets, but avoid logging them
 3. Use `::add-mask::` if you need to handle secrets in output

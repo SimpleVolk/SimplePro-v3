@@ -23,7 +23,7 @@ export function Cacheable(options: CacheableOptions = {}) {
   return function (
     target: any,
     propertyKey: string,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
   ) {
     const originalMethod = descriptor.value;
 
@@ -42,7 +42,7 @@ export function Cacheable(options: CacheableOptions = {}) {
         : generateDefaultCacheKey(
             options.keyPrefix || target.constructor.name,
             propertyKey,
-            args
+            args,
           );
 
       try {
@@ -82,7 +82,7 @@ export function Cacheable(options: CacheableOptions = {}) {
 function generateDefaultCacheKey(
   prefix: string,
   methodName: string,
-  args: any[]
+  args: any[],
 ): string {
   const argsKey = args.length > 0 ? ':' + JSON.stringify(args) : '';
   return `${prefix}:${methodName}${argsKey}`;

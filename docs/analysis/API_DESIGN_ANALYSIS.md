@@ -14,6 +14,7 @@
 SimplePro-v3 demonstrates a **production-ready, enterprise-grade API architecture** with excellent security practices, comprehensive validation, and consistent patterns. The API successfully balances RESTful design principles with GraphQL capabilities, providing flexible access patterns for different client needs.
 
 **Key Strengths:**
+
 - ✅ Comprehensive security (JWT, RBAC, rate limiting, NoSQL injection protection)
 - ✅ Consistent response formats with standardized error handling
 - ✅ Well-structured DTOs with thorough validation (class-validator)
@@ -24,6 +25,7 @@ SimplePro-v3 demonstrates a **production-ready, enterprise-grade API architectur
 - ✅ Multi-tier rate limiting (10/sec, 50/10sec, 200/min, 5/min auth)
 
 **Key Areas for Improvement:**
+
 - ⚠️ API versioning strategy not implemented (no `/v1` prefix)
 - ⚠️ GraphQL API only 50% complete (resolvers exist, subscriptions not implemented)
 - ⚠️ Inconsistent HTTP status codes in some controllers
@@ -38,6 +40,7 @@ SimplePro-v3 demonstrates a **production-ready, enterprise-grade API architectur
 ### 1.1 RESTful Principles Adherence: 8/10
 
 **Strengths:**
+
 - ✅ **Resource-Based URLs**: Clean hierarchical structure (`/api/customers/:id`, `/api/jobs/:id/crew`)
 - ✅ **HTTP Method Semantics**: Proper use of GET (read), POST (create), PATCH (partial update), DELETE (remove)
 - ✅ **Stateless Design**: JWT-based authentication, no server-side sessions
@@ -46,14 +49,15 @@ SimplePro-v3 demonstrates a **production-ready, enterprise-grade API architectur
 
 **Issues Identified:**
 
-| Issue | Severity | Location | Recommendation |
-|-------|----------|----------|----------------|
-| No API versioning | Medium | `main.ts:96` | Add `/api/v1` prefix for future-proofing |
-| DELETE returns 204 but some return 200 | Low | `customers.controller.ts:191`, `jobs.controller.ts:245` | Inconsistent - standardize on 204 for DELETE |
-| Missing PUT methods | Low | All controllers | Use PATCH (correct) but consider PUT for full replacement |
-| No conditional requests | Medium | All controllers | Add `ETag`/`If-None-Match` support for caching |
+| Issue                                  | Severity | Location                                                | Recommendation                                            |
+| -------------------------------------- | -------- | ------------------------------------------------------- | --------------------------------------------------------- |
+| No API versioning                      | Medium   | `main.ts:96`                                            | Add `/api/v1` prefix for future-proofing                  |
+| DELETE returns 204 but some return 200 | Low      | `customers.controller.ts:191`, `jobs.controller.ts:245` | Inconsistent - standardize on 204 for DELETE              |
+| Missing PUT methods                    | Low      | All controllers                                         | Use PATCH (correct) but consider PUT for full replacement |
+| No conditional requests                | Medium   | All controllers                                         | Add `ETag`/`If-None-Match` support for caching            |
 
 **Example - Proper REST Pattern:**
+
 ```typescript
 // customers.controller.ts:40-81
 @Post()
@@ -73,15 +77,16 @@ async create(@Body() createCustomerDto: CreateCustomerDto, @CurrentUser() user: 
 
 **Excellent Consistency:**
 
-| Resource | Endpoint Pattern | Score |
-|----------|-----------------|-------|
-| Customers | `/api/customers`, `/api/customers/:id`, `/api/customers/search/email/:email` | 9/10 |
-| Jobs | `/api/jobs`, `/api/jobs/:id`, `/api/jobs/:id/crew`, `/api/jobs/:id/status` | 9/10 |
-| Auth | `/api/auth/login`, `/api/auth/refresh`, `/api/auth/profile` | 10/10 |
-| Documents | `/api/documents/upload`, `/api/documents/:id/download`, `/api/documents/shared/:token` | 9/10 |
-| Analytics | `/api/analytics/dashboard`, `/api/analytics/revenue`, `/api/analytics/reports` | 8/10 |
+| Resource  | Endpoint Pattern                                                                       | Score |
+| --------- | -------------------------------------------------------------------------------------- | ----- |
+| Customers | `/api/customers`, `/api/customers/:id`, `/api/customers/search/email/:email`           | 9/10  |
+| Jobs      | `/api/jobs`, `/api/jobs/:id`, `/api/jobs/:id/crew`, `/api/jobs/:id/status`             | 9/10  |
+| Auth      | `/api/auth/login`, `/api/auth/refresh`, `/api/auth/profile`                            | 10/10 |
+| Documents | `/api/documents/upload`, `/api/documents/:id/download`, `/api/documents/shared/:token` | 9/10  |
+| Analytics | `/api/analytics/dashboard`, `/api/analytics/revenue`, `/api/analytics/reports`         | 8/10  |
 
 **Best Practices Observed:**
+
 - ✅ Plural nouns for collections (`/customers`, `/jobs`)
 - ✅ Nested resources for relationships (`/jobs/:id/crew`)
 - ✅ Action-oriented sub-resources for operations (`/jobs/:id/status`)
@@ -101,15 +106,16 @@ async create(@Body() createCustomerDto: CreateCustomerDto, @CurrentUser() user: 
 
 **Excellent Implementation:**
 
-| Method | Usage | Example | Correctness |
-|--------|-------|---------|-------------|
-| GET | Read operations | `GET /api/customers/:id` | ✅ Correct |
-| POST | Create resources | `POST /api/customers` | ✅ Correct |
-| PATCH | Partial updates | `PATCH /api/customers/:id` | ✅ Correct |
-| DELETE | Remove resources | `DELETE /api/customers/:id` | ✅ Correct |
-| PUT | Full replacement | Not used | ⚠️ Missing but acceptable |
+| Method | Usage            | Example                     | Correctness               |
+| ------ | ---------------- | --------------------------- | ------------------------- |
+| GET    | Read operations  | `GET /api/customers/:id`    | ✅ Correct                |
+| POST   | Create resources | `POST /api/customers`       | ✅ Correct                |
+| PATCH  | Partial updates  | `PATCH /api/customers/:id`  | ✅ Correct                |
+| DELETE | Remove resources | `DELETE /api/customers/:id` | ✅ Correct                |
+| PUT    | Full replacement | Not used                    | ⚠️ Missing but acceptable |
 
 **Advanced Patterns:**
+
 ```typescript
 // jobs.controller.ts:199-238
 @Patch(':id/status')  // ✅ PATCH for partial update (status only)
@@ -132,15 +138,18 @@ export class CustomerQueryFiltersDto extends QueryFiltersDto {
   @IsEnum(['lead', 'prospect', 'active', 'inactive'])
   status?: 'lead' | 'prospect' | 'active' | 'inactive';
 
-  @Transform(({ value }) => value.replace(/[^\w\s,.-]/g, ''))  // ✅ NoSQL injection protection
+  @Transform(({ value }) => value.replace(/[^\w\s,.-]/g, '')) // ✅ NoSQL injection protection
   tags?: string;
 
-  @Type(() => Number) @Min(0) @Max(100)
+  @Type(() => Number)
+  @Min(0)
+  @Max(100)
   leadScoreMin?: number;
 }
 ```
 
 **Features:**
+
 - ✅ Type-safe validation with class-validator
 - ✅ Automatic transformation (@Transform)
 - ✅ NoSQL injection protection (sanitization)
@@ -149,6 +158,7 @@ export class CustomerQueryFiltersDto extends QueryFiltersDto {
 - ✅ Sorting support (sortBy, sortOrder)
 
 **Example Usage:**
+
 ```
 GET /api/customers?status=active&type=residential&page=1&limit=20&sortBy=createdAt&sortOrder=desc
 GET /api/jobs?status=in_progress&scheduledAfter=2025-10-01&scheduledBefore=2025-10-31
@@ -158,18 +168,18 @@ GET /api/jobs?status=in_progress&scheduledAfter=2025-10-01&scheduledBefore=2025-
 
 **Comprehensive Coverage:**
 
-| Status Code | Usage | Example |
-|-------------|-------|---------|
-| 200 OK | Successful GET/PATCH/POST (non-creation) | `auth.controller.ts:42` |
-| 201 Created | Successful POST (resource creation) | `customers.controller.ts:41` |
-| 204 No Content | Successful DELETE | `customers.controller.ts:191` |
-| 400 Bad Request | Validation failures | `GlobalExceptionFilter.ts:78` |
-| 401 Unauthorized | Authentication required | `GlobalExceptionFilter.ts:79` |
-| 403 Forbidden | Insufficient permissions | `GlobalExceptionFilter.ts:80` |
-| 404 Not Found | Resource not found | `GlobalExceptionFilter.ts:81` |
-| 409 Conflict | Duplicate resource | `GlobalExceptionFilter.ts:83` |
-| 429 Too Many Requests | Rate limit exceeded | `GlobalExceptionFilter.ts:87` |
-| 500 Internal Server Error | Server errors | `GlobalExceptionFilter.ts:88` |
+| Status Code               | Usage                                    | Example                       |
+| ------------------------- | ---------------------------------------- | ----------------------------- |
+| 200 OK                    | Successful GET/PATCH/POST (non-creation) | `auth.controller.ts:42`       |
+| 201 Created               | Successful POST (resource creation)      | `customers.controller.ts:41`  |
+| 204 No Content            | Successful DELETE                        | `customers.controller.ts:191` |
+| 400 Bad Request           | Validation failures                      | `GlobalExceptionFilter.ts:78` |
+| 401 Unauthorized          | Authentication required                  | `GlobalExceptionFilter.ts:79` |
+| 403 Forbidden             | Insufficient permissions                 | `GlobalExceptionFilter.ts:80` |
+| 404 Not Found             | Resource not found                       | `GlobalExceptionFilter.ts:81` |
+| 409 Conflict              | Duplicate resource                       | `GlobalExceptionFilter.ts:83` |
+| 429 Too Many Requests     | Rate limit exceeded                      | `GlobalExceptionFilter.ts:87` |
+| 500 Internal Server Error | Server errors                            | `GlobalExceptionFilter.ts:88` |
 
 **Inconsistencies:**
 
@@ -195,19 +205,20 @@ type Customer {
   id: ID!
   firstName: String!
   lastName: String!
-  fullName: String         # ✅ Computed field via resolver
+  fullName: String # ✅ Computed field via resolver
   email: String!
   phone: String!
   type: CustomerType!
   status: CustomerStatus!
   tags: [String!]
-  jobs: [Job!]            # ✅ Relationship via field resolver
+  jobs: [Job!] # ✅ Relationship via field resolver
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 ```
 
 **Strengths:**
+
 - ✅ Well-defined custom scalars (`DateTime`, `JSON`)
 - ✅ Comprehensive enums (JobType, JobStatus, CustomerStatus)
 - ✅ Proper nullable vs non-nullable types
@@ -216,11 +227,12 @@ type Customer {
 - ✅ Input types for mutations (CreateJobInput, UpdateJobInput)
 
 **Advanced Features:**
+
 ```graphql
 # schema.graphql:301-311
 type JobConnection {
   edges: [JobEdge!]!
-  pageInfo: PageInfo!      # ✅ Relay pagination standard
+  pageInfo: PageInfo! # ✅ Relay pagination standard
   totalCount: Int!
 }
 
@@ -255,19 +267,20 @@ async getAssignedCrewDetails(@Parent() job: Job) {
 ```
 
 **Issues:**
+
 - ⚠️ DataLoaders implemented but not all resolvers use them consistently
 - ⚠️ No caching strategy for DataLoaders
 - ⚠️ Subscriptions defined in schema but not implemented
 
 **Missing Resolvers:**
 
-| Schema Definition | Resolver Status | Location |
-|------------------|----------------|----------|
-| `analytics` query | ❌ Not implemented | N/A |
-| `jobStats` query | ❌ Not implemented | N/A |
-| `crewMember` query | ❌ Not implemented | N/A |
-| `jobUpdated` subscription | ❌ Not implemented | N/A |
-| `jobStatusChanged` subscription | ❌ Not implemented | N/A |
+| Schema Definition               | Resolver Status    | Location |
+| ------------------------------- | ------------------ | -------- |
+| `analytics` query               | ❌ Not implemented | N/A      |
+| `jobStats` query                | ❌ Not implemented | N/A      |
+| `crewMember` query              | ❌ Not implemented | N/A      |
+| `jobUpdated` subscription       | ❌ Not implemented | N/A      |
+| `jobStatusChanged` subscription | ❌ Not implemented | N/A      |
 
 ### 2.3 Query Complexity: 6/10
 
@@ -287,12 +300,14 @@ async getCustomers(
 ```
 
 **Recommendations:**
+
 1. Implement query complexity analysis
 2. Add depth limiting (max 5-7 levels)
 3. Use proper database pagination instead of in-memory slicing
 4. Add query cost estimation
 
 **Example Configuration Needed:**
+
 ```typescript
 GraphQLModule.forRoot({
   validationRules: [depthLimit(7)],
@@ -301,26 +316,28 @@ GraphQLModule.forRoot({
       maximumComplexity: 1000,
       estimators: [
         fieldExtensionsEstimator(),
-        simpleEstimator({ defaultComplexity: 1 })
-      ]
-    })
-  ]
-})
+        simpleEstimator({ defaultComplexity: 1 }),
+      ],
+    }),
+  ],
+});
 ```
 
 ### 2.4 Error Handling in GraphQL: 7/10
 
 **Current Implementation:**
+
 - ✅ Uses NestJS exception filters (inherited from REST)
 - ✅ Throws standard exceptions (NotFoundException, BadRequestException)
 - ⚠️ No GraphQL-specific error codes
 - ⚠️ No custom error extensions
 
 **Recommendation:**
+
 ```typescript
 throw new ApolloError('Customer not found', 'CUSTOMER_NOT_FOUND', {
   customerId: id,
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString(),
 });
 ```
 
@@ -335,7 +352,9 @@ throw new ApolloError('Customer not found', 'CUSTOMER_NOT_FOUND', {
 ```typescript
 // customers/interfaces/customer.interface.ts
 export class CreateCustomerDto {
-  @IsString() @IsNotEmpty() @MaxLength(50)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(50)
   @Transform(({ value }) => value?.trim())
   firstName: string;
 
@@ -349,16 +368,22 @@ export class CreateCustomerDto {
   @IsEnum(['lead', 'prospect', 'active', 'inactive'])
   status: 'lead' | 'prospect' | 'active' | 'inactive';
 
-  @IsOptional() @IsArray() @ArrayMaxSize(20)
-  @Transform(({ value }) => Array.isArray(value) ? value.map(t => t.trim()) : [])
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map((t) => t.trim()) : [],
+  )
   tags?: string[];
 
-  @ValidateNested() @Type(() => AddressDto)
+  @ValidateNested()
+  @Type(() => AddressDto)
   address: AddressDto;
 }
 ```
 
 **Features:**
+
 - ✅ Comprehensive validation decorators
 - ✅ Automatic transformation (trim, toLowerCase)
 - ✅ Nested validation (@ValidateNested)
@@ -367,6 +392,7 @@ export class CreateCustomerDto {
 - ✅ Security sanitization (NoSQL injection prevention)
 
 **NoSQL Injection Protection:**
+
 ```typescript
 // common/dto/query-filters.dto.ts:18-27
 @Transform(({ value }) => {
@@ -415,22 +441,23 @@ search?: string;
 
 **Consistency Across Controllers:**
 
-| Controller | Response Format | Consistent? |
-|-----------|----------------|-------------|
-| Auth | `{ success, data, message }` | ✅ Yes |
-| Customers | `{ success, customers, count, pagination }` | ✅ Yes |
-| Jobs | `{ success, jobs, count, pagination }` | ✅ Yes |
-| Analytics | `{ success, data }` | ✅ Yes |
-| Documents | `{ success, document, message }` | ✅ Yes |
-| Notifications | `{ success, data, count }` | ✅ Yes |
+| Controller    | Response Format                             | Consistent? |
+| ------------- | ------------------------------------------- | ----------- |
+| Auth          | `{ success, data, message }`                | ✅ Yes      |
+| Customers     | `{ success, customers, count, pagination }` | ✅ Yes      |
+| Jobs          | `{ success, jobs, count, pagination }`      | ✅ Yes      |
+| Analytics     | `{ success, data }`                         | ✅ Yes      |
+| Documents     | `{ success, document, message }`            | ✅ Yes      |
+| Notifications | `{ success, data, count }`                  | ✅ Yes      |
 
 **Minor Inconsistency:**
+
 ```typescript
 // customers.controller.ts:120
-return { success: true, customers: result.data, count, pagination };  // "customers" (plural)
+return { success: true, customers: result.data, count, pagination }; // "customers" (plural)
 
 // estimates.controller.ts:19
-return this.estimatesService.calculateEstimate(dto);  // No wrapper (inconsistent)
+return this.estimatesService.calculateEstimate(dto); // No wrapper (inconsistent)
 ```
 
 ### 3.3 Error Response Structure: 10/10
@@ -472,6 +499,7 @@ private createErrorResponse(errorInfo: any, request: Request, securityContext: S
 ```
 
 **Security Features:**
+
 - ✅ Sensitive error pattern detection (password, token, database connection)
 - ✅ Production-safe error messages
 - ✅ Request correlation IDs for debugging
@@ -480,6 +508,7 @@ private createErrorResponse(errorInfo: any, request: Request, securityContext: S
 - ✅ Stack trace sanitization in production
 
 **Error Type Coverage:**
+
 - ✅ HTTP Exceptions (NestJS)
 - ✅ MongoDB Errors (duplicate key, connection, validation)
 - ✅ JWT Errors (invalid token, expired token)
@@ -494,14 +523,21 @@ private createErrorResponse(errorInfo: any, request: Request, securityContext: S
 ```typescript
 // common/dto/pagination.dto.ts:4-21
 export class PaginationDto {
-  @IsOptional() @Type(() => Number) @IsInt() @Min(1)
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   page?: number = 1;
 
-  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100)
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   get skip(): number {
-    return (this.page - 1) * this.limit;  // ✅ Computed property
+    return (this.page - 1) * this.limit; // ✅ Computed property
   }
 }
 
@@ -511,7 +547,7 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     total: number;
-    totalPages: number;  // ✅ Computed on server
+    totalPages: number; // ✅ Computed on server
   };
 }
 ```
@@ -521,24 +557,30 @@ export interface PaginatedResponse<T> {
 ```typescript
 // graphql/resolvers/customers.resolver.ts:55-74
 const limit = first || 20;
-const startIndex = after ? customers.findIndex((c: any) => c.id === after) + 1 : 0;
+const startIndex = after
+  ? customers.findIndex((c: any) => c.id === after) + 1
+  : 0;
 const paginatedCustomers = customers.slice(startIndex, startIndex + limit);
 
 return {
-  edges: paginatedCustomers.map(customer => ({ node: customer, cursor: customer.id })),
+  edges: paginatedCustomers.map((customer) => ({
+    node: customer,
+    cursor: customer.id,
+  })),
   pageInfo: {
     hasNextPage: startIndex + limit < customers.length,
     hasPreviousPage: startIndex > 0,
     startCursor: edges[0]?.cursor,
-    endCursor: edges[edges.length - 1]?.cursor
+    endCursor: edges[edges.length - 1]?.cursor,
   },
-  totalCount: customers.length
+  totalCount: customers.length,
 };
 ```
 
 **Issue:** GraphQL cursor pagination implemented in-memory (inefficient for large datasets)
 
 **Recommendation:** Use MongoDB cursor-based pagination:
+
 ```typescript
 const cursor = after ? { _id: { $gt: new ObjectId(after) } } : {};
 const customers = await Customer.find(cursor).limit(limit + 1);
@@ -564,25 +606,31 @@ const config = new DocumentBuilder()
   .addTag('estimates', 'Estimate calculations')
   .addTag('jobs', 'Job management')
   .addTag('analytics', 'Analytics and reporting')
-  .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT-auth')
+  .addBearerAuth(
+    { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+    'JWT-auth',
+  )
   .addServer(`http://localhost:${port}/api`, 'Development server')
   .addServer('https://api.simplepro.com/api', 'Production server')
   .build();
 ```
 
 **Features:**
+
 - ✅ JWT authentication documented
 - ✅ Multiple servers configured
 - ✅ Tags for organization
 - ✅ DTO validation decorators auto-document parameters
 
 **Missing:**
+
 - ⚠️ No example requests/responses (`@ApiResponse`, `@ApiExample`)
 - ⚠️ No operation IDs (generated from method names only)
 - ⚠️ No API versioning information
 - ⚠️ Limited controller-level documentation (`@ApiTags` not consistently used)
 
 **Recommendation:**
+
 ```typescript
 @ApiTags('customers')
 @ApiOperation({ summary: 'Create new customer', description: 'Creates a customer record with full validation' })
@@ -605,43 +653,53 @@ async create(@Body() dto: CreateCustomerDto) { }
 # GraphQL Schema for SimplePro-v3 Moving Company Management System
 
 # Scalar Types
-scalar DateTime  # ISO 8601 datetime
-scalar JSON      # Arbitrary JSON data
-
+scalar DateTime # ISO 8601 datetime
+scalar JSON # Arbitrary JSON data
 # Enums with clear values
 enum CustomerStatus {
-  lead       # Initial contact, not qualified
-  prospect   # Qualified lead
-  active     # Paying customer
-  inactive   # Former customer
+  lead # Initial contact, not qualified
+  prospect # Qualified lead
+  active # Paying customer
+  inactive # Former customer
 }
 ```
 
 **Missing:**
+
 - ⚠️ Field-level descriptions
 - ⚠️ Deprecation notices
 - ⚠️ Usage examples
 
 **Recommendation:**
+
 ```graphql
 type Customer {
-  """Unique customer identifier (MongoDB ObjectId)"""
+  """
+  Unique customer identifier (MongoDB ObjectId)
+  """
   id: ID!
 
-  """Customer's email address (unique, lowercased)"""
+  """
+  Customer's email address (unique, lowercased)
+  """
   email: String!
 
-  """Lead score (0-100) - calculated from engagement metrics"""
+  """
+  Lead score (0-100) - calculated from engagement metrics
+  """
   leadScore: Float
 
-  """All jobs associated with this customer"""
+  """
+  All jobs associated with this customer
+  """
   jobs: [Job!]
 
   """
   Customer's last contact date
   @deprecated Use contactHistory field instead
   """
-  lastContactDate: DateTime @deprecated(reason: "Use contactHistory for full audit trail")
+  lastContactDate: DateTime
+    @deprecated(reason: "Use contactHistory for full audit trail")
 }
 ```
 
@@ -662,6 +720,7 @@ type Customer {
 ```
 
 **Security Features:**
+
 - ✅ bcrypt password hashing (12 rounds)
 - ✅ Access + refresh token pattern
 - ✅ Token rotation on refresh
@@ -670,6 +729,7 @@ type Customer {
 - ✅ Secure password storage (`.secrets/` directory, not logged)
 
 **Example:**
+
 ```typescript
 // auth.controller.ts:91-102
 @Public()
@@ -698,6 +758,7 @@ async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
 ```
 
 **Permission Model:**
+
 - ✅ Resource-based permissions (customers, jobs, estimates, users)
 - ✅ Action-based permissions (create, read, update, delete, assign)
 - ✅ Role-based shortcuts (@Roles decorator)
@@ -705,15 +766,16 @@ async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
 
 **Coverage:**
 
-| Endpoint | Auth Required | RBAC | Permission Check |
-|----------|--------------|------|-----------------|
-| `POST /api/customers` | ✅ Yes | ✅ Yes | ✅ `customers:create` |
-| `GET /api/customers/:id` | ✅ Yes | ✅ Yes | ✅ `customers:read` |
-| `POST /api/auth/login` | ⛔ Public | N/A | N/A |
-| `GET /api/health` | ⛔ Public | N/A | N/A |
-| `POST /api/jobs/:id/crew` | ✅ Yes | ✅ Yes | ✅ `jobs:assign` |
+| Endpoint                  | Auth Required | RBAC   | Permission Check      |
+| ------------------------- | ------------- | ------ | --------------------- |
+| `POST /api/customers`     | ✅ Yes        | ✅ Yes | ✅ `customers:create` |
+| `GET /api/customers/:id`  | ✅ Yes        | ✅ Yes | ✅ `customers:read`   |
+| `POST /api/auth/login`    | ⛔ Public     | N/A    | N/A                   |
+| `GET /api/health`         | ⛔ Public     | N/A    | N/A                   |
+| `POST /api/jobs/:id/crew` | ✅ Yes        | ✅ Yes | ✅ `jobs:assign`      |
 
 **Minor Issue:**
+
 ```typescript
 // estimates.controller.ts:14-17
 @RequirePermissions(
@@ -729,24 +791,25 @@ async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
 ```typescript
 // app.module.ts:50-71
 ThrottlerModule.forRoot([
-  { name: 'short', ttl: 1000, limit: 10 },      // 10 requests per second
-  { name: 'medium', ttl: 10000, limit: 50 },    // 50 requests per 10 seconds
-  { name: 'long', ttl: 60000, limit: 200 },     // 200 requests per minute
-  { name: 'auth', ttl: 60000, limit: 5 },       // 5 login attempts per minute
-])
+  { name: 'short', ttl: 1000, limit: 10 }, // 10 requests per second
+  { name: 'medium', ttl: 10000, limit: 50 }, // 50 requests per 10 seconds
+  { name: 'long', ttl: 60000, limit: 200 }, // 200 requests per minute
+  { name: 'auth', ttl: 60000, limit: 5 }, // 5 login attempts per minute
+]);
 ```
 
 **Endpoint-Specific Limits:**
 
-| Endpoint | Rate Limit | Justification |
-|----------|-----------|---------------|
-| `POST /api/auth/login` | 5/min | ✅ Brute-force protection |
-| `POST /api/customers` | 10/min | ✅ Prevent spam customer creation |
-| `GET /api/customers` | 30/min | ✅ Reasonable for list queries |
-| `GET /api/customers/:id` | 50/min | ✅ Higher for detail views |
-| `DELETE /api/customers/:id` | 5/min | ✅ Destructive operations limited |
+| Endpoint                    | Rate Limit | Justification                     |
+| --------------------------- | ---------- | --------------------------------- |
+| `POST /api/auth/login`      | 5/min      | ✅ Brute-force protection         |
+| `POST /api/customers`       | 10/min     | ✅ Prevent spam customer creation |
+| `GET /api/customers`        | 30/min     | ✅ Reasonable for list queries    |
+| `GET /api/customers/:id`    | 50/min     | ✅ Higher for detail views        |
+| `DELETE /api/customers/:id` | 5/min      | ✅ Destructive operations limited |
 
 **Example:**
+
 ```typescript
 // customers.controller.ts:40-43
 @Post()
@@ -763,14 +826,15 @@ async create(@Body() dto: CreateCustomerDto) { }
 // main.ts:63-81
 app.useGlobalPipes(
   new ValidationPipe({
-    whitelist: true,                  // ✅ Strip unknown properties
-    forbidNonWhitelisted: true,       // ✅ Reject unknown properties
-    transform: true,                  // ✅ Auto-transform to DTO types
-    disableErrorMessages: process.env.NODE_ENV === 'production',  // ✅ Security
-    exceptionFactory: (errors) => {   // ✅ Standardized error format
+    whitelist: true, // ✅ Strip unknown properties
+    forbidNonWhitelisted: true, // ✅ Reject unknown properties
+    transform: true, // ✅ Auto-transform to DTO types
+    disableErrorMessages: process.env.NODE_ENV === 'production', // ✅ Security
+    exceptionFactory: (errors) => {
+      // ✅ Standardized error format
       return new BadRequestException({
         message: 'Validation failed',
-        errors: errors.map(e => Object.values(e.constraints).join(', ')),
+        errors: errors.map((e) => Object.values(e.constraints).join(', ')),
         statusCode: 400,
       });
     },
@@ -785,9 +849,9 @@ app.useGlobalPipes(
 export function sanitizeMongoQuery(query: any): any {
   const sanitized: any = {};
   for (const [key, value] of Object.entries(query)) {
-    if (key.startsWith('$')) continue;  // ✅ Block MongoDB operators
+    if (key.startsWith('$')) continue; // ✅ Block MongoDB operators
     if (typeof value === 'string') {
-      sanitized[key] = value.replace(/[\$\{\}\[\]]/g, '');  // ✅ Remove special chars
+      sanitized[key] = value.replace(/[\$\{\}\[\]]/g, ''); // ✅ Remove special chars
     }
   }
   return sanitized;
@@ -795,6 +859,7 @@ export function sanitizeMongoQuery(query: any): any {
 ```
 
 **Features:**
+
 - ✅ Type validation (IsString, IsNumber, IsEmail, IsEnum)
 - ✅ Range validation (Min, Max, MinLength, MaxLength)
 - ✅ Format validation (IsEmail, IsMongoId, Matches regex)
@@ -809,31 +874,38 @@ export function sanitizeMongoQuery(query: any): any {
 
 ```typescript
 // main.ts:84-93
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? (process.env.ALLOWED_ORIGINS?.split(',') || [])
-  : ['http://localhost:3000', 'http://localhost:3009', 'http://localhost:3010'];
+const allowedOrigins =
+  process.env.NODE_ENV === 'production'
+    ? process.env.ALLOWED_ORIGINS?.split(',') || []
+    : [
+        'http://localhost:3000',
+        'http://localhost:3009',
+        'http://localhost:3010',
+      ];
 
 app.enableCors({
   origin: allowedOrigins,
-  credentials: true,  // ✅ Required for cookies/auth
+  credentials: true, // ✅ Required for cookies/auth
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 });
 ```
 
 **Issues:**
+
 - ⚠️ No `Access-Control-Max-Age` configured (preflight caching)
 - ⚠️ No `Access-Control-Expose-Headers` for custom headers
 
 **Recommendation:**
+
 ```typescript
 app.enableCors({
   origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-Request-Id', 'X-RateLimit-Remaining'],  // ADD
-  maxAge: 86400  // 24 hours preflight cache - ADD
+  exposedHeaders: ['X-Request-Id', 'X-RateLimit-Remaining'], // ADD
+  maxAge: 86400, // 24 hours preflight cache - ADD
 });
 ```
 
@@ -847,16 +919,18 @@ app.enableCors({
 
 ```typescript
 // main.ts:96
-app.setGlobalPrefix('api');  // ⚠️ No version prefix
+app.setGlobalPrefix('api'); // ⚠️ No version prefix
 ```
 
 **Current URLs:**
+
 ```
 GET /api/customers/:id
 POST /api/jobs
 ```
 
 **Should be:**
+
 ```
 GET /api/v1/customers/:id
 POST /api/v1/jobs
@@ -871,14 +945,16 @@ POST /api/v1/jobs
 app.setGlobalPrefix('api/v1');
 
 // For backward compatibility during migration:
-app.setGlobalPrefix('api', { exclude: [{ path: 'v1', method: RequestMethod.ALL }] });
+app.setGlobalPrefix('api', {
+  exclude: [{ path: 'v1', method: RequestMethod.ALL }],
+});
 
 // Version-specific controllers:
 @Controller('v1/customers')
-export class CustomersV1Controller { }
+export class CustomersV1Controller {}
 
 @Controller('v2/customers')
-export class CustomersV2Controller { }
+export class CustomersV2Controller {}
 ```
 
 **Deprecation Headers:**
@@ -924,14 +1000,14 @@ async findOne(@Param('id') id: string, @Res({ passthrough: true }) res: Response
 
 **Excellent Patterns:**
 
-| Pattern | Consistency | Example |
-|---------|------------|---------|
-| Response wrapper | ✅ 95% | `{ success, data, message }` |
-| Error format | ✅ 100% | GlobalExceptionFilter standardizes all |
-| Pagination | ✅ 100% | `PaginationDto` used everywhere |
-| Filtering | ✅ 100% | `QueryFiltersDto` base class |
-| Authentication | ✅ 100% | JWT + RBAC on all protected routes |
-| Audit logging | ✅ 100% | All sensitive operations logged |
+| Pattern          | Consistency | Example                                |
+| ---------------- | ----------- | -------------------------------------- |
+| Response wrapper | ✅ 95%      | `{ success, data, message }`           |
+| Error format     | ✅ 100%     | GlobalExceptionFilter standardizes all |
+| Pagination       | ✅ 100%     | `PaginationDto` used everywhere        |
+| Filtering        | ✅ 100%     | `QueryFiltersDto` base class           |
+| Authentication   | ✅ 100%     | JWT + RBAC on all protected routes     |
+| Audit logging    | ✅ 100%     | All sensitive operations logged        |
 
 **Minor Inconsistencies:**
 
@@ -947,13 +1023,21 @@ return this.analyticsService.getDashboardMetrics();  // No wrapper (different se
 ```
 
 **Recommendation:** Standardize on `data` key for all resources:
+
 ```typescript
-return { success: true, data: result.data, resourceType: 'customers', count, pagination };
+return {
+  success: true,
+  data: result.data,
+  resourceType: 'customers',
+  count,
+  pagination,
+};
 ```
 
 ### 7.2 API Predictability: 9/10
 
 **Strengths:**
+
 - ✅ Consistent URL patterns (`/api/{resource}`, `/api/{resource}/:id`)
 - ✅ Predictable CRUD operations (POST create, GET read, PATCH update, DELETE remove)
 - ✅ Standard error codes (400, 401, 403, 404, 409, 429, 500)
@@ -961,6 +1045,7 @@ return { success: true, data: result.data, resourceType: 'customers', count, pag
 - ✅ Uniform pagination (`page`, `limit`, `skip`)
 
 **Example - Predictable Pattern:**
+
 ```typescript
 // If this works for customers:
 GET /api/customers?status=active&page=1&limit=20
@@ -1007,6 +1092,7 @@ GET /api/jobs?status=in_progress&page=1&limit=20  // ✅ It does!
 ```
 
 **Features:**
+
 - ✅ Clear, actionable messages
 - ✅ Field-level validation errors
 - ✅ Request IDs for debugging
@@ -1016,11 +1102,13 @@ GET /api/jobs?status=in_progress&page=1&limit=20  // ✅ It does!
 ### 7.4 API Discoverability: 7/10
 
 **Swagger UI Available:**
+
 ```
 http://localhost:3001/api/docs
 ```
 
 **Missing:**
+
 - ⚠️ No API explorer homepage
 - ⚠️ No interactive examples in Swagger
 - ⚠️ No GraphQL Playground (could add)
@@ -1030,6 +1118,7 @@ http://localhost:3001/api/docs
 **Recommendation:**
 
 1. **Add HATEOAS Links:**
+
 ```typescript
 {
   "success": true,
@@ -1046,18 +1135,21 @@ http://localhost:3001/api/docs
 ```
 
 2. **Add GraphQL Playground:**
+
 ```typescript
 GraphQLModule.forRoot({
   playground: process.env.NODE_ENV !== 'production',
-  introspection: true
-})
+  introspection: true,
+});
 ```
 
 3. **Create API Changelog:**
+
 ```markdown
 # API Changelog
 
 ## 2025-10-02 - v1.0.0
+
 - Initial API release
 - 53+ REST endpoints
 - GraphQL API with 7 resolvers
@@ -1072,6 +1164,7 @@ GraphQLModule.forRoot({
 ### 8.1 Endpoint Response Optimization: 7/10
 
 **Good:**
+
 - ✅ MongoDB indexes on frequently queried fields
 - ✅ GraphQL DataLoader for N+1 prevention
 - ✅ Pagination to limit dataset size
@@ -1081,7 +1174,7 @@ GraphQLModule.forRoot({
 
 ```typescript
 // graphql/resolvers/customers.resolver.ts:42
-const result = await this.customersService.findAll(filters, 0, 1000);  // ⚠️ Fetches 1000 records
+const result = await this.customersService.findAll(filters, 0, 1000); // ⚠️ Fetches 1000 records
 const customers = result.data;
 // Then slices in-memory for pagination - inefficient!
 ```
@@ -1089,6 +1182,7 @@ const customers = result.data;
 **Recommendations:**
 
 1. **Database-Level Pagination:**
+
 ```typescript
 // Use MongoDB cursor-based pagination
 const customers = await Customer.find(filters)
@@ -1099,14 +1193,16 @@ const customers = await Customer.find(filters)
 ```
 
 2. **Field Projection:**
+
 ```typescript
 // Only fetch needed fields
 const customers = await Customer.find(filters)
-  .select('id firstName lastName email status')  // ✅ Reduce payload
+  .select('id firstName lastName email status') // ✅ Reduce payload
   .exec();
 ```
 
 3. **Add Caching:**
+
 ```typescript
 @UseInterceptors(CacheInterceptor)
 @CacheTTL(300)  // 5 minutes
@@ -1117,15 +1213,18 @@ async findOne(@Param('id') id: string) { }
 ### 8.2 Payload Optimization: 8/10
 
 **Good:**
+
 - ✅ Pagination limits response size
 - ✅ GraphQL allows field selection
 - ✅ Compression enabled (`main.ts:54`)
 
 **Issues:**
+
 - ⚠️ REST responses always return full objects (no sparse fieldsets)
 - ⚠️ No support for `?fields=firstName,lastName,email` query parameter
 
 **Recommendation:**
+
 ```typescript
 // Add field selection to DTOs
 export class FieldSelectionDto {
@@ -1148,6 +1247,7 @@ async findOne(@Param('id') id: string, @Query() selection: FieldSelectionDto) {
 **Missing:** No batch endpoints
 
 **Recommendation:**
+
 ```typescript
 // Add batch operations
 @Post('batch')
@@ -1167,6 +1267,7 @@ async updateBatch(@Body() dto: { updates: Array<{ id: string; data: UpdateCustom
 ### 8.4 Caching Strategy: 6/10
 
 **Current State:**
+
 - ✅ Redis module configured (`CacheModule`)
 - ⚠️ Not actively used in controllers
 - ⚠️ No cache headers in responses
@@ -1174,6 +1275,7 @@ async updateBatch(@Body() dto: { updates: Array<{ id: string; data: UpdateCustom
 **Recommendations:**
 
 1. **Add Cache-Control Headers:**
+
 ```typescript
 @Get(':id')
 async findOne(@Param('id') id: string, @Res({ passthrough: true }) res: Response) {
@@ -1185,6 +1287,7 @@ async findOne(@Param('id') id: string, @Res({ passthrough: true }) res: Response
 ```
 
 2. **Implement ETags:**
+
 ```typescript
 @Get(':id')
 async findOne(
@@ -1213,14 +1316,15 @@ async findOne(
 
 **Issues:**
 
-| Line | Issue | Severity | Recommendation |
-|------|-------|----------|----------------|
-| 42 | `@Post('login')` returns 200 | Low | Acceptable for login (common practice) |
-| 92 | `@Post('refresh')` returns 200 | Low | Should be 201 if creating new token, but 200 acceptable |
-| 146 | Profile update allows changing role/isActive | Medium | Prevent users from elevating own privileges |
-| 278 | User update doesn't validate role changes | Medium | Add authorization check for role changes |
+| Line | Issue                                        | Severity | Recommendation                                          |
+| ---- | -------------------------------------------- | -------- | ------------------------------------------------------- |
+| 42   | `@Post('login')` returns 200                 | Low      | Acceptable for login (common practice)                  |
+| 92   | `@Post('refresh')` returns 200               | Low      | Should be 201 if creating new token, but 200 acceptable |
+| 146  | Profile update allows changing role/isActive | Medium   | Prevent users from elevating own privileges             |
+| 278  | User update doesn't validate role changes    | Medium   | Add authorization check for role changes                |
 
 **Recommendation:**
+
 ```typescript
 @Patch('profile')
 async updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto) {
@@ -1236,13 +1340,14 @@ async updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto) {
 
 **Issues:**
 
-| Line | Issue | Severity | Recommendation |
-|------|-------|----------|----------------|
-| 87 | Query params parsed manually | Low | Use @Query(ValidationPipe) for all params |
-| 191 | DELETE returns 204 but method returns nothing | Low | Either return 204 or 200 with message |
-| 228 | `POST :id/estimates/:estimateId` - unusual pattern | Medium | Should be `PATCH :id` with estimateId in body |
+| Line | Issue                                              | Severity | Recommendation                                |
+| ---- | -------------------------------------------------- | -------- | --------------------------------------------- |
+| 87   | Query params parsed manually                       | Low      | Use @Query(ValidationPipe) for all params     |
+| 191  | DELETE returns 204 but method returns nothing      | Low      | Either return 204 or 200 with message         |
+| 228  | `POST :id/estimates/:estimateId` - unusual pattern | Medium   | Should be `PATCH :id` with estimateId in body |
 
 **Good Practices:**
+
 - ✅ Comprehensive filtering
 - ✅ Pagination on all list endpoints
 - ✅ Audit logging on all mutations
@@ -1252,13 +1357,14 @@ async updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto) {
 
 **Issues:**
 
-| Line | Issue | Severity | Recommendation |
-|------|-------|----------|----------------|
-| 135 | Manual date validation | Low | Use DTO with @IsDateString() |
-| 349 | Calendar endpoint uses path param for date | Medium | Use query param: `?startDate=2025-10-01` |
-| 362 | Manual loop for week schedule | Low | Move to service layer |
+| Line | Issue                                      | Severity | Recommendation                           |
+| ---- | ------------------------------------------ | -------- | ---------------------------------------- |
+| 135  | Manual date validation                     | Low      | Use DTO with @IsDateString()             |
+| 349  | Calendar endpoint uses path param for date | Medium   | Use query param: `?startDate=2025-10-01` |
+| 362  | Manual loop for week schedule              | Low      | Move to service layer                    |
 
 **Example Fix:**
+
 ```typescript
 // Instead of:
 @Get('calendar/week/:startDate')
@@ -1284,13 +1390,14 @@ class WeeklyScheduleDto {
 
 **Issues:**
 
-| Line | Issue | Severity | Recommendation |
-|------|-------|----------|----------------|
-| 36 | Manual period parsing in controller | Low | Create PeriodFilterDto |
-| 99 | Manual pagination calculation | Low | Use PaginationDto |
-| 156 | Enum validation for period string | Medium | Use @IsEnum decorator in DTO |
+| Line | Issue                               | Severity | Recommendation               |
+| ---- | ----------------------------------- | -------- | ---------------------------- |
+| 36   | Manual period parsing in controller | Low      | Create PeriodFilterDto       |
+| 99   | Manual pagination calculation       | Low      | Use PaginationDto            |
+| 156  | Enum validation for period string   | Medium   | Use @IsEnum decorator in DTO |
 
 **Good Practices:**
+
 - ✅ Role-based access control on all analytics endpoints
 - ✅ Comprehensive business metrics
 - ✅ Report generation endpoints
@@ -1299,13 +1406,14 @@ class WeeklyScheduleDto {
 
 **Issues:**
 
-| Line | Issue | Severity | Recommendation |
-|------|-------|----------|----------------|
-| 50 | Manual file validation | Medium | Use FileValidationPipe |
-| 104 | Entity type as string param | Medium | Use enum validation |
-| 179 | Public endpoint with weak password check | High | Implement proper token validation |
+| Line | Issue                                    | Severity | Recommendation                    |
+| ---- | ---------------------------------------- | -------- | --------------------------------- |
+| 50   | Manual file validation                   | Medium   | Use FileValidationPipe            |
+| 104  | Entity type as string param              | Medium   | Use enum validation               |
+| 179  | Public endpoint with weak password check | High     | Implement proper token validation |
 
 **Security Concern:**
+
 ```typescript
 // documents.controller.ts:178-193
 @Get('shared/:token')
@@ -1319,6 +1427,7 @@ async accessSharedDocument(
 ```
 
 **Recommendation:**
+
 ```typescript
 @Get('shared/:token')
 @Public()
@@ -1338,21 +1447,22 @@ async accessSharedDocument(
 
 **Issues:**
 
-| Line | Issue | Severity | Recommendation |
-|------|-------|----------|----------------|
-| 51 | userId from `req.user.sub` inconsistent | Low | Standardize user ID extraction |
-| 164 | Template endpoint returns placeholder | Medium | Implement or remove endpoint |
+| Line | Issue                                   | Severity | Recommendation                 |
+| ---- | --------------------------------------- | -------- | ------------------------------ |
+| 51   | userId from `req.user.sub` inconsistent | Low      | Standardize user ID extraction |
+| 164  | Template endpoint returns placeholder   | Medium   | Implement or remove endpoint   |
 
 **Inconsistency:**
+
 ```typescript
 // notifications.controller.ts:51
-const userId = req.user.sub;  // ⚠️ Uses 'sub'
+const userId = req.user.sub; // ⚠️ Uses 'sub'
 
 // documents.controller.ts:61
-const userId = req.user.userId;  // ⚠️ Uses 'userId'
+const userId = req.user.userId; // ⚠️ Uses 'userId'
 
 // customers.controller.ts:49
-const userId = user.id;  // ⚠️ Uses 'id' from @CurrentUser
+const userId = user.id; // ⚠️ Uses 'id' from @CurrentUser
 ```
 
 **Recommendation:** Standardize on `@CurrentUser()` decorator everywhere.
@@ -1365,39 +1475,40 @@ const userId = user.id;  // ⚠️ Uses 'id' from @CurrentUser
 
 **Implemented Resolvers:**
 
-| Resolver | Queries | Mutations | Field Resolvers | Completeness |
-|----------|---------|-----------|----------------|--------------|
-| customers | ✅ 3/3 | ✅ 3/4 | ✅ 2/2 | 89% |
-| jobs | ✅ 4/4 | ✅ 6/6 | ✅ 4/4 | 100% |
-| documents | ⚠️ 1/3 | ⚠️ 1/2 | ❌ 0/2 | 33% |
-| estimates | ⚠️ 1/2 | ❌ 0/1 | ❌ 0/1 | 33% |
-| analytics | ❌ 0/3 | N/A | N/A | 0% |
-| notifications | ⚠️ 1/3 | ⚠️ 2/4 | ❌ 0/1 | 38% |
-| opportunities | ⚠️ 2/4 | ⚠️ 2/3 | ❌ 0/2 | 44% |
+| Resolver      | Queries | Mutations | Field Resolvers | Completeness |
+| ------------- | ------- | --------- | --------------- | ------------ |
+| customers     | ✅ 3/3  | ✅ 3/4    | ✅ 2/2          | 89%          |
+| jobs          | ✅ 4/4  | ✅ 6/6    | ✅ 4/4          | 100%         |
+| documents     | ⚠️ 1/3  | ⚠️ 1/2    | ❌ 0/2          | 33%          |
+| estimates     | ⚠️ 1/2  | ❌ 0/1    | ❌ 0/1          | 33%          |
+| analytics     | ❌ 0/3  | N/A       | N/A             | 0%           |
+| notifications | ⚠️ 1/3  | ⚠️ 2/4    | ❌ 0/1          | 38%          |
+| opportunities | ⚠️ 2/4  | ⚠️ 2/3    | ❌ 0/2          | 44%          |
 
 **Missing Implementations:**
 
 ```graphql
 # Schema defines but not implemented:
 type Query {
-  analytics(startDate: DateTime, endDate: DateTime): Analytics!  # ❌ No resolver
-  jobStats: JobStats!                                             # ❌ No resolver
-  revenueMetrics(startDate: DateTime, endDate: DateTime): RevenueMetrics!  # ❌ No resolver
-  crewMember(id: ID!): CrewMember                                # ❌ No resolver
-  crewMembers(filters: JSON): [CrewMember!]!                     # ❌ No resolver
-  availableCrew(date: DateTime!): [CrewMember!]!                 # ❌ No resolver
+  analytics(startDate: DateTime, endDate: DateTime): Analytics! # ❌ No resolver
+  jobStats: JobStats! # ❌ No resolver
+  revenueMetrics(startDate: DateTime, endDate: DateTime): RevenueMetrics! # ❌ No resolver
+  crewMember(id: ID!): CrewMember # ❌ No resolver
+  crewMembers(filters: JSON): [CrewMember!]! # ❌ No resolver
+  availableCrew(date: DateTime!): [CrewMember!]! # ❌ No resolver
 }
 
 type Subscription {
-  jobUpdated(jobId: ID!): Job!                                    # ❌ No implementation
-  jobStatusChanged(jobId: ID!): Job!                              # ❌ No implementation
-  crewAssigned(crewMemberId: String!): Job!                       # ❌ No implementation
+  jobUpdated(jobId: ID!): Job! # ❌ No implementation
+  jobStatusChanged(jobId: ID!): Job! # ❌ No implementation
+  crewAssigned(crewMemberId: String!): Job! # ❌ No implementation
 }
 ```
 
 ### 10.2 DataLoader Usage: 7/10
 
 **Good:**
+
 ```typescript
 // jobs.resolver.ts:192-196
 @ResolveField('customer')
@@ -1407,11 +1518,13 @@ async getCustomer(@Parent() job: Job) {
 ```
 
 **Issues:**
+
 - ⚠️ DataLoaders not cached per request
 - ⚠️ No error handling in DataLoader callbacks
 - ⚠️ Not all resolvers use DataLoaders
 
 **Recommendation:**
+
 ```typescript
 // Add DataLoader caching per request
 @Module({
@@ -1437,6 +1550,7 @@ async getCustomer(@Parent() job: Job) {
 ### 10.3 GraphQL Subscriptions: Not Implemented ❌
 
 **Schema Defines:**
+
 ```graphql
 type Subscription {
   jobUpdated(jobId: ID!): Job!
@@ -1448,6 +1562,7 @@ type Subscription {
 **Status:** Schema exists but no resolver implementations
 
 **Recommendation:**
+
 ```typescript
 @Resolver('Subscription')
 export class JobSubscriptionResolver {
@@ -1479,19 +1594,20 @@ async updateStatus(jobId: string, status: string) {
 
 ### 11.2 Recommended Changes (Non-Breaking)
 
-| Change | Impact | Migration Path |
-|--------|--------|----------------|
-| Add `/api/v1` prefix | Low | Maintain `/api` as alias |
+| Change                    | Impact | Migration Path                              |
+| ------------------------- | ------ | ------------------------------------------- |
+| Add `/api/v1` prefix      | Low    | Maintain `/api` as alias                    |
 | Standardize response keys | Medium | Add `resourceType` field, keep current keys |
-| Add HATEOAS links | Low | Additive only (no removal) |
-| Improve GraphQL resolvers | Low | Complete missing resolvers |
-| Add batch endpoints | Low | New endpoints, no changes to existing |
+| Add HATEOAS links         | Low    | Additive only (no removal)                  |
+| Improve GraphQL resolvers | Low    | Complete missing resolvers                  |
+| Add batch endpoints       | Low    | New endpoints, no changes to existing       |
 
 ### 11.3 Future Breaking Changes (v2.0)
 
 **Potential v2.0 Changes:**
 
 1. **Response Format Standardization:**
+
 ```typescript
 // v1 (current)
 { success: true, customers: [...], count: 10 }
@@ -1506,17 +1622,19 @@ async updateStatus(jobId: string, status: string) {
 ```
 
 2. **Date Format Standardization:**
+
 ```typescript
 // v1 (current) - Mixed formats
-scheduledDate: "2025-10-01"  // Date string
-createdAt: "2025-10-01T12:00:00Z"  // DateTime string
+scheduledDate: '2025-10-01'; // Date string
+createdAt: '2025-10-01T12:00:00Z'; // DateTime string
 
 // v2 (proposed) - Always ISO 8601 DateTime
-scheduledDate: "2025-10-01T00:00:00Z"
-createdAt: "2025-10-01T12:00:00Z"
+scheduledDate: '2025-10-01T00:00:00Z';
+createdAt: '2025-10-01T12:00:00Z';
 ```
 
 3. **Error Code Standardization:**
+
 ```typescript
 // v2 - Add machine-readable error codes
 {
@@ -1621,6 +1739,7 @@ createdAt: "2025-10-01T12:00:00Z"
 SimplePro-v3's API demonstrates **exceptional engineering quality** with a comprehensive security model, consistent design patterns, and production-ready infrastructure. The API successfully serves as a robust foundation for a moving company management platform.
 
 **Major Achievements:**
+
 - ✅ Enterprise-grade security (JWT, RBAC, rate limiting, NoSQL protection)
 - ✅ Comprehensive input validation and error handling
 - ✅ Consistent RESTful design across 26 controllers
@@ -1629,6 +1748,7 @@ SimplePro-v3's API demonstrates **exceptional engineering quality** with a compr
 - ✅ Professional API documentation (Swagger)
 
 **Key Gaps:**
+
 - ⚠️ No API versioning strategy (critical for long-term maintenance)
 - ⚠️ GraphQL API 50% complete (missing analytics, crew, subscription resolvers)
 - ⚠️ Limited caching utilization (Redis configured but underutilized)
@@ -1639,16 +1759,16 @@ SimplePro-v3's API demonstrates **exceptional engineering quality** with a compr
 
 **API Design Score: 8.5/10**
 
-| Category | Score | Weight | Weighted Score |
-|----------|-------|--------|----------------|
-| REST Design | 8/10 | 25% | 2.00 |
-| GraphQL Design | 7/10 | 15% | 1.05 |
-| Security | 10/10 | 20% | 2.00 |
-| Documentation | 7/10 | 10% | 0.70 |
-| Developer Experience | 9/10 | 15% | 1.35 |
-| Performance | 7/10 | 10% | 0.70 |
-| Consistency | 9/10 | 5% | 0.45 |
-| **Total** | **8.5/10** | **100%** | **8.25** |
+| Category             | Score      | Weight   | Weighted Score |
+| -------------------- | ---------- | -------- | -------------- |
+| REST Design          | 8/10       | 25%      | 2.00           |
+| GraphQL Design       | 7/10       | 15%      | 1.05           |
+| Security             | 10/10      | 20%      | 2.00           |
+| Documentation        | 7/10       | 10%      | 0.70           |
+| Developer Experience | 9/10       | 15%      | 1.35           |
+| Performance          | 7/10       | 10%      | 0.70           |
+| Consistency          | 9/10       | 5%       | 0.45           |
+| **Total**            | **8.5/10** | **100%** | **8.25**       |
 
 **Recommendation:** The API is **production-ready** with the completion of critical security fixes (document sharing) and the addition of API versioning. The GraphQL API should be completed before marketing it as a feature.
 
@@ -1676,6 +1796,7 @@ SimplePro-v3's API demonstrates **exceptional engineering quality** with a compr
 **For API Consumers:**
 
 1. **Start Using Version Prefix:**
+
    ```typescript
    // Old (will be deprecated)
    GET /api/customers/:id
@@ -1685,6 +1806,7 @@ SimplePro-v3's API demonstrates **exceptional engineering quality** with a compr
    ```
 
 2. **Handle New Response Fields:**
+
    ```typescript
    // Responses may include additional metadata
    interface ApiResponse<T> {
@@ -1698,9 +1820,9 @@ SimplePro-v3's API demonstrates **exceptional engineering quality** with a compr
 3. **Monitor Deprecation Headers:**
    ```typescript
    // Check for deprecation warnings
-   response.headers['X-API-Deprecated']
-   response.headers['X-API-Sunset']
-   response.headers['Link']  // Successor version
+   response.headers['X-API-Deprecated'];
+   response.headers['X-API-Sunset'];
+   response.headers['Link']; // Successor version
    ```
 
 ---

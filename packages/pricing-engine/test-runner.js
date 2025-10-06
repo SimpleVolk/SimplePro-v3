@@ -8,7 +8,7 @@ async function runTests() {
   // First compile the TypeScript
   const tsc = spawn('npx', ['tsc'], {
     cwd: __dirname,
-    stdio: 'inherit'
+    stdio: 'inherit',
   });
 
   tsc.on('close', (code) => {
@@ -17,7 +17,11 @@ async function runTests() {
       console.log('🧪 Running basic functionality test...');
 
       // Run a basic test
-      const node = spawn('node', ['-e', `
+      const node = spawn(
+        'node',
+        [
+          '-e',
+          `
         const { DeterministicEstimator, defaultRules, sampleInputs } = require('./dist/index.js');
 
         try {
@@ -61,10 +65,13 @@ async function runTests() {
           console.error('❌ Test failed:', error.message);
           process.exit(1);
         }
-      `], {
-        cwd: __dirname,
-        stdio: 'inherit'
-      });
+      `,
+        ],
+        {
+          cwd: __dirname,
+          stdio: 'inherit',
+        },
+      );
 
       node.on('close', (testCode) => {
         if (testCode === 0) {

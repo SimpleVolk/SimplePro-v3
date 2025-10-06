@@ -10,6 +10,7 @@
 ## Executive Summary
 
 This document specifies a comprehensive security metrics dashboard for SimplePro-v3 that provides real-time visibility into:
+
 - Authentication attempts and failures
 - Rate limiting enforcement
 - WebSocket connection patterns
@@ -23,14 +24,14 @@ This document specifies a comprehensive security metrics dashboard for SimplePro
 
 ### 1.1 Key Metrics
 
-| Metric Category | Key Indicators | Alert Threshold |
-|----------------|----------------|-----------------|
-| **Authentication** | Login attempts, failures, success rate | > 100 failures/hour |
-| **Authorization** | Permission denials, role violations | > 50 denials/hour |
-| **Rate Limiting** | Rate limit hits, blocked requests | > 1000 hits/hour |
-| **WebSocket** | Connection attempts, rejections, active connections | > 500 rejections/hour |
-| **Document Access** | Share attempts, password failures | > 100 failures/hour |
-| **Input Validation** | Injection attempts, XSS attempts | > 10 attempts/hour |
+| Metric Category      | Key Indicators                                      | Alert Threshold       |
+| -------------------- | --------------------------------------------------- | --------------------- |
+| **Authentication**   | Login attempts, failures, success rate              | > 100 failures/hour   |
+| **Authorization**    | Permission denials, role violations                 | > 50 denials/hour     |
+| **Rate Limiting**    | Rate limit hits, blocked requests                   | > 1000 hits/hour      |
+| **WebSocket**        | Connection attempts, rejections, active connections | > 500 rejections/hour |
+| **Document Access**  | Share attempts, password failures                   | > 100 failures/hour   |
+| **Input Validation** | Injection attempts, XSS attempts                    | > 10 attempts/hour    |
 
 ### 1.2 Dashboard Sections
 
@@ -56,103 +57,104 @@ import { Counter, Gauge, Histogram } from 'prom-client';
 export const authenticationAttempts = new Counter({
   name: 'simplepro_auth_attempts_total',
   help: 'Total authentication attempts',
-  labelNames: ['method', 'result', 'username']
+  labelNames: ['method', 'result', 'username'],
 });
 
 export const authenticationFailures = new Counter({
   name: 'simplepro_auth_failures_total',
   help: 'Failed authentication attempts',
-  labelNames: ['reason', 'username', 'ip']
+  labelNames: ['reason', 'username', 'ip'],
 });
 
 export const activeTokens = new Gauge({
   name: 'simplepro_active_tokens',
   help: 'Number of active JWT tokens',
-  labelNames: ['type']  // access, refresh
+  labelNames: ['type'], // access, refresh
 });
 
 // Rate Limiting Metrics
 export const rateLimitHits = new Counter({
   name: 'simplepro_rate_limit_hits_total',
   help: 'Rate limit violations',
-  labelNames: ['endpoint', 'ip', 'type']
+  labelNames: ['endpoint', 'ip', 'type'],
 });
 
 export const rateLimitBlocked = new Counter({
   name: 'simplepro_rate_limit_blocked_total',
   help: 'Requests blocked by rate limiting',
-  labelNames: ['endpoint', 'ip']
+  labelNames: ['endpoint', 'ip'],
 });
 
 // WebSocket Metrics
 export const websocketConnections = new Gauge({
   name: 'simplepro_websocket_connections',
   help: 'Active WebSocket connections',
-  labelNames: ['user_id', 'ip']
+  labelNames: ['user_id', 'ip'],
 });
 
 export const websocketConnectionAttempts = new Counter({
   name: 'simplepro_websocket_connection_attempts_total',
   help: 'WebSocket connection attempts',
-  labelNames: ['result', 'ip']
+  labelNames: ['result', 'ip'],
 });
 
 export const websocketEvents = new Counter({
   name: 'simplepro_websocket_events_total',
   help: 'WebSocket events processed',
-  labelNames: ['event_type', 'user_id']
+  labelNames: ['event_type', 'user_id'],
 });
 
 export const websocketEventRateLimitHits = new Counter({
   name: 'simplepro_websocket_event_rate_limit_hits_total',
   help: 'WebSocket event rate limit violations',
-  labelNames: ['user_id', 'ip']
+  labelNames: ['user_id', 'ip'],
 });
 
 // Document Access Metrics
 export const documentShareAttempts = new Counter({
   name: 'simplepro_document_share_attempts_total',
   help: 'Document sharing access attempts',
-  labelNames: ['result', 'token', 'ip']
+  labelNames: ['result', 'token', 'ip'],
 });
 
 export const documentSharePasswordFailures = new Counter({
   name: 'simplepro_document_share_password_failures_total',
   help: 'Failed password attempts on shared documents',
-  labelNames: ['token', 'ip']
+  labelNames: ['token', 'ip'],
 });
 
 // Security Event Metrics
 export const securityEvents = new Counter({
   name: 'simplepro_security_events_total',
   help: 'Security events detected',
-  labelNames: ['severity', 'category', 'description']
+  labelNames: ['severity', 'category', 'description'],
 });
 
 export const injectionAttempts = new Counter({
   name: 'simplepro_injection_attempts_total',
   help: 'Injection attack attempts detected',
-  labelNames: ['type', 'ip', 'blocked']
+  labelNames: ['type', 'ip', 'blocked'],
 });
 
 // API Request Metrics
 export const apiRequests = new Counter({
   name: 'simplepro_api_requests_total',
   help: 'Total API requests',
-  labelNames: ['method', 'endpoint', 'status']
+  labelNames: ['method', 'endpoint', 'status'],
 });
 
 export const apiRequestDuration = new Histogram({
   name: 'simplepro_api_request_duration_seconds',
   help: 'API request duration',
   labelNames: ['method', 'endpoint'],
-  buckets: [0.1, 0.5, 1, 2, 5]
+  buckets: [0.1, 0.5, 1, 2, 5],
 });
 ```
 
 ### 2.2 Instrumentation Example
 
 **Authentication Service:**
+
 ```typescript
 // apps/api/src/auth/auth.service.ts
 import { authenticationAttempts, authenticationFailures } from '../common/metrics/security.metrics';
@@ -180,6 +182,7 @@ async login(credentials: LoginDto, ip: string) {
 ```
 
 **WebSocket Gateway:**
+
 ```typescript
 // apps/api/src/websocket/websocket.gateway.ts
 import { websocketConnectionAttempts, websocketConnections } from '../common/metrics/security.metrics';
@@ -520,8 +523,8 @@ groups:
           severity: warning
           category: authentication
         annotations:
-          summary: "High authentication failure rate"
-          description: "More than 2 failed logins per second for 5 minutes"
+          summary: 'High authentication failure rate'
+          description: 'More than 2 failed logins per second for 5 minutes'
 
       - alert: BruteForceAttackDetected
         expr: sum by(ip) (increase(simplepro_auth_failures_total[1m])) > 10
@@ -530,8 +533,8 @@ groups:
           severity: critical
           category: authentication
         annotations:
-          summary: "Potential brute force attack from {{ $labels.ip }}"
-          description: "{{ $value }} failed login attempts in 1 minute"
+          summary: 'Potential brute force attack from {{ $labels.ip }}'
+          description: '{{ $value }} failed login attempts in 1 minute'
 
       # Rate Limiting Alerts
       - alert: HighRateLimitViolations
@@ -541,8 +544,8 @@ groups:
           severity: warning
           category: rate_limiting
         annotations:
-          summary: "High rate of rate limit violations"
-          description: "More than 10 rate limit hits per second"
+          summary: 'High rate of rate limit violations'
+          description: 'More than 10 rate limit hits per second'
 
       - alert: DocumentShareBruteForce
         expr: sum by(ip) (increase(simplepro_document_share_password_failures_total[5m])) > 5
@@ -551,8 +554,8 @@ groups:
           severity: high
           category: document_security
         annotations:
-          summary: "Brute force on document sharing from {{ $labels.ip }}"
-          description: "{{ $value }} failed password attempts in 5 minutes"
+          summary: 'Brute force on document sharing from {{ $labels.ip }}'
+          description: '{{ $value }} failed password attempts in 5 minutes'
 
       # WebSocket Alerts
       - alert: HighWebSocketConnectionRejections
@@ -562,8 +565,8 @@ groups:
           severity: warning
           category: websocket
         annotations:
-          summary: "High WebSocket connection rejection rate"
-          description: "More than 5 rejections per second"
+          summary: 'High WebSocket connection rejection rate'
+          description: 'More than 5 rejections per second'
 
       - alert: WebSocketConnectionFlood
         expr: sum by(ip) (increase(simplepro_websocket_connection_attempts_total[1m])) > 20
@@ -572,8 +575,8 @@ groups:
           severity: critical
           category: websocket
         annotations:
-          summary: "WebSocket connection flood from {{ $labels.ip }}"
-          description: "{{ $value }} connection attempts in 1 minute"
+          summary: 'WebSocket connection flood from {{ $labels.ip }}'
+          description: '{{ $value }} connection attempts in 1 minute'
 
       # Security Event Alerts
       - alert: InjectionAttemptDetected
@@ -583,8 +586,8 @@ groups:
           severity: high
           category: injection
         annotations:
-          summary: "Injection attempt detected"
-          description: "{{ $value }} injection attempts in last 5 minutes"
+          summary: 'Injection attempt detected'
+          description: '{{ $value }} injection attempts in last 5 minutes'
 
       - alert: CriticalSecurityEvent
         expr: increase(simplepro_security_events_total{severity="critical"}[1m]) > 0
@@ -593,8 +596,8 @@ groups:
           severity: critical
           category: security_event
         annotations:
-          summary: "Critical security event detected"
-          description: "{{ $value }} critical security events"
+          summary: 'Critical security event detected'
+          description: '{{ $value }} critical security events'
 ```
 
 ---
@@ -628,7 +631,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./monitoring/prometheus/alerts:/etc/prometheus/alerts
@@ -642,7 +645,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
@@ -659,7 +662,7 @@ services:
   loki:
     image: grafana/loki:latest
     ports:
-      - "3100:3100"
+      - '3100:3100'
     volumes:
       - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml
       - loki-data:/loki
@@ -791,6 +794,7 @@ docker-compose -f docker-compose.monitoring.yml ps
 ### 6.4 Querying Metrics
 
 **Prometheus Queries:**
+
 ```promql
 # Current authentication failure rate
 rate(simplepro_auth_failures_total[5m])
@@ -806,6 +810,7 @@ topk(10, sum by(ip) (simplepro_auth_failures_total))
 ```
 
 **Loki Queries:**
+
 ```logql
 # Recent authentication failures
 {job="simplepro-api"} |= "authentication failed" | json
@@ -824,10 +829,12 @@ topk(10, sum by(ip) (simplepro_auth_failures_total))
 ### 7.1 Data Retention
 
 **Prometheus:**
+
 - Default: 15 days
 - Adjust in `prometheus.yml`: `--storage.tsdb.retention.time=30d`
 
 **Loki:**
+
 - Default: 7 days
 - Adjust in `loki-config.yml`
 
@@ -862,6 +869,7 @@ This security metrics dashboard provides comprehensive visibility into SimplePro
 ✅ Capacity planning
 
 **Next Steps:**
+
 1. Deploy monitoring stack
 2. Configure alert notifications
 3. Train team on dashboard usage

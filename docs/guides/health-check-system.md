@@ -28,18 +28,21 @@ apps/api/src/health/
 ## Health Check Levels
 
 ### 1. Basic Health Check (`/api/health/basic`)
+
 - **Purpose**: Fast, minimal dependency validation
 - **Checks**: MongoDB connectivity only
 - **Timeout**: 2 seconds
 - **Use Case**: Load balancer health probes
 
 ### 2. Detailed Health Check (`/api/health/detailed`)
+
 - **Purpose**: Comprehensive infrastructure validation
 - **Checks**: MongoDB, Redis, memory usage, disk space
 - **Timeout**: 5 seconds for database, 3 seconds for Redis
 - **Use Case**: Application monitoring dashboards
 
 ### 3. Full Health Check (`/api/health/full`)
+
 - **Purpose**: Complete system and external dependency validation
 - **Checks**: All infrastructure + external services (if configured)
 - **Timeout**: Variable based on service configuration
@@ -48,12 +51,14 @@ apps/api/src/health/
 ## Kubernetes Probes
 
 ### Liveness Probe (`/api/health/liveness`)
+
 - **Purpose**: Verify service is running and not deadlocked
 - **Response Time**: < 100ms
 - **Checks**: Basic process health, uptime, memory info
 - **Failure Action**: Container restart
 
 ### Readiness Probe (`/api/health/readiness`)
+
 - **Purpose**: Verify service is ready to receive traffic
 - **Checks**: Database connectivity
 - **Failure Action**: Remove from service endpoints
@@ -61,6 +66,7 @@ apps/api/src/health/
 ## Health Indicators
 
 ### Database Health Indicator
+
 ```typescript
 // MongoDB connection validation
 - Connection state verification
@@ -71,6 +77,7 @@ apps/api/src/health/
 ```
 
 ### Redis Health Indicator
+
 ```typescript
 // Redis connectivity and performance
 - PING command execution
@@ -81,6 +88,7 @@ apps/api/src/health/
 ```
 
 ### Memory Health Indicator
+
 ```typescript
 // System and heap memory monitoring
 - System memory usage percentage
@@ -90,6 +98,7 @@ apps/api/src/health/
 ```
 
 ### Disk Health Indicator
+
 ```typescript
 // Storage space monitoring
 - Cross-platform disk usage detection
@@ -99,6 +108,7 @@ apps/api/src/health/
 ```
 
 ### External Service Health Indicator
+
 ```typescript
 // Third-party service validation
 - HTTP health endpoint checks
@@ -111,19 +121,20 @@ apps/api/src/health/
 
 ### Health Check Endpoints
 
-| Endpoint | Method | Description | Response Time |
-|----------|--------|-------------|---------------|
-| `/api/health` | GET | Configurable health check | Variable |
-| `/api/health/basic` | GET | Basic infrastructure check | < 2s |
-| `/api/health/detailed` | GET | Comprehensive check | < 8s |
-| `/api/health/full` | GET | Complete system check | < 15s |
-| `/api/health/liveness` | GET | Kubernetes liveness probe | < 100ms |
-| `/api/health/readiness` | GET | Kubernetes readiness probe | < 3s |
-| `/api/health/info` | GET | System information | < 100ms |
+| Endpoint                | Method | Description                | Response Time |
+| ----------------------- | ------ | -------------------------- | ------------- |
+| `/api/health`           | GET    | Configurable health check  | Variable      |
+| `/api/health/basic`     | GET    | Basic infrastructure check | < 2s          |
+| `/api/health/detailed`  | GET    | Comprehensive check        | < 8s          |
+| `/api/health/full`      | GET    | Complete system check      | < 15s         |
+| `/api/health/liveness`  | GET    | Kubernetes liveness probe  | < 100ms       |
+| `/api/health/readiness` | GET    | Kubernetes readiness probe | < 3s          |
+| `/api/health/info`      | GET    | System information         | < 100ms       |
 
 ### Query Parameters
 
 #### `/api/health` endpoint supports:
+
 - `level`: `basic` | `detailed` | `full` (default: `basic`)
 - `includeTiming`: boolean (default: `false`)
 
@@ -205,6 +216,7 @@ REDIS_URL=redis://localhost:6379
 ## Monitoring Integration
 
 ### Prometheus Metrics
+
 The health check system provides metrics compatible with Prometheus monitoring:
 
 ```yaml
@@ -225,13 +237,13 @@ groups:
         expr: simplepro_health_check_status != 1
         for: 5m
         annotations:
-          summary: "SimplePro health check failed"
+          summary: 'SimplePro health check failed'
 
       - alert: HighMemoryUsage
         expr: simplepro_health_memory_usage_ratio > 0.9
         for: 2m
         annotations:
-          summary: "High memory usage detected"
+          summary: 'High memory usage detected'
 ```
 
 ## Production Deployment
@@ -254,24 +266,24 @@ spec:
   template:
     spec:
       containers:
-      - name: simplepro-api
-        livenessProbe:
-          httpGet:
-            path: /api/health/liveness
-            port: 4000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+        - name: simplepro-api
+          livenessProbe:
+            httpGet:
+              path: /api/health/liveness
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
 
-        readinessProbe:
-          httpGet:
-            path: /api/health/readiness
-            port: 4000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/readiness
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
 ```
 
 ## Security Considerations
@@ -284,12 +296,14 @@ spec:
 ## Testing
 
 ### Unit Tests
+
 ```bash
 # Run health check unit tests
 npm run test -- --testPathPattern=health
 ```
 
 ### Integration Tests
+
 ```bash
 # Test health endpoints
 curl http://localhost:4000/api/health/basic
@@ -298,6 +312,7 @@ curl http://localhost:4000/api/health/full
 ```
 
 ### Load Testing
+
 ```bash
 # Test health endpoint performance
 ab -n 1000 -c 10 http://localhost:4000/api/health/basic

@@ -10,9 +10,11 @@ This directory contains comprehensive operational runbooks for managing SimplePr
 ## Available Runbooks
 
 ### 1. [MongoDB Replica Set Setup Guide](./MONGODB_REPLICA_SET_SETUP.md)
+
 **Use for:** Initial setup and configuration of MongoDB replica set
 
 **Quick Start:**
+
 ```bash
 cd D:\Claude\SimplePro-v3
 ./scripts/mongodb/setup-replica-set.sh  # Linux/Mac
@@ -20,6 +22,7 @@ scripts\mongodb\setup-replica-set.bat   # Windows
 ```
 
 **Key Topics:**
+
 - Architecture overview
 - Installation steps
 - Configuration guidelines
@@ -29,9 +32,11 @@ scripts\mongodb\setup-replica-set.bat   # Windows
 ---
 
 ### 2. [Database Operations Runbook](./DATABASE_OPERATIONS_RUNBOOK.md)
+
 **Use for:** Day-to-day database management tasks
 
 **Common Operations:**
+
 ```bash
 # Health check
 ./scripts/mongodb/check-replica-health.sh
@@ -48,6 +53,7 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ```
 
 **Key Topics:**
+
 - Startup/shutdown procedures
 - Backup and restore procedures
 - Failover procedures (automatic and manual)
@@ -59,15 +65,18 @@ docker exec simplepro-mongodb-primary mongosh -u admin -p <password> \
 ---
 
 ### 3. [Deployment Runbook](./DEPLOYMENT_RUNBOOK.md)
+
 **Use for:** Deploying application updates
 
 **Quick Deploy (Staging):**
+
 ```bash
 cd D:\Claude\SimplePro-v3
 ./scripts/deploy-staging.sh
 ```
 
 **Quick Deploy (Production):**
+
 ```bash
 # Pre-deployment backup
 ./scripts/backup/mongodb-backup.sh
@@ -80,6 +89,7 @@ cd D:\Claude\SimplePro-v3
 ```
 
 **Key Topics:**
+
 - Pre-deployment checklist (15+ items)
 - Staging deployment procedure
 - Production deployment (blue-green)
@@ -91,15 +101,18 @@ cd D:\Claude\SimplePro-v3
 ---
 
 ### 4. [Incident Response Runbook](./INCIDENT_RESPONSE_RUNBOOK.md)
+
 **Use for:** Handling production incidents
 
 **Severity Levels:**
+
 - **P0 (Critical):** Complete outage, data loss - Response: Immediate
 - **P1 (High):** Major feature down - Response: <15 min
 - **P2 (Medium):** Minor degradation - Response: <1 hour
 - **P3 (Low):** Cosmetic issues - Response: Next business day
 
 **Quick Incident Response:**
+
 ```bash
 # 1. Acknowledge alert
 # 2. Quick health check
@@ -117,6 +130,7 @@ docker logs simplepro-mongodb-primary --tail=100
 ```
 
 **Key Topics:**
+
 - Incident severity levels
 - Response process (6 phases)
 - Common incident scenarios
@@ -126,15 +140,18 @@ docker logs simplepro-mongodb-primary --tail=100
 ---
 
 ### 5. [Backup and Recovery Runbook](./BACKUP_RECOVERY_RUNBOOK.md)
+
 **Use for:** Backup management and disaster recovery
 
 **Backup Strategy:**
+
 - **Continuous:** Oplog every 5 minutes (RPO: <5 min)
 - **Daily:** Full backup at 2 AM UTC (Retention: 30 days)
 - **Weekly:** Verified backup Sunday 3 AM (Retention: 90 days)
 - **Monthly:** Archive 1st of month (Retention: 1 year)
 
 **Quick Restore:**
+
 ```bash
 # List backups
 ls -lh /backups/mongodb/
@@ -147,6 +164,7 @@ ls -lh /backups/mongodb/
 ```
 
 **Key Topics:**
+
 - Backup strategy and schedules
 - Manual and automated backups
 - Full database restore
@@ -160,6 +178,7 @@ ls -lh /backups/mongodb/
 ## Quick Command Reference
 
 ### Health Checks
+
 ```bash
 # Replica set health
 ./scripts/mongodb/check-replica-health.sh
@@ -172,6 +191,7 @@ docker ps --filter "name=simplepro"
 ```
 
 ### Backup Operations
+
 ```bash
 # Create backup
 ./scripts/backup/mongodb-backup.sh
@@ -184,6 +204,7 @@ ls -lt /backups/mongodb/ | head -10
 ```
 
 ### Deployment
+
 ```bash
 # Deploy to staging
 ./scripts/deploy-staging.sh
@@ -196,6 +217,7 @@ docker-compose -f docker-compose.production.yml restart
 ```
 
 ### Monitoring
+
 ```bash
 # Prometheus
 http://localhost:9090
@@ -208,6 +230,7 @@ curl http://localhost:9216/metrics
 ```
 
 ### Logs
+
 ```bash
 # API logs
 docker logs simplepro-api --tail=100 -f
@@ -224,11 +247,13 @@ docker-compose -f docker-compose.mongodb-replica.yml logs -f
 ## Emergency Contacts
 
 ### On-Call Rotation
+
 - **Primary:** DevOps Lead - +1-555-0100
 - **Secondary:** Backend Lead - +1-555-0101
 - **Escalation:** CTO - +1-555-0199
 
 ### Communication Channels
+
 - **Critical Incidents:** Slack #ops-critical, PagerDuty
 - **Warnings:** Slack #ops-alerts
 - **General:** Slack #ops, Email ops@simplepro.com
@@ -240,16 +265,19 @@ docker-compose -f docker-compose.mongodb-replica.yml logs -f
 ### Key Metrics to Watch
 
 **Replica Set Health:**
+
 - ✅ All members healthy (health: 1)
 - ✅ Replication lag <10 seconds
 - ✅ Primary available
 
 **Performance:**
+
 - ✅ Response time p95 <500ms
 - ✅ Error rate <0.1%
 - ✅ Connection pool <80% utilized
 
 **Resources:**
+
 - ✅ CPU <70%
 - ✅ Memory <80%
 - ✅ Disk space >20% free
@@ -283,10 +311,12 @@ If you receive any of these alerts, take immediate action:
 ## Maintenance Windows
 
 ### Preferred Windows
+
 - **Tuesday/Wednesday:** 10 AM - 2 PM EST
 - **Avoid:** Monday, Friday, weekends, holidays, month-end
 
 ### Scheduled Maintenance
+
 - **Database patching:** Monthly (2nd Tuesday)
 - **Infrastructure updates:** Quarterly
 - **DR drills:** Quarterly
@@ -297,17 +327,20 @@ If you receive any of these alerts, take immediate action:
 ## Training Resources
 
 ### Required Reading
+
 1. MongoDB Replica Set Setup Guide (this folder)
 2. Database Operations Runbook
 3. Incident Response Runbook
 
 ### Recommended Training
+
 - MongoDB University: M103 (Basic Cluster Administration)
 - MongoDB University: M201 (MongoDB Performance)
 - Internal: SimplePro Architecture Overview
 - Internal: On-Call Training
 
 ### Hands-On Practice
+
 - Complete replica set setup in staging
 - Perform test failover
 - Execute backup and restore
@@ -318,11 +351,13 @@ If you receive any of these alerts, take immediate action:
 ## Document Maintenance
 
 ### Review Schedule
+
 - **Quarterly:** Review all runbooks for accuracy
 - **After Incidents:** Update based on lessons learned
 - **After Major Changes:** Update affected runbooks immediately
 
 ### Contributing
+
 1. Create branch for documentation updates
 2. Make changes to relevant runbooks
 3. Test procedures if applicable
@@ -330,6 +365,7 @@ If you receive any of these alerts, take immediate action:
 5. Get review from DevOps team member
 
 ### Version History
+
 All runbooks include version history at the bottom. Major changes require version increment.
 
 ---
@@ -337,12 +373,14 @@ All runbooks include version history at the bottom. Major changes require versio
 ## Additional Resources
 
 ### Internal Links
+
 - [SimplePro-v3 Main README](../../README.md)
 - [CLAUDE.md Developer Guide](../../CLAUDE.md)
 - [Architecture Documentation](../architecture/)
 - [API Documentation](../api/)
 
 ### External References
+
 - [MongoDB Replica Set Documentation](https://docs.mongodb.com/manual/replication/)
 - [MongoDB Operations Best Practices](https://docs.mongodb.com/manual/administration/production-notes/)
 - [Prometheus MongoDB Exporter](https://github.com/percona/mongodb_exporter)
@@ -355,16 +393,19 @@ All runbooks include version history at the bottom. Major changes require versio
 ### Getting Help
 
 **For Operational Questions:**
+
 - Slack: #ops or #database-team
 - Email: ops@simplepro.com
 - Documentation: This folder
 
 **For Incidents:**
+
 - P0/P1: Page on-call via PagerDuty
 - P2/P3: Create ticket in Jira
 - Communication: Slack #ops-alerts
 
 **For Documentation Issues:**
+
 - Submit PR with corrections
 - Email: devops-team@simplepro.com
 - Slack: #ops

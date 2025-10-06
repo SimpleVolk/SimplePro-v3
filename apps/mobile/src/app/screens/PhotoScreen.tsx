@@ -11,7 +11,11 @@ import {
   TextInput,
   Dimensions,
 } from 'react-native';
-import { launchImageLibrary, launchCamera, ImagePickerResponse } from 'react-native-image-picker';
+import {
+  launchImageLibrary,
+  launchCamera,
+  ImagePickerResponse,
+} from 'react-native-image-picker';
 import { useJobs } from '../contexts/JobContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -21,7 +25,9 @@ const PhotoScreen = ({ route }: any) => {
   const { jobId } = route.params;
   const { currentJob, addPhoto } = useJobs();
   const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
-  const [selectedType, setSelectedType] = useState<'before' | 'during' | 'after' | 'damage' | 'inventory'>('before');
+  const [selectedType, setSelectedType] = useState<
+    'before' | 'during' | 'after' | 'damage' | 'inventory'
+  >('before');
   const [modalVisible, setModalVisible] = useState(false);
   const [photoDescription, setPhotoDescription] = useState('');
   const [tempPhotoUri, setTempPhotoUri] = useState<string | null>(null);
@@ -250,15 +256,11 @@ const PhotoScreen = ({ route }: any) => {
   ];
 
   const showImagePicker = () => {
-    Alert.alert(
-      'Select Photo',
-      'Choose how to add a photo',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Camera', onPress: () => openCamera() },
-        { text: 'Photo Library', onPress: () => openLibrary() },
-      ]
-    );
+    Alert.alert('Select Photo', 'Choose how to add a photo', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Camera', onPress: () => openCamera() },
+      { text: 'Photo Library', onPress: () => openLibrary() },
+    ]);
   };
 
   const openCamera = () => {
@@ -269,7 +271,7 @@ const PhotoScreen = ({ route }: any) => {
         maxWidth: 1024,
         maxHeight: 1024,
       },
-      handleImageResponse
+      handleImageResponse,
     );
   };
 
@@ -281,7 +283,7 @@ const PhotoScreen = ({ route }: any) => {
         maxWidth: 1024,
         maxHeight: 1024,
       },
-      handleImageResponse
+      handleImageResponse,
     );
   };
 
@@ -331,7 +333,7 @@ const PhotoScreen = ({ route }: any) => {
   };
 
   const getPhotosByType = (type: string) => {
-    return currentJob.photos.filter(photo => photo.type === type);
+    return currentJob.photos.filter((photo) => photo.type === type);
   };
 
   const renderPhotoItem = ({ item }: { item: any }) => (
@@ -353,7 +355,9 @@ const PhotoScreen = ({ route }: any) => {
       <View key={type.key} style={styles.typeSection}>
         <View style={styles.typeSectionHeader}>
           <View style={styles.typeHeaderLeft}>
-            <View style={[styles.typeIndicator, { backgroundColor: type.color }]} />
+            <View
+              style={[styles.typeIndicator, { backgroundColor: type.color }]}
+            />
             <Text style={styles.typeSectionTitle}>{type.label}</Text>
           </View>
           <View style={styles.photoCount}>
@@ -363,7 +367,9 @@ const PhotoScreen = ({ route }: any) => {
 
         {photos.length === 0 ? (
           <View style={styles.emptyPhotoSection}>
-            <Text style={styles.emptyPhotoText}>No {type.label.toLowerCase()} photos</Text>
+            <Text style={styles.emptyPhotoText}>
+              No {type.label.toLowerCase()} photos
+            </Text>
           </View>
         ) : (
           <FlatList
@@ -392,10 +398,12 @@ const PhotoScreen = ({ route }: any) => {
               ]}
               onPress={() => setSelectedType(type.key as any)}
             >
-              <Text style={[
-                styles.typeButtonText,
-                selectedType === type.key && styles.activeTypeButtonText,
-              ]}>
+              <Text
+                style={[
+                  styles.typeButtonText,
+                  selectedType === type.key && styles.activeTypeButtonText,
+                ]}
+              >
                 {type.label}
               </Text>
             </TouchableOpacity>

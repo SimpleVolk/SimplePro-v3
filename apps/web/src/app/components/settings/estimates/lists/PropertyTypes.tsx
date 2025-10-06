@@ -30,7 +30,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 1000, max: 5000 },
       typicalRoomCount: { min: 2, max: 6 },
       category: 'residential',
-      isActive: true
+      isActive: true,
     },
     {
       id: '2',
@@ -40,7 +40,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 500, max: 2000 },
       typicalRoomCount: { min: 1, max: 4 },
       category: 'residential',
-      isActive: true
+      isActive: true,
     },
     {
       id: '3',
@@ -50,7 +50,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 600, max: 2500 },
       typicalRoomCount: { min: 1, max: 4 },
       category: 'residential',
-      isActive: true
+      isActive: true,
     },
     {
       id: '4',
@@ -60,7 +60,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 1200, max: 3000 },
       typicalRoomCount: { min: 2, max: 5 },
       category: 'residential',
-      isActive: true
+      isActive: true,
     },
     {
       id: '5',
@@ -70,7 +70,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 500, max: 10000 },
       typicalRoomCount: { min: 1, max: 20 },
       category: 'commercial',
-      isActive: true
+      isActive: true,
     },
     {
       id: '6',
@@ -80,7 +80,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 5000, max: 50000 },
       typicalRoomCount: { min: 1, max: 10 },
       category: 'commercial',
-      isActive: true
+      isActive: true,
     },
     {
       id: '7',
@@ -90,8 +90,8 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 50, max: 500 },
       typicalRoomCount: { min: 1, max: 1 },
       category: 'storage',
-      isActive: true
-    }
+      isActive: true,
+    },
   ]);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -101,14 +101,14 @@ export default function PropertyTypes() {
   const categories = [
     { value: 'residential', label: 'Residential', icon: '🏠' },
     { value: 'commercial', label: 'Commercial', icon: '🏢' },
-    { value: 'storage', label: 'Storage', icon: '🏪' }
+    { value: 'storage', label: 'Storage', icon: '🏪' },
   ];
 
   const accessDifficultyOptions = [
     { value: 'easy', label: 'Easy', color: '#10B981' },
     { value: 'moderate', label: 'Moderate', color: '#F59E0B' },
     { value: 'difficult', label: 'Difficult', color: '#EF4444' },
-    { value: 'very_difficult', label: 'Very Difficult', color: '#991B1B' }
+    { value: 'very_difficult', label: 'Very Difficult', color: '#991B1B' },
   ];
 
   const handleCreate = () => {
@@ -119,7 +119,7 @@ export default function PropertyTypes() {
       squareFootageRange: { min: 0, max: 0 },
       typicalRoomCount: { min: 0, max: 0 },
       category: 'residential',
-      isActive: true
+      isActive: true,
     });
     setEditingType(null);
     setShowCreateForm(true);
@@ -133,13 +133,19 @@ export default function PropertyTypes() {
 
   const handleSave = () => {
     if (editingType) {
-      setPropertyTypes(prev => prev.map(t => t.id === editingType.id ? { ...formData as PropertyType, id: editingType.id } : t));
+      setPropertyTypes((prev) =>
+        prev.map((t) =>
+          t.id === editingType.id
+            ? { ...(formData as PropertyType), id: editingType.id }
+            : t,
+        ),
+      );
     } else {
       const newType: PropertyType = {
-        ...formData as PropertyType,
-        id: Date.now().toString()
+        ...(formData as PropertyType),
+        id: Date.now().toString(),
       };
-      setPropertyTypes(prev => [...prev, newType]);
+      setPropertyTypes((prev) => [...prev, newType]);
     }
     setShowCreateForm(false);
     setEditingType(null);
@@ -153,7 +159,7 @@ export default function PropertyTypes() {
   };
 
   const updateFormData = (path: string[], value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = { ...prev } as any;
       let current = updated;
       for (let i = 0; i < path.length - 1; i++) {
@@ -193,8 +199,10 @@ export default function PropertyTypes() {
                 onChange={(e) => updateFormData(['category'], e.target.value)}
                 className={styles.select}
               >
-                {categories.map(cat => (
-                  <option key={cat.value} value={cat.value}>{cat.icon} {cat.label}</option>
+                {categories.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.icon} {cat.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -204,7 +212,9 @@ export default function PropertyTypes() {
               <input
                 type="text"
                 value={formData.description || ''}
-                onChange={(e) => updateFormData(['description'], e.target.value)}
+                onChange={(e) =>
+                  updateFormData(['description'], e.target.value)
+                }
                 className={styles.input}
                 placeholder="Brief description"
               />
@@ -214,11 +224,15 @@ export default function PropertyTypes() {
               <label>Default Access Difficulty</label>
               <select
                 value={formData.defaultAccessDifficulty || 'easy'}
-                onChange={(e) => updateFormData(['defaultAccessDifficulty'], e.target.value)}
+                onChange={(e) =>
+                  updateFormData(['defaultAccessDifficulty'], e.target.value)
+                }
                 className={styles.select}
               >
-                {accessDifficultyOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                {accessDifficultyOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -229,7 +243,12 @@ export default function PropertyTypes() {
                 <input
                   type="number"
                   value={formData.squareFootageRange?.min || 0}
-                  onChange={(e) => updateFormData(['squareFootageRange', 'min'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['squareFootageRange', 'min'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                   placeholder="Min"
                   min="0"
@@ -238,7 +257,12 @@ export default function PropertyTypes() {
                 <input
                   type="number"
                   value={formData.squareFootageRange?.max || 0}
-                  onChange={(e) => updateFormData(['squareFootageRange', 'max'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['squareFootageRange', 'max'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                   placeholder="Max"
                   min="0"
@@ -252,7 +276,12 @@ export default function PropertyTypes() {
                 <input
                   type="number"
                   value={formData.typicalRoomCount?.min || 0}
-                  onChange={(e) => updateFormData(['typicalRoomCount', 'min'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['typicalRoomCount', 'min'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                   placeholder="Min"
                   min="0"
@@ -261,7 +290,12 @@ export default function PropertyTypes() {
                 <input
                   type="number"
                   value={formData.typicalRoomCount?.max || 0}
-                  onChange={(e) => updateFormData(['typicalRoomCount', 'max'], parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateFormData(
+                      ['typicalRoomCount', 'max'],
+                      parseInt(e.target.value),
+                    )
+                  }
                   className={styles.input}
                   placeholder="Max"
                   min="0"
@@ -274,7 +308,9 @@ export default function PropertyTypes() {
                 <input
                   type="checkbox"
                   checked={formData.isActive !== false}
-                  onChange={(e) => updateFormData(['isActive'], e.target.checked)}
+                  onChange={(e) =>
+                    updateFormData(['isActive'], e.target.checked)
+                  }
                 />
                 Active
               </label>
@@ -282,7 +318,9 @@ export default function PropertyTypes() {
           </div>
 
           <div className={styles.formActions}>
-            <button onClick={handleCancel} className={styles.cancelButton}>Cancel</button>
+            <button onClick={handleCancel} className={styles.cancelButton}>
+              Cancel
+            </button>
             <button onClick={handleSave} className={styles.saveButton}>
               {editingType ? 'Update' : 'Create'} Property Type
             </button>
@@ -305,19 +343,25 @@ export default function PropertyTypes() {
       </div>
 
       <div className={styles.categoriesGrid}>
-        {categories.map(category => {
-          const categoryTypes = propertyTypes.filter(type => type.category === category.value);
+        {categories.map((category) => {
+          const categoryTypes = propertyTypes.filter(
+            (type) => type.category === category.value,
+          );
           return (
             <div key={category.value} className={styles.categorySection}>
               <div className={styles.categoryHeader}>
                 <span className={styles.categoryIcon}>{category.icon}</span>
                 <h4>{category.label}</h4>
-                <span className={styles.typeCount}>{categoryTypes.length} types</span>
+                <span className={styles.typeCount}>
+                  {categoryTypes.length} types
+                </span>
               </div>
 
               <div className={styles.typesList}>
-                {categoryTypes.map(type => {
-                  const difficultyOption = accessDifficultyOptions.find(opt => opt.value === type.defaultAccessDifficulty);
+                {categoryTypes.map((type) => {
+                  const difficultyOption = accessDifficultyOptions.find(
+                    (opt) => opt.value === type.defaultAccessDifficulty,
+                  );
                   return (
                     <div key={type.id} className={styles.typeCard}>
                       <div className={styles.typeInfo}>
@@ -325,23 +369,46 @@ export default function PropertyTypes() {
                         <p>{type.description}</p>
                         <div className={styles.typeDetails}>
                           <span className={styles.badge}>
-                            {type.squareFootageRange.min}-{type.squareFootageRange.max} sq ft
+                            {type.squareFootageRange.min}-
+                            {type.squareFootageRange.max} sq ft
                           </span>
                           <span className={styles.badge}>
-                            {type.typicalRoomCount.min}-{type.typicalRoomCount.max} rooms
+                            {type.typicalRoomCount.min}-
+                            {type.typicalRoomCount.max} rooms
                           </span>
-                          <span className={styles.badge} style={{ backgroundColor: difficultyOption?.color + '20', color: difficultyOption?.color }}>
+                          <span
+                            className={styles.badge}
+                            style={{
+                              backgroundColor: difficultyOption?.color + '20',
+                              color: difficultyOption?.color,
+                            }}
+                          >
                             {difficultyOption?.label}
                           </span>
-                          <span className={`${styles.status} ${type.isActive ? styles.active : styles.inactive}`}>
+                          <span
+                            className={`${styles.status} ${type.isActive ? styles.active : styles.inactive}`}
+                          >
                             {type.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </div>
                       </div>
                       <div className={styles.typeActions}>
-                        <button onClick={() => handleEdit(type)} className={styles.actionButton}>✏️</button>
                         <button
-                          onClick={() => setPropertyTypes(prev => prev.map(t => t.id === type.id ? { ...t, isActive: !t.isActive } : t))}
+                          onClick={() => handleEdit(type)}
+                          className={styles.actionButton}
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() =>
+                            setPropertyTypes((prev) =>
+                              prev.map((t) =>
+                                t.id === type.id
+                                  ? { ...t, isActive: !t.isActive }
+                                  : t,
+                              ),
+                            )
+                          }
                           className={styles.actionButton}
                         >
                           {type.isActive ? '🚫' : '✅'}

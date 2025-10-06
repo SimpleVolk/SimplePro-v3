@@ -33,10 +33,12 @@ export const SalesSection = memo(function SalesSection() {
   const { user } = useAuth();
   const [salesData, setSalesData] = useState<SalesData>({
     topPerformers: [],
-    referralSources: []
+    referralSources: [],
   });
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState<'performers' | 'referrals'>('performers');
+  const [activeView, setActiveView] = useState<'performers' | 'referrals'>(
+    'performers',
+  );
 
   const fetchSalesData = useCallback(async () => {
     try {
@@ -49,7 +51,9 @@ export const SalesSection = memo(function SalesSection() {
         'Content-Type': 'application/json',
       };
 
-      const response = await fetch(getApiUrl('analytics/sales-performance'), { headers });
+      const response = await fetch(getApiUrl('analytics/sales-performance'), {
+        headers,
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -64,7 +68,7 @@ export const SalesSection = memo(function SalesSection() {
               role: 'Sales Manager',
               sales: 12,
               revenue: 18500,
-              conversion: 85
+              conversion: 85,
             },
             {
               id: '2',
@@ -72,7 +76,7 @@ export const SalesSection = memo(function SalesSection() {
               role: 'Sales Rep',
               sales: 8,
               revenue: 12200,
-              conversion: 72
+              conversion: 72,
             },
             {
               id: '3',
@@ -80,8 +84,8 @@ export const SalesSection = memo(function SalesSection() {
               role: 'Sales Rep',
               sales: 6,
               revenue: 9800,
-              conversion: 68
-            }
+              conversion: 68,
+            },
           ],
           referralSources: [
             {
@@ -90,7 +94,7 @@ export const SalesSection = memo(function SalesSection() {
               leads: 25,
               conversions: 8,
               revenue: 12400,
-              conversionRate: 32
+              conversionRate: 32,
             },
             {
               id: '2',
@@ -98,7 +102,7 @@ export const SalesSection = memo(function SalesSection() {
               leads: 18,
               conversions: 12,
               revenue: 18600,
-              conversionRate: 67
+              conversionRate: 67,
             },
             {
               id: '3',
@@ -106,7 +110,7 @@ export const SalesSection = memo(function SalesSection() {
               leads: 15,
               conversions: 4,
               revenue: 6200,
-              conversionRate: 27
+              conversionRate: 27,
             },
             {
               id: '4',
@@ -114,19 +118,18 @@ export const SalesSection = memo(function SalesSection() {
               leads: 12,
               conversions: 3,
               revenue: 4800,
-              conversionRate: 25
-            }
-          ]
+              conversionRate: 25,
+            },
+          ],
         };
         setSalesData(fallbackData);
       }
-
     } catch (error) {
       console.error('Failed to fetch sales data:', error);
       // Set empty fallback data
       setSalesData({
         topPerformers: [],
-        referralSources: []
+        referralSources: [],
       });
     } finally {
       setLoading(false);
@@ -152,7 +155,7 @@ export const SalesSection = memo(function SalesSection() {
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(part => part[0])
+      .map((part) => part[0])
       .join('')
       .toUpperCase();
   };
@@ -198,9 +201,7 @@ export const SalesSection = memo(function SalesSection() {
                   {salesData.topPerformers.length > 0 ? (
                     salesData.topPerformers.map((performer, index) => (
                       <div key={performer.id} className={styles.performerCard}>
-                        <div className={styles.performerRank}>
-                          #{index + 1}
-                        </div>
+                        <div className={styles.performerRank}>#{index + 1}</div>
 
                         <div className={styles.performerAvatar}>
                           {performer.avatar ? (
@@ -223,7 +224,9 @@ export const SalesSection = memo(function SalesSection() {
 
                         <div className={styles.performerMetrics}>
                           <div className={styles.metric}>
-                            <span className={styles.metricValue}>{performer.sales}</span>
+                            <span className={styles.metricValue}>
+                              {performer.sales}
+                            </span>
                             <span className={styles.metricLabel}>Sales</span>
                           </div>
                           <div className={styles.metric}>
@@ -235,7 +238,11 @@ export const SalesSection = memo(function SalesSection() {
                           <div className={styles.metric}>
                             <span
                               className={styles.metricValue}
-                              style={{ color: getPerformanceColor(performer.conversion) }}
+                              style={{
+                                color: getPerformanceColor(
+                                  performer.conversion,
+                                ),
+                              }}
                             >
                               {performer.conversion}%
                             </span>
@@ -273,17 +280,27 @@ export const SalesSection = memo(function SalesSection() {
                         <div className={styles.referralMetrics}>
                           <div className={styles.referralStat}>
                             <span className={styles.statLabel}>Leads:</span>
-                            <span className={styles.statValue}>{source.leads}</span>
+                            <span className={styles.statValue}>
+                              {source.leads}
+                            </span>
                           </div>
                           <div className={styles.referralStat}>
-                            <span className={styles.statLabel}>Conversions:</span>
-                            <span className={styles.statValue}>{source.conversions}</span>
+                            <span className={styles.statLabel}>
+                              Conversions:
+                            </span>
+                            <span className={styles.statValue}>
+                              {source.conversions}
+                            </span>
                           </div>
                           <div className={styles.referralStat}>
                             <span className={styles.statLabel}>Rate:</span>
                             <span
                               className={styles.statValue}
-                              style={{ color: getPerformanceColor(source.conversionRate) }}
+                              style={{
+                                color: getPerformanceColor(
+                                  source.conversionRate,
+                                ),
+                              }}
                             >
                               {source.conversionRate}%
                             </span>
@@ -295,7 +312,9 @@ export const SalesSection = memo(function SalesSection() {
                             className={styles.conversionProgress}
                             style={{
                               width: `${source.conversionRate}%`,
-                              backgroundColor: getPerformanceColor(source.conversionRate)
+                              backgroundColor: getPerformanceColor(
+                                source.conversionRate,
+                              ),
                             }}
                           />
                         </div>

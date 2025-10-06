@@ -155,7 +155,7 @@ describe('WebSocket Real-time Updates & Messaging (Integration)', () => {
             jobId,
             isRead: false,
           }),
-        ])
+        ]),
       );
       expect(response.body.unreadCount).toBeGreaterThan(0);
     });
@@ -176,7 +176,7 @@ describe('WebSocket Real-time Updates & Messaging (Integration)', () => {
         .expect(201);
 
       expect(response.body.channels).toEqual(
-        expect.arrayContaining(['in_app', 'email', 'sms', 'push'])
+        expect.arrayContaining(['in_app', 'email', 'sms', 'push']),
       );
 
       // In test environment with mocks, these would show 'sent' status
@@ -464,7 +464,9 @@ describe('WebSocket Real-time Updates & Messaging (Integration)', () => {
 
     it('should retrieve conversation history with pagination', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/api/messages/conversations/${conversationId}/messages?limit=10&offset=0`)
+        .get(
+          `/api/messages/conversations/${conversationId}/messages?limit=10&offset=0`,
+        )
         .set('Authorization', `Bearer ${crewToken}`)
         .expect(200);
 
@@ -545,7 +547,7 @@ describe('WebSocket Real-time Updates & Messaging (Integration)', () => {
         .expect(200);
 
       const rapidMessages = historyResponse.body.messages.filter((m: any) =>
-        m.message.startsWith('Rapid message')
+        m.message.startsWith('Rapid message'),
       );
 
       expect(rapidMessages.length).toBe(messageCount);

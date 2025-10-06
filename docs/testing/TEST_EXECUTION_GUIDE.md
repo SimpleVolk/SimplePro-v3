@@ -32,11 +32,13 @@ k6 version
 ### Install k6 (Load Testing Tool)
 
 **macOS:**
+
 ```bash
 brew install k6
 ```
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo gpg -k
 sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
@@ -46,6 +48,7 @@ sudo apt-get install k6
 ```
 
 **Windows:**
+
 ```bash
 choco install k6
 ```
@@ -125,6 +128,7 @@ npm run test:coverage:pricing
 ```
 
 **Coverage Output:**
+
 ```
 File                 | % Stmts | % Branch | % Funcs | % Lines |
 ---------------------|---------|----------|---------|---------|
@@ -153,11 +157,13 @@ npm run test:api:integration
 ```
 
 **Test Files:**
+
 - `apps/api/test/integration/offline-sync.integration-spec.ts` - Offline mode and background sync
 - `apps/api/test/integration/websocket-realtime.integration-spec.ts` - Real-time messaging and notifications
 - `apps/api/test/integration/pricing-engine.integration-spec.ts` - Deterministic pricing calculations
 
 **Expected Output:**
+
 ```
 PASS apps/api/test/integration/offline-sync.integration-spec.ts (15.234 s)
   Offline Mobile App Sync (Integration)
@@ -175,11 +181,13 @@ PASS apps/api/test/integration/offline-sync.integration-spec.ts (15.234 s)
 ### API E2E Tests
 
 **Complete Job Lifecycle Test:**
+
 ```bash
 npm run test:e2e:api
 ```
 
 **Test Coverage:**
+
 - ✅ Customer creation
 - ✅ Opportunity with inventory
 - ✅ Estimate calculation (deterministic)
@@ -195,6 +203,7 @@ npm run test:e2e:api
 ### Web E2E Tests (Playwright)
 
 **Prerequisites:**
+
 ```bash
 # Install Playwright browsers (one-time)
 npx playwright install
@@ -205,6 +214,7 @@ npm run dev:web  # Terminal 2
 ```
 
 **Run Tests:**
+
 ```bash
 # Headless mode
 npm run test:e2e:web
@@ -219,11 +229,13 @@ npx playwright test --project=webkit
 ```
 
 **Test Files:**
+
 - `apps/web-e2e/src/opportunity-workflow.spec.ts` - Complete opportunity → job workflow
 - `apps/web-e2e/src/customer-management.spec.ts` - CRUD operations
 - `apps/web-e2e/src/job-scheduling.spec.ts` - Calendar and dispatch
 
 **View Test Report:**
+
 ```bash
 npx playwright show-report
 ```
@@ -263,16 +275,19 @@ k6 run apps/api/test/load/api-endpoints.test.js \
 ```
 
 **Load Profile:**
+
 - Ramp up: 50 → 100 → 200 users over 9 minutes
 - Hold: 5 minutes at peak
 - Ramp down: 2 minutes
 
 **Performance Targets:**
+
 - P95 latency: < 500ms
 - Error rate: < 1%
 - Throughput: > 100 req/sec
 
 **Sample Output:**
+
 ```
      ✓ customer created successfully
      ✓ estimate calculated successfully
@@ -298,11 +313,13 @@ k6 run apps/api/test/load/websocket-load.test.js \
 ```
 
 **Load Profile:**
+
 - Ramp up: 100 → 1000 → 5000 connections
 - Hold: 2 minutes at 5000 connections
 - Ramp down: 2 minutes
 
 **Performance Targets:**
+
 - Connection time P95: < 2000ms
 - Message delivery: < 100ms
 - No connection failures
@@ -340,6 +357,7 @@ npm run test:ci
 ```
 
 **Coverage Thresholds:**
+
 - **API:** 80% lines, 75% branches
 - **Web:** 75% lines, 70% branches
 - **Pricing Engine:** 80% lines, 80% branches
@@ -351,11 +369,13 @@ npm run test:ci
 ### Issue: MongoDB Connection Failed
 
 **Symptoms:**
+
 ```
 MongoServerError: Authentication failed
 ```
 
 **Solution:**
+
 ```bash
 # Stop and restart MongoDB
 npm run docker:dev:down
@@ -371,11 +391,13 @@ npm run docker:dev:logs
 ### Issue: Port Already in Use
 
 **Symptoms:**
+
 ```
 Error: listen EADDRINUSE: address already in use :::3001
 ```
 
 **Solution (Windows):**
+
 ```bash
 # Find process using port 3001
 netstat -ano | findstr :3001
@@ -385,6 +407,7 @@ taskkill /PID <PID> /F
 ```
 
 **Solution (macOS/Linux):**
+
 ```bash
 # Find and kill process
 lsof -ti:3001 | xargs kill -9
@@ -393,11 +416,13 @@ lsof -ti:3001 | xargs kill -9
 ### Issue: Playwright Browser Not Installed
 
 **Symptoms:**
+
 ```
 browserType.launch: Executable doesn't exist
 ```
 
 **Solution:**
+
 ```bash
 npx playwright install
 ```
@@ -405,11 +430,13 @@ npx playwright install
 ### Issue: k6 Not Found
 
 **Symptoms:**
+
 ```
 k6: command not found
 ```
 
 **Solution:**
+
 ```bash
 # macOS
 brew install k6
@@ -423,11 +450,13 @@ choco install k6
 ### Issue: Test Timeout
 
 **Symptoms:**
+
 ```
 Timeout - Async callback was not invoked within the 5000 ms timeout
 ```
 
 **Solution:**
+
 ```bash
 # Increase timeout in test file
 test('my test', async () => {
@@ -441,11 +470,13 @@ testTimeout: 30000
 ### Issue: WebSocket Connection Failed in Tests
 
 **Symptoms:**
+
 ```
 WebSocket connection to 'ws://localhost:3001' failed
 ```
 
 **Solution:**
+
 ```bash
 # Ensure API server is running
 npm run dev:api
@@ -459,11 +490,13 @@ curl http://localhost:3001/api/health
 ### Issue: Load Test JWT Token Expired
 
 **Symptoms:**
+
 ```
 http_req_failed: 100% (401 Unauthorized)
 ```
 
 **Solution:**
+
 ```bash
 # Get fresh token before running load test
 JWT_TOKEN=$(curl -s -X POST http://localhost:3001/api/auth/login \
@@ -480,6 +513,7 @@ echo $JWT_TOKEN
 ## Test File Locations
 
 ### Unit Tests
+
 ```
 apps/api/src/**/*.spec.ts
 apps/web/src/**/*.test.tsx
@@ -487,6 +521,7 @@ packages/pricing-engine/src/estimator.test.ts
 ```
 
 ### Integration Tests
+
 ```
 apps/api/test/integration/
 ├── offline-sync.integration-spec.ts
@@ -495,6 +530,7 @@ apps/api/test/integration/
 ```
 
 ### E2E Tests
+
 ```
 apps/api/test/e2e/
 └── complete-job-lifecycle.e2e-spec.ts
@@ -506,6 +542,7 @@ apps/web-e2e/src/
 ```
 
 ### Load Tests
+
 ```
 apps/api/test/load/
 ├── api-endpoints.test.js
@@ -513,6 +550,7 @@ apps/api/test/load/
 ```
 
 ### Mock Services
+
 ```
 apps/api/test/mocks/
 ├── email.mock.ts
@@ -528,6 +566,7 @@ apps/api/test/mocks/
 ### GitHub Actions
 
 Tests run automatically on:
+
 - Push to `main` or `develop`
 - Pull requests
 - Nightly schedule (2 AM UTC)
@@ -535,6 +574,7 @@ Tests run automatically on:
 **Workflow:** `.github/workflows/comprehensive-tests.yml`
 
 **Jobs:**
+
 1. Unit Tests (parallel: pricing-engine, api, web)
 2. Integration Tests (with MongoDB, Redis)
 3. E2E API Tests
@@ -556,16 +596,16 @@ git push
 
 ### Expected Test Execution Times
 
-| Test Suite | Duration | Parallel? |
-|------------|----------|-----------|
-| Pricing Engine Unit | ~5 sec | Yes |
-| API Unit Tests | ~15 sec | Yes |
-| Web Component Tests | ~10 sec | Yes |
-| Integration Tests | ~30 sec | Sequential |
-| E2E API Tests | ~60 sec | Sequential |
-| Web E2E Tests | ~120 sec | Parallel |
-| Load Tests (API) | ~15 min | N/A |
-| Load Tests (WebSocket) | ~15 min | N/A |
+| Test Suite             | Duration | Parallel?  |
+| ---------------------- | -------- | ---------- |
+| Pricing Engine Unit    | ~5 sec   | Yes        |
+| API Unit Tests         | ~15 sec  | Yes        |
+| Web Component Tests    | ~10 sec  | Yes        |
+| Integration Tests      | ~30 sec  | Sequential |
+| E2E API Tests          | ~60 sec  | Sequential |
+| Web E2E Tests          | ~120 sec | Parallel   |
+| Load Tests (API)       | ~15 min  | N/A        |
+| Load Tests (WebSocket) | ~15 min  | N/A        |
 
 ### Total CI Pipeline Time
 
@@ -605,6 +645,7 @@ open coverage/index.html
 ### 4. Clean Test Data
 
 Tests automatically clean up, but if needed:
+
 ```bash
 # Clear test database
 npm run docker:dev:down

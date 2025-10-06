@@ -7,15 +7,11 @@ const DYNAMIC_CACHE_NAME = 'simplepro-dynamic-v1.0.0';
 const CACHE_STRATEGIES = {
   CACHE_FIRST: 'cache-first',
   NETWORK_FIRST: 'network-first',
-  STALE_WHILE_REVALIDATE: 'stale-while-revalidate'
+  STALE_WHILE_REVALIDATE: 'stale-while-revalidate',
 };
 
 // Assets to cache immediately on install
-const STATIC_ASSETS = [
-  '/',
-  '/manifest.json',
-  '/offline.html'
-];
+const STATIC_ASSETS = ['/', '/manifest.json', '/offline.html'];
 
 // Cache patterns for different resource types
 const CACHE_PATTERNS = [
@@ -23,20 +19,20 @@ const CACHE_PATTERNS = [
     pattern: /\.(js|css|woff2?|ttf|eot)$/,
     strategy: CACHE_STRATEGIES.CACHE_FIRST,
     cacheName: STATIC_CACHE_NAME,
-    maxAge: 365 * 24 * 60 * 60 * 1000 // 1 year
+    maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
   },
   {
     pattern: /\.(png|jpg|jpeg|gif|svg|webp|avif)$/,
     strategy: CACHE_STRATEGIES.CACHE_FIRST,
     cacheName: STATIC_CACHE_NAME,
-    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   },
   {
     pattern: /\/api\//,
     strategy: CACHE_STRATEGIES.NETWORK_FIRST,
     cacheName: DYNAMIC_CACHE_NAME,
-    maxAge: 5 * 60 * 1000 // 5 minutes
-  }
+    maxAge: 5 * 60 * 1000, // 5 minutes
+  },
 ];
 
 // Install event - cache static assets
@@ -51,7 +47,7 @@ self.addEventListener('install', (event) => {
 
       // Skip waiting to activate immediately
       self.skipWaiting();
-    })()
+    })(),
   );
 });
 
@@ -63,15 +59,17 @@ self.addEventListener('activate', (event) => {
     (async () => {
       const cacheNames = await caches.keys();
       const deletions = cacheNames
-        .filter(name => name !== STATIC_CACHE_NAME && name !== DYNAMIC_CACHE_NAME)
-        .map(name => caches.delete(name));
+        .filter(
+          (name) => name !== STATIC_CACHE_NAME && name !== DYNAMIC_CACHE_NAME,
+        )
+        .map((name) => caches.delete(name));
 
       await Promise.all(deletions);
       console.log('[SW] Old caches cleaned up');
 
       // Take control of all pages
       self.clients.claim();
-    })()
+    })(),
   );
 });
 
@@ -93,7 +91,7 @@ self.addEventListener('fetch', (event) => {
 
 // Find matching cache pattern for request
 function findMatchingPattern(path) {
-  return CACHE_PATTERNS.find(pattern => pattern.pattern.test(path));
+  return CACHE_PATTERNS.find((pattern) => pattern.pattern.test(path));
 }
 
 // Handle request based on caching strategy
@@ -165,14 +163,16 @@ async function staleWhileRevalidate(request, cacheName, maxAge) {
   const cached = await cache.match(request);
 
   // Always try to update cache in background
-  const fetchPromise = fetch(request).then(response => {
-    if (response.ok) {
-      cache.put(request, response.clone());
-    }
-    return response;
-  }).catch(error => {
-    console.log('[SW] Background fetch failed:', error);
-  });
+  const fetchPromise = fetch(request)
+    .then((response) => {
+      if (response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch((error) => {
+      console.log('[SW] Background fetch failed:', error);
+    });
 
   // Return cached version immediately if available and not expired
   if (cached && !isExpired(cached, maxAge)) {
@@ -190,7 +190,7 @@ function isExpired(response, maxAge) {
   const cachedTime = new Date(response.headers.get('date') || Date.now());
   const now = new Date();
 
-  return (now - cachedTime) > maxAge;
+  return now - cachedTime > maxAge;
 }
 
 // Background sync for offline actions
@@ -234,8 +234,8 @@ async function uploadData(data) {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   });
 }
 
@@ -252,18 +252,16 @@ self.addEventListener('push', (event) => {
     actions: [
       {
         action: 'open',
-        title: 'Open App'
+        title: 'Open App',
       },
       {
         action: 'dismiss',
-        title: 'Dismiss'
-      }
-    ]
+        title: 'Dismiss',
+      },
+    ],
   };
 
-  event.waitUntil(
-    self.registration.showNotification('SimplePro', options)
-  );
+  event.waitUntil(self.registration.showNotification('SimplePro', options));
 });
 
 // Notification click handler
@@ -273,10 +271,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   if (event.action === 'open') {
-    event.waitUntil(
-      // eslint-disable-next-line no-undef
-      clients.openWindow('/')
-    );
+    event.waitUntil(clients.openWindow('/'));
   }
 });
 

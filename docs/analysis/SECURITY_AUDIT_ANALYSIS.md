@@ -31,6 +31,7 @@
 **Location:** `D:\Claude\SimplePro-v3\docker-compose.dev.yml` (lines 14, 35, 57)
 
 **Issue:** Default credentials are hardcoded with weak fallback values:
+
 ```yaml
 MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-simplepro_dev_2024}
 REDIS_PASSWORD: ${REDIS_PASSWORD:-simplepro_redis_2024}
@@ -38,6 +39,7 @@ MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-simplepro_minio_2024}
 ```
 
 **Risk:**
+
 - Default passwords `simplepro_dev_2024`, `simplepro_redis_2024`, `simplepro_minio_2024` are predictable
 - If `.env` files are not properly configured, these weak defaults are used
 - Attackers can easily guess these patterns
@@ -46,15 +48,21 @@ MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-simplepro_minio_2024}
 **Severity:** CRITICAL (CVSS 9.8)
 
 **Remediation:**
+
 1. Remove all default fallback values from docker-compose files
 2. Enforce mandatory environment variable validation at startup
 3. Generate cryptographically random passwords for all services
 4. Implement pre-deployment checklist that validates all secrets are set
 5. Add startup validation in `main.ts`:
+
 ```typescript
 // Add to main.ts bootstrap()
-const requiredSecrets = ['MONGODB_PASSWORD', 'REDIS_PASSWORD', 'MINIO_ROOT_PASSWORD'];
-requiredSecrets.forEach(secret => {
+const requiredSecrets = [
+  'MONGODB_PASSWORD',
+  'REDIS_PASSWORD',
+  'MINIO_ROOT_PASSWORD',
+];
+requiredSecrets.forEach((secret) => {
   if (!process.env[secret] || process.env[secret].length < 32) {
     throw new Error(`${secret} must be set with minimum 32 characters`);
   }
@@ -69,11 +77,13 @@ requiredSecrets.forEach(secret => {
 `D:\Claude\SimplePro-v3\apps\api\src\auth\strategies\partner-jwt.strategy.ts` (line 24)
 
 **Issue:** Hardcoded JWT secret fallback:
+
 ```typescript
 secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret-key',
 ```
 
 **Risk:**
+
 - If `JWT_SECRET` is not set, uses weak fallback `'default-secret-key'`
 - Attackers can forge JWT tokens with this known secret
 - **IMPACT:** Complete authentication bypass, unauthorized access to partner portal
@@ -81,6 +91,7 @@ secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret-key',
 **Severity:** CRITICAL (CVSS 9.1)
 
 **Remediation:**
+
 ```typescript
 // CORRECT implementation
 const jwtSecret = configService.get<string>('JWT_SECRET');
@@ -97,6 +108,7 @@ secretOrKey: jwtSecret,
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\documents\documents.controller.ts` (lines 178-225)
 
 **Issue:** Public endpoints allow document access via token without proper validation:
+
 ```typescript
 @Get('shared/:token')
 @Public()
@@ -110,6 +122,7 @@ async accessSharedDocument(
 ```
 
 **Risks:**
+
 1. **Password in URL:** Query parameter passwords are logged in access logs, proxy logs, browser history
 2. **No Rate Limiting:** Brute force attacks possible on shared links
 3. **Token Enumeration:** No protection against token guessing attacks
@@ -118,7 +131,9 @@ async accessSharedDocument(
 **Severity:** CRITICAL (CVSS 8.6)
 
 **Remediation:**
+
 1. **Move password to request body (POST):**
+
 ```typescript
 @Post('shared/:token/access')
 @Public()
@@ -152,6 +167,7 @@ async accessSharedDocument(
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\websocket\websocket.gateway.ts` (lines 179-187, 228-234)
 
 **Issue:** Duplicate connection limit checks allow bypass:
+
 ```typescript
 // First check at IP level (line 182)
 if (existingConnections >= this.MAX_CONNECTIONS_PER_USER) {
@@ -165,6 +181,7 @@ if (userConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
 ```
 
 **Risk:**
+
 - Attacker can create `MAX_CONNECTIONS_PER_USER * 2` connections before being blocked
 - Memory leak potential: connections added to tracking maps before second validation
 - **IMPACT:** Denial of Service via connection exhaustion
@@ -172,6 +189,7 @@ if (userConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
 **Severity:** CRITICAL (CVSS 7.5)
 
 **Remediation:**
+
 1. Consolidate connection limits to single check after authentication
 2. Add connection tracking cleanup on validation failure
 3. Implement global connection limit (e.g., 10,000 total connections)
@@ -186,6 +204,7 @@ if (userConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\contexts\AuthContext.tsx` (lines 85-156)
 
 **Issue:** Excessive console logging including sensitive data:
+
 ```typescript
 console.log('🔗 Attempting login to:', apiUrl);
 console.log('📤 Request payload:', requestPayload); // Logs username/password
@@ -194,6 +213,7 @@ console.log('💾 Tokens stored in localStorage');
 ```
 
 **Risk:**
+
 - Credentials and JWT tokens exposed in browser console
 - Visible to anyone with physical access or screen sharing
 - Persists in browser debug logs
@@ -202,18 +222,22 @@ console.log('💾 Tokens stored in localStorage');
 **Severity:** HIGH (CVSS 7.2)
 
 **Remediation:**
+
 ```typescript
 // Replace all console.log with conditional logging
 const logger = {
   debug: (msg: string, data?: any) => {
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_AUTH === 'true') {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      process.env.NEXT_PUBLIC_DEBUG_AUTH === 'true'
+    ) {
       console.debug(msg, data);
     }
   },
   error: (msg: string, error?: any) => {
     // Always log errors (but sanitize sensitive data)
     console.error(msg, error?.message || error);
-  }
+  },
 };
 
 // Usage
@@ -229,6 +253,7 @@ logger.debug('Login attempt', { username: email.substring(0, 3) + '***' }); // S
 **Issue:** No CSRF token validation on state-changing operations
 
 **Affected Endpoints:**
+
 - `POST /api/auth/login`
 - `POST /api/customers`
 - `PATCH /api/jobs/:id`
@@ -236,6 +261,7 @@ logger.debug('Login attempt', { username: email.substring(0, 3) + '***' }); // S
 - All other POST/PATCH/DELETE endpoints
 
 **Risk:**
+
 - Cross-Site Request Forgery attacks possible
 - Attacker can trigger actions on behalf of authenticated users
 - **IMPACT:** Unauthorized data modification, privilege escalation
@@ -243,24 +269,29 @@ logger.debug('Login attempt', { username: email.substring(0, 3) + '***' }); // S
 **Severity:** HIGH (CVSS 6.8)
 
 **Remediation:**
+
 1. **Install CSRF protection:**
+
 ```bash
 npm install csurf cookie-parser
 ```
 
 2. **Enable CSRF in main.ts:**
+
 ```typescript
 import * as csurf from 'csurf';
 import * as cookieParser from 'cookie-parser';
 
 app.use(cookieParser());
-app.use(csurf({
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  }
-}));
+app.use(
+  csurf({
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    },
+  }),
+);
 
 // Add CSRF token endpoint
 app.get('/api/csrf-token', (req, res) => {
@@ -279,12 +310,14 @@ app.get('/api/csrf-token', (req, res) => {
 **Location:** `D:\Claude\SimplePro-v3\apps\web\src\app\contexts\AuthContext.tsx` (lines 125-127)
 
 **Issue:** JWT tokens stored in localStorage:
+
 ```typescript
 localStorage.setItem('access_token', data.access_token);
 localStorage.setItem('refresh_token', data.refresh_token);
 ```
 
 **Risk:**
+
 - Vulnerable to XSS attacks (any XSS can steal all tokens)
 - Tokens accessible to all JavaScript on the page (including third-party scripts)
 - No HttpOnly protection
@@ -293,7 +326,9 @@ localStorage.setItem('refresh_token', data.refresh_token);
 **Severity:** HIGH (CVSS 7.4)
 
 **Remediation:**
+
 1. **Use HttpOnly cookies instead of localStorage:**
+
 ```typescript
 // Backend: Set tokens as HttpOnly cookies in auth.controller.ts
 @Post('login')
@@ -320,13 +355,14 @@ async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Respons
 ```
 
 2. **Update frontend to use cookies:**
+
 ```typescript
 // Frontend: Remove localStorage calls
 const response = await fetch(apiUrl, {
   method: 'POST',
   credentials: 'include', // Send cookies
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ username: email, password })
+  body: JSON.stringify({ username: email, password }),
 });
 ```
 
@@ -337,12 +373,14 @@ const response = await fetch(apiUrl, {
 **Location:** Multiple controllers lacking HTML sanitization
 
 **Issue:** No sanitization for user inputs that may be displayed as HTML:
+
 - Customer names, addresses, notes
 - Job descriptions, special instructions
 - Message content (`messages.service.ts`)
 - Document descriptions and tags
 
 **Risk:**
+
 - Stored XSS attacks via malicious user input
 - **Example:** Customer name `<script>steal_tokens()</script>` executes when admin views customer
 - **IMPACT:** Session hijacking, credential theft, malware distribution
@@ -350,12 +388,15 @@ const response = await fetch(apiUrl, {
 **Severity:** HIGH (CVSS 7.1)
 
 **Remediation:**
+
 1. **Install sanitization library:**
+
 ```bash
 npm install sanitize-html
 ```
 
 2. **Create sanitization utility:**
+
 ```typescript
 // apps/api/src/common/utils/sanitize.util.ts
 import * as sanitizeHtml from 'sanitize-html';
@@ -364,7 +405,7 @@ export function sanitizeInput(input: string): string {
   return sanitizeHtml(input, {
     allowedTags: [], // Strip all HTML tags
     allowedAttributes: {},
-    disallowedTagsMode: 'discard'
+    disallowedTagsMode: 'discard',
   });
 }
 
@@ -372,12 +413,13 @@ export function sanitizeRichText(input: string): string {
   return sanitizeHtml(input, {
     allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li'],
     allowedAttributes: {},
-    allowedClasses: {}
+    allowedClasses: {},
   });
 }
 ```
 
 3. **Apply to DTOs:**
+
 ```typescript
 import { Transform } from 'class-transformer';
 import { sanitizeInput } from '../common/utils/sanitize.util';
@@ -398,11 +440,13 @@ export class CreateCustomerDto {
 **Location:** Environment variable validation insufficient
 
 **Issue:** MongoDB URI contains credentials:
+
 ```
 MONGODB_URI=mongodb://admin:password123@localhost:27017/simplepro?authSource=admin
 ```
 
 **Risks:**
+
 - If `.env.local` is committed to Git, credentials are exposed
 - Database credentials in plain text in environment
 - No validation that `.env.local` is in `.gitignore`
@@ -410,7 +454,9 @@ MONGODB_URI=mongodb://admin:password123@localhost:27017/simplepro?authSource=adm
 **Severity:** HIGH (CVSS 7.3)
 
 **Remediation:**
+
 1. **Verify `.gitignore` contains:**
+
 ```gitignore
 .env
 .env.local
@@ -420,11 +466,14 @@ MONGODB_URI=mongodb://admin:password123@localhost:27017/simplepro?authSource=adm
 ```
 
 2. **Add startup validation in main.ts:**
+
 ```typescript
 // Check if sensitive files are tracked by Git
 const { execSync } = require('child_process');
 try {
-  const trackedFiles = execSync('git ls-files .env.local .env.production', { encoding: 'utf-8' });
+  const trackedFiles = execSync('git ls-files .env.local .env.production', {
+    encoding: 'utf-8',
+  });
   if (trackedFiles.trim()) {
     logger.error('SECURITY ERROR: Sensitive .env files are tracked by Git!');
     logger.error('Tracked files:', trackedFiles);
@@ -436,6 +485,7 @@ try {
 ```
 
 3. **Use separate credential management:**
+
 ```typescript
 // Use environment-specific credential files
 MONGODB_USER=admin
@@ -455,17 +505,20 @@ const mongoUri = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\auth\auth.controller.ts` (line 40)
 
 **Issue:** Login rate limit too permissive:
+
 ```typescript
 @Throttle({ auth: { limit: 5, ttl: 60000 } }) // 5 login attempts per minute
 ```
 
 **Problems:**
+
 1. **Per-IP only** - attacker can bypass with distributed IPs
 2. **No account lockout** - can try 5 passwords per minute indefinitely
 3. **No progressive delays** - same delay for all failed attempts
 4. **No CAPTCHA requirement** - automated attacks possible
 
 **Risk:**
+
 - Brute force password attacks
 - Credential stuffing attacks
 - **IMPACT:** Account compromise
@@ -473,6 +526,7 @@ const mongoUri = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:
 **Severity:** HIGH (CVSS 6.5)
 
 **Remediation:**
+
 ```typescript
 // 1. Implement account-based rate limiting
 @Throttle({
@@ -521,12 +575,15 @@ async login(loginDto: LoginDto): Promise<LoginResponse> {
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\websocket\websocket.gateway.ts` (line 189)
 
 **Issue:** Multiple token sources allow bypass:
+
 ```typescript
-const token = client.handshake.auth?.token ||
-              client.handshake.headers?.authorization?.replace('Bearer ', '');
+const token =
+  client.handshake.auth?.token ||
+  client.handshake.headers?.authorization?.replace('Bearer ', '');
 ```
 
 **Risk:**
+
 - Attacker can provide token in `auth` object OR `authorization` header
 - No validation which source should be used
 - Potential for header injection attacks
@@ -535,22 +592,30 @@ const token = client.handshake.auth?.token ||
 **Severity:** HIGH (CVSS 6.8)
 
 **Remediation:**
+
 ```typescript
 // Strict token extraction with single source
 const token = client.handshake.auth?.token;
 
 if (!token) {
-  this.logger.warn(`WebSocket connection ${client.id} rejected: Missing authentication token`);
+  this.logger.warn(
+    `WebSocket connection ${client.id} rejected: Missing authentication token`,
+  );
   client.emit('error', {
-    message: 'Authentication required. Provide token in handshake.auth.token'
+    message: 'Authentication required. Provide token in handshake.auth.token',
   });
   client.disconnect();
   return;
 }
 
 // Validate token format
-if (typeof token !== 'string' || !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
-  this.logger.warn(`WebSocket connection ${client.id} rejected: Invalid token format`);
+if (
+  typeof token !== 'string' ||
+  !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+) {
+  this.logger.warn(
+    `WebSocket connection ${client.id} rejected: Invalid token format`,
+  );
   client.disconnect();
   return;
 }
@@ -565,6 +630,7 @@ if (typeof token !== 'string' || !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.
 **Issue:** Some security headers missing or misconfigured:
 
 **Current Issues:**
+
 1. **CSP too permissive** - `'unsafe-inline'` for scripts and styles (lines 108, 113)
 2. **No Permissions-Policy** - commented out (lines 176-183)
 3. **HSTS maxAge too short** - should be 2 years minimum (line 127)
@@ -573,6 +639,7 @@ if (typeof token !== 'string' || !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.
 **Severity:** HIGH (CVSS 6.4)
 
 **Remediation:**
+
 ```typescript
 // 1. Strengthen CSP (remove unsafe-inline)
 contentSecurityPolicy: {
@@ -625,6 +692,7 @@ hsts: {
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\auth\auth.service.ts` (lines 104-114)
 
 **Issue:** Development password is well-known:
+
 ```typescript
 if (isProduction) {
   password = crypto.randomBytes(16).toString('hex');
@@ -634,6 +702,7 @@ if (isProduction) {
 ```
 
 **Risk:**
+
 - Default password `Admin123!` is documented in code, README, and login form
 - Developers may forget to change it in staging/production
 - **IMPACT:** Administrative account compromise
@@ -641,19 +710,23 @@ if (isProduction) {
 **Severity:** MEDIUM (CVSS 5.9)
 
 **Remediation:**
+
 1. **Always generate random passwords:**
+
 ```typescript
 // Remove conditional - always random
 const password = crypto.randomBytes(32).toString('base64').slice(0, 32);
 ```
 
 2. **Force password change on first login:**
+
 ```typescript
 // Already implemented (line 146) but ensure it's enforced
 mustChangePassword: true, // Always true for default admin
 ```
 
 3. **Add startup warning:**
+
 ```typescript
 if (!isProduction) {
   logger.warn('='.repeat(80));
@@ -671,6 +744,7 @@ if (!isProduction) {
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\auth\auth.service.ts` (line 244, 706-710)
 
 **Issue:** Session fingerprint only uses userId and timestamp:
+
 ```typescript
 sessionFingerprint: this.generateSessionFingerprint(user.id, Date.now())
 
@@ -685,6 +759,7 @@ private generateSessionFingerprint(userId: string, timestamp: number): string {
 **Severity:** MEDIUM (CVSS 5.3)
 
 **Remediation:**
+
 ```typescript
 // Include User-Agent and IP in fingerprint
 private generateSessionFingerprint(
@@ -723,6 +798,7 @@ async refreshToken(refreshToken: string, req: Request): Promise<...> {
 **Location:** Multiple controllers lack security event logging
 
 **Issues:**
+
 1. Password changes logged but not failed password change attempts
 2. Permission denied errors not logged with sufficient context
 3. No centralized security event log
@@ -731,7 +807,9 @@ async refreshToken(refreshToken: string, req: Request): Promise<...> {
 **Severity:** MEDIUM (CVSS 4.8)
 
 **Remediation:**
+
 1. **Create security event logger:**
+
 ```typescript
 // apps/api/src/common/services/security-logger.service.ts
 @Injectable()
@@ -739,7 +817,12 @@ export class SecurityLogger {
   private readonly logger = new Logger('SecurityEvents');
 
   logSecurityEvent(event: {
-    type: 'auth_failure' | 'permission_denied' | 'suspicious_activity' | 'data_access' | 'config_change';
+    type:
+      | 'auth_failure'
+      | 'permission_denied'
+      | 'suspicious_activity'
+      | 'data_access'
+      | 'config_change';
     severity: 'low' | 'medium' | 'high' | 'critical';
     userId?: string;
     ipAddress: string;
@@ -750,7 +833,7 @@ export class SecurityLogger {
     const logEntry = {
       timestamp: new Date().toISOString(),
       correlationId: event.correlationId || this.generateCorrelationId(),
-      ...event
+      ...event,
     };
 
     // Log to file/SIEM
@@ -773,6 +856,7 @@ export class SecurityLogger {
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\documents\documents.controller.ts` (lines 41-56)
 
 **Issue:** File upload only checks size, not content type:
+
 ```typescript
 @UseInterceptors(
   FileInterceptor('file', {
@@ -784,6 +868,7 @@ export class SecurityLogger {
 ```
 
 **Risks:**
+
 - Malicious file upload (executables, scripts)
 - File type mismatch attacks
 - **IMPACT:** Malware distribution, server compromise
@@ -791,6 +876,7 @@ export class SecurityLogger {
 **Severity:** MEDIUM (CVSS 5.8)
 
 **Remediation:**
+
 ```typescript
 @UseInterceptors(
   FileInterceptor('file', {
@@ -845,6 +931,7 @@ async uploadDocument(file: any, dto: UploadDocumentDto, userId: string) {
 **Issue:** No global request size limit configured
 
 **Risk:**
+
 - JSON payload DoS attacks
 - Memory exhaustion from large requests
 - **IMPACT:** Service unavailability
@@ -852,6 +939,7 @@ async uploadDocument(file: any, dto: UploadDocumentDto, userId: string) {
 **Severity:** MEDIUM (CVSS 5.3)
 
 **Remediation:**
+
 ```typescript
 // Add to main.ts before app.use()
 app.use(express.json({ limit: '1mb' }));
@@ -874,9 +962,13 @@ app.use(express.raw({ limit: '10mb' })); // For file uploads only
 
 **Remediation:**
 Add comment in password validation:
+
 ```typescript
 // ✅ SECURITY: bcrypt.compare is timing-safe - DO NOT replace with custom comparison
-const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHash);
+const isPasswordValid = await bcrypt.compare(
+  loginDto.password,
+  user.passwordHash,
+);
 ```
 
 ---
@@ -888,6 +980,7 @@ const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHas
 **Issue:** No API versioning allows breaking changes
 
 **Risk:**
+
 - Cannot deprecate insecure endpoints
 - Breaking changes affect all clients
 - **IMPACT:** Unable to migrate away from vulnerable endpoints
@@ -895,6 +988,7 @@ const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHas
 **Severity:** MEDIUM (CVSS 3.8)
 
 **Remediation:**
+
 ```typescript
 // 1. Update main.ts global prefix
 app.setGlobalPrefix('api/v1');
@@ -933,6 +1027,7 @@ export class AuthV2Controller {
 **Severity:** MEDIUM (CVSS 5.1)
 
 **Remediation:**
+
 ```typescript
 // Create password validator
 import { registerDecorator, ValidationOptions } from 'class-validator';
@@ -949,10 +1044,10 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
           if (typeof value !== 'string') return false;
 
           return (
-            value.length >= 12 &&                    // Minimum 12 characters
-            /[a-z]/.test(value) &&                   // Lowercase letter
-            /[A-Z]/.test(value) &&                   // Uppercase letter
-            /[0-9]/.test(value) &&                   // Number
+            value.length >= 12 && // Minimum 12 characters
+            /[a-z]/.test(value) && // Lowercase letter
+            /[A-Z]/.test(value) && // Uppercase letter
+            /[0-9]/.test(value) && // Number
             /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/.test(value) // Special char
           );
         },
@@ -994,6 +1089,7 @@ export class ChangePasswordDto {
 **Location:** `D:\Claude\SimplePro-v3\apps\api\src\main.ts` (line 68)
 
 **Issue:**
+
 ```typescript
 disableErrorMessages: process.env.NODE_ENV === 'production',
 ```
@@ -1036,22 +1132,23 @@ disableErrorMessages: process.env.NODE_ENV === 'production',
 
 ### OWASP API Security Top 10 (2023)
 
-| Risk | Status | Notes |
-|------|--------|-------|
-| API1:2023 Broken Object Level Authorization | ⚠️ PARTIAL | RBAC implemented but needs testing |
-| API2:2023 Broken Authentication | 🔴 VULNERABLE | HIGH-1, HIGH-3, HIGH-6 |
-| API3:2023 Broken Object Property Level Authorization | ✅ COMPLIANT | Good DTO validation |
-| API4:2023 Unrestricted Resource Consumption | 🟡 PARTIAL | Rate limiting exists, needs improvement |
-| API5:2023 Broken Function Level Authorization | ✅ COMPLIANT | Permission decorators used |
-| API6:2023 Unrestricted Access to Sensitive Business Flows | 🟡 PARTIAL | Some flows unprotected |
-| API7:2023 Server Side Request Forgery | ✅ COMPLIANT | No user-controlled URLs |
-| API8:2023 Security Misconfiguration | 🔴 VULNERABLE | CRITICAL-1, CRITICAL-2 |
-| API9:2023 Improper Inventory Management | ✅ COMPLIANT | Swagger documentation |
-| API10:2023 Unsafe Consumption of APIs | N/A | No external API consumption |
+| Risk                                                      | Status        | Notes                                   |
+| --------------------------------------------------------- | ------------- | --------------------------------------- |
+| API1:2023 Broken Object Level Authorization               | ⚠️ PARTIAL    | RBAC implemented but needs testing      |
+| API2:2023 Broken Authentication                           | 🔴 VULNERABLE | HIGH-1, HIGH-3, HIGH-6                  |
+| API3:2023 Broken Object Property Level Authorization      | ✅ COMPLIANT  | Good DTO validation                     |
+| API4:2023 Unrestricted Resource Consumption               | 🟡 PARTIAL    | Rate limiting exists, needs improvement |
+| API5:2023 Broken Function Level Authorization             | ✅ COMPLIANT  | Permission decorators used              |
+| API6:2023 Unrestricted Access to Sensitive Business Flows | 🟡 PARTIAL    | Some flows unprotected                  |
+| API7:2023 Server Side Request Forgery                     | ✅ COMPLIANT  | No user-controlled URLs                 |
+| API8:2023 Security Misconfiguration                       | 🔴 VULNERABLE | CRITICAL-1, CRITICAL-2                  |
+| API9:2023 Improper Inventory Management                   | ✅ COMPLIANT  | Swagger documentation                   |
+| API10:2023 Unsafe Consumption of APIs                     | N/A           | No external API consumption             |
 
 ### GDPR Considerations
 
 **Data Protection:**
+
 - ✅ Password hashing (bcrypt 12 rounds)
 - ✅ Audit logging implemented
 - ⚠️ PII masking mentioned but not verified in code
@@ -1060,6 +1157,7 @@ disableErrorMessages: process.env.NODE_ENV === 'production',
 - ❌ Consent management not implemented
 
 **Recommendations:**
+
 1. Implement explicit consent tracking for data collection
 2. Add data export functionality (GDPR Article 20)
 3. Implement hard delete for right to erasure compliance
@@ -1072,12 +1170,14 @@ disableErrorMessages: process.env.NODE_ENV === 'production',
 ### Docker Security
 
 **Issues Found:**
+
 1. ❌ Services run as root (no USER directive)
 2. ⚠️ Default passwords (see CRITICAL-1)
 3. ✅ Health checks implemented
 4. ⚠️ No resource limits (CPU/memory)
 
 **Recommendations:**
+
 ```dockerfile
 # Add to Dockerfile
 USER node
@@ -1088,12 +1188,14 @@ HEALTHCHECK --interval=30s --timeout=3s \
 ### MongoDB Security
 
 **Current:**
+
 - ✅ Authentication required
 - ✅ authSource specified
 - ⚠️ Default admin username
 - 🔴 Weak default password (CRITICAL-1)
 
 **Recommendations:**
+
 1. Create application-specific database user (not admin)
 2. Implement role-based access control
 3. Enable MongoDB audit logging
@@ -1102,11 +1204,13 @@ HEALTHCHECK --interval=30s --timeout=3s \
 ### Redis Security
 
 **Current:**
+
 - ✅ Password protection
 - ⚠️ No SSL/TLS
 - ✅ Not exposed externally (commented out)
 
 **Recommendations:**
+
 1. Enable TLS for Redis connections
 2. Implement Redis ACLs (Access Control Lists)
 3. Set maxmemory policy to prevent DoS
@@ -1116,12 +1220,14 @@ HEALTHCHECK --interval=30s --timeout=3s \
 ## Security Checklist for Production Deployment
 
 ### CRITICAL (MUST FIX)
+
 - [ ] Remove all default password fallbacks (CRITICAL-1)
 - [ ] Fix hardcoded JWT secret fallback (CRITICAL-2)
 - [ ] Secure document sharing endpoint (CRITICAL-3)
 - [ ] Fix WebSocket connection limits (CRITICAL-4)
 
 ### HIGH PRIORITY (FIX BEFORE LAUNCH)
+
 - [ ] Remove console logging of credentials (HIGH-1)
 - [ ] Implement CSRF protection (HIGH-2)
 - [ ] Move tokens to HttpOnly cookies (HIGH-3)
@@ -1132,6 +1238,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 - [ ] Complete security headers (HIGH-8)
 
 ### MEDIUM PRIORITY (RECOMMENDED)
+
 - [ ] Randomize admin password always (MEDIUM-1)
 - [ ] Strengthen session fingerprinting (MEDIUM-2)
 - [ ] Implement security event logging (MEDIUM-3)
@@ -1141,6 +1248,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 - [ ] Enforce password complexity (MEDIUM-8)
 
 ### INFRASTRUCTURE
+
 - [ ] Generate strong random passwords for all services
 - [ ] Configure MongoDB with application user (not admin)
 - [ ] Enable TLS for MongoDB, Redis, MinIO
@@ -1151,6 +1259,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 - [ ] Configure monitoring and alerting
 
 ### TESTING
+
 - [ ] Penetration testing by security professional
 - [ ] Automated security scanning (OWASP ZAP, Burp Suite)
 - [ ] Dependency vulnerability scanning (npm audit fix)
@@ -1162,10 +1271,12 @@ HEALTHCHECK --interval=30s --timeout=3s \
 ## Dependency Vulnerabilities
 
 **Current Status:** Low-severity vulnerabilities detected:
+
 - `tmp` package: Arbitrary file/directory write via symlink (CVSS 3.3)
 - `commitizen`, `inquirer`: Low-severity dev dependencies
 
 **Recommendation:**
+
 ```bash
 npm audit fix --force
 npm update
@@ -1180,6 +1291,7 @@ npm update
 The following security implementations are **commendable**:
 
 ✅ **Excellent:**
+
 1. bcrypt password hashing with 12 rounds (industry standard)
 2. JWT token refresh rotation implemented
 3. Comprehensive RBAC with granular permissions
@@ -1197,6 +1309,7 @@ The following security implementations are **commendable**:
 15. User session tracking and management
 
 ✅ **Good:**
+
 1. Multi-tier rate limiting strategy
 2. User session fingerprinting (basic)
 3. Centralized security middleware
@@ -1209,6 +1322,7 @@ The following security implementations are **commendable**:
 ## Recommendations by Priority
 
 ### Immediate (Week 1)
+
 1. Fix CRITICAL-1: Remove hardcoded default passwords
 2. Fix CRITICAL-2: Remove JWT secret fallback
 3. Fix CRITICAL-3: Secure document sharing
@@ -1216,6 +1330,7 @@ The following security implementations are **commendable**:
 5. Fix HIGH-1: Remove credential logging
 
 ### Short-term (Week 2-3)
+
 1. Implement CSRF protection (HIGH-2)
 2. Migrate to HttpOnly cookies (HIGH-3)
 3. Add input sanitization (HIGH-4)
@@ -1223,6 +1338,7 @@ The following security implementations are **commendable**:
 5. Complete security headers (HIGH-8)
 
 ### Medium-term (Month 1-2)
+
 1. Implement security event logging system
 2. Add comprehensive monitoring/alerting
 3. Enforce password complexity requirements
@@ -1230,6 +1346,7 @@ The following security implementations are **commendable**:
 5. Complete penetration testing
 
 ### Long-term (Ongoing)
+
 1. Regular security audits (quarterly)
 2. Dependency vulnerability scanning (automated)
 3. Security training for development team
@@ -1243,6 +1360,7 @@ The following security implementations are **commendable**:
 SimplePro-v3 demonstrates a solid security foundation with proper authentication, authorization, and data protection mechanisms. However, **critical vulnerabilities must be addressed before production deployment**.
 
 **Key Strengths:**
+
 - Strong password hashing (bcrypt)
 - Comprehensive RBAC implementation
 - NoSQL injection protection
@@ -1250,6 +1368,7 @@ SimplePro-v3 demonstrates a solid security foundation with proper authentication
 - Audit logging infrastructure
 
 **Critical Weaknesses:**
+
 - Hardcoded secrets with weak defaults
 - Insecure token storage (localStorage)
 - Missing CSRF protection
@@ -1258,6 +1377,7 @@ SimplePro-v3 demonstrates a solid security foundation with proper authentication
 **Overall Assessment:** With immediate remediation of CRITICAL and HIGH-priority issues, this platform can achieve production-ready security. The development team shows security awareness, but needs to apply more defense-in-depth strategies.
 
 **Next Steps:**
+
 1. Address all CRITICAL issues (estimated 2-3 days)
 2. Implement HIGH-priority fixes (estimated 1-2 weeks)
 3. Conduct penetration testing (external consultant)

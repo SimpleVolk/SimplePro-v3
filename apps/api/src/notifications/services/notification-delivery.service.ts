@@ -1,7 +1,10 @@
 import { Injectable, Logger, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Notification, NotificationDocument } from '../schemas/notification.schema';
+import {
+  Notification,
+  NotificationDocument,
+} from '../schemas/notification.schema';
 import { WebSocketGateway } from '../../websocket/websocket.gateway';
 import { NotificationConfigService } from '../config/notification-config.service';
 import { NotificationTemplateService } from './notification-template.service';
@@ -14,7 +17,8 @@ export class NotificationDeliveryService {
   private readonly INITIAL_RETRY_DELAY_MS = 1000;
 
   constructor(
-    @InjectModel(Notification.name) private notificationModel: Model<NotificationDocument>,
+    @InjectModel(Notification.name)
+    private notificationModel: Model<NotificationDocument>,
     @Inject(forwardRef(() => WebSocketGateway))
     private websocketGateway: WebSocketGateway,
     private readonly configService: NotificationConfigService,
@@ -26,7 +30,9 @@ export class NotificationDeliveryService {
   /**
    * Send in-app notification via WebSocket
    */
-  async sendInAppNotification(notification: NotificationDocument): Promise<void> {
+  async sendInAppNotification(
+    notification: NotificationDocument,
+  ): Promise<void> {
     try {
       // Send via WebSocket to connected clients
       this.websocketGateway.broadcastToUser(
@@ -55,9 +61,12 @@ export class NotificationDeliveryService {
         },
       });
 
-      this.logger.log(`In-app notification sent to user ${notification.recipientId}`);
+      this.logger.log(
+        `In-app notification sent to user ${notification.recipientId}`,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error('Failed to send in-app notification:', errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
@@ -76,9 +85,13 @@ export class NotificationDeliveryService {
   /**
    * Send email notification using Nodemailer
    */
-  async sendEmailNotification(notification: NotificationDocument): Promise<void> {
+  async sendEmailNotification(
+    notification: NotificationDocument,
+  ): Promise<void> {
     if (!this.configService.isEmailEnabled()) {
-      this.logger.debug('Email notifications are disabled, skipping email delivery');
+      this.logger.debug(
+        'Email notifications are disabled, skipping email delivery',
+      );
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.email': {
@@ -92,7 +105,9 @@ export class NotificationDeliveryService {
     }
 
     const deliveryFn = async () => {
-      const user = await this.authService.findOne(notification.recipientId.toString());
+      const user = await this.authService.findOne(
+        notification.recipientId.toString(),
+      );
       if (!user || !user.email) {
         throw new Error('User email not found');
       }
@@ -133,8 +148,12 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to send email notification after ${this.MAX_RETRIES} retries:`, errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to send email notification after ${this.MAX_RETRIES} retries:`,
+        errorMessage,
+      );
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
@@ -153,7 +172,9 @@ export class NotificationDeliveryService {
    */
   async sendSmsNotification(notification: NotificationDocument): Promise<void> {
     if (!this.configService.isSmsEnabled()) {
-      this.logger.debug('SMS notifications are disabled, skipping SMS delivery');
+      this.logger.debug(
+        'SMS notifications are disabled, skipping SMS delivery',
+      );
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.sms': {
@@ -167,7 +188,9 @@ export class NotificationDeliveryService {
     }
 
     const deliveryFn = async () => {
-      const user = await this.authService.findOne(notification.recipientId.toString());
+      const user = await this.authService.findOne(
+        notification.recipientId.toString(),
+      );
       if (!user || !user.phoneNumber) {
         throw new Error('User phone number not found');
       }
@@ -211,8 +234,12 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to send SMS notification after ${this.MAX_RETRIES} retries:`, errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to send SMS notification after ${this.MAX_RETRIES} retries:`,
+        errorMessage,
+      );
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
@@ -229,9 +256,13 @@ export class NotificationDeliveryService {
   /**
    * Send push notification using Firebase FCM
    */
-  async sendPushNotification(notification: NotificationDocument): Promise<void> {
+  async sendPushNotification(
+    notification: NotificationDocument,
+  ): Promise<void> {
     if (!this.configService.isPushEnabled()) {
-      this.logger.debug('Push notifications are disabled, skipping push delivery');
+      this.logger.debug(
+        'Push notifications are disabled, skipping push delivery',
+      );
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
           'deliveryStatus.push': {
@@ -245,7 +276,9 @@ export class NotificationDeliveryService {
     }
 
     const deliveryFn = async () => {
-      const user = await this.authService.findOne(notification.recipientId.toString());
+      const user = await this.authService.findOne(
+        notification.recipientId.toString(),
+      );
       if (!user || !user.fcmTokens || user.fcmTokens.length === 0) {
         throw new Error('No FCM tokens registered for user');
       }
@@ -271,9 +304,13 @@ export class NotificationDeliveryService {
         tokens: user.fcmTokens,
       };
 
-      const response = await firebaseAdmin.messaging().sendEachForMulticast(message);
+      const response = await firebaseAdmin
+        .messaging()
+        .sendEachForMulticast(message);
 
-      this.logger.log(`Push notification sent: ${response.successCount} successful, ${response.failureCount} failed`);
+      this.logger.log(
+        `Push notification sent: ${response.successCount} successful, ${response.failureCount} failed`,
+      );
 
       // Remove invalid FCM tokens
       if (response.failureCount > 0) {
@@ -293,7 +330,9 @@ export class NotificationDeliveryService {
 
         if (invalidTokens.length > 0) {
           await this.authService.removeFcmTokens(user.id, invalidTokens);
-          this.logger.log(`Removed ${invalidTokens.length} invalid FCM tokens for user ${user.id}`);
+          this.logger.log(
+            `Removed ${invalidTokens.length} invalid FCM tokens for user ${user.id}`,
+          );
         }
       }
 
@@ -315,8 +354,12 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to send push notification after ${this.MAX_RETRIES} retries:`, errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to send push notification after ${this.MAX_RETRIES} retries:`,
+        errorMessage,
+      );
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
         $set: {
@@ -349,7 +392,10 @@ export class NotificationDeliveryService {
         // Exponential backoff: 1s, 2s, 4s, 8s, etc.
         const delay = this.INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
         const errorMsg = error instanceof Error ? error.message : String(error);
-        this.logger.warn(`Delivery attempt ${attempt} failed, retrying in ${delay}ms...`, errorMsg);
+        this.logger.warn(
+          `Delivery attempt ${attempt} failed, retrying in ${delay}ms...`,
+          errorMsg,
+        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }

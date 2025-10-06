@@ -33,7 +33,9 @@ async function bootstrap() {
   if (process.env.SEED_DATA === 'true') {
     try {
       logger.log('🌱 Seeding tariff settings...');
-      const { TariffSettingsSeeder } = await import('./database/seeders/tariff-settings.seeder');
+      const { TariffSettingsSeeder } = await import(
+        './database/seeders/tariff-settings.seeder'
+      );
       const tariffSeeder = app.get(TariffSettingsSeeder);
       const hasDefaultTariff = await tariffSeeder.hasDefaultTariff();
 
@@ -44,7 +46,8 @@ async function bootstrap() {
         logger.log('✓ Default tariff settings already exist (skipping seed)');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       logger.warn('Tariff settings seed skipped:', errorMessage);
     }
   }
@@ -54,18 +57,20 @@ async function bootstrap() {
 
   // Security middleware
   // OPTIMIZED: Enhanced compression configuration (1KB threshold, level 6)
-  app.use(compression({
-    filter: (req, res) => {
-      // Don't compress responses with x-no-compression header
-      if (req.headers['x-no-compression']) {
-        return false;
-      }
-      // Use compression filter (defaults to text, json, xml, etc.)
-      return compression.filter(req, res);
-    },
-    threshold: 1024, // Only compress responses > 1KB
-    level: 6, // Compression level 1-9 (6 is good balance between speed/compression)
-  }));
+  app.use(
+    compression({
+      filter: (req, res) => {
+        // Don't compress responses with x-no-compression header
+        if (req.headers['x-no-compression']) {
+          return false;
+        }
+        // Use compression filter (defaults to text, json, xml, etc.)
+        return compression.filter(req, res);
+      },
+      threshold: 1024, // Only compress responses > 1KB
+      level: 6, // Compression level 1-9 (6 is good balance between speed/compression)
+    }),
+  );
   app.use(cookieParser()); // Parse cookies securely
   app.use(new SecurityMiddleware().use.bind(new SecurityMiddleware()));
   app.use(new LoggingMiddleware().use.bind(new LoggingMiddleware()));
@@ -81,9 +86,11 @@ async function bootstrap() {
       transform: true, // Transform payloads to be objects typed according to their DTO classes
       disableErrorMessages: process.env.NODE_ENV === 'production', // Hide detailed validation errors in production
       exceptionFactory: (errors) => {
-        const errorMessages = errors.map(error => {
+        const errorMessages = errors.map((error) => {
           const constraints = error.constraints;
-          return constraints ? Object.values(constraints).join(', ') : 'Validation failed';
+          return constraints
+            ? Object.values(constraints).join(', ')
+            : 'Validation failed';
         });
         return new BadRequestException({
           message: 'Validation failed',
@@ -95,9 +102,18 @@ async function bootstrap() {
   );
 
   // CORS configuration - restrict origins in production
-  const allowedOrigins = process.env.NODE_ENV === 'production'
-    ? (process.env.ALLOWED_ORIGINS?.split(',') || [])
-    : ['http://localhost:3000', 'http://localhost:3004', 'http://localhost:3007', 'http://localhost:3008', 'http://localhost:3009', 'http://localhost:3010', 'http://localhost:4000'];
+  const allowedOrigins =
+    process.env.NODE_ENV === 'production'
+      ? process.env.ALLOWED_ORIGINS?.split(',') || []
+      : [
+          'http://localhost:3000',
+          'http://localhost:3004',
+          'http://localhost:3007',
+          'http://localhost:3008',
+          'http://localhost:3009',
+          'http://localhost:3010',
+          'http://localhost:4000',
+        ];
 
   app.enableCors({
     origin: allowedOrigins,
@@ -110,7 +126,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // Setup Swagger documentation
-  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.ENABLE_SWAGGER === 'true'
+  ) {
     setupSwagger(app, port);
   }
 
@@ -147,14 +166,15 @@ function setupSwagger(app: any, port: number) {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth'
+      'JWT-auth',
     )
     .addServer(`http://localhost:${port}/api`, 'Development server')
     .addServer('https://api.simplepro.com/api', 'Production server')
     .build();
 
   const document = SwaggerModule.createDocument(app, config, {
-    operationIdFactory: (_controllerKey: string, methodKey: string) => methodKey,
+    operationIdFactory: (_controllerKey: string, methodKey: string) =>
+      methodKey,
   });
 
   SwaggerModule.setup('api/docs', app, document, {
@@ -180,7 +200,6 @@ function setupSwagger(app: any, port: number) {
 // Graceful shutdown handler
 function setupGracefulShutdown(app: any) {
   const signals = ['SIGTERM', 'SIGINT', 'SIGQUIT'] as const;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const logger = new (require('@nestjs/common').Logger)('Bootstrap');
 
   signals.forEach((signal) => {

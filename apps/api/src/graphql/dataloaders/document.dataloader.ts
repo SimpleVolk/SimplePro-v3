@@ -2,39 +2,46 @@ import { Injectable, Scope } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import DataLoader from 'dataloader';
-import { DocumentEntity, DocumentDocument } from '../../documents/schemas/document.schema';
+import {
+  DocumentEntity,
+  DocumentDocument,
+} from '../../documents/schemas/document.schema';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DocumentDataLoader {
   constructor(
-    @InjectModel(DocumentEntity.name) private documentModel: Model<DocumentDocument>
+    @InjectModel(DocumentEntity.name)
+    private documentModel: Model<DocumentDocument>,
   ) {}
 
-  private readonly batchDocuments = new DataLoader<string, DocumentEntity | null>(
-    async (documentIds: readonly string[]) => {
-      // Fetch all documents in a single query
-      const documents = await this.documentModel
-        .find({ _id: { $in: documentIds as string[] } })
-        .lean()
-        .exec();
+  private readonly batchDocuments = new DataLoader<
+    string,
+    DocumentEntity | null
+  >(async (documentIds: readonly string[]) => {
+    // Fetch all documents in a single query
+    const documents = await this.documentModel
+      .find({ _id: { $in: documentIds as string[] } })
+      .lean()
+      .exec();
 
-      // Create a map for quick lookup
-      const documentMap = new Map<string, any>();
-      documents.forEach((doc: any) => {
-        documentMap.set(doc._id.toString(), this.convertDocumentDocument(doc));
-      });
+    // Create a map for quick lookup
+    const documentMap = new Map<string, any>();
+    documents.forEach((doc: any) => {
+      documentMap.set(doc._id.toString(), this.convertDocumentDocument(doc));
+    });
 
-      // Return documents in the same order as requested IDs
-      return documentIds.map(id => documentMap.get(id) || null);
-    }
-  );
+    // Return documents in the same order as requested IDs
+    return documentIds.map((id) => documentMap.get(id) || null);
+  });
 
   async load(documentId: string): Promise<DocumentEntity | null> {
     return this.batchDocuments.load(documentId);
   }
 
   async loadMany(documentIds: string[]): Promise<(DocumentEntity | null)[]> {
-    return this.batchDocuments.loadMany(documentIds) as Promise<(DocumentEntity | null)[]>;
+    return this.batchDocuments.loadMany(documentIds) as Promise<
+      (DocumentEntity | null)[]
+    >;
   }
 
   private convertDocumentDocument(doc: any): DocumentEntity {
@@ -56,7 +63,7 @@ export class DocumentDataLoader {
       shareLinks: doc.shareLinks,
       metadata: doc.metadata,
       createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt
+      updatedAt: doc.updatedAt,
     } as any;
   }
 }
