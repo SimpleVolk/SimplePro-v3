@@ -60,7 +60,7 @@ export class ForeignKeyValidationService {
     refModel: string,
     required = false
   ) {
-    return async function (this: any, next: () => Promise<void>) {
+    return async function (this: any, next: any) {
       try {
         const refValue = this[refField];
 
@@ -95,7 +95,7 @@ export class ForeignKeyValidationService {
   createMultiReferenceValidator(
     references: Array<{ field: string; model: string; required?: boolean }>
   ) {
-    return async function (this: any, next: () => Promise<void>) {
+    return async function (this: any, next: any) {
       try {
         for (const ref of references) {
           const refValue = this[ref.field];
@@ -136,7 +136,7 @@ export class ForeignKeyValidationService {
     refField: string,
     refModel: string
   ) {
-    return async function (this: any, next: () => Promise<void>) {
+    return async function (this: any, next: any) {
       try {
         const arrayValue = this[arrayField];
 

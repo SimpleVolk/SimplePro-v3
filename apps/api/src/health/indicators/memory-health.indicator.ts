@@ -81,6 +81,7 @@ export class MemoryHealthIndicator extends HealthIndicator {
 
   private getTotalSystemMemory(): number {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const os = require('os');
       return os.totalmem();
     } catch {

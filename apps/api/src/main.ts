@@ -180,6 +180,7 @@ function setupSwagger(app: any, port: number) {
 // Graceful shutdown handler
 function setupGracefulShutdown(app: any) {
   const signals = ['SIGTERM', 'SIGINT', 'SIGQUIT'] as const;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const logger = new (require('@nestjs/common').Logger)('Bootstrap');
 
   signals.forEach((signal) => {

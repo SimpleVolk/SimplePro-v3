@@ -148,7 +148,7 @@ export class CreateEstimateDto {
   @IsOptional()
   @IsString()
   @Length(10, 20)
-  @Matches(/^[\+]?[1-9][\d]{0,15}$/, { message: 'Customer phone must be a valid phone number' })
+  @Matches(/^[+]?[1-9][\d]{0,15}$/, { message: 'Customer phone must be a valid phone number' })
   customerPhone?: string;
 
   @IsEnum(ServiceType, { message: 'Service type must be local, long_distance, or packing_only' })

@@ -64,7 +64,7 @@ export function createSizeMonitoringMiddleware(
   const maxSizeBytes = config.maxSizeMB * 1024 * 1024;
   const warnSizeBytes = maxSizeBytes * (config.warnThresholdPercent / 100);
 
-  return async function (this: any, next: () => Promise<void>) {
+  return async function (this: any, next: any) {
     try {
       const docSizeBytes = calculateDocumentSize(this);
 
@@ -114,7 +114,7 @@ export function createArraySizeMonitoringMiddleware(
   arrayFields: string[],
   maxArraySize = 1000
 ) {
-  return async function (this: any, next: () => Promise<void>) {
+  return async function (this: any, next: any) {
     try {
       for (const fieldName of arrayFields) {
         const arrayValue = this[fieldName];

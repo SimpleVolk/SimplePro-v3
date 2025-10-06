@@ -183,6 +183,7 @@ export class TariffSettingsSeeder {
  * @returns Promise<boolean> - True if seeding was successful
  */
 export async function runTariffSeeder(mongoUri: string): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const mongoose = require('mongoose');
 
   try {

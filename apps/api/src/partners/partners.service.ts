@@ -290,7 +290,7 @@ export class PartnersService {
         }
         return commissionStructure.flatAmount;
 
-      case 'tiered':
+      case 'tiered': {
         if (!commissionStructure.tiers || commissionStructure.tiers.length === 0) {
           throw new BadRequestException('Tiers not defined for tiered commission type');
         }
@@ -314,6 +314,7 @@ export class PartnersService {
         }
 
         return jobValue * (tier.rate / 100);
+      }
 
       case 'custom':
         // For custom commission structures, return 0 and handle manually

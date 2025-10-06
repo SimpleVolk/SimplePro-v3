@@ -545,7 +545,7 @@ export class PricingRulesService {
     const changes: Record<string, { old: any; new: any }> = {};
 
     for (const key in newRule) {
-      if (newRule.hasOwnProperty(key) && oldRule[key] !== newRule[key]) {
+      if (Object.prototype.hasOwnProperty.call(newRule, key) && oldRule[key] !== newRule[key]) {
         changes[key] = {
           old: oldRule[key],
           new: newRule[key]

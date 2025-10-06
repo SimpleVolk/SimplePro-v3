@@ -27,9 +27,10 @@ export interface AuthenticatedRequest extends ExpressRequest {
  * Note: We extend the existing Express.User type from passport
  */
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     // Extend the existing User interface instead of Request
     // This is compatible with passport's type declarations
-    type User = AuthenticatedUser
+    interface User extends AuthenticatedUser {}
   }
 }
