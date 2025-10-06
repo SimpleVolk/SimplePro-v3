@@ -16,97 +16,6 @@ const ChecklistScreen = ({ route }: any) => {
   const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
 
-  if (!currentJob) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>Job not found</Text>
-      </View>
-    );
-  }
-
-  const handleChecklistToggle = async (item: any) => {
-    if (updatingItems.has(item.id)) return;
-
-    setUpdatingItems(prev => new Set(prev).add(item.id));
-
-    const updatedItem = {
-      ...item,
-      completed: !item.completed,
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      await updateChecklist(jobId, updatedItem);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to update checklist item');
-    } finally {
-      setUpdatingItems(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(item.id);
-        return newSet;
-      });
-    }
-  };
-
-  const getCompletionStats = () => {
-    const completed = currentJob.checklist.filter(item => item.completed).length;
-    const total = currentJob.checklist.length;
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-    return { completed, total, percentage };
-  };
-
-  const renderChecklistItem = ({ item }: { item: any }) => {
-    const isUpdating = updatingItems.has(item.id);
-
-    return (
-      <TouchableOpacity
-        style={[
-          styles.checklistItem,
-          item.completed && styles.completedItem,
-          isUpdating && styles.updatingItem,
-        ]}
-        onPress={() => handleChecklistToggle(item)}
-        disabled={isUpdating}
-      >
-        <View style={styles.checkboxContainer}>
-          <View style={[
-            styles.checkbox,
-            item.completed && styles.checkedBox,
-            isUpdating && styles.updatingBox,
-          ]}>
-            {item.completed && !isUpdating && (
-              <Text style={styles.checkmark}>✓</Text>
-            )}
-            {isUpdating && (
-              <Text style={styles.updating}>⟳</Text>
-            )}
-          </View>
-          {item.required && (
-            <View style={styles.requiredBadge}>
-              <Text style={styles.requiredText}>Required</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.itemContent}>
-          <Text style={[
-            styles.itemDescription,
-            item.completed && styles.completedText,
-          ]}>
-            {item.description}
-          </Text>
-          {item.timestamp && (
-            <Text style={styles.timestampText}>
-              Completed: {new Date(item.timestamp).toLocaleString()}
-            </Text>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const stats = getCompletionStats();
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -265,6 +174,97 @@ const ChecklistScreen = ({ route }: any) => {
       textAlign: 'center',
     },
   });
+
+  if (!currentJob) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>Job not found</Text>
+      </View>
+    );
+  }
+
+  const handleChecklistToggle = async (item: any) => {
+    if (updatingItems.has(item.id)) return;
+
+    setUpdatingItems(prev => new Set(prev).add(item.id));
+
+    const updatedItem = {
+      ...item,
+      completed: !item.completed,
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      await updateChecklist(jobId, updatedItem);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update checklist item');
+    } finally {
+      setUpdatingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(item.id);
+        return newSet;
+      });
+    }
+  };
+
+  const getCompletionStats = () => {
+    const completed = currentJob.checklist.filter(item => item.completed).length;
+    const total = currentJob.checklist.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { completed, total, percentage };
+  };
+
+  const renderChecklistItem = ({ item }: { item: any }) => {
+    const isUpdating = updatingItems.has(item.id);
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.checklistItem,
+          item.completed && styles.completedItem,
+          isUpdating && styles.updatingItem,
+        ]}
+        onPress={() => handleChecklistToggle(item)}
+        disabled={isUpdating}
+      >
+        <View style={styles.checkboxContainer}>
+          <View style={[
+            styles.checkbox,
+            item.completed && styles.checkedBox,
+            isUpdating && styles.updatingBox,
+          ]}>
+            {item.completed && !isUpdating && (
+              <Text style={styles.checkmark}>✓</Text>
+            )}
+            {isUpdating && (
+              <Text style={styles.updating}>⟳</Text>
+            )}
+          </View>
+          {item.required && (
+            <View style={styles.requiredBadge}>
+              <Text style={styles.requiredText}>Required</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.itemContent}>
+          <Text style={[
+            styles.itemDescription,
+            item.completed && styles.completedText,
+          ]}>
+            {item.description}
+          </Text>
+          {item.timestamp && (
+            <Text style={styles.timestampText}>
+              Completed: {new Date(item.timestamp).toLocaleString()}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const stats = getCompletionStats();
 
   return (
     <View style={styles.container}>

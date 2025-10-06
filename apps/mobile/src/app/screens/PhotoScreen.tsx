@@ -27,150 +27,6 @@ const PhotoScreen = ({ route }: any) => {
   const [tempPhotoUri, setTempPhotoUri] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  if (!currentJob) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>Job not found</Text>
-      </View>
-    );
-  }
-
-  const photoTypes = [
-    { key: 'before', label: 'Before', color: colors.info },
-    { key: 'during', label: 'During', color: colors.warning },
-    { key: 'after', label: 'After', color: colors.success },
-    { key: 'damage', label: 'Damage', color: colors.error },
-    { key: 'inventory', label: 'Inventory', color: colors.accent },
-  ];
-
-  const showImagePicker = () => {
-    Alert.alert(
-      'Select Photo',
-      'Choose how to add a photo',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Camera', onPress: () => openCamera() },
-        { text: 'Photo Library', onPress: () => openLibrary() },
-      ]
-    );
-  };
-
-  const openCamera = () => {
-    launchCamera(
-      {
-        mediaType: 'photo',
-        quality: 0.8,
-        maxWidth: 1024,
-        maxHeight: 1024,
-      },
-      handleImageResponse
-    );
-  };
-
-  const openLibrary = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        quality: 0.8,
-        maxWidth: 1024,
-        maxHeight: 1024,
-      },
-      handleImageResponse
-    );
-  };
-
-  const handleImageResponse = (response: ImagePickerResponse) => {
-    if (response.didCancel || response.errorMessage) {
-      return;
-    }
-
-    if (response.assets && response.assets[0]) {
-      const asset = response.assets[0];
-      if (asset.uri) {
-        setTempPhotoUri(asset.uri);
-        setModalVisible(true);
-      }
-    }
-  };
-
-  const handleSavePhoto = async () => {
-    if (!tempPhotoUri || !photoDescription.trim()) {
-      Alert.alert('Error', 'Please provide a description for the photo');
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      await addPhoto(jobId, {
-        uri: tempPhotoUri,
-        description: photoDescription.trim(),
-        type: selectedType,
-      });
-
-      setModalVisible(false);
-      setTempPhotoUri(null);
-      setPhotoDescription('');
-      Alert.alert('Success', 'Photo added successfully');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save photo');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleCancelPhoto = () => {
-    setModalVisible(false);
-    setTempPhotoUri(null);
-    setPhotoDescription('');
-  };
-
-  const getPhotosByType = (type: string) => {
-    return currentJob.photos.filter(photo => photo.type === type);
-  };
-
-  const renderPhotoItem = ({ item }: { item: any }) => (
-    <View style={styles.photoItem}>
-      <Image source={{ uri: item.uri }} style={styles.photoThumbnail} />
-      <View style={styles.photoInfo}>
-        <Text style={styles.photoDescription}>{item.description}</Text>
-        <Text style={styles.photoTimestamp}>
-          {new Date(item.timestamp).toLocaleString()}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const renderTypeSection = (type: any) => {
-    const photos = getPhotosByType(type.key);
-
-    return (
-      <View key={type.key} style={styles.typeSection}>
-        <View style={styles.typeSectionHeader}>
-          <View style={styles.typeHeaderLeft}>
-            <View style={[styles.typeIndicator, { backgroundColor: type.color }]} />
-            <Text style={styles.typeSectionTitle}>{type.label}</Text>
-          </View>
-          <View style={styles.photoCount}>
-            <Text style={styles.photoCountText}>{photos.length}</Text>
-          </View>
-        </View>
-
-        {photos.length === 0 ? (
-          <View style={styles.emptyPhotoSection}>
-            <Text style={styles.emptyPhotoText}>No {type.label.toLowerCase()} photos</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={photos}
-            renderItem={renderPhotoItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-        )}
-      </View>
-    );
-  };
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -376,6 +232,150 @@ const PhotoScreen = ({ route }: any) => {
       textAlign: 'center',
     },
   });
+
+  if (!currentJob) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>Job not found</Text>
+      </View>
+    );
+  }
+
+  const photoTypes = [
+    { key: 'before', label: 'Before', color: colors.info },
+    { key: 'during', label: 'During', color: colors.warning },
+    { key: 'after', label: 'After', color: colors.success },
+    { key: 'damage', label: 'Damage', color: colors.error },
+    { key: 'inventory', label: 'Inventory', color: colors.accent },
+  ];
+
+  const showImagePicker = () => {
+    Alert.alert(
+      'Select Photo',
+      'Choose how to add a photo',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Camera', onPress: () => openCamera() },
+        { text: 'Photo Library', onPress: () => openLibrary() },
+      ]
+    );
+  };
+
+  const openCamera = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 1024,
+        maxHeight: 1024,
+      },
+      handleImageResponse
+    );
+  };
+
+  const openLibrary = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 1024,
+        maxHeight: 1024,
+      },
+      handleImageResponse
+    );
+  };
+
+  const handleImageResponse = (response: ImagePickerResponse) => {
+    if (response.didCancel || response.errorMessage) {
+      return;
+    }
+
+    if (response.assets && response.assets[0]) {
+      const asset = response.assets[0];
+      if (asset.uri) {
+        setTempPhotoUri(asset.uri);
+        setModalVisible(true);
+      }
+    }
+  };
+
+  const handleSavePhoto = async () => {
+    if (!tempPhotoUri || !photoDescription.trim()) {
+      Alert.alert('Error', 'Please provide a description for the photo');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      await addPhoto(jobId, {
+        uri: tempPhotoUri,
+        description: photoDescription.trim(),
+        type: selectedType,
+      });
+
+      setModalVisible(false);
+      setTempPhotoUri(null);
+      setPhotoDescription('');
+      Alert.alert('Success', 'Photo added successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save photo');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleCancelPhoto = () => {
+    setModalVisible(false);
+    setTempPhotoUri(null);
+    setPhotoDescription('');
+  };
+
+  const getPhotosByType = (type: string) => {
+    return currentJob.photos.filter(photo => photo.type === type);
+  };
+
+  const renderPhotoItem = ({ item }: { item: any }) => (
+    <View style={styles.photoItem}>
+      <Image source={{ uri: item.uri }} style={styles.photoThumbnail} />
+      <View style={styles.photoInfo}>
+        <Text style={styles.photoDescription}>{item.description}</Text>
+        <Text style={styles.photoTimestamp}>
+          {new Date(item.timestamp).toLocaleString()}
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderTypeSection = (type: any) => {
+    const photos = getPhotosByType(type.key);
+
+    return (
+      <View key={type.key} style={styles.typeSection}>
+        <View style={styles.typeSectionHeader}>
+          <View style={styles.typeHeaderLeft}>
+            <View style={[styles.typeIndicator, { backgroundColor: type.color }]} />
+            <Text style={styles.typeSectionTitle}>{type.label}</Text>
+          </View>
+          <View style={styles.photoCount}>
+            <Text style={styles.photoCountText}>{photos.length}</Text>
+          </View>
+        </View>
+
+        {photos.length === 0 ? (
+          <View style={styles.emptyPhotoSection}>
+            <Text style={styles.emptyPhotoText}>No {type.label.toLowerCase()} photos</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={photos}
+            renderItem={renderPhotoItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        )}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>

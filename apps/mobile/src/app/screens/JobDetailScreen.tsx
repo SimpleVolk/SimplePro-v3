@@ -18,77 +18,6 @@ const JobDetailScreen = ({ route, navigation }: any) => {
   const [notes, setNotes] = useState(currentJob?.notes || '');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  if (!currentJob) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>Job not found</Text>
-      </View>
-    );
-  }
-
-  const handleStatusChange = async (newStatus: string) => {
-    Alert.alert(
-      'Update Job Status',
-      `Change status to ${newStatus.replace('_', ' ')}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: async () => {
-            setIsUpdatingStatus(true);
-            try {
-              await updateJobStatus(jobId, newStatus as any);
-              Alert.alert('Success', 'Job status updated');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to update job status');
-            } finally {
-              setIsUpdatingStatus(false);
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleNotesUpdate = async () => {
-    try {
-      await updateNotes(jobId, notes);
-      Alert.alert('Success', 'Notes updated');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to update notes');
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return colors.warning;
-      case 'in_progress':
-        return colors.info;
-      case 'completed':
-        return colors.success;
-      case 'cancelled':
-        return colors.error;
-      default:
-        return colors.textMuted;
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Pending';
-      case 'in_progress':
-        return 'In Progress';
-      case 'completed':
-        return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      default:
-        return status;
-    }
-  };
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -265,6 +194,77 @@ const JobDetailScreen = ({ route, navigation }: any) => {
       textAlign: 'center',
     },
   });
+
+  if (!currentJob) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>Job not found</Text>
+      </View>
+    );
+  }
+
+  const handleStatusChange = async (newStatus: string) => {
+    Alert.alert(
+      'Update Job Status',
+      `Change status to ${newStatus.replace('_', ' ')}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            setIsUpdatingStatus(true);
+            try {
+              await updateJobStatus(jobId, newStatus as any);
+              Alert.alert('Success', 'Job status updated');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to update job status');
+            } finally {
+              setIsUpdatingStatus(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleNotesUpdate = async () => {
+    try {
+      await updateNotes(jobId, notes);
+      Alert.alert('Success', 'Notes updated');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update notes');
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return colors.warning;
+      case 'in_progress':
+        return colors.info;
+      case 'completed':
+        return colors.success;
+      case 'cancelled':
+        return colors.error;
+      default:
+        return colors.textMuted;
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'Pending';
+      case 'in_progress':
+        return 'In Progress';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  };
 
   return (
     <View style={styles.container}>

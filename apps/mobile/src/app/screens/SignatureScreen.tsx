@@ -5,10 +5,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Dimensions,
 } from 'react-native';
 import SignatureScreen from 'react-native-signature-canvas';
 import { useJobs } from '../contexts/JobContext';
 import { useTheme } from '../contexts/ThemeContext';
+
+const { height } = Dimensions.get('window');
 
 const SignatureCaptureScreen = ({ route, navigation }: any) => {
   const { jobId } = route.params;
@@ -17,79 +20,6 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
   const [signatureType, setSignatureType] = useState<'pickup' | 'delivery'>('pickup');
   const [isSaving, setIsSaving] = useState(false);
   const signatureRef = useRef<any>(null);
-
-  if (!currentJob) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>Job not found</Text>
-      </View>
-    );
-  }
-
-  const handleSignature = async (signature: string) => {
-    if (!signature) {
-      Alert.alert('Error', 'Please provide a signature');
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      await addSignature(jobId, signatureType, signature);
-      Alert.alert(
-        'Success',
-        `${signatureType === 'pickup' ? 'Pickup' : 'Delivery'} signature saved`,
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save signature');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleClear = () => {
-    signatureRef.current?.clearSignature();
-  };
-
-  const handleConfirm = () => {
-    Alert.alert(
-      'Confirm Signature',
-      `Save this signature for ${signatureType === 'pickup' ? 'pickup' : 'delivery'}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Save',
-          onPress: () => signatureRef.current?.readSignature(),
-        },
-      ]
-    );
-  };
-
-  const signatureStyle = `
-    .m-signature-pad {
-      box-shadow: none;
-      border: none;
-      background-color: ${colors.surface};
-    }
-    .m-signature-pad--body {
-      border: 2px solid ${colors.border};
-      border-radius: 8px;
-      background-color: ${colors.background};
-    }
-    .m-signature-pad--footer {
-      display: none;
-    }
-    body {
-      background-color: ${colors.surface};
-      margin: 0;
-      padding: 16px;
-    }
-  `;
 
   const styles = StyleSheet.create({
     container: {
@@ -210,6 +140,79 @@ const SignatureCaptureScreen = ({ route, navigation }: any) => {
       textAlign: 'center',
     },
   });
+
+  if (!currentJob) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>Job not found</Text>
+      </View>
+    );
+  }
+
+  const handleSignature = async (signature: string) => {
+    if (!signature) {
+      Alert.alert('Error', 'Please provide a signature');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await addSignature(jobId, signatureType, signature);
+      Alert.alert(
+        'Success',
+        `${signatureType === 'pickup' ? 'Pickup' : 'Delivery'} signature saved`,
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save signature');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleClear = () => {
+    signatureRef.current?.clearSignature();
+  };
+
+  const handleConfirm = () => {
+    Alert.alert(
+      'Confirm Signature',
+      `Save this signature for ${signatureType === 'pickup' ? 'pickup' : 'delivery'}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Save',
+          onPress: () => signatureRef.current?.readSignature(),
+        },
+      ]
+    );
+  };
+
+  const signatureStyle = `
+    .m-signature-pad {
+      box-shadow: none;
+      border: none;
+      background-color: ${colors.surface};
+    }
+    .m-signature-pad--body {
+      border: 2px solid ${colors.border};
+      border-radius: 8px;
+      background-color: ${colors.background};
+    }
+    .m-signature-pad--footer {
+      display: none;
+    }
+    body {
+      background-color: ${colors.surface};
+      margin: 0;
+      padding: 16px;
+    }
+  `;
 
   return (
     <View style={styles.container}>

@@ -133,7 +133,7 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? errorMessage : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to send email notification after ${this.MAX_RETRIES} retries:`, errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
@@ -211,7 +211,7 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? errorMessage : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to send SMS notification after ${this.MAX_RETRIES} retries:`, errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
@@ -315,7 +315,7 @@ export class NotificationDeliveryService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? errorMessage : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to send push notification after ${this.MAX_RETRIES} retries:`, errorMessage);
 
       await this.notificationModel.findByIdAndUpdate(notification._id, {
@@ -348,7 +348,8 @@ export class NotificationDeliveryService {
 
         // Exponential backoff: 1s, 2s, 4s, 8s, etc.
         const delay = this.INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-        this.logger.warn(`Delivery attempt ${attempt} failed, retrying in ${delay}ms...`, errorMessage);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Delivery attempt ${attempt} failed, retrying in ${delay}ms...`, errorMsg);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
