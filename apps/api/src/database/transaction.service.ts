@@ -218,7 +218,10 @@ export class TransactionService {
    */
   async getTransactionStats(): Promise<any> {
     try {
-      const adminDb = this.connection.db.admin();
+      const adminDb = this.connection.db?.admin();
+      if (!adminDb) {
+        throw new Error('Database not initialized');
+      }
       const serverStatus = await adminDb.serverStatus();
 
       return {

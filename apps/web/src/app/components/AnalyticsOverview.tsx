@@ -111,7 +111,7 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
     if (autoRefresh && user) {
       const interval = setInterval(() => {
         fetchAnalyticsData();
-      }, 30000); // Refresh every 30 seconds
+      }, 30000) as unknown as NodeJS.Timeout; // Refresh every 30 seconds
 
       setRefreshInterval(interval);
 

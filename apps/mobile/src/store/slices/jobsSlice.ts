@@ -105,6 +105,9 @@ export const checkInToJob = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await jobsApi.checkIn(auth.accessToken, data);
   }
 );
@@ -121,6 +124,9 @@ export const checkOutFromJob = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await jobsApi.checkOut(auth.accessToken, data);
   }
 );
@@ -137,6 +143,9 @@ export const updateJobStatus = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await jobsApi.updateJobStatus(auth.accessToken, jobId, status);
   }
 );

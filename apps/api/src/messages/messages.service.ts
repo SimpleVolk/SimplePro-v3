@@ -284,8 +284,8 @@ export class MessagesService {
         messages: resultMessages,
         hasMore,
         totalCount,
-        nextCursor: hasMore ? resultMessages[resultMessages.length - 1]._id.toString() : undefined,
-        prevCursor: resultMessages.length > 0 ? resultMessages[0]._id.toString() : undefined,
+        nextCursor: hasMore ? (resultMessages[resultMessages.length - 1]._id as any).toString() : undefined,
+        prevCursor: resultMessages.length > 0 ? (resultMessages[0]._id as any).toString() : undefined,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);

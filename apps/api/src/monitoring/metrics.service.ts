@@ -236,7 +236,7 @@ export class MetricsService {
     let dbResponseTime = 0;
     const dbStart = Date.now();
     const dbConnected = this.connection.readyState === 1;
-    if (dbConnected) {
+    if (dbConnected && this.connection.db) {
       try {
         await this.connection.db.admin().ping();
         dbResponseTime = Date.now() - dbStart;

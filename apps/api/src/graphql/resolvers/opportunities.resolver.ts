@@ -12,6 +12,9 @@ import { CustomerDataLoader } from '../dataloaders/customer.dataloader';
 export class OpportunitiesResolver {
   constructor(
     private readonly opportunitiesService: OpportunitiesService,
+    // Reserved for future direct customer queries
+    // @ts-expect-error - Service injected for future use
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private readonly customersService: CustomersService,
     private readonly customerDataLoader: CustomerDataLoader
   ) {}

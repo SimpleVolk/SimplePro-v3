@@ -14,7 +14,7 @@ class NotificationService {
   configure() {
     PushNotification.configure({
       // Called when a notification is received
-      onNotification: function (notification) {
+      onNotification: function (notification: any) {
         console.log('Notification received:', notification);
 
         // Handle notification tap
@@ -46,7 +46,7 @@ class NotificationService {
         importance: 4,
         vibrate: true,
       },
-      (created) => console.log(`Channel 'job-updates' created: ${created}`)
+      (created: boolean) => console.log(`Channel 'job-updates' created: ${created}`)
     );
 
     PushNotification.createChannel(
@@ -59,7 +59,7 @@ class NotificationService {
         importance: 4,
         vibrate: true,
       },
-      (created) => console.log(`Channel 'messages' created: ${created}`)
+      (created: boolean) => console.log(`Channel 'messages' created: ${created}`)
     );
   }
 

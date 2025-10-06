@@ -126,6 +126,6 @@ export class CrewResolver {
   @Query('availableCrew')
   @Roles('admin', 'super_admin', 'dispatcher')
   async getAvailableCrew(@Args('date') _date: Date) {
-    return this.crewDataLoader.loadAvailableCrew(date);
+    return this.crewDataLoader.loadAvailableCrew(_date);
   }
 }

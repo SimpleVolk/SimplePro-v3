@@ -52,6 +52,9 @@ export const clockIn = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await timeTrackingApi.clockIn(auth.accessToken, jobId);
   }
 );
@@ -67,6 +70,9 @@ export const clockOut = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await timeTrackingApi.clockOut(auth.accessToken, entryId);
   }
 );

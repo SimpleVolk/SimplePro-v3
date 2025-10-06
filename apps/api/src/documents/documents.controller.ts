@@ -219,7 +219,7 @@ export class DocumentsController {
     );
 
     const { buffer } = await this.documentsService.downloadDocument(
-      document._id.toString(),
+      document._id?.toString() ?? '',
     );
 
     // Set response headers

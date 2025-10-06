@@ -68,6 +68,9 @@ export const uploadPhoto = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await documentsApi.uploadPhoto(auth.accessToken, data);
   }
 );
@@ -100,6 +103,9 @@ export const uploadSignature = createAsyncThunk(
     }
 
     const { auth } = state;
+    if (!auth.accessToken) {
+      throw new Error('No access token');
+    }
     return await documentsApi.uploadSignature(auth.accessToken, data);
   }
 );

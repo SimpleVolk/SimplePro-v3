@@ -30,7 +30,7 @@ import type {
   ReviewTimeOffDto,
   TimeOffFiltersDto,
   AutoAssignDto,
-  ManualAssignDto,
+  // ManualAssignDto, // TODO: Will be used when manual assignment is implemented
 } from './dto';
 import { parseISO } from 'date-fns';
 

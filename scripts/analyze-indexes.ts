@@ -44,6 +44,9 @@ async function connectToDatabase() {
 
 async function analyzeCollectionIndexes(collectionName: string): Promise<CollectionIndexReport> {
   const db = mongoose.connection.db;
+  if (!db) {
+    throw new Error('Database connection not established');
+  }
   const collection = db.collection(collectionName);
 
   // Get all indexes
@@ -72,8 +75,7 @@ async function analyzeCollectionIndexes(collectionName: string): Promise<Collect
   }
 
   // Get collection stats
-  const collStats = await collection.stats();
-  const documentCount = collStats.count || 0;
+  const documentCount = await collection.countDocuments();
 
   // Analyze indexes
   const unusedIndexes = indexStats
@@ -132,6 +134,9 @@ async function analyzeCollectionIndexes(collectionName: string): Promise<Collect
 
 async function analyzeAllIndexes() {
   const db = mongoose.connection.db;
+  if (!db) {
+    throw new Error('Database connection not established');
+  }
   const collections = await db.listCollections().toArray();
 
   console.log('\n=== DATABASE INDEX USAGE ANALYSIS ===\n');

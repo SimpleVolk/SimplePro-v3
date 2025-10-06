@@ -114,10 +114,10 @@ export class QuoteHistoryService {
       type: dto.type as any,
       timestamp: new Date(),
       details: dto.details || {},
-      userId: dto.userId,
+      userId: dto.userId || '',
     };
 
-    quote.customerInteractions.push(interaction);
+    quote.customerInteractions.push(interaction as any);
 
     // Update timeline for viewed interactions
     if (dto.type === 'viewed') {
@@ -153,11 +153,11 @@ export class QuoteHistoryService {
       activityType: dto.activityType as any,
       timestamp: new Date(),
       performedBy: dto.performedBy,
-      outcome: dto.outcome,
-      notes: dto.notes,
+      outcome: dto.outcome || '',
+      notes: dto.notes || '',
     };
 
-    quote.salesActivity.push(activity);
+    quote.salesActivity.push(activity as any);
 
     // Track follow-up dates
     if (dto.activityType === 'follow_up_call') {
@@ -182,10 +182,10 @@ export class QuoteHistoryService {
       revisedBy: dto.revisedBy,
       priceChange: dto.priceChange,
       changeReason: dto.changeReason,
-      changesDescription: dto.changesDescription,
+      changesDescription: dto.changesDescription || '',
     };
 
-    quote.revisionHistory.push(revision);
+    quote.revisionHistory.push(revision as any);
     quote.version = newVersion;
     quote.quoteData = dto.newQuoteData as any;
     quote.status = QuoteStatus.REVISED;
@@ -204,9 +204,9 @@ export class QuoteHistoryService {
     quote.status = QuoteStatus.ACCEPTED;
     quote.winAnalysis = {
       winReason: dto.winReason as any,
-      winReasonDetails: dto.winReasonDetails,
+      winReasonDetails: dto.winReasonDetails || '',
       keySellingPoints: dto.keySellingPoints || [],
-      marginAchieved: dto.marginAchieved,
+      marginAchieved: dto.marginAchieved || 0,
       upsellOpportunities: dto.upsellOpportunities || [],
     };
 
@@ -235,13 +235,13 @@ export class QuoteHistoryService {
     quote.status = QuoteStatus.REJECTED;
     quote.lossAnalysis = {
       lostReason: dto.lostReason as any,
-      lostReasonDetails: dto.lostReasonDetails,
-      competitorWon: dto.competitorWon,
-      priceDifference: dto.priceDifference,
-      lessonsLearned: dto.lessonsLearned,
+      lostReasonDetails: dto.lostReasonDetails || '',
+      competitorWon: dto.competitorWon || '',
+      priceDifference: dto.priceDifference || 0,
+      lessonsLearned: dto.lessonsLearned || '',
       followUpScheduled: dto.followUpScheduled
         ? new Date(dto.followUpScheduled)
-        : null,
+        : undefined as any,
     };
 
     if (!quote.timeline.decisionDate) {

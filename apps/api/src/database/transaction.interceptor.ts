@@ -32,7 +32,12 @@ import { TransactionService } from './transaction.service';
 export class TransactionInterceptor implements NestInterceptor {
   private readonly logger = new Logger(TransactionInterceptor.name);
 
-  constructor(private readonly transactionService: TransactionService) {}
+  constructor(
+    // Reserved for future transaction management functionality
+    // @ts-expect-error - Service injected for future use
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    private readonly transactionService: TransactionService
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();

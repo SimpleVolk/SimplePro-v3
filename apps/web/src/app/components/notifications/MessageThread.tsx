@@ -206,7 +206,7 @@ export function MessageThread({ threadId, jobId, onClose }: MessageThreadProps) 
       if (socket && isConnected && thread) {
         socket.emit('stopTyping', { threadId: thread.id });
       }
-    }, 2000);
+    }, 2000) as unknown as NodeJS.Timeout;
   };
 
   // Send message

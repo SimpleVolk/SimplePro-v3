@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 interface Job {
   id: string;
@@ -101,8 +101,9 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (response.ok) {
         const data = await response.json();
+        const userId = user?.id || '';
         const crewJobs = data.jobs.filter((job: Job) =>
-          job.assignedCrew?.includes(user?.id) || job.crewId === user?.crewId
+          job.assignedCrew?.includes(userId) || job.crewId === user?.crewId
         );
         setJobs(crewJobs);
 

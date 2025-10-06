@@ -164,7 +164,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     this.heartbeatInterval = setInterval(() => {
       this.cleanupStaleConnections();
       this.logConnectionStats();
-    }, this.HEARTBEAT_INTERVAL);
+    }, this.HEARTBEAT_INTERVAL) as unknown as NodeJS.Timeout;
   }
 
   private cleanupStaleConnections() {
@@ -304,7 +304,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         this.logger.warn(`Connection timeout for client ${socketId} (user: ${client.userId})`);
         this.handleDisconnect(client);
         client.disconnect();
-      }, this.CONNECTION_TIMEOUT);
+      }, this.CONNECTION_TIMEOUT) as unknown as NodeJS.Timeout;
       this.connectionTimers.set(socketId, timeout);
 
       // Join role-based rooms
@@ -935,7 +935,7 @@ export class WebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
           this.logger.error(`Failed to auto-clear typing: ${err.message}`);
         });
         this.typingTimers.delete(timerKey);
-      }, this.TYPING_TIMEOUT);
+      }, this.TYPING_TIMEOUT) as unknown as NodeJS.Timeout;
 
       this.typingTimers.set(timerKey, timer);
 
