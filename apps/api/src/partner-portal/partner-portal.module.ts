@@ -8,6 +8,7 @@ import { PartnerJwtStrategy } from '../auth/strategies/partner-jwt.strategy';
 
 @Module({
   imports: [
+    ConfigModule,
     PartnersModule,
     ReferralsModule,
     JwtModule.registerAsync({

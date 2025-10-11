@@ -4,6 +4,7 @@ import { JobsService } from '../../jobs/jobs.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
+import { CrewDataLoader } from '../dataloaders/crew.dataloader';
 
 @Resolver('Analytics')
 @UseGuards(JwtAuthGuard)
@@ -111,7 +112,7 @@ export class AnalyticsResolver {
 @UseGuards(JwtAuthGuard)
 export class CrewResolver {
   constructor(
-    private readonly crewDataLoader: any, // Inject CrewDataLoader
+    private readonly crewDataLoader: CrewDataLoader,
   ) {}
 
   @Query('crewMember')

@@ -25,6 +25,7 @@ import {
   CrewWorkload,
   CrewWorkloadSchema,
 } from './schemas/crew-workload.schema';
+import { User, UserSchema } from '../auth/schemas/user.schema';
 import { JobsModule } from '../jobs/jobs.module';
 import { AuthModule } from '../auth/auth.module';
 
@@ -35,6 +36,7 @@ import { AuthModule } from '../auth/auth.module';
       { name: TimeOffRequest.name, schema: TimeOffRequestSchema },
       { name: CrewAssignment.name, schema: CrewAssignmentSchema },
       { name: CrewWorkload.name, schema: CrewWorkloadSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     ScheduleModule.forRoot(),
     forwardRef(() => JobsModule),

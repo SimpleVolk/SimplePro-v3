@@ -8,7 +8,7 @@ import {
   Opportunity,
   OpportunitySchema,
 } from '../opportunities/schemas/opportunity.schema';
-import { DocumentSchema } from '../documents/schemas/document.schema';
+import { DocumentEntity, DocumentSchema } from '../documents/schemas/document.schema';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 @Module({
@@ -17,7 +17,7 @@ import { AuditLogsModule } from '../audit-logs/audit-logs.module';
       { name: Customer.name, schema: CustomerSchema },
       { name: Job.name, schema: JobSchema },
       { name: Opportunity.name, schema: OpportunitySchema },
-      { name: Document.name, schema: DocumentSchema },
+      { name: DocumentEntity.name, schema: DocumentSchema },
     ]),
     AuditLogsModule,
   ],

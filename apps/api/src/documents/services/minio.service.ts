@@ -25,7 +25,7 @@ export class MinioService implements OnModuleInit {
       'MINIO_SECRET_KEY',
       'simplepro_minio_2024',
     );
-    const useSSL = this.configService.get<boolean>('MINIO_USE_SSL', false);
+    const useSSL = this.configService.get<string>('MINIO_USE_SSL', 'false') === 'true';
     this.bucket = this.configService.get<string>(
       'MINIO_BUCKET',
       'simplepro-documents',
