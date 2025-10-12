@@ -9,19 +9,19 @@ export type ReferralDocument = Referral &
 
 @Schema({ collection: 'referrals', timestamps: true })
 export class Referral {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Partner', index: true })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Partner' })
   partnerId!: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Opportunity', index: true, sparse: true })
-  opportunityId?: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Opportunity' })
+  opportunityId?: Types.ObjectId; // Sparse unique index created explicitly below
 
-  @Prop({ type: Types.ObjectId, ref: 'Customer', index: true })
+  @Prop({ type: Types.ObjectId, ref: 'Customer' })
   customerId?: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Job', index: true, sparse: true })
-  jobId?: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Job' })
+  jobId?: Types.ObjectId; // Sparse unique index created explicitly below
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   referralDate!: Date;
 
   @Prop({
@@ -37,7 +37,6 @@ export class Referral {
       'cancelled',
     ],
     default: 'received',
-    index: true,
   })
   status!: string;
 
@@ -46,7 +45,6 @@ export class Referral {
     type: String,
     enum: ['hot', 'warm', 'cold'],
     default: 'warm',
-    index: true,
   })
   leadQuality!: string;
 
@@ -110,7 +108,7 @@ export class Referral {
   @Prop()
   internalNotes?: string;
 
-  @Prop({ index: true })
+  @Prop()
   assignedSalesRep?: string;
 
   @Prop({ type: [String], default: [] })

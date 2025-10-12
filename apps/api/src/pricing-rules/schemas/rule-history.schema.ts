@@ -5,7 +5,7 @@ export type RuleHistoryDocument = RuleHistory & Document;
 
 @Schema({ collection: 'rule-history', timestamps: false })
 export class RuleHistory {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   ruleId!: string;
 
   @Prop({
@@ -20,20 +20,19 @@ export class RuleHistory {
       'imported',
       'exported',
     ],
-    index: true,
   })
   action!: string;
 
   @Prop({ type: Object, default: {} })
   changes!: Record<string, { old: any; new: any }>;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   userId!: string;
 
   @Prop({ required: true })
   userName!: string;
 
-  @Prop({ default: Date.now, index: true })
+  @Prop({ default: Date.now })
   timestamp!: Date;
 
   @Prop()
@@ -52,9 +51,10 @@ export class RuleHistory {
 export const RuleHistorySchema = SchemaFactory.createForClass(RuleHistory);
 
 // Create compound indexes for efficient querying
-RuleHistorySchema.index({ ruleId: 1, timestamp: -1 });
-RuleHistorySchema.index({ userId: 1, timestamp: -1 });
-RuleHistorySchema.index({ action: 1, timestamp: -1 });
+// Note: Compound indexes also serve single-field queries on the first field
+RuleHistorySchema.index({ ruleId: 1, timestamp: -1 }); // Also serves ruleId queries
+RuleHistorySchema.index({ userId: 1, timestamp: -1 }); // Also serves userId queries
+RuleHistorySchema.index({ action: 1, timestamp: -1 }); // Also serves action queries
 
 // TTL index to automatically clean up old history records (keep for 2 years)
 RuleHistorySchema.index({ timestamp: 1 }, { expireAfterSeconds: 63072000 }); // 2 years in seconds

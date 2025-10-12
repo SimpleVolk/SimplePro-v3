@@ -28,7 +28,7 @@ export class NotificationsResolver {
     return this.notificationsService.findAll(userId, filters);
   }
 
-  @Query('unreadNotificationCount')
+  @Query('unreadNotificationsCount')
   async getUnreadCount(@Request() req: any) {
     const userId = req.user?.sub || req.user?.userId;
     return this.notificationsService.getUnreadCount(userId);

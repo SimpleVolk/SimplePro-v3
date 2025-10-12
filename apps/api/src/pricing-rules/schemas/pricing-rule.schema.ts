@@ -66,7 +66,7 @@ export class PricingRuleAction {
 
 @Schema({ collection: 'pricing-rules', timestamps: true })
 export class PricingRule {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   id!: string;
 
   @Prop({ required: true })
@@ -87,11 +87,10 @@ export class PricingRule {
       'location_handicaps',
       'additional_services',
     ],
-    index: true,
   })
   category!: string;
 
-  @Prop({ required: true, min: 1, max: 1000, index: true })
+  @Prop({ required: true, min: 1, max: 1000 })
   priority!: number;
 
   @Prop({ type: [PricingRuleCondition], required: true })
@@ -100,14 +99,13 @@ export class PricingRule {
   @Prop({ type: [PricingRuleAction], required: true })
   actions!: PricingRuleAction[];
 
-  @Prop({ default: true, index: true })
+  @Prop({ default: true })
   isActive!: boolean;
 
   @Prop({
     type: [String],
     enum: ['local', 'long_distance', 'storage', 'packing_only'],
     required: true,
-    index: true,
   })
   applicableServices!: string[];
 

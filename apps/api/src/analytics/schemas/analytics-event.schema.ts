@@ -5,10 +5,10 @@ export type AnalyticsEventDocument = AnalyticsEvent & Document;
 
 @Schema({ collection: 'analytics_events', timestamps: true })
 export class AnalyticsEvent {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   eventType!: string; // 'job_created', 'job_completed', 'estimate_generated', 'customer_acquired', etc.
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   category!: string; // 'jobs', 'customers', 'revenue', 'crew', 'operations'
 
   @Prop({ required: true })
@@ -17,19 +17,19 @@ export class AnalyticsEvent {
   @Prop({ type: Object, required: true })
   data!: Record<string, any>; // Event-specific data
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   userId!: string; // User who triggered the event
 
-  @Prop({ index: true })
+  @Prop()
   customerId?: string;
 
-  @Prop({ index: true })
+  @Prop()
   jobId?: string;
 
-  @Prop({ index: true })
+  @Prop()
   estimateId?: string;
 
-  @Prop({ index: true })
+  @Prop()
   crewId?: string;
 
   // Financial tracking
@@ -89,20 +89,20 @@ export const AnalyticsEventSchema =
 AnalyticsEventSchema.index({ timestamp: -1 });
 AnalyticsEventSchema.index({ eventType: 1, timestamp: -1 });
 AnalyticsEventSchema.index({ category: 1, timestamp: -1 });
-AnalyticsEventSchema.index({ userId: 1, timestamp: -1 });
+// Note: userId+timestamp index removed - covered by userId+category+timestamp compound index in IndexOptimizationService
 AnalyticsEventSchema.index({ customerId: 1, timestamp: -1 });
-AnalyticsEventSchema.index({ jobId: 1 });
+// Note: jobId single index removed - covered by jobId+timestamp+eventType compound index in IndexOptimizationService
 AnalyticsEventSchema.index({ 'location.state': 1, 'location.city': 1 });
 AnalyticsEventSchema.index({ processed: 1 });
 
 // Compound indexes for common queries
 AnalyticsEventSchema.index({ category: 1, eventType: 1, timestamp: -1 });
-AnalyticsEventSchema.index({ revenue: -1, timestamp: -1 });
+// Note: revenue+timestamp index removed - covered by partial index below
 
 // Additional performance indexes
-AnalyticsEventSchema.index({ userId: 1, category: 1, timestamp: -1 });
+// Note: userId+category+timestamp compound index is created by IndexOptimizationService
 AnalyticsEventSchema.index({ customerId: 1, eventType: 1 }, { sparse: true });
-AnalyticsEventSchema.index({ jobId: 1, timestamp: -1 }, { sparse: true });
+// Note: jobId+timestamp+eventType compound index is created by IndexOptimizationService
 AnalyticsEventSchema.index({ processed: 1, processedAt: 1 });
 
 // Partial indexes for better performance

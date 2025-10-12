@@ -6,7 +6,7 @@ export interface Job {
   title: string; // Brief description of the job
   description?: string;
   type: 'local' | 'long_distance' | 'storage' | 'packing_only';
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+  status: 'draft' | 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
   priority: 'low' | 'normal' | 'high' | 'urgent';
 
   // Related Records
@@ -268,7 +268,7 @@ export interface CreateJobDto {
 export interface UpdateJobDto {
   title?: string;
   description?: string;
-  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+  status?: 'draft' | 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
   priority?: 'low' | 'normal' | 'high' | 'urgent';
 
   scheduledDate?: Date;
@@ -305,7 +305,7 @@ export interface UpdateJobDto {
 }
 
 export interface JobFilters {
-  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+  status?: 'draft' | 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
   type?: 'local' | 'long_distance' | 'storage' | 'packing_only';
   priority?: 'low' | 'normal' | 'high' | 'urgent';
   customerId?: string;

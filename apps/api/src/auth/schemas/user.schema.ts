@@ -10,10 +10,10 @@ export type UserDocument = User & Document;
 
 @Schema({ collection: 'users', timestamps: true })
 export class User {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   username!: string;
 
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   email!: string;
 
   @Prop({ required: true })
@@ -25,7 +25,7 @@ export class User {
   @Prop({ required: true })
   lastName!: string;
 
-  @Prop({ type: Object, required: true, index: true })
+  @Prop({ type: Object, required: true })
   role!: UserRole;
 
   @Prop()
@@ -40,7 +40,7 @@ export class User {
   @Prop({ type: [String], default: [] })
   fcmTokens!: string[]; // Firebase Cloud Messaging tokens for push notifications
 
-  @Prop({ default: true, index: true })
+  @Prop({ default: true })
   isActive!: boolean;
 
   @Prop({ default: false })
@@ -76,6 +76,7 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 // Additional indexes (OPTIMIZED - removed redundant indexes)
+// Note: email and username indexes are created automatically by unique: true in @Prop decorators
 UserSchema.index({ 'role.name': 1 }); // Role-based filtering
 UserSchema.index({ department: 1 }); // Department filtering
 UserSchema.index({ crewId: 1 }); // Crew member lookups

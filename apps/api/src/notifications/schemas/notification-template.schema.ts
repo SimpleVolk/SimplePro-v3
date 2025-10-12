@@ -12,7 +12,7 @@ export interface DefaultChannels {
 
 @Schema({ collection: 'notification_templates', timestamps: true })
 export class NotificationTemplate {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   type!: string; // Matches notification.type
 
   @Prop({ required: true })
@@ -43,8 +43,7 @@ export class NotificationTemplate {
 export const NotificationTemplateSchema =
   SchemaFactory.createForClass(NotificationTemplate);
 
-// Ensure type is unique
-NotificationTemplateSchema.index({ type: 1 }, { unique: true });
+// NOTE: type unique index is created automatically by @Prop({ unique: true })
 
 // Ensure virtuals are serialized
 NotificationTemplateSchema.set('toJSON', {

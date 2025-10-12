@@ -128,10 +128,10 @@ export class Opportunity {
   })
   leadSource!: string;
 
-  @Prop({ index: true })
+  @Prop()
   referralId?: string;
 
-  @Prop({ index: true })
+  @Prop()
   partnerId?: string;
 
   @Prop()

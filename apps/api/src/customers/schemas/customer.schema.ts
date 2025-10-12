@@ -9,13 +9,13 @@ export type CustomerDocument = Customer & Document;
 
 @Schema({ collection: 'customers', timestamps: true })
 export class Customer {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   firstName!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   lastName!: string;
 
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   email!: string;
 
   @Prop({ required: true })
@@ -28,7 +28,6 @@ export class Customer {
     required: true,
     type: String,
     enum: ['residential', 'commercial'],
-    index: true,
   })
   type!: 'residential' | 'commercial';
 
@@ -37,7 +36,6 @@ export class Customer {
     type: String,
     enum: ['lead', 'prospect', 'active', 'inactive'],
     default: 'lead',
-    index: true,
   })
   status!: 'lead' | 'prospect' | 'active' | 'inactive';
 
@@ -52,7 +50,6 @@ export class Customer {
       'partner',
       'other',
     ],
-    index: true,
   })
   source!:
     | 'website'
@@ -100,13 +97,13 @@ export class Customer {
     source: string;
   };
 
-  @Prop({ index: true })
+  @Prop()
   assignedSalesRep?: string;
 
   @Prop()
   leadScore?: number;
 
-  @Prop({ type: [String], index: true })
+  @Prop({ type: [String] })
   tags?: string[];
 
   @Prop()
@@ -118,10 +115,10 @@ export class Customer {
   @Prop({ type: [String], default: [] })
   jobs!: string[];
 
-  @Prop({ type: Date, index: true })
+  @Prop({ type: Date })
   lastContactDate?: Date;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   createdBy!: string;
 
   @Prop()
@@ -161,7 +158,7 @@ CustomerSchema.pre(
 );
 
 // Optimize indexes for performance (OPTIMIZED - removed redundant indexes)
-CustomerSchema.index({ email: 1 }, { unique: true }); // Unique email lookup
+// NOTE: email unique index is created automatically by @Prop({ unique: true })
 CustomerSchema.index({ firstName: 1, lastName: 1 }); // Name-based search
 CustomerSchema.index({ status: 1 }); // Status filtering
 CustomerSchema.index({ type: 1 }); // Type filtering (residential/commercial)

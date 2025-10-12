@@ -5,13 +5,13 @@ export type UserSessionDocument = UserSession & Document;
 
 @Schema({ collection: 'sessions', timestamps: true })
 export class UserSession {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   userId!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   token!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   refreshToken!: string;
 
   @Prop()
@@ -20,7 +20,7 @@ export class UserSession {
   @Prop()
   ipAddress?: string;
 
-  @Prop({ default: true, index: true })
+  @Prop({ default: true })
   isActive!: boolean;
 
   @Prop({ required: true, type: Date })
@@ -49,11 +49,10 @@ export class UserSession {
 
 export const UserSessionSchema = SchemaFactory.createForClass(UserSession);
 
-// Additional indexes (basic indexes already defined in @Prop decorators)
-// TTL index for automatic cleanup - this one needs to be explicit
+// TTL index for automatic cleanup
 UserSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-// Compound indexes for common queries
+// Compound indexes for common queries (these also serve single-field userId queries)
 UserSessionSchema.index({ userId: 1, isActive: 1 });
 UserSessionSchema.index({ userId: 1, refreshToken: 1, isActive: 1 });
 

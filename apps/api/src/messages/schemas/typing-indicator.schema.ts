@@ -9,17 +9,16 @@ export class TypingIndicator {
     required: true,
     type: Types.ObjectId,
     ref: 'MessageThread',
-    index: true,
   })
   threadId!: Types.ObjectId;
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User', index: true })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId!: Types.ObjectId;
 
   @Prop({ required: true, type: Date })
   startedAt!: Date;
 
-  @Prop({ required: true, type: Date, index: true })
+  @Prop({ required: true, type: Date })
   expiresAt!: Date;
 }
 

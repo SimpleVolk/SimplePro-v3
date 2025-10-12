@@ -122,8 +122,10 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
 
-  // Global prefix
-  app.setGlobalPrefix('api');
+  // Global prefix (exclude GraphQL so Apollo Server can handle its own middleware)
+  app.setGlobalPrefix('api', {
+    exclude: ['/graphql'],
+  });
 
   // Setup Swagger documentation
   if (

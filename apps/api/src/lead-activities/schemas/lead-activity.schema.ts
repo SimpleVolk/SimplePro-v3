@@ -87,7 +87,7 @@ export class LeadActivity {
 export const LeadActivitySchema = SchemaFactory.createForClass(LeadActivity);
 
 // Indexes for efficient queries
-LeadActivitySchema.index({ activityId: 1 }, { unique: true });
+// Note: activityId unique index is created automatically by unique: true in @Prop decorator
 LeadActivitySchema.index({ opportunityId: 1, activityType: 1 });
 LeadActivitySchema.index({ customerId: 1, createdAt: -1 });
 LeadActivitySchema.index({ assignedTo: 1, dueDate: 1, completedDate: 1 });

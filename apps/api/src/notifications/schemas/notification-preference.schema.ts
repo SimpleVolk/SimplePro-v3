@@ -65,8 +65,7 @@ export const NotificationPreferenceSchema = SchemaFactory.createForClass(
   NotificationPreference,
 );
 
-// Ensure userId is unique
-NotificationPreferenceSchema.index({ userId: 1 }, { unique: true });
+// NOTE: userId unique index is created automatically by @Prop({ unique: true, index: true })
 
 // Ensure virtuals are serialized
 NotificationPreferenceSchema.set('toJSON', {

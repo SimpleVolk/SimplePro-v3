@@ -5,13 +5,13 @@ export type PartnerDocument = Partner & Document;
 
 @Schema({ collection: 'partners', timestamps: true })
 export class Partner {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   companyName!: string;
 
   @Prop({ required: true })
   contactName!: string;
 
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   email!: string;
 
   @Prop({ required: true })
@@ -29,7 +29,6 @@ export class Partner {
       'referral_network',
       'other',
     ],
-    index: true,
   })
   partnerType!: string;
 
@@ -38,7 +37,6 @@ export class Partner {
     type: String,
     enum: ['active', 'inactive', 'pending', 'suspended'],
     default: 'pending',
-    index: true,
   })
   status!: string;
 
@@ -125,17 +123,17 @@ export class Partner {
   @Prop()
   notes?: string;
 
-  @Prop({ type: [String], default: [], index: true })
+  @Prop({ type: [String], default: [] })
   tags!: string[];
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   createdBy!: string;
 }
 
 export const PartnerSchema = SchemaFactory.createForClass(Partner);
 
 // Optimize indexes for performance
-PartnerSchema.index({ email: 1 }, { unique: true });
+// Note: email unique index is created automatically by unique: true in @Prop decorator
 PartnerSchema.index({ companyName: 1 });
 PartnerSchema.index({ partnerType: 1, status: 1 });
 PartnerSchema.index({ status: 1, createdAt: -1 });

@@ -77,12 +77,13 @@ import { loadSecrets } from '../config/secrets.config';
         // Options: primary, primaryPreferred, secondary, secondaryPreferred, nearest
         // Use secondaryPreferred for better read scaling (falls back to primary if secondaries unavailable)
         // Use primary or primaryPreferred for transactions
+        // For standalone MongoDB (no replica set), use 'primary'
         readPreference:
-          (process.env.MONGODB_READ_PREFERENCE as any) || 'secondaryPreferred',
+          (process.env.MONGODB_READ_PREFERENCE as any) || (process.env.MONGODB_REPLICA_SET ? 'secondaryPreferred' : 'primary'),
         readConcern: { level: 'majority' }, // Ensure reads return committed data
 
-        // Replica set specific settings
-        replicaSet: process.env.MONGODB_REPLICA_SET || 'simplepro-rs',
+        // Replica set specific settings (only set if MONGODB_REPLICA_SET is defined and not empty)
+        ...(process.env.MONGODB_REPLICA_SET && { replicaSet: process.env.MONGODB_REPLICA_SET }),
 
         // Network and performance settings
         family: 4, // Use IPv4, skip trying IPv6

@@ -180,7 +180,7 @@ export class Metrics {
 // Main schema
 @Schema({ timestamps: true })
 export class ConversionMetrics {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   metricsId!: string;
 
   @Prop({ type: MetricsPeriod, required: true })
@@ -189,7 +189,6 @@ export class ConversionMetrics {
   @Prop({
     required: true,
     enum: Object.values(MetricsGranularity),
-    index: true,
   })
   granularity!: MetricsGranularity;
 

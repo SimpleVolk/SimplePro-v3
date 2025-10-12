@@ -213,16 +213,16 @@ export class RevisionHistory {
 // Main schema
 @Schema({ timestamps: true })
 export class QuoteHistory {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   quoteHistoryId!: string;
 
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   estimateId!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   opportunityId!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   customerId!: string;
 
   @Prop({ required: true, default: 1 })
@@ -235,7 +235,6 @@ export class QuoteHistory {
     required: true,
     enum: Object.values(QuoteStatus),
     default: QuoteStatus.DRAFT,
-    index: true,
   })
   status!: QuoteStatus;
 
@@ -263,7 +262,7 @@ export class QuoteHistory {
   @Prop({ type: [RevisionHistory], default: [] })
   revisionHistory!: RevisionHistory[];
 
-  @Prop({ index: true })
+  @Prop()
   assignedSalesRep!: string;
 
   @Prop({ required: true })

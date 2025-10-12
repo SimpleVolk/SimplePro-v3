@@ -23,6 +23,7 @@ import { CacheService } from '../cache/cache.service';
 import { RealtimeService } from '../websocket/realtime.service';
 import { PaginatedResponse } from '../common/dto/pagination.dto';
 import { TransactionService } from '../database/transaction.service';
+import { PubSubService } from '../graphql/pubsub.service';
 
 @Injectable()
 export class JobsService implements OnModuleInit {
@@ -32,6 +33,8 @@ export class JobsService implements OnModuleInit {
     private realtimeService: RealtimeService,
     private transactionService: TransactionService,
     private cacheService: CacheService,
+    @Inject(forwardRef(() => PubSubService))
+    private pubSubService: PubSubService,
   ) {}
 
   async onModuleInit() {
@@ -286,7 +289,18 @@ export class JobsService implements OnModuleInit {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
 
-    return this.convertJobDocument(updatedJob);
+    const convertedJob = this.convertJobDocument(updatedJob);
+
+    // Emit GraphQL subscription event for job update
+    if (this.pubSubService) {
+      setImmediate(() => {
+        this.pubSubService.publishJobUpdated(convertedJob).catch((err) => {
+          console.error('Failed to publish job updated event:', err);
+        });
+      });
+    }
+
+    return convertedJob;
   }
 
   /**
@@ -357,7 +371,22 @@ export class JobsService implements OnModuleInit {
         });
       }
 
-      return this.convertJobDocument(updatedJob);
+      const convertedJob = this.convertJobDocument(updatedJob);
+
+      // 3. Emit GraphQL subscription events for status change
+      if (this.pubSubService) {
+        setImmediate(() => {
+          // Emit both job updated and status changed events
+          this.pubSubService.publishJobStatusChanged(convertedJob).catch((err) => {
+            console.error('Failed to publish job status changed event:', err);
+          });
+          this.pubSubService.publishJobUpdated(convertedJob).catch((err) => {
+            console.error('Failed to publish job updated event:', err);
+          });
+        });
+      }
+
+      return convertedJob;
     });
   }
 
@@ -418,7 +447,23 @@ export class JobsService implements OnModuleInit {
       throw new NotFoundException(`Job with ID ${id} not found`);
     }
 
-    return this.convertJobDocument(updatedJob);
+    const convertedJob = this.convertJobDocument(updatedJob);
+
+    // Emit GraphQL subscription events for crew assignment
+    if (this.pubSubService) {
+      setImmediate(() => {
+        // Emit crew assigned event
+        this.pubSubService.publishCrewAssigned(convertedJob).catch((err) => {
+          console.error('Failed to publish crew assigned event:', err);
+        });
+        // Also emit general job updated event
+        this.pubSubService.publishJobUpdated(convertedJob).catch((err) => {
+          console.error('Failed to publish job updated event:', err);
+        });
+      });
+    }
+
+    return convertedJob;
   }
 
   async updateCrewStatus(

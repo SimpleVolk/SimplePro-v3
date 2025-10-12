@@ -83,6 +83,6 @@ export class FollowUpRule {
 export const FollowUpRuleSchema = SchemaFactory.createForClass(FollowUpRule);
 
 // Indexes for efficient queries
-FollowUpRuleSchema.index({ ruleId: 1 }, { unique: true });
+// NOTE: ruleId unique index is created automatically by @Prop({ unique: true })
 FollowUpRuleSchema.index({ isActive: 1, priority: 1 });
 FollowUpRuleSchema.index({ 'trigger.eventType': 1 });

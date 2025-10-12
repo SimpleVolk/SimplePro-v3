@@ -8,14 +8,13 @@ export class MessageThread {
   @Prop({
     required: true,
     type: [{ type: Types.ObjectId, ref: 'User' }],
-    index: true,
   })
   participants!: Types.ObjectId[];
 
-  @Prop({ enum: ['direct', 'job', 'group'], default: 'direct', index: true })
+  @Prop({ enum: ['direct', 'job', 'group'], default: 'direct' })
   threadType!: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Job', index: true })
+  @Prop({ type: Types.ObjectId, ref: 'Job' })
   jobId?: Types.ObjectId;
 
   @Prop()
@@ -24,7 +23,7 @@ export class MessageThread {
   @Prop({ type: Types.ObjectId, ref: 'Message' })
   lastMessageId?: Types.ObjectId;
 
-  @Prop({ type: Date, index: true })
+  @Prop({ type: Date })
   lastMessageAt?: Date;
 
   @Prop({ default: false })

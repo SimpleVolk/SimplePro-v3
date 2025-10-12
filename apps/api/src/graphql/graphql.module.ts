@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { GraphQLModule as NestGraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -18,6 +18,10 @@ import { EstimatesResolver } from './resolvers/estimates.resolver';
 import { OpportunitiesResolver } from './resolvers/opportunities.resolver';
 import { DocumentsResolver } from './resolvers/documents.resolver';
 import { NotificationsResolver } from './resolvers/notifications.resolver';
+import { SubscriptionsResolver } from './resolvers/subscriptions.resolver';
+
+// Import PubSub service
+import { PubSubService } from './pubsub.service';
 
 // Import DataLoaders
 import { CustomerDataLoader } from './dataloaders/customer.dataloader';
@@ -60,6 +64,8 @@ import {
       playground: process.env.NODE_ENV !== 'production', // Enable GraphQL Playground in development
       introspection: true, // Enable introspection for GraphQL tools
       context: ({ req }: { req: any }) => ({ req }), // Pass request to context for auth guards
+      // Disable CSRF protection for development (Apollo Server v4 requirement)
+      csrfPrevention: false,
       formatError: (error) => {
         // Custom error formatting
         return {
@@ -72,6 +78,22 @@ import {
           },
         };
       },
+      // Enable subscriptions with WebSocket support
+      subscriptions: {
+        'graphql-ws': {
+          path: '/graphql',
+          onConnect: (context: any) => {
+            // Extract token from connection params for authentication
+            const { token } = context.connectionParams || {};
+            if (token) {
+              return { token };
+            }
+            return {};
+          },
+        },
+      },
+      // Install subscriptions handlers
+      installSubscriptionHandlers: true,
     }),
     // Import Mongoose models for DataLoaders
     MongooseModule.forFeature([
@@ -81,7 +103,7 @@ import {
       { name: DocumentEntity.name, schema: DocumentSchema },
     ]),
     // Import feature modules
-    JobsModule,
+    forwardRef(() => JobsModule),
     CustomersModule,
     AnalyticsModule,
     EstimatesModule,
@@ -101,12 +123,20 @@ import {
     OpportunitiesResolver,
     DocumentsResolver,
     NotificationsResolver,
+    SubscriptionsResolver,
     // DataLoaders (scoped to REQUEST for proper batching)
     CustomerDataLoader,
     EstimateDataLoader,
     CrewDataLoader,
     OpportunityDataLoader,
     DocumentDataLoader,
+    // PubSub Service for subscriptions
+    PubSubService,
+    {
+      provide: 'PUB_SUB',
+      useFactory: (pubSubService: PubSubService) => pubSubService.getPubSub(),
+      inject: [PubSubService],
+    },
   ],
   exports: [
     CustomerDataLoader,
@@ -114,6 +144,7 @@ import {
     CrewDataLoader,
     OpportunityDataLoader,
     DocumentDataLoader,
+    PubSubService,
   ],
 })
 export class GraphQLModule {}

@@ -8,6 +8,7 @@ import {
   EquipmentRequirement,
   JobMilestone,
   JobPhoto,
+  JobDocument as JobDocumentInterface,
   CustomerNotification,
   InternalNote,
   AdditionalCharge,
@@ -21,7 +22,7 @@ export type JobDocument = Job & Document;
 
 @Schema({ collection: 'jobs', timestamps: true })
 export class Job {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   jobNumber!: string;
 
   @Prop({ required: true })
@@ -34,40 +35,37 @@ export class Job {
     required: true,
     type: String,
     enum: ['local', 'long_distance', 'storage', 'packing_only'],
-    index: true,
   })
   type!: 'local' | 'long_distance' | 'storage' | 'packing_only';
 
   @Prop({
     required: true,
     type: String,
-    enum: ['scheduled', 'in_progress', 'completed', 'cancelled', 'on_hold'],
+    enum: ['draft', 'scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'on_hold'],
     default: 'scheduled',
-    index: true,
   })
-  status!: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+  status!: 'draft' | 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
 
   @Prop({
     required: true,
     type: String,
     enum: ['low', 'normal', 'high', 'urgent'],
     default: 'normal',
-    index: true,
   })
   priority!: 'low' | 'normal' | 'high' | 'urgent';
 
   // Related Records
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   customerId!: string;
 
-  @Prop({ index: true })
+  @Prop()
   estimateId?: string;
 
-  @Prop({ index: true })
+  @Prop()
   invoiceId?: string;
 
   // Scheduling Information
-  @Prop({ required: true, type: Date, index: true })
+  @Prop({ required: true, type: Date })
   scheduledDate!: Date;
 
   @Prop({ required: true })
@@ -114,7 +112,7 @@ export class Job {
   @Prop({ type: [Object], default: [] })
   assignedCrew!: CrewAssignment[];
 
-  @Prop({ index: true })
+  @Prop()
   leadCrew?: string;
 
   @Prop()
@@ -160,7 +158,7 @@ export class Job {
   photos!: JobPhoto[];
 
   @Prop({ type: [Object], default: [] })
-  documents!: JobDocument[];
+  documents!: JobDocumentInterface[];
 
   // Communication
   @Prop({ type: [Object], default: [] })
@@ -213,8 +211,18 @@ JobSchema.pre(
 // Foreign key validation middleware
 JobSchema.pre('save', async function (next) {
   try {
+    // Helper function to safely check if a model exists
+    const modelExists = (modelName: string): boolean => {
+      try {
+        mongoose.model(modelName);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     // Validate customerId reference (required)
-    if (this.customerId) {
+    if (this.customerId && modelExists('Customer')) {
       const Customer = mongoose.model('Customer');
       const customerExists = await Customer.exists({ _id: this.customerId });
       if (!customerExists) {
@@ -222,8 +230,8 @@ JobSchema.pre('save', async function (next) {
       }
     }
 
-    // Validate estimateId reference (optional)
-    if (this.estimateId) {
+    // Validate estimateId reference (optional) - skip if model not registered
+    if (this.estimateId && modelExists('Estimate')) {
       const Estimate = mongoose.model('Estimate');
       const estimateExists = await Estimate.exists({ _id: this.estimateId });
       if (!estimateExists) {
@@ -231,8 +239,8 @@ JobSchema.pre('save', async function (next) {
       }
     }
 
-    // Validate invoiceId reference (optional)
-    if (this.invoiceId) {
+    // Validate invoiceId reference (optional) - skip if model not registered
+    if (this.invoiceId && modelExists('Invoice')) {
       const Invoice = mongoose.model('Invoice');
       const invoiceExists = await Invoice.exists({ _id: this.invoiceId });
       if (!invoiceExists) {
@@ -241,7 +249,7 @@ JobSchema.pre('save', async function (next) {
     }
 
     // Validate leadCrew reference (optional)
-    if (this.leadCrew) {
+    if (this.leadCrew && modelExists('User')) {
       const User = mongoose.model('User');
       const leadCrewExists = await User.exists({ _id: this.leadCrew });
       if (!leadCrewExists) {
@@ -252,7 +260,7 @@ JobSchema.pre('save', async function (next) {
     }
 
     // Validate assignedCrew references
-    if (this.assignedCrew && this.assignedCrew.length > 0) {
+    if (this.assignedCrew && this.assignedCrew.length > 0 && modelExists('User')) {
       const User = mongoose.model('User');
       for (const assignment of this.assignedCrew) {
         if (assignment.crewMemberId) {
@@ -269,7 +277,7 @@ JobSchema.pre('save', async function (next) {
     }
 
     // Validate createdBy reference (required)
-    if (this.createdBy) {
+    if (this.createdBy && modelExists('User')) {
       const User = mongoose.model('User');
       const creatorExists = await User.exists({ _id: this.createdBy });
       if (!creatorExists) {
@@ -280,7 +288,7 @@ JobSchema.pre('save', async function (next) {
     }
 
     // Validate lastModifiedBy reference (required)
-    if (this.lastModifiedBy) {
+    if (this.lastModifiedBy && modelExists('User')) {
       const User = mongoose.model('User');
       const modifierExists = await User.exists({ _id: this.lastModifiedBy });
       if (!modifierExists) {
@@ -297,10 +305,9 @@ JobSchema.pre('save', async function (next) {
 });
 
 // Add indexes for optimal performance (OPTIMIZED - removed redundant indexes)
-JobSchema.index({ jobNumber: 1 }, { unique: true });
+// Note: jobNumber index is created automatically by unique: true in @Prop decorator
 JobSchema.index({ customerId: 1 }); // Frequently used for job lookups by customer
 JobSchema.index({ status: 1 }); // Used for status-based queries (dashboard, reports)
-JobSchema.index({ type: 1 }); // Used for filtering by job type
 JobSchema.index({ priority: 1 }); // Used for priority-based sorting
 JobSchema.index({ scheduledDate: 1 }); // Used for calendar and scheduling queries
 JobSchema.index({ 'assignedCrew.crewMemberId': 1 }); // Used for crew member job lookups
@@ -310,11 +317,12 @@ JobSchema.index({ invoiceId: 1 }); // Used for invoice to job linking
 JobSchema.index({ createdBy: 1 }); // Used for filtering by creator
 
 // Compound indexes for common queries (OPTIMIZED - removed redundant ones)
-JobSchema.index({ type: 1, status: 1 }); // Used for filtering by type and status
+// Note: Single type index removed - covered by compound index below
+JobSchema.index({ type: 1, status: 1 }); // Used for filtering by type and status (also serves single type queries)
 JobSchema.index({ 'assignedCrew.crewMemberId': 1, status: 1 }); // Used for crew member active jobs
 JobSchema.index({ status: 1, scheduledDate: -1 }); // PERFORMANCE: Dashboard queries (active jobs by date)
 JobSchema.index({ customerId: 1, status: 1 }); // PERFORMANCE: Customer job history
-JobSchema.index({ createdBy: 1, createdAt: -1 }); // PERFORMANCE: Sales performance analytics
+// NOTE: createdBy + createdAt index is created by IndexOptimizationService as 'created_audit_idx'
 
 // Text index for search functionality
 JobSchema.index(

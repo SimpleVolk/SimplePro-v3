@@ -20,7 +20,6 @@ export class Material {
     required: true,
     type: String,
     enum: Object.values(MaterialCategory),
-    index: true,
   })
   category!: MaterialCategory;
 
@@ -30,7 +29,7 @@ export class Material {
   @Prop({ required: true, maxlength: 50 })
   unit!: string;
 
-  @Prop({ required: true, default: true, index: true })
+  @Prop({ required: true, default: true })
   isActive!: boolean;
 
   @Prop({ required: true, default: true })
@@ -57,5 +56,5 @@ export class Material {
 
 export const MaterialSchema = SchemaFactory.createForClass(Material);
 
-// Index for active materials by category
-MaterialSchema.index({ isActive: 1, category: 1 });
+// Note: Indexes for embedded materials are defined in the parent TariffSettings schema
+// No indexes needed here as this is a subdocument schema (_id: false)

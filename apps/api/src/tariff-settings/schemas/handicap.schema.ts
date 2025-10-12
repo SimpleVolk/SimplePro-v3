@@ -20,7 +20,6 @@ export class Handicap {
     required: true,
     type: String,
     enum: Object.values(HandicapCategory),
-    index: true,
   })
   category!: HandicapCategory;
 
@@ -37,7 +36,7 @@ export class Handicap {
   @Prop({ maxlength: 50 })
   unit?: string;
 
-  @Prop({ required: true, default: true, index: true })
+  @Prop({ required: true, default: true })
   isActive!: boolean;
 
   @Prop({
@@ -54,5 +53,5 @@ export class Handicap {
 
 export const HandicapSchema = SchemaFactory.createForClass(Handicap);
 
-// Index for active handicaps by category
-HandicapSchema.index({ isActive: 1, category: 1 });
+// Note: Indexes for embedded handicaps are defined in the parent TariffSettings schema
+// No indexes needed here as this is a subdocument schema (_id: false)

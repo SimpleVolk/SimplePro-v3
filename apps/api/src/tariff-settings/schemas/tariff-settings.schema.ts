@@ -44,13 +44,13 @@ export const AuditLogEntrySchema = SchemaFactory.createForClass(AuditLogEntry);
 @Schema({ collection: 'tariff_settings', timestamps: true })
 export class TariffSettings {
   // Metadata
-  @Prop({ required: true, maxlength: 200, index: true })
+  @Prop({ required: true, maxlength: 200 })
   name!: string;
 
   @Prop({ maxlength: 1000 })
   description?: string;
 
-  @Prop({ required: true, default: true, index: true })
+  @Prop({ required: true, default: true })
   isActive!: boolean;
 
   @Prop({
@@ -58,17 +58,16 @@ export class TariffSettings {
     type: String,
     enum: Object.values(TariffStatus),
     default: TariffStatus.ACTIVE,
-    index: true,
   })
   status!: TariffStatus;
 
-  @Prop({ required: true, maxlength: 50, default: '1.0.0', index: true })
+  @Prop({ required: true, maxlength: 50, default: '1.0.0' })
   version!: string;
 
-  @Prop({ required: true, type: Date, default: Date.now, index: true })
+  @Prop({ required: true, type: Date, default: Date.now })
   effectiveFrom!: Date;
 
-  @Prop({ type: Date, index: true })
+  @Prop({ type: Date })
   effectiveTo?: Date;
 
   // Embedded Pricing Components

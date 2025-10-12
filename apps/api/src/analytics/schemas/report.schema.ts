@@ -5,10 +5,10 @@ export type ReportDocument = Report & Document;
 
 @Schema({ collection: 'reports', timestamps: true })
 export class Report {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   id!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   name!: string;
 
   @Prop({ required: true })
@@ -25,7 +25,6 @@ export class Report {
       'customer',
       'custom',
     ],
-    index: true,
   })
   type!: string;
 
@@ -33,7 +32,6 @@ export class Report {
     required: true,
     type: String,
     enum: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly', 'custom'],
-    index: true,
   })
   period!: string;
 
@@ -58,7 +56,6 @@ export class Report {
     type: String,
     enum: ['pending', 'generating', 'completed', 'failed'],
     default: 'pending',
-    index: true,
   })
   status!: string;
 
@@ -69,10 +66,10 @@ export class Report {
   progress?: number; // Generation progress (0-100)
 
   // Access control
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   createdBy!: string;
 
-  @Prop({ type: [String], index: true })
+  @Prop({ type: [String] })
   sharedWith?: string[]; // User IDs with access
 
   @Prop({
@@ -80,7 +77,6 @@ export class Report {
     type: String,
     enum: ['private', 'team', 'company'],
     default: 'private',
-    index: true,
   })
   visibility!: string;
 

@@ -39,6 +39,86 @@ enum CustomerType {
   commercial
 }
 
+enum OpportunityStatus {
+  open
+  contacted
+  quoted
+  negotiating
+  won
+  lost
+  cancelled
+}
+
+enum OpportunityPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum ServiceType {
+  local
+  long_distance
+  storage
+  packing_only
+}
+
+enum MoveSize {
+  studio
+  br_1
+  br_2
+  br_3
+  br_4
+  br_5
+  custom
+}
+
+enum Flexibility {
+  exact
+  week
+  month
+}
+
+enum BuildingType {
+  house
+  apartment
+  condo
+  townhouse
+  storage
+  office
+  warehouse
+  other
+}
+
+enum AccessDifficulty {
+  easy
+  moderate
+  difficult
+  very_difficult
+}
+
+enum PackingLevel {
+  none
+  partial
+  full
+  fragile_only
+}
+
+enum LeadSource {
+  website
+  phone
+  referral
+  partner
+  walkin
+  other
+}
+
+enum SeasonalPeriod {
+  peak
+  standard
+  off_peak
+}
+
 enum CrewMemberStatus {
   assigned
   checked_in
@@ -121,6 +201,112 @@ type InternalNote {
   createdBy: String!
   createdAt: DateTime!
   isPinned: Boolean
+}
+
+# Opportunity-specific Types
+type NewCustomerInfo {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  address: Address!
+  type: String!
+  companyName: String
+}
+
+type LocationDetails {
+  address: String!
+  buildingType: String!
+  floorLevel: Int!
+  elevatorAccess: Boolean!
+  stairsCount: Int!
+  longCarry: Boolean!
+  parkingDistance: Int!
+  accessDifficulty: String!
+  narrowHallways: Boolean!
+  specialNotes: String
+}
+
+type RoomDetails {
+  id: String!
+  type: String!
+  description: String
+  items: [JSON!]
+  packingRequired: Boolean!
+  totalWeight: Float!
+  totalVolume: Float!
+}
+
+type SpecialItems {
+  piano: Boolean!
+  poolTable: Boolean!
+  safe: Boolean!
+  antiques: Boolean!
+  artwork: Boolean!
+  fragileItems: Int!
+  valuableItems: Int!
+}
+
+type AdditionalServices {
+  packing: String!
+  unpacking: Boolean!
+  assembly: Boolean!
+  storage: Boolean!
+  storageDuration: Int
+  cleaning: Boolean!
+}
+
+type OpportunityStatistics {
+  totalOpportunities: Int!
+  byStatus: JSON!
+  byLeadSource: JSON!
+  conversionRate: Float!
+  averageValue: Float!
+  totalValue: Float!
+  wonCount: Int!
+  lostCount: Int!
+  openCount: Int!
+}
+
+# Opportunity Type
+type Opportunity {
+  id: ID!
+  customerId: String!
+  customer: Customer
+  customerType: String!
+  newCustomer: NewCustomerInfo
+  service: ServiceType!
+  moveDate: DateTime!
+  moveSize: String!
+  flexibility: Flexibility!
+  pickup: LocationDetails!
+  delivery: LocationDetails!
+  rooms: [RoomDetails!]!
+  totalWeight: Float!
+  totalVolume: Float!
+  specialItems: SpecialItems
+  additionalServices: AdditionalServices
+  leadSource: LeadSource!
+  referralId: String
+  partnerId: String
+  assignedSalesRep: String
+  assignedSalesRepDetails: JSON
+  priority: OpportunityPriority!
+  internalNotes: String
+  followUpDate: DateTime
+  distance: Float!
+  estimatedDuration: Float!
+  crewSize: Int!
+  isWeekend: Boolean!
+  isHoliday: Boolean!
+  seasonalPeriod: SeasonalPeriod!
+  estimateId: String
+  estimatedPrice: Float
+  status: OpportunityStatus!
+  createdBy: String!
+  updatedBy: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 # Customer Type
@@ -290,6 +476,44 @@ type Analytics {
   generatedAt: DateTime!
 }
 
+# Document Types
+type Document {
+  id: ID!
+  name: String!
+  originalName: String!
+  mimeType: String!
+  size: Float!
+  documentType: String!
+  entityType: String!
+  entityId: String!
+  url: String!
+  s3Key: String!
+  uploadedBy: String!
+  uploadedAt: DateTime!
+  tags: [String!]
+  metadata: JSON
+}
+
+type DocumentStorageStatistics {
+  totalDocuments: Int!
+  totalSize: Float!
+  byType: JSON!
+  byEntityType: JSON!
+  averageSize: Float!
+}
+
+input UpdateDocumentInput {
+  name: String
+  tags: [String!]
+  documentType: String
+  metadata: JSON
+}
+
+input CreateDocumentShareLinkInput {
+  expiresInHours: Int
+  allowDownload: Boolean
+}
+
 # Pagination Types
 type PageInfo {
   hasNextPage: Boolean!
@@ -418,9 +642,181 @@ input CustomerFilters {
   search: String
 }
 
+input CreateCustomerInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  alternatePhone: String
+  type: CustomerType!
+  status: CustomerStatus
+  source: String!
+  companyName: String
+  preferredContactMethod: String
+  address: AddressInput!
+  assignedSalesRep: String
+  tags: [String!]
+  notes: String
+}
+
+input UpdateCustomerInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  alternatePhone: String
+  type: CustomerType
+  status: CustomerStatus
+  source: String
+  companyName: String
+  preferredContactMethod: String
+  address: AddressInput
+  assignedSalesRep: String
+  tags: [String!]
+  notes: String
+  lastContactDate: DateTime
+}
+
 input SortBy {
   field: String!
   order: SortOrder!
+}
+
+# Opportunity Input Types
+input NewCustomerInfoInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  address: AddressInput!
+  type: String!
+  companyName: String
+}
+
+input LocationDetailsInput {
+  address: String!
+  buildingType: String!
+  floorLevel: Int!
+  elevatorAccess: Boolean!
+  stairsCount: Int!
+  longCarry: Boolean!
+  parkingDistance: Int!
+  accessDifficulty: String!
+  narrowHallways: Boolean!
+  specialNotes: String
+}
+
+input RoomDetailsInput {
+  id: String
+  type: String!
+  description: String
+  items: [JSON!]
+  packingRequired: Boolean!
+  totalWeight: Float!
+  totalVolume: Float!
+}
+
+input SpecialItemsInput {
+  piano: Boolean
+  poolTable: Boolean
+  safe: Boolean
+  antiques: Boolean
+  artwork: Boolean
+  fragileItems: Int
+  valuableItems: Int
+}
+
+input AdditionalServicesInput {
+  packing: String!
+  unpacking: Boolean
+  assembly: Boolean
+  storage: Boolean
+  storageDuration: Int
+  cleaning: Boolean
+}
+
+input CreateOpportunityInput {
+  customerId: String!
+  customerType: String
+  newCustomer: NewCustomerInfoInput
+  service: ServiceType!
+  moveDate: DateTime!
+  moveSize: String!
+  flexibility: Flexibility
+  pickup: LocationDetailsInput!
+  delivery: LocationDetailsInput!
+  rooms: [RoomDetailsInput!]
+  totalWeight: Float!
+  totalVolume: Float!
+  specialItems: SpecialItemsInput
+  additionalServices: AdditionalServicesInput
+  leadSource: LeadSource
+  referralId: String
+  partnerId: String
+  assignedSalesRep: String
+  priority: OpportunityPriority
+  internalNotes: String
+  followUpDate: DateTime
+  distance: Float!
+  estimatedDuration: Float!
+  crewSize: Int!
+  isWeekend: Boolean
+  isHoliday: Boolean
+  seasonalPeriod: SeasonalPeriod
+  estimateId: String
+  estimatedPrice: Float
+}
+
+input UpdateOpportunityInput {
+  customerId: String
+  customerType: String
+  newCustomer: NewCustomerInfoInput
+  service: ServiceType
+  moveDate: DateTime
+  moveSize: String
+  flexibility: Flexibility
+  pickup: LocationDetailsInput
+  delivery: LocationDetailsInput
+  rooms: [RoomDetailsInput!]
+  totalWeight: Float
+  totalVolume: Float
+  specialItems: SpecialItemsInput
+  additionalServices: AdditionalServicesInput
+  leadSource: LeadSource
+  referralId: String
+  partnerId: String
+  assignedSalesRep: String
+  priority: OpportunityPriority
+  internalNotes: String
+  followUpDate: DateTime
+  distance: Float
+  estimatedDuration: Float
+  crewSize: Int
+  isWeekend: Boolean
+  isHoliday: Boolean
+  seasonalPeriod: SeasonalPeriod
+  estimateId: String
+  estimatedPrice: Float
+  status: OpportunityStatus
+}
+
+input OpportunityFilters {
+  status: OpportunityStatus
+  service: ServiceType
+  priority: OpportunityPriority
+  leadSource: LeadSource
+  customerId: String
+  assignedSalesRep: String
+  partnerId: String
+  referralId: String
+  moveDateAfter: DateTime
+  moveDateBefore: DateTime
+  createdAfter: DateTime
+  createdBefore: DateTime
+  followUpBefore: DateTime
+  minEstimatedPrice: Float
+  maxEstimatedPrice: Float
+  search: String
 }
 
 # Queries
@@ -467,6 +863,24 @@ type Query {
     startDate: DateTime
     endDate: DateTime
   ): RevenueMetrics!
+
+  # Opportunity Queries
+  opportunity(id: ID!): Opportunity
+  opportunities(filters: OpportunityFilters): [Opportunity!]!
+  opportunityStatistics(userId: String): OpportunityStatistics!
+
+  # Document Queries
+  document(id: ID!): Document
+  documents(filters: JSON): [Document!]!
+  documentsByEntity(entityType: String!, entityId: String!): [Document!]!
+  documentStorageStatistics(userId: String): DocumentStorageStatistics!
+
+  # Notification Queries
+  notification(id: ID!): JSON
+  notifications(filters: JSON): [JSON!]!
+  unreadNotificationsCount: Int!
+  notificationPreferences: JSON
+  notificationTemplate(type: String!): JSON
 }
 
 # Mutations
@@ -498,6 +912,36 @@ type Mutation {
     milestoneId: String!
     status: String!
   ): Job!
+
+  # Opportunity Mutations
+  createOpportunity(input: CreateOpportunityInput!): Opportunity!
+  updateOpportunity(id: ID!, input: UpdateOpportunityInput!): Opportunity!
+  updateOpportunityStatus(id: ID!, status: String!): Opportunity!
+  deleteOpportunity(id: ID!): Boolean!
+
+  # Document Mutations
+  updateDocument(id: ID!, input: UpdateDocumentInput!): Document!
+  deleteDocument(id: ID!): Boolean!
+  createDocumentShareLink(documentId: String!, input: CreateDocumentShareLinkInput): JSON!
+
+  # Customer Mutations
+  createCustomer(input: CreateCustomerInput!): Customer!
+  updateCustomer(id: ID!, input: UpdateCustomerInput!): Customer!
+  deleteCustomer(id: ID!): Boolean!
+  updateCustomerStatus(id: ID!, status: CustomerStatus!): Customer!
+
+  # Estimate Mutations
+  calculateEstimate(input: JSON!): Estimate!
+
+  # Notification Mutations
+  createNotification(input: JSON!): JSON!
+  markNotificationAsRead(id: ID!): JSON!
+  markAllNotificationsAsRead: Boolean!
+  deleteNotification(id: ID!): Boolean!
+  archiveNotification(id: ID!): Boolean!
+  updateNotificationPreferences(input: JSON!): JSON!
+  createNotificationTemplate(input: JSON!): JSON!
+  updateNotificationTemplate(type: String!, input: JSON!): JSON!
 }
 
 # Subscriptions (for real-time updates)

@@ -24,6 +24,81 @@ export class IndexOptimizationService implements OnModuleInit {
     await this.createOptimizedIndexes();
   }
 
+  /**
+   * Helper method to check if an index with the same specification already exists.
+   * Compares index keys, uniqueness, sparseness, and partial filter expressions.
+   */
+  private async indexExists(
+    collection: any,
+    indexSpec: Record<string, any>,
+    options: any = {},
+  ): Promise<boolean> {
+    try {
+      const existingIndexes = await collection.listIndexes().toArray();
+
+      return existingIndexes.some((idx: any) => {
+        // Compare index keys (field order matters!)
+        const keysMatch =
+          JSON.stringify(idx.key) === JSON.stringify(indexSpec);
+        if (!keysMatch) return false;
+
+        // Check if relevant options match (unique, sparse, partialFilterExpression)
+        if (options.unique && !idx.unique) return false;
+        if (options.sparse && !idx.sparse) return false;
+
+        // Compare partial filter expressions if specified
+        if (options.partialFilterExpression) {
+          const existingFilter = JSON.stringify(
+            idx.partialFilterExpression || {},
+          );
+          const newFilter = JSON.stringify(options.partialFilterExpression);
+          if (existingFilter !== newFilter) return false;
+        }
+
+        return true;
+      });
+    } catch (error) {
+      // If we can't check, assume it doesn't exist (safer to attempt creation)
+      this.logger.warn(
+        `Could not check index existence for ${options.name || 'unnamed'}: ${error}`,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Creates an index only if it doesn't already exist.
+   * This prevents duplicate index warnings from Mongoose schema-defined indexes.
+   */
+  private async createIndexIfNotExists(
+    collection: any,
+    indexSpec: Record<string, any>,
+    options: any = {},
+  ): Promise<void> {
+    try {
+      const exists = await this.indexExists(collection, indexSpec, options);
+
+      if (exists) {
+        this.logger.debug(
+          `Index ${options.name || 'unnamed'} already exists, skipping creation`,
+        );
+        return;
+      }
+
+      // Index doesn't exist, create it
+      await collection.createIndex(indexSpec, options);
+      this.logger.log(
+        `Created optimized index ${options.name || 'unnamed'} on ${collection.collectionName}`,
+      );
+    } catch (error) {
+      // Log error but don't throw - allow other indexes to be created
+      this.logger.error(
+        `Failed to create index ${options.name || 'unnamed'} on ${collection.collectionName}:`,
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+
   private async createOptimizedIndexes(): Promise<void> {
     try {
       const db = this.connection.db;
@@ -55,31 +130,26 @@ export class IndexOptimizationService implements OnModuleInit {
   private async createUserIndexes(db: any): Promise<void> {
     const users = db.collection('users');
 
-    // Compound index for authentication queries
-    await users.createIndex(
-      { email: 1, isActive: 1 },
-      { name: 'email_active_idx', background: true },
-    );
-
-    await users.createIndex(
-      { username: 1, isActive: 1 },
-      { name: 'username_active_idx', background: true },
-    );
+    // NOTE: email and username already have unique indexes from schema
+    // MongoDB can use single-field unique indexes efficiently, no compound index needed
 
     // Index for role-based queries
-    await users.createIndex(
+    await this.createIndexIfNotExists(
+      users,
       { 'role.name': 1, isActive: 1 },
       { name: 'role_active_idx', background: true },
     );
 
     // Index for department-based queries
-    await users.createIndex(
+    await this.createIndexIfNotExists(
+      users,
       { department: 1, isActive: 1 },
       { name: 'department_active_idx', background: true, sparse: true },
     );
 
     // Partial index for crew members only
-    await users.createIndex(
+    await this.createIndexIfNotExists(
+      users,
       { crewId: 1, isActive: 1 },
       {
         name: 'crew_active_idx',
@@ -93,17 +163,20 @@ export class IndexOptimizationService implements OnModuleInit {
     const jobs = db.collection('jobs');
 
     // Critical compound indexes for job management
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { customerId: 1, status: 1, scheduledDate: -1 },
       { name: 'customer_status_scheduled_idx', background: true },
     );
 
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { 'assignedCrew.crewMemberId': 1, status: 1, scheduledDate: -1 },
       { name: 'crew_status_scheduled_idx', background: true },
     );
 
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { leadCrew: 1, status: 1, scheduledDate: -1 },
       {
         name: 'lead_crew_status_scheduled_idx',
@@ -113,41 +186,48 @@ export class IndexOptimizationService implements OnModuleInit {
     );
 
     // Performance indexes for calendar views
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { scheduledDate: 1, scheduledStartTime: 1 },
       { name: 'schedule_time_idx', background: true },
     );
 
     // Geographic indexes for location-based queries
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { 'pickupAddress.zipCode': 1, 'pickupAddress.state': 1 },
       { name: 'pickup_location_idx', background: true },
     );
 
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { 'deliveryAddress.zipCode': 1, 'deliveryAddress.state': 1 },
       { name: 'delivery_location_idx', background: true },
     );
 
     // Financial indexes
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { estimatedCost: -1, status: 1 },
       { name: 'cost_status_idx', background: true },
     );
 
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { actualCost: -1, status: 1 },
       { name: 'actual_cost_status_idx', background: true, sparse: true },
     );
 
     // Priority and type compound index
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { priority: 1, type: 1, status: 1 },
       { name: 'priority_type_status_idx', background: true },
     );
 
     // Audit trail indexes
-    await jobs.createIndex(
+    await this.createIndexIfNotExists(
+      jobs,
       { createdBy: 1, createdAt: -1 },
       { name: 'created_audit_idx', background: true },
     );
@@ -157,42 +237,49 @@ export class IndexOptimizationService implements OnModuleInit {
     const customers = db.collection('customers');
 
     // Sales rep performance indexes
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { assignedSalesRep: 1, status: 1, lastContactDate: -1 },
       { name: 'sales_rep_performance_idx', background: true, sparse: true },
     );
 
     // Lead scoring indexes
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { leadScore: -1, status: 1 },
       { name: 'lead_score_status_idx', background: true, sparse: true },
     );
 
     // Geographic customer analysis
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { 'address.state': 1, 'address.city': 1, type: 1 },
       { name: 'location_type_idx', background: true },
     );
 
     // Source attribution indexes
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { source: 1, createdAt: -1, status: 1 },
       { name: 'source_attribution_idx', background: true },
     );
 
     // Budget-based indexes
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { estimatedBudget: -1, status: 1 },
       { name: 'budget_status_idx', background: true, sparse: true },
     );
 
     // Referral tracking
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { 'referredBy.customerId': 1 },
       { name: 'referral_customer_idx', background: true, sparse: true },
     );
 
-    await customers.createIndex(
+    await this.createIndexIfNotExists(
+      customers,
       { 'referredBy.partnerName': 1, 'referredBy.source': 1 },
       { name: 'referral_partner_idx', background: true, sparse: true },
     );
@@ -202,19 +289,22 @@ export class IndexOptimizationService implements OnModuleInit {
     const analytics = db.collection('analytics_events');
 
     // Time-series optimized indexes
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { timestamp: -1, category: 1, eventType: 1 },
       { name: 'timeseries_category_event_idx', background: true },
     );
 
     // User activity tracking
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { userId: 1, timestamp: -1, category: 1 },
       { name: 'user_activity_idx', background: true },
     );
 
     // Revenue analytics optimizations
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { category: 1, timestamp: -1, revenue: -1 },
       {
         name: 'revenue_analytics_idx',
@@ -224,25 +314,29 @@ export class IndexOptimizationService implements OnModuleInit {
     );
 
     // Customer journey tracking
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { customerId: 1, timestamp: -1, eventType: 1 },
       { name: 'customer_journey_idx', background: true, sparse: true },
     );
 
     // Job lifecycle tracking
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { jobId: 1, timestamp: -1, eventType: 1 },
       { name: 'job_lifecycle_idx', background: true, sparse: true },
     );
 
     // Geographic performance analysis
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { 'location.state': 1, 'location.city': 1, timestamp: -1 },
       { name: 'geographic_performance_idx', background: true, sparse: true },
     );
 
     // Batch processing index
-    await analytics.createIndex(
+    await this.createIndexIfNotExists(
+      analytics,
       { processed: 1, timestamp: 1 },
       { name: 'batch_processing_idx', background: true },
     );
@@ -252,19 +346,22 @@ export class IndexOptimizationService implements OnModuleInit {
     const sessions = db.collection('sessions');
 
     // Active session lookups
-    await sessions.createIndex(
+    await this.createIndexIfNotExists(
+      sessions,
       { userId: 1, isActive: 1, expiresAt: 1 },
       { name: 'active_session_lookup_idx', background: true },
     );
 
     // Refresh token lookups
-    await sessions.createIndex(
+    await this.createIndexIfNotExists(
+      sessions,
       { refreshToken: 1, isActive: 1, expiresAt: 1 },
       { name: 'refresh_token_lookup_idx', background: true },
     );
 
     // Session cleanup (in addition to TTL index)
-    await sessions.createIndex(
+    await this.createIndexIfNotExists(
+      sessions,
       { isActive: 1, lastAccessedAt: -1 },
       { name: 'session_cleanup_idx', background: true },
     );

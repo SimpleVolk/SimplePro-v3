@@ -90,7 +90,8 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 
       this.logger.log(`Connecting to Redis at ${redisHost}:${redisPort}...`);
 
-      this.redisClient = createClient({
+      // Build Redis client configuration
+      const redisConfig: any = {
         socket: {
           host: redisHost,
           port: redisPort,
@@ -109,8 +110,17 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
             return delay;
           },
         },
-        password: redisPassword,
-      });
+      };
+
+      // Only add password if it's defined and non-empty
+      if (redisPassword && redisPassword.trim() !== '') {
+        redisConfig.password = redisPassword;
+        this.logger.log('Redis password authentication enabled');
+      } else {
+        this.logger.log('Redis password authentication disabled');
+      }
+
+      this.redisClient = createClient(redisConfig);
 
       // Cast to RedisClientWithEvents to access event emitter methods
       const clientWithEvents = this.redisClient as RedisClientWithEvents;

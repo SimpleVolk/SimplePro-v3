@@ -27,7 +27,7 @@ export interface DeliveryStatus {
 
 @Schema({ collection: 'notifications', timestamps: true })
 export class Notification {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User', index: true })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   recipientId!: Types.ObjectId;
 
   @Prop({ required: true })
@@ -52,14 +52,12 @@ export class Notification {
       'schedule_change',
       'document_uploaded',
     ],
-    index: true,
   })
   type!: string;
 
   @Prop({
     enum: ['low', 'normal', 'high', 'urgent'],
     default: 'normal',
-    index: true,
   })
   priority!: string;
 
@@ -82,7 +80,7 @@ export class Notification {
   @Prop({ type: Object, default: {} })
   deliveryStatus!: DeliveryStatus;
 
-  @Prop({ default: false, index: true })
+  @Prop({ default: false })
   isRead!: boolean;
 
   @Prop()

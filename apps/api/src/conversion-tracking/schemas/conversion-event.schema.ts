@@ -58,29 +58,28 @@ export class Attribution {
 // Main schema
 @Schema({ timestamps: true })
 export class ConversionEvent {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   eventId!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   customerId!: string;
 
-  @Prop({ index: true })
+  @Prop()
   opportunityId!: string;
 
-  @Prop({ index: true })
+  @Prop()
   estimateId!: string;
 
-  @Prop({ index: true })
+  @Prop()
   jobId!: string;
 
   @Prop({
     required: true,
     enum: Object.values(ConversionEventType),
-    index: true,
   })
   eventType!: ConversionEventType;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   eventDate!: Date;
 
   @Prop({ type: Object })
@@ -89,7 +88,7 @@ export class ConversionEvent {
   @Prop()
   performedBy!: string;
 
-  @Prop({ enum: Object.values(SourceChannel), index: true })
+  @Prop({ enum: Object.values(SourceChannel) })
   sourceChannel!: SourceChannel;
 
   @Prop({ type: Attribution })

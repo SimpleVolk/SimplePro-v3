@@ -46,18 +46,16 @@ export class DocumentEntity {
   @Prop({
     required: true,
     enum: Object.values(DocumentType),
-    index: true,
   })
   documentType!: DocumentType;
 
   @Prop({
     required: true,
     enum: Object.values(EntityType),
-    index: true,
   })
   entityType!: EntityType;
 
-  @Prop({ required: true, type: Types.ObjectId, index: true })
+  @Prop({ required: true, type: Types.ObjectId })
   entityId!: Types.ObjectId;
 
   @Prop({ type: [String], default: [] })
@@ -66,10 +64,10 @@ export class DocumentEntity {
   @Prop()
   description?: string;
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User', index: true })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   uploadedBy!: Types.ObjectId;
 
-  @Prop({ default: false, index: true })
+  @Prop({ default: false })
   isDeleted!: boolean;
 
   @Prop()
@@ -82,7 +80,7 @@ export class DocumentEntity {
   @Prop({ default: false })
   isShared!: boolean;
 
-  @Prop({ unique: true, sparse: true, index: true })
+  @Prop({ unique: true, sparse: true })
   shareToken?: string;
 
   @Prop()
@@ -166,9 +164,9 @@ DocumentSchema.pre('save', async function (next) {
 });
 
 // Compound indexes (OPTIMIZED)
+// Note: shareToken index is created automatically by unique: true, sparse: true in @Prop decorator
 DocumentSchema.index({ entityType: 1, entityId: 1, isDeleted: 1 }); // Entity documents
 DocumentSchema.index({ uploadedBy: 1, createdAt: -1 }); // User uploads
-DocumentSchema.index({ shareToken: 1 }); // Shared document lookups
 DocumentSchema.index({ documentType: 1 }); // Filter by document type
 DocumentSchema.index({ tags: 1 }); // Tag-based filtering
 

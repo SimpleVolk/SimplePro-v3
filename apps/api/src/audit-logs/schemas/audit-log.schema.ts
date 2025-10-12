@@ -25,29 +25,28 @@ export interface ResourceChanges {
   minimize: false,
 })
 export class AuditLog {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   timestamp!: Date;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   userId!: string;
 
   @Prop({ required: true })
   userName!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   action!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   resource!: string;
 
-  @Prop({ index: true })
+  @Prop()
   resourceId?: string;
 
   @Prop({
     required: true,
     type: String,
     enum: ['info', 'warning', 'error', 'critical'],
-    index: true,
   })
   severity!: 'info' | 'warning' | 'error' | 'critical';
 
@@ -66,7 +65,6 @@ export class AuditLog {
   @Prop({
     required: true,
     enum: ['success', 'failure'],
-    index: true,
   })
   outcome!: 'success' | 'failure';
 
