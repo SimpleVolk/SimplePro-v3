@@ -177,7 +177,8 @@ vitest.config.*.timestamp*
 *.md
 !docs/**/*.md
 !CLAUDE.md
-
+CLAUDE.md
 .claude
 
 docs/ui-reference
+CLAUDE.md
