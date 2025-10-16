@@ -113,7 +113,9 @@ export class SubscriptionsResolver {
       ) ?? false;
     },
   })
-  crewAssigned(@Args('crewMemberId') crewMemberId: string) {
+  crewAssigned(@Args('crewMemberId') _crewMemberId: string) {
+    // Parameter is needed for GraphQL schema definition but not used in function body
+    // The filter function above receives the crewMemberId via variables.crewMemberId
     return this.pubSub.asyncIterableIterator('CREW_ASSIGNED');
   }
 }

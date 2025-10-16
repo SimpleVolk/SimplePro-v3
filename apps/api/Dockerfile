@@ -17,8 +17,43 @@ COPY . .
 RUN set -eux; \
   mkdir -p apps/api/src/config; \
   cat > apps/api/src/config/secrets.config.ts <<'TS'
-export type Secrets = { mongodb?: { uri?: string } };
-export const loadSecrets = async (): Promise<Secrets> => ({});
+export interface SecretConfig {
+  mongodb: { username: string; password: string; uri: string };
+  redis: { password: string; url: string };
+  jwt: { secret: string; refreshSecret: string; expiresIn: string; refreshExpiresIn: string };
+  minio: { rootUser: string; rootPassword: string; browserRedirectUrl: string };
+  grafana: { adminUser: string; adminPassword: string };
+}
+export const loadSecrets = (): SecretConfig => {
+  return {
+    mongodb: {
+      username: process.env.MONGODB_USERNAME || 'admin',
+      password: process.env.MONGODB_PASSWORD || 'password123',
+      uri: process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://admin:password123@mongodb:27017/simplepro_prod?authSource=admin'
+    },
+    redis: {
+      password: process.env.REDIS_PASSWORD || '',
+      url: process.env.REDIS_URL || 'redis://redis:6379'
+    },
+    jwt: {
+      secret: process.env.JWT_SECRET || 'dev-jwt-secret-min-32-chars-long',
+      refreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-min-32-chars',
+      expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+      refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
+    },
+    minio: {
+      rootUser: process.env.MINIO_ROOT_USER || 'simplepro-admin',
+      rootPassword: process.env.MINIO_ROOT_PASSWORD || 'minioadmin',
+      browserRedirectUrl: process.env.MINIO_BROWSER_REDIRECT_URL || 'https://yourdomain.com:9001'
+    },
+    grafana: {
+      adminUser: process.env.GRAFANA_ADMIN_USER || 'admin',
+      adminPassword: process.env.GRAFANA_ADMIN_PASSWORD || 'admin'
+    }
+  };
+};
+export const secretsManager = { loadSecrets };
+export const getSecretsConfigSummary = () => ({ environment: process.env.NODE_ENV });
 TS
 
 # (optional but recommended if you don’t commit a root tsconfig.json)
@@ -26,8 +61,6 @@ RUN [ -f tsconfig.json ] || printf '{\n  "extends": "./tsconfig.base.json",\n  "
 
 # Install ALL deps (use legacy to bypass peer conflicts)
 RUN npm install --no-audit --no-fund --legacy-peer-deps
-
-RUN test -f apps/api/src/config/secrets.config.ts || printf "export const loadSecrets = async () => ({} as Record<string,string>);\n" > apps/api/src/config/secrets.config.ts
 
 # If you use Prisma, uncomment:
 # RUN npx prisma generate
