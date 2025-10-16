@@ -96,14 +96,14 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
           host: redisHost,
           port: redisPort,
           connectTimeout: 5000, // 5 second connection timeout
-          reconnectStrategy: (retries) => {
+          reconnectStrategy: (retries: number) => {
             if (retries > 10) {
               this.logger.error(
                 'Redis reconnection limit reached. Falling back to memory cache.',
               );
               return new Error('Redis reconnection limit reached');
             }
-            const delay = Math.min(retries * 100, 3000);
+            const delay = Math.min(retries * 50, 2000);
             this.logger.warn(
               `Redis reconnecting... Attempt ${retries}, delay ${delay}ms`,
             );

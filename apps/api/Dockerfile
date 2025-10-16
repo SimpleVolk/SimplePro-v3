@@ -14,6 +14,16 @@ COPY nx.json tsconfig.base.json ./
 # Copy full repo so Nx can resolve workspaces/libs
 COPY . .
 
+RUN set -eux; \
+  mkdir -p apps/api/src/config; \
+  cat > apps/api/src/config/secrets.config.ts <<'TS'
+export type Secrets = { mongodb?: { uri?: string } };
+export const loadSecrets = async (): Promise<Secrets> => ({});
+TS
+
+# (optional but recommended if you don’t commit a root tsconfig.json)
+RUN [ -f tsconfig.json ] || printf '{\n  "extends": "./tsconfig.base.json",\n  "files": []\n}\n' > tsconfig.json
+
 # Install ALL deps (use legacy to bypass peer conflicts)
 RUN npm install --no-audit --no-fund --legacy-peer-deps
 

@@ -16,21 +16,30 @@ try {
 @Module({
   imports: [
     MongooseModule.forRoot(
-      (() => {
+      (useFactory: async () => {
         try {
           // Try to load from secure secrets configuration
-          const secrets = loadSecrets();
+          const secrets = await loadSecrets();
           return secrets.mongodb.uri;
         } catch (error) {
           // Fallback to environment variable for development
-          const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URL;
+          const mongoUri = 
+            (secrets as any)?.mongodb.uri ??
+            process.env.MONGODB_URI ??
+            process.env.DATABASE_URL;
+
           if (!mongoUri) {
             throw new Error(
-              'MongoDB configuration failed. ' +
+              'No MongoDB URI found' +
                 'For production: ensure secrets are configured via production-secrets.sh script. ' +
                 'For development: set MONGODB_URI or DATABASE_URL environment variable. ' +
                 'Example: mongodb://username:password@localhost:27017/database',
             );
+          return mongoUri;  
+          } catch {
+            const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URL;
+            if (!mongoUri) throw new Error('No MongoDB URI configured');
+            return mongoUri;
           }
 
           // Validate that the URI doesn't contain obvious default credentials
