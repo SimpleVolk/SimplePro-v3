@@ -32,7 +32,8 @@
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
       "Bash(npm view:*)",
-      "Bash(npm audit)"
+      "Bash(npm audit)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

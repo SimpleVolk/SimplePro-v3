@@ -1,0 +1,781 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@nestjs/apollo": {
+      "name": "@nestjs/apollo",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/graphql"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@nestjs/apollo"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/apollo",
+        "version": "10.2.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/axios": {
+      "name": "@nestjs/axios",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/@nestjs/axios"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/axios",
+        "version": "3.1.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/bull": {
+      "name": "@nestjs/bull",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/bull-shared",
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=10.0.0",
+      "nodes": [
+        "node_modules/@nestjs/bull"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/bull",
+        "version": "0.6.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/bull-shared": {
+      "name": "@nestjs/bull-shared",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=10.0.0",
+      "nodes": [
+        "node_modules/@nestjs/bull-shared"
+      ],
+      "fixAvailable": true
+    },
+    "@nestjs/cache-manager": {
+      "name": "@nestjs/cache-manager",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@nestjs/cache-manager"
+      ],
+      "fixAvailable": false
+    },
+    "@nestjs/common": {
+      "name": "@nestjs/common",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "class-validator"
+      ],
+      "effects": [
+        "@nestjs/apollo",
+        "@nestjs/axios",
+        "@nestjs/bull",
+        "@nestjs/bull-shared",
+        "@nestjs/cache-manager",
+        "@nestjs/config",
+        "@nestjs/core",
+        "@nestjs/event-emitter",
+        "@nestjs/graphql",
+        "@nestjs/jwt",
+        "@nestjs/mapped-types",
+        "@nestjs/microservices",
+        "@nestjs/mongoose",
+        "@nestjs/passport",
+        "@nestjs/platform-express",
+        "@nestjs/platform-socket.io",
+        "@nestjs/schedule",
+        "@nestjs/swagger",
+        "@nestjs/terminus",
+        "@nestjs/testing",
+        "@nestjs/websockets",
+        "nestjs-pino"
+      ],
+      "range": "4.3.0 - 5.0.0-rc.4 || >=7.6.0-next.1",
+      "nodes": [
+        "node_modules/@nestjs/common"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/terminus",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/config": {
+      "name": "@nestjs/config",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/@nestjs/config"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/config",
+        "version": "2.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/core": {
+      "name": "@nestjs/core",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/microservices",
+        "@nestjs/platform-express",
+        "@nestjs/websockets"
+      ],
+      "effects": [
+        "@nestjs/cache-manager",
+        "@nestjs/graphql",
+        "@nestjs/mongoose",
+        "@nestjs/swagger",
+        "@nestjs/terminus"
+      ],
+      "range": "<=2.0.2 || >=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/core"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/terminus",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/event-emitter": {
+      "name": "@nestjs/event-emitter",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/@nestjs/event-emitter"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/event-emitter",
+        "version": "1.4.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/graphql": {
+      "name": "@nestjs/graphql",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/mapped-types",
+        "class-validator"
+      ],
+      "effects": [
+        "@nestjs/apollo"
+      ],
+      "range": "<=2.0.0 || >=7.3.1-next.1",
+      "nodes": [
+        "node_modules/@nestjs/graphql"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/jwt": {
+      "name": "@nestjs/jwt",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=9.0.0",
+      "nodes": [
+        "node_modules/@nestjs/jwt"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/jwt",
+        "version": "8.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/mapped-types": {
+      "name": "@nestjs/mapped-types",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@nestjs/common",
+        "class-validator"
+      ],
+      "effects": [
+        "@nestjs/graphql",
+        "@nestjs/swagger"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@nestjs/graphql/node_modules/@nestjs/mapped-types",
+        "node_modules/@nestjs/mapped-types"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/microservices": {
+      "name": "@nestjs/microservices",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/websockets"
+      ],
+      "effects": [
+        "@nestjs/core",
+        "@nestjs/terminus"
+      ],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/microservices"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/microservices",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/mongoose": {
+      "name": "@nestjs/mongoose",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [
+        "@nestjs/terminus"
+      ],
+      "range": "<=3.0.1 || >=9.2.0",
+      "nodes": [
+        "node_modules/@nestjs/mongoose"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/mongoose",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/passport": {
+      "name": "@nestjs/passport",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=9.0.0",
+      "nodes": [
+        "node_modules/@nestjs/passport"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/passport",
+        "version": "8.2.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/platform-express": {
+      "name": "@nestjs/platform-express",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/platform-express"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/platform-express",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/platform-socket.io": {
+      "name": "@nestjs/platform-socket.io",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/websockets"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/platform-socket.io"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/platform-socket.io",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/schedule": {
+      "name": "@nestjs/schedule",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/@nestjs/schedule"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/schedule",
+        "version": "2.2.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/swagger": {
+      "name": "@nestjs/swagger",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/mapped-types",
+        "class-validator"
+      ],
+      "effects": [],
+      "range": "1.2.0 - 1.3.1 || >=4.5.2",
+      "nodes": [
+        "node_modules/@nestjs/swagger"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/swagger",
+        "version": "6.1.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/terminus": {
+      "name": "@nestjs/terminus",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/microservices",
+        "@nestjs/mongoose"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-next.0",
+      "nodes": [
+        "node_modules/@nestjs/terminus"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/terminus",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/testing": {
+      "name": "@nestjs/testing",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/microservices",
+        "@nestjs/platform-express"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/testing"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/testing",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/websockets": {
+      "name": "@nestjs/websockets",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/platform-socket.io"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/websockets"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/websockets",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "class-validator": {
+      "name": "class-validator",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "validator"
+      ],
+      "effects": [
+        "@nestjs/common",
+        "@nestjs/graphql",
+        "@nestjs/mapped-types",
+        "@nestjs/swagger"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/class-validator"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/terminus",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "commitizen": {
+      "name": "commitizen",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        "cz-conventional-changelog",
+        "inquirer"
+      ],
+      "effects": [
+        "cz-conventional-changelog"
+      ],
+      "range": ">=3.0.1",
+      "nodes": [
+        "node_modules/commitizen"
+      ],
+      "fixAvailable": {
+        "name": "commitizen",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "cz-conventional-changelog": {
+      "name": "cz-conventional-changelog",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        "commitizen"
+      ],
+      "effects": [
+        "commitizen"
+      ],
+      "range": ">=3.0.2",
+      "nodes": [
+        "node_modules/cz-conventional-changelog"
+      ],
+      "fixAvailable": {
+        "name": "commitizen",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "external-editor": {
+      "name": "external-editor",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "inquirer"
+      ],
+      "range": ">=1.1.1",
+      "nodes": [
+        "node_modules/external-editor"
+      ],
+      "fixAvailable": {
+        "name": "commitizen",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "fast-redact": {
+      "name": "fast-redact",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1108265,
+          "name": "fast-redact",
+          "dependency": "fast-redact",
+          "title": "fast-redact vulnerable to prototype pollution",
+          "url": "https://github.com/advisories/GHSA-ffrw-9mx8-89p8",
+          "severity": "low",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.5.0"
+        }
+      ],
+      "effects": [
+        "pino"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/fast-redact"
+      ],
+      "fixAvailable": {
+        "name": "pino-http",
+        "version": "11.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "inquirer": {
+      "name": "inquirer",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "external-editor"
+      ],
+      "effects": [
+        "commitizen"
+      ],
+      "range": "3.0.0 - 8.2.6 || 9.0.0 - 9.3.7",
+      "nodes": [
+        "node_modules/inquirer"
+      ],
+      "fixAvailable": {
+        "name": "commitizen",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "nestjs-pino": {
+      "name": "nestjs-pino",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=2.5.2-alpha.2528",
+      "nodes": [
+        "node_modules/nestjs-pino"
+      ],
+      "fixAvailable": {
+        "name": "nestjs-pino",
+        "version": "2.5.1",
+        "isSemVerMajor": true
+      }
+    },
+    "nodemailer": {
+      "name": "nodemailer",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1108571,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Email to an unintended domain can occur due to Interpretation Conflict",
+          "url": "https://github.com/advisories/GHSA-mm7p-fcc7-pg87",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-20",
+            "CWE-436"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<7.0.7"
+        }
+      ],
+      "effects": [],
+      "range": "<7.0.7",
+      "nodes": [
+        "node_modules/nodemailer"
+      ],
+      "fixAvailable": {
+        "name": "nodemailer",
+        "version": "7.0.9",
+        "isSemVerMajor": true
+      }
+    },
+    "pino": {
+      "name": "pino",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "fast-redact"
+      ],
+      "effects": [
+        "pino-http"
+      ],
+      "range": "5.0.0-rc.1 - 9.11.0",
+      "nodes": [
+        "node_modules/pino"
+      ],
+      "fixAvailable": {
+        "name": "pino-http",
+        "version": "11.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "pino-http": {
+      "name": "pino-http",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        "pino"
+      ],
+      "effects": [],
+      "range": "4.0.0 - 9.0.0",
+      "nodes": [
+        "node_modules/pino-http"
+      ],
+      "fixAvailable": {
+        "name": "pino-http",
+        "version": "11.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "tmp": {
+      "name": "tmp",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1106849,
+          "name": "tmp",
+          "dependency": "tmp",
+          "title": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter",
+          "url": "https://github.com/advisories/GHSA-52f5-9888-hmc6",
+          "severity": "low",
+          "cwe": [
+            "CWE-59"
+          ],
+          "cvss": {
+            "score": 2.5,
+            "vectorString": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<=0.2.3"
+        }
+      ],
+      "effects": [
+        "external-editor"
+      ],
+      "range": "<=0.2.3",
+      "nodes": [
+        "node_modules/external-editor/node_modules/tmp"
+      ],
+      "fixAvailable": {
+        "name": "commitizen",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "validator": {
+      "name": "validator",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1108959,
+          "name": "validator",
+          "dependency": "validator",
+          "title": "validator.js has a URL validation bypass vulnerability in its isURL function",
+          "url": "https://github.com/advisories/GHSA-9965-vmph-33xx",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 6.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": "<=13.15.15"
+        }
+      ],
+      "effects": [
+        "class-validator"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/validator"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/terminus",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 8,
+      "moderate": 26,
+      "high": 0,
+      "critical": 0,
+      "total": 34
+    },
+    "dependencies": {
+      "prod": 2157,
+      "dev": 1375,
+      "optional": 328,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 3752
+    }
+  }
+}
