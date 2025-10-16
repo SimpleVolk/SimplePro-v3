@@ -17,6 +17,8 @@ COPY . .
 # Install ALL deps (use legacy to bypass peer conflicts)
 RUN npm install --no-audit --no-fund --legacy-peer-deps
 
+RUN test -f apps/api/src/config/secrets.config.ts || printf "export const loadSecrets = async () => ({} as Record<string,string>);\n" > apps/api/src/config/secrets.config.ts
+
 # If you use Prisma, uncomment:
 # RUN npx prisma generate
 

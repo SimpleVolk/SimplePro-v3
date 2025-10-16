@@ -4,8 +4,14 @@ import { CircuitBreakerService } from './circuit-breaker.service';
 import { DatabasePerformanceService } from './database-performance.service';
 import { IndexOptimizationService } from './index-optimization.service';
 import { TransactionService } from './transaction.service';
-import { loadSecrets } from '../config/secrets.config';
-
+let loadSecrets: () => Promise<Record<string, string>>;
+try {
+  // Works if secrets.config.ts exists (dev/prod with mounted secrets)
+  ({ loadSecrets } = require('../config/secrets.config'));
+} catch {
+  // Safe no-op fallback for Docker builds where the file isn't present
+  loadSecrets = async () => ({});
+}
 @Global()
 @Module({
   imports: [

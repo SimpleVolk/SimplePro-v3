@@ -1,10 +1,11 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/apps/api",
+    "outDir": "../../dist/out-tsc/apps/api",
     "types": ["node"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/*.spec.ts", "jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts", "**/*.test.ts"]
 }
