@@ -129,13 +129,13 @@ interface Customer {
   };
 }
 
-interface CrewMember {
-  id: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  skills: string[];
-}
+// interface CrewMember {
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+//   role: string;
+//   skills: string[];
+// }
 
 interface Document {
   id: string;

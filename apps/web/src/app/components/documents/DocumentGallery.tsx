@@ -92,7 +92,7 @@ export function DocumentGallery({
     }
   };
 
-  const handleShare = (document: Document) => {
+  const handleShare = (_document: Document) => {
     // This will be handled by the parent component or open share dialog
     // TODO: Implement share functionality
   };

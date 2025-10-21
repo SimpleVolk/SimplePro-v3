@@ -173,7 +173,7 @@ export function ReportsManagement() {
 
       if (!response.ok) throw new Error(`Failed to generate ${type} report`);
 
-      const reportData = await response.json();
+      await response.json();
 
       // In production, this would likely trigger a download or display
       alert(`${type} report generated successfully!`);

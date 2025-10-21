@@ -4,7 +4,7 @@ export const sampleInputs = {
   // Basic local move - studio apartment
   studioLocal: {
     customerId: 'customer-001',
-    moveDate: new Date('2025-10-15'),
+    moveDate: new Date('2025-11-15'),
     service: 'local',
     pickup: {
       address: '123 Main St, Apartment 2A, Springfield, IL 62701',

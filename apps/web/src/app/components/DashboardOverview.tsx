@@ -176,7 +176,7 @@ export const DashboardOverview = memo(function DashboardOverview() {
   };
 
   // Handle KPI card clicks for navigation
-  const handleKPIClick = (type: string) => {
+  const handleKPIClick = (_type: string) => {
     // Future: Navigate to specific views based on KPI type
     // Placeholder for navigation logic
   };

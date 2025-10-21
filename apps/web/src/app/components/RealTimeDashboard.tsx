@@ -49,7 +49,7 @@ interface SystemStats {
 }
 
 export const RealTimeDashboard: React.FC = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [_socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
   const [recentJobUpdates, setRecentJobUpdates] = useState<JobUpdate[]>([]);

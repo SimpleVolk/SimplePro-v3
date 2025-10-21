@@ -154,7 +154,7 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
       }
     };
 
-    const handleMetricsUpdate = (event: CustomEvent) => {
+    const handleMetricsUpdate = (_event: CustomEvent) => {
       // Refresh data when metrics are updated
       fetchAnalyticsData();
     };
