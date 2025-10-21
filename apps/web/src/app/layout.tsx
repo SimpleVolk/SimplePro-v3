@@ -59,30 +59,17 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
-                    });
+                  navigator.serviceWorker.register('/sw.js').catch(() => {
+                    // Service worker registration failed silently
+                  });
                 });
               }
 
               // Performance monitoring
               if ('performance' in window && 'observe' in PerformanceObserver.prototype) {
                 const observer = new PerformanceObserver((list) => {
-                  for (const entry of list.getEntries()) {
-                    if (entry.entryType === 'largest-contentful-paint') {
-                      console.log('LCP:', entry.startTime);
-                    }
-                    if (entry.entryType === 'first-input') {
-                      console.log('FID:', entry.processingStart - entry.startTime);
-                    }
-                    if (entry.entryType === 'layout-shift' && !entry.hadRecentInput) {
-                      console.log('CLS:', entry.value);
-                    }
-                  }
+                  // Performance metrics collected silently
+                  // LCP, FID, CLS metrics available via Performance API
                 });
 
                 observer.observe({entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift']});

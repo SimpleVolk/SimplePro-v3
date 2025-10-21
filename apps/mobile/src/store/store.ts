@@ -18,12 +18,14 @@ import offlineReducer from './slices/offlineSlice';
 import notificationsReducer from './slices/notificationsSlice';
 import documentsReducer from './slices/documentsSlice';
 import timeTrackingReducer from './slices/timeTrackingSlice';
+import inventoryReducer from './slices/inventorySlice';
+import messagesReducer from './slices/messagesSlice';
 
 // Persist configuration
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth', 'jobs', 'shifts', 'offline', 'timeTracking'], // Only persist these reducers
+  whitelist: ['auth', 'jobs', 'shifts', 'offline', 'timeTracking', 'inventory', 'messages'], // Only persist these reducers
   blacklist: ['notifications'], // Don't persist notifications
 };
 
@@ -36,6 +38,8 @@ const rootReducer = combineReducers({
   notifications: notificationsReducer,
   documents: documentsReducer,
   timeTracking: timeTrackingReducer,
+  inventory: inventoryReducer,
+  messages: messagesReducer,
 });
 
 // Create persisted reducer

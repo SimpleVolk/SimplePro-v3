@@ -458,6 +458,244 @@
   border-top: 1px solid #374151;
 }
 
+.success {
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.success button {
+  background: none;
+  border: none;
+  color: #065f46;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContentLarge {
+  background: #1f2937;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.tabContainer {
+  padding: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #374151;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: #e5e7eb;
+}
+
+.tabActive {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-bottom: 2px solid #3b82f6;
+  margin-bottom: -2px;
+}
+
+.tabContent {
+  min-height: 300px;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.detailSection {
+  background: #374151;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #4b5563;
+}
+
+.detailSection h4 {
+  color: #e5e7eb;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid #4b5563;
+  padding-bottom: 0.5rem;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.detailRow:last-child {
+  margin-bottom: 0;
+}
+
+.detailLabel {
+  color: #9ca3af;
+  font-weight: 500;
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+.detailValue {
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  text-align: right;
+  flex: 1;
+}
+
+.relatedList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.relatedCard {
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+}
+
+.relatedCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #4b5563;
+}
+
+.relatedCardHeader h4 {
+  color: #e5e7eb;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.relatedCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.activityList::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #4b5563;
+}
+
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+}
+
+.activityDot {
+  position: absolute;
+  left: -1.75rem;
+  top: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 2px solid #1f2937;
+}
+
+.activityContent {
+  flex: 1;
+  background: #374151;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #4b5563;
+}
+
+.activityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.activityType {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.activityDate {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.activityDescription {
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.loadingInline {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
 @media (max-width: 768px) {
   .jobGrid {
     grid-template-columns: 1fr;
@@ -483,8 +721,17 @@
     grid-template-columns: 1fr;
   }
 
-  .modalContent {
+  .modalContent,
+  .modalContentLarge {
     margin: 1rem;
     max-width: none;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
   }
 }

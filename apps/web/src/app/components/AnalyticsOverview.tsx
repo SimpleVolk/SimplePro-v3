@@ -143,7 +143,6 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
   useEffect(() => {
     const handleAnalyticsUpdate = (event: CustomEvent) => {
       const { dashboardType, data } = event.detail;
-      console.log('Real-time analytics update:', dashboardType, data);
 
       // Update appropriate state based on dashboard type
       if (dashboardType === activeTab) {
@@ -156,9 +155,6 @@ export const AnalyticsOverview = memo(function AnalyticsOverview() {
     };
 
     const handleMetricsUpdate = (event: CustomEvent) => {
-      const { metrics } = event.detail;
-      console.log('Real-time metrics update:', metrics);
-
       // Refresh data when metrics are updated
       fetchAnalyticsData();
     };

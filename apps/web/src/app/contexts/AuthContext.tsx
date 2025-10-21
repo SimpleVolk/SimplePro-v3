@@ -94,17 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      // Enhanced debugging for fetch issues
       const apiUrl = getApiUrl('auth/login');
-      console.log('🔗 Attempting login to:', apiUrl);
-      console.log('📋 Environment variables check:', {
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-        NODE_ENV: process.env.NODE_ENV,
-        windowDefined: typeof window !== 'undefined',
-      });
-
       const requestPayload = { username: email, password };
-      console.log('📤 Request payload:', requestPayload);
 
       const fetchOptions = {
         method: 'POST',
@@ -112,33 +103,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestPayload),
-        // Add credentials for CORS
         credentials: 'include' as RequestCredentials,
       };
 
-      console.log('⚙️ Fetch options:', fetchOptions);
-      console.log('🚀 Making fetch request...');
-
       const response = await fetch(apiUrl, fetchOptions);
-
-      console.log('📡 Response received:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: response.headers,
-        url: response.url,
-        type: response.type,
-      });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Login successful, response data:', result);
-
-        const data = result.data; // Extract data from the response envelope
+        const data = result.data;
         if (typeof window !== 'undefined') {
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
-          console.log('💾 Tokens stored in localStorage');
         }
         setUser(data.user);
         return true;

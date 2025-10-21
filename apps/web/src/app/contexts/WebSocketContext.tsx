@@ -51,17 +51,15 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
 
     // Connection event handlers
     newSocket.on('connect', () => {
-      console.log('WebSocket connected:', newSocket.id);
       setIsConnected(true);
     });
 
-    newSocket.on('disconnect', (reason) => {
-      console.log('WebSocket disconnected:', reason);
+    newSocket.on('disconnect', () => {
       setIsConnected(false);
     });
 
-    newSocket.on('connected', (data) => {
-      console.log('SimplePro WebSocket connected:', data);
+    newSocket.on('connected', () => {
+      // WebSocket connection established
     });
 
     newSocket.on('error', (error) => {
@@ -70,64 +68,46 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
 
     // Analytics-specific event handlers
     newSocket.on('analyticsUpdate', (data) => {
-      console.log('Analytics update received:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(
         new CustomEvent('analyticsUpdate', { detail: data }),
       );
     });
 
     newSocket.on('metricsUpdate', (data) => {
-      console.log('Metrics update received:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(new CustomEvent('metricsUpdate', { detail: data }));
     });
 
     newSocket.on('reportUpdate', (data) => {
-      console.log('Report update received:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(new CustomEvent('reportUpdate', { detail: data }));
     });
 
-    newSocket.on('analyticsSubscribed', (data) => {
-      console.log('Subscribed to analytics:', data);
+    newSocket.on('analyticsSubscribed', () => {
+      // Successfully subscribed to analytics updates
     });
 
-    newSocket.on('analyticsUnsubscribed', (data) => {
-      console.log('Unsubscribed from analytics:', data);
+    newSocket.on('analyticsUnsubscribed', () => {
+      // Successfully unsubscribed from analytics updates
     });
 
     // Job update handlers (for real-time dashboard)
     newSocket.on('jobUpdate', (data) => {
-      console.log('Job update received:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(new CustomEvent('jobUpdate', { detail: data }));
     });
 
     // Notification event handlers (for real-time notifications)
     newSocket.on('notification.created', (data) => {
-      console.log('Notification created:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(
         new CustomEvent('notificationCreated', { detail: data }),
       );
     });
 
     newSocket.on('notification.updated', (data) => {
-      console.log('Notification updated:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(
         new CustomEvent('notificationUpdated', { detail: data }),
       );
@@ -135,10 +115,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
 
     // Message event handlers (for real-time messaging)
     newSocket.on('message.created', (data) => {
-      console.log('Message created:', data);
       setLastUpdate(Date.now());
-
-      // Dispatch custom event for components to listen to
       window.dispatchEvent(new CustomEvent('messageCreated', { detail: data }));
     });
 
@@ -150,21 +127,18 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     setSocket(newSocket);
 
     return () => {
-      console.log('Cleaning up WebSocket connection');
       newSocket.disconnect();
     };
   }, [user]);
 
   const subscribeToAnalytics = (dashboardType?: string) => {
     if (socket && isConnected) {
-      console.log('Subscribing to analytics:', dashboardType);
       socket.emit('subscribeToAnalytics', { dashboardType });
     }
   };
 
   const unsubscribeFromAnalytics = (dashboardType?: string) => {
     if (socket && isConnected) {
-      console.log('Unsubscribing from analytics:', dashboardType);
       socket.emit('unsubscribeFromAnalytics', { dashboardType });
     }
   };

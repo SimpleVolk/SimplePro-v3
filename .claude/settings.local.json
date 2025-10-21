@@ -33,7 +33,14 @@
       "Bash(done)",
       "Bash(npm view:*)",
       "Bash(npm audit)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(npx tsc --noEmit --project apps/web/tsconfig.json)",
+      "Bash(npx tsc --noEmit --project apps/mobile/tsconfig.json)",
+      "Bash(npx tsc --noEmit apps/web/src/app/components/JobManagement.tsx)",
+      "Bash(node_modules/.bin/tsc --noEmit --project apps/web/tsconfig.json)",
+      "Bash(npx tsc --noEmit --project apps/api/tsconfig.json)",
+      "Bash(dir /b /s config)"
     ],
     "deny": [],
     "ask": []

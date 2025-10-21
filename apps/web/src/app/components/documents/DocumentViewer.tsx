@@ -52,10 +52,6 @@ export function DocumentViewer({
 
   const handleSaveMetadata = async () => {
     // TODO: Implement metadata update API call
-    console.log('Saving metadata:', {
-      tags: editedTags.split(',').map((t) => t.trim()),
-      description: editedDescription,
-    });
     setIsEditingMetadata(false);
   };
 

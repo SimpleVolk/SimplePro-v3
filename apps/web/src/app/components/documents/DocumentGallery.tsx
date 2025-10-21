@@ -94,7 +94,7 @@ export function DocumentGallery({
 
   const handleShare = (document: Document) => {
     // This will be handled by the parent component or open share dialog
-    console.log('Share document:', document.id);
+    // TODO: Implement share functionality
   };
 
   const handleViewDocument = (document: Document) => {

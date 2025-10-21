@@ -71,15 +71,10 @@ export const RealTimeDashboard: React.FC = () => {
 
     // Connection events
     newSocket.on('connect', () => {
-      console.log(
-        'Connected to WebSocket',
-        socket ? 'previous socket exists' : 'first connection',
-      );
       setIsConnected(true);
     });
 
     newSocket.on('disconnect', () => {
-      console.log('Disconnected from WebSocket');
       setIsConnected(false);
     });
 

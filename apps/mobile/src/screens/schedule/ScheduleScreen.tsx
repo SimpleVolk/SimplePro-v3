@@ -116,14 +116,30 @@ export const ScheduleScreen = ({ navigation }: any) => {
       )}
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Schedule</Text>
-        <Text style={styles.headerSubtitle}>
-          {new Date(selectedDate).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
+        <View>
+          <Text style={styles.headerTitle}>My Schedule</Text>
+          <Text style={styles.headerSubtitle}>
+            {new Date(selectedDate).toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </Text>
+        </View>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('Messages')}
+          >
+            <Text style={styles.iconButtonText}>💬</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('Profile')}
+          >
+            <Text style={styles.iconButtonText}>👤</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -175,6 +191,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#2a2a2a',
@@ -188,6 +207,32 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     color: '#999',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconButton: {
+    backgroundColor: '#3b82f6',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconButtonText: {
+    fontSize: 20,
+  },
+  messagesButton: {
+    backgroundColor: '#3b82f6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  messagesButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   listContainer: {
     padding: 16,

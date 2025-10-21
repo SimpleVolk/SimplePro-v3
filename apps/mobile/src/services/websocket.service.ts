@@ -8,6 +8,11 @@ import { io, Socket } from 'socket.io-client';
 import { store } from '../store/store';
 import { updateJobLocally } from '../store/slices/jobsSlice';
 import { addNotification } from '../store/slices/notificationsSlice';
+import {
+  addMessageToThread,
+  setTypingIndicator,
+  updateThreadLocally,
+} from '../store/slices/messagesSlice';
 import PushNotification from 'react-native-push-notification';
 
 class WebSocketService {
@@ -132,14 +137,87 @@ class WebSocketService {
       });
     });
 
-    // Dispatcher messages
+    // New message received
     this.socket.on('message.new', (message) => {
       console.log('New message:', message);
 
-      this.showLocalNotification({
-        title: 'New Message from Dispatcher',
-        message: message.content,
-      });
+      // Add message to Redux store
+      store.dispatch(
+        addMessageToThread({
+          threadId: message.threadId,
+          message,
+        }),
+      );
+
+      // Show push notification if not in the conversation
+      const currentThreadId = store.getState().messages.currentThreadId;
+      if (currentThreadId !== message.threadId) {
+        this.showLocalNotification({
+          title: `New Message: ${message.senderName}`,
+          message: message.content,
+        });
+      }
+
+      // Add to notifications list
+      store.dispatch(
+        addNotification({
+          id: message.id || Date.now().toString(),
+          title: `Message from ${message.senderName}`,
+          message: message.content,
+          type: 'info',
+          timestamp: new Date().toISOString(),
+          read: false,
+          data: message,
+        }),
+      );
+    });
+
+    // Message thread updated (read status, etc.)
+    this.socket.on('message.updated', (data) => {
+      console.log('Message updated:', data);
+
+      if (data.threadId && data.message) {
+        store.dispatch(
+          addMessageToThread({
+            threadId: data.threadId,
+            message: data.message,
+          }),
+        );
+      }
+    });
+
+    // Thread updated (new participant, subject change, etc.)
+    this.socket.on('thread.updated', (thread) => {
+      console.log('Thread updated:', thread);
+
+      store.dispatch(updateThreadLocally(thread));
+    });
+
+    // Typing indicators
+    this.socket.on('typing.start', (data) => {
+      console.log('User started typing:', data);
+
+      store.dispatch(
+        setTypingIndicator({
+          threadId: data.threadId,
+          userId: data.userId,
+          userName: data.userName,
+          isTyping: true,
+        }),
+      );
+    });
+
+    this.socket.on('typing.stop', (data) => {
+      console.log('User stopped typing:', data);
+
+      store.dispatch(
+        setTypingIndicator({
+          threadId: data.threadId,
+          userId: data.userId,
+          userName: data.userName,
+          isTyping: false,
+        }),
+      );
     });
   }
 

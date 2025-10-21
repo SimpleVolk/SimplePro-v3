@@ -73,6 +73,17 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async (
+    { currentPassword, newPassword }: { currentPassword: string; newPassword: string },
+    { getState }: any,
+  ) => {
+    const { auth } = getState();
+    return await authApi.changePassword(auth.accessToken, currentPassword, newPassword);
+  },
+);
+
 // Slice
 const authSlice = createSlice({
   name: 'auth',

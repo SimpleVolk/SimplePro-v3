@@ -40,15 +40,21 @@ export default function EstimateConfiguration() {
   const quickActions = [
     {
       label: 'View All Estimates',
-      action: () => console.log('View estimates'),
+      action: () => {
+        // TODO: Navigate to estimates view
+      },
     },
     {
       label: 'Create New Estimate',
-      action: () => console.log('Create estimate'),
+      action: () => {
+        // TODO: Navigate to new estimate form
+      },
     },
     {
       label: 'Export Configuration',
-      action: () => console.log('Export config'),
+      action: () => {
+        // TODO: Implement configuration export
+      },
     },
   ];
 

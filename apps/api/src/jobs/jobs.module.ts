@@ -6,6 +6,7 @@ import { Job, JobSchema } from './schemas/job.schema';
 import { WebSocketModule } from '../websocket/websocket.module';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 import { GraphQLModule } from '../graphql/graphql.module';
+import { InventoryModule } from './inventory/inventory.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { GraphQLModule } from '../graphql/graphql.module';
     forwardRef(() => WebSocketModule),
     forwardRef(() => GraphQLModule),
     AuditLogsModule,
+    InventoryModule,
   ],
   controllers: [JobsController],
   providers: [JobsService],
