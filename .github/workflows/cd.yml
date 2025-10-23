@@ -24,10 +24,12 @@ jobs:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 60
 
     strategy:
       matrix:
         service: [api, web]
+      fail-fast: false
 
     permissions:
       contents: read
@@ -41,8 +43,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Set up Docker Buildx (Optimized)
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
+          buildkitd-flags: --allow-insecure-entitlement network.host
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3
@@ -62,8 +69,11 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=staging,enable=${{ github.ref == 'refs/heads/develop' }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (multi-arch)
+        id: docker-build
         uses: docker/build-push-action@v5
+        continue-on-error: true
+        timeout-minutes: 50
         with:
           context: .
           file: ./apps/${{ matrix.service }}/Dockerfile
@@ -73,10 +83,58 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
           platforms: linux/amd64,linux/arm64
+          provenance: false
+          outputs: type=registry,push=true,compression=zstd,compression-level=3
           build-args: |
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
             VERSION=${{ github.ref_name }}
+
+      - name: Retry build on network failure
+        if: steps.docker-build.outcome == 'failure'
+        uses: docker/build-push-action@v5
+        continue-on-error: true
+        timeout-minutes: 50
+        with:
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta-${{ matrix.service }}.outputs.tags }}
+          labels: ${{ steps.meta-${{ matrix.service }}.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          outputs: type=registry,push=true,compression=zstd,compression-level=3
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ github.ref_name }}
+
+      - name: Fallback build (amd64 only)
+        id: docker-build-fallback
+        if: steps.docker-build.outcome == 'failure'
+        uses: docker/build-push-action@v5
+        timeout-minutes: 30
+        with:
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta-${{ matrix.service }}.outputs.tags }}
+          labels: ${{ steps.meta-${{ matrix.service }}.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          platforms: linux/amd64
+          provenance: false
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ github.ref_name }}
+
+      - name: Notify fallback used
+        if: steps.docker-build.outcome == 'failure' && steps.docker-build-fallback.outcome == 'success'
+        run: |
+          echo "::warning::Multi-arch build failed, fell back to amd64-only build for ${{ matrix.service }}"
 
       - name: Image digest
         run: echo "Image pushed with digest ${{ steps.meta-${{ matrix.service }}.outputs.digest }}"

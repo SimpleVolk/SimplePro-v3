@@ -128,17 +128,24 @@ jobs:
     runs-on: ubuntu-latest
     needs: [quality, test]
     if: needs.quality.outputs.should-deploy == 'true'
+    timeout-minutes: 60
 
     strategy:
       matrix:
         service: [api, web]
+      fail-fast: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
+      - name: Setup Docker Buildx (Optimized)
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
+          buildkitd-flags: --allow-insecure-entitlement network.host
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3
@@ -158,8 +165,11 @@ jobs:
             type=sha,prefix=commit-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (multi-arch)
+        id: docker-build
         uses: docker/build-push-action@v5
+        continue-on-error: true
+        timeout-minutes: 50
         with:
           context: .
           file: ./apps/${{ matrix.service }}/Dockerfile
@@ -169,6 +179,46 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+          provenance: false
+          outputs: type=registry,push=true,compression=zstd,compression-level=3
+
+      - name: Retry build on network failure
+        if: steps.docker-build.outcome == 'failure'
+        uses: docker/build-push-action@v5
+        continue-on-error: true
+        timeout-minutes: 50
+        with:
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          outputs: type=registry,push=true,compression=zstd,compression-level=3
+
+      - name: Fallback build (amd64 only)
+        id: docker-build-fallback
+        if: steps.docker-build.outcome == 'failure'
+        uses: docker/build-push-action@v5
+        timeout-minutes: 30
+        with:
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          provenance: false
+
+      - name: Notify fallback used
+        if: steps.docker-build.outcome == 'failure' && steps.docker-build-fallback.outcome == 'success'
+        run: |
+          echo "::warning::Multi-arch build failed, fell back to amd64-only build for ${{ matrix.service }}"
 
   # Security Scanning
   security:
