@@ -17,6 +17,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY nx.json ./
 COPY tsconfig.base.json ./
+COPY .eslintrc.json ./
 
 # Install all dependencies
 RUN npm ci --legacy-peer-deps && npm cache clean --force
@@ -29,15 +30,15 @@ RUN apk add --no-cache python3 make g++ libc6-compat
 
 WORKDIR /app
 
-# Copy dependencies from previous stage
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=dependencies /app/package*.json ./
-COPY --from=dependencies /app/nx.json ./
-COPY --from=dependencies /app/tsconfig.base.json ./
+# Copy minimal files first (cache layer)
+COPY package.json package-lock.json ./
+COPY nx.json tsconfig.base.json .eslintrc.json ./
 
-# Copy source code
-COPY apps/web ./apps/web
-COPY packages ./packages
+# Copy full repo so NX can resolve workspaces/libs
+COPY . .
+
+# Install all dependencies (this will create proper workspace symlinks)
+RUN npm ci --legacy-peer-deps && npm cache clean --force
 
 # Set environment variables for build
 ENV NODE_ENV=production
