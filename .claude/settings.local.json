@@ -40,7 +40,19 @@
       "Bash(npx tsc --noEmit apps/web/src/app/components/JobManagement.tsx)",
       "Bash(node_modules/.bin/tsc --noEmit --project apps/web/tsconfig.json)",
       "Bash(npx tsc --noEmit --project apps/api/tsconfig.json)",
-      "Bash(dir /b /s config)"
+      "Bash(dir /b /s config)",
+      "Bash(git push origin main)",
+      "Bash(npm audit --json)",
+      "Bash(npm test -- --verbose)",
+      "Bash(npm audit --summary)",
+      "Bash(git add package.json package-lock.json apps/api/package.json apps/web/src/app/components/AnalyticsOverview.tsx apps/web/src/app/components/DashboardOverview.tsx apps/web/src/app/components/JobManagement.tsx apps/web/src/app/components/RealTimeDashboard.tsx apps/web/src/app/components/ReportsManagement.tsx apps/web/src/app/components/documents/DocumentGallery.tsx packages/pricing-engine/src/test-data/sample-inputs.ts)",
+      "Bash(docker build:*)",
+      "Bash(bash -n:*)",
+      "Bash(npx:*)",
+      "Bash(dos2unix:*)",
+      "Bash(chmod:*)",
+      "Bash(scripts/build-docker-images.sh:*)",
+      "Bash(docker builder prune:*)"
     ],
     "deny": [],
     "ask": []

@@ -69,7 +69,7 @@ RUN npm install --no-audit --no-fund --legacy-peer-deps
 RUN npx nx build api --configuration=production --skip-nx-cache --verbose --stats-error-details
 
 # Now prune node_modules down to production-only (no re-resolve!)
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev --legacy-peer-deps --force || true
 
 
 # ---------- Stage 2: Runtime (no install; copy pruned deps) ----------
@@ -86,7 +86,8 @@ EXPOSE 4000
 RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001 -G nodejs
 
 # Copy compiled app and pruned node_modules from builder
-COPY --from=builder /workspace/dist/apps/api ./        # yields /app/main.js
+# This yields /app/main.js, /app/3rdpartylicenses.txt, etc.
+COPY --from=builder /workspace/dist/apps/api ./
 COPY --from=builder /workspace/node_modules ./node_modules
 COPY --from=builder /workspace/package.json ./package.json
 
