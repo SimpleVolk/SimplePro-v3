@@ -17,19 +17,38 @@ export class MinioService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {
     const endpoint = this.configService.get<string>('MINIO_ENDPOINT', 'minio');
     const port = this.configService.get<number>('MINIO_PORT', 9000);
-    const accessKey = this.configService.get<string>(
-      'MINIO_ACCESS_KEY',
-      'admin',
-    );
-    const secretKey = this.configService.get<string>(
-      'MINIO_SECRET_KEY',
-      'simplepro_minio_2024',
-    );
+
+    // SECURITY FIX: Enforce strong credentials in production
+    // Get credentials from config, falling back to dev defaults only in non-production
+    const accessKey = this.configService.get<string>('MINIO_ACCESS_KEY') ??
+      (process.env.NODE_ENV !== 'production' ? 'admin' : undefined);
+    const secretKey = this.configService.get<string>('MINIO_SECRET_KEY') ??
+      (process.env.NODE_ENV !== 'production' ? 'simplepro_minio_2024' : undefined);
+
+    // SECURITY FIX: Validate credentials in production
+    if (process.env.NODE_ENV === 'production') {
+      if (!accessKey || !secretKey) {
+        throw new Error(
+          'MINIO_ACCESS_KEY and MINIO_SECRET_KEY are required in production. Generate with: openssl rand -base64 32',
+        );
+      }
+      if (secretKey.length < 32) {
+        throw new Error(
+          'MINIO_SECRET_KEY must be at least 32 characters in production for security',
+        );
+      }
+    }
+
     const useSSL = this.configService.get<string>('MINIO_USE_SSL', 'false') === 'true';
     this.bucket = this.configService.get<string>(
       'MINIO_BUCKET',
       'simplepro-documents',
     );
+
+    // At this point, credentials are guaranteed to exist (either from env or dev defaults)
+    if (!accessKey || !secretKey) {
+      throw new Error('MinIO credentials are required');
+    }
 
     this.minioClient = new Minio.Client({
       endPoint: endpoint,

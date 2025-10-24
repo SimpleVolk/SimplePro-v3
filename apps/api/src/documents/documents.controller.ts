@@ -46,6 +46,32 @@ export class DocumentsController {
       limits: {
         fileSize: MAX_FILE_SIZE,
       },
+      // SECURITY FIX: Add MIME type validation to prevent malicious file uploads
+      fileFilter: (_req, file, callback) => {
+        const allowedMimes = [
+          'application/pdf',
+          'image/jpeg',
+          'image/jpg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/vnd.ms-excel',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'text/plain',
+          'text/csv',
+        ];
+        if (!allowedMimes.includes(file.mimetype)) {
+          return callback(
+            new BadRequestException(
+              `Invalid file type. Allowed types: ${allowedMimes.join(', ')}`,
+            ),
+            false,
+          );
+        }
+        callback(null, true);
+      },
     }),
   )
   async uploadDocument(

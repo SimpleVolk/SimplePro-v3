@@ -52,7 +52,9 @@
       "Bash(dos2unix:*)",
       "Bash(chmod:*)",
       "Bash(scripts/build-docker-images.sh:*)",
-      "Bash(docker builder prune:*)"
+      "Bash(docker builder prune:*)",
+      "Bash(find:*)",
+      "Bash(npm audit fix:*)"
     ],
     "deny": [],
     "ask": []

@@ -344,9 +344,10 @@ Environment: ${process.env.NODE_ENV || 'development'}
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    // SECURITY FIX: Reduce refresh token lifetime from 7d to 48h for enhanced security
     const refreshToken = this.jwtService.sign(
       { sub: (user._id as any).toString() },
-      { expiresIn: '7d' },
+      { expiresIn: '48h' },
     );
 
     // SECURITY ENHANCEMENT: Create session with enhanced security features
@@ -355,7 +356,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
       token: accessToken,
       refreshToken,
       isActive: true,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // SECURITY FIX: 48 hours (was 7 days)
       lastAccessedAt: new Date(),
       tokenRefreshCount: 0,
       lastTokenRefreshAt: null,
@@ -418,7 +419,7 @@ Environment: ${process.env.NODE_ENV || 'development'}
       // Use MongoDB's findOneAndUpdate with atomic operations to prevent race conditions
       const now = new Date();
       const newRefreshToken = this.REFRESH_TOKEN_ROTATION_ENABLED
-        ? this.jwtService.sign({ sub: userId }, { expiresIn: '7d' })
+        ? this.jwtService.sign({ sub: userId }, { expiresIn: '48h' }) // SECURITY FIX: 48h instead of 7d
         : refreshToken;
 
       // CRITICAL SECURITY FIX: Atomic session update with refresh token rotation
@@ -434,9 +435,11 @@ Environment: ${process.env.NODE_ENV || 'development'}
           $set: {
             refreshToken: newRefreshToken,
             lastAccessedAt: now,
-            // Add concurrency protection
             lastTokenRefreshAt: now,
-            tokenRefreshCount: { $inc: 1 },
+          },
+          // SECURITY FIX: Move $inc outside of $set to properly increment counter
+          $inc: {
+            tokenRefreshCount: 1,
           },
         },
         {
@@ -451,8 +454,14 @@ Environment: ${process.env.NODE_ENV || 'development'}
       // SECURITY FIX: Detect race condition - if session is null, the refresh token was already used
       if (!session) {
         // SECURITY ALERT: Potential token replay attack or race condition detected
+        // SECURITY FIX: Log only token hash instead of partial token
+        const tokenHash = crypto
+          .createHash('sha256')
+          .update(refreshToken)
+          .digest('hex')
+          .substring(0, 16);
         console.error(
-          `SECURITY ALERT: Refresh token reuse detected for user ${userId}. Token: ${refreshToken.substring(0, 10)}...`,
+          `SECURITY ALERT: Refresh token reuse detected for user ${userId}. Token hash: ${tokenHash}`,
         );
 
         // Revoke all sessions for this user as a security measure
@@ -867,12 +876,10 @@ Environment: ${process.env.NODE_ENV || 'development'}
     userId: string,
     timestamp: number,
   ): string {
-    const data = `${userId}_${timestamp}_${process.env.JWT_SECRET}`;
-    return crypto
-      .createHash('sha256')
-      .update(data)
-      .digest('hex')
-      .substring(0, 32);
+    // SECURITY FIX: Use HMAC instead of including JWT_SECRET in plaintext
+    const data = `${userId}_${timestamp}`;
+    const hmac = crypto.createHmac('sha256', process.env.JWT_SECRET!);
+    return hmac.update(data).digest('hex').substring(0, 32);
   }
 
   // SECURITY ENHANCEMENT: Detect concurrent session usage

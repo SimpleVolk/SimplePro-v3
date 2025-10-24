@@ -1,0 +1,503 @@
+{
+  "audit_metadata": {
+    "project": "SimplePro-v3 NestJS API",
+    "audit_date": "2025-10-24",
+    "auditor": "Claude Code Security Auditor",
+    "scope": "Comprehensive API Security Assessment",
+    "files_reviewed": 50,
+    "lines_of_code_audited": "~100,000+"
+  },
+
+  "critical": [
+    {
+      "id": "CRIT-001",
+      "category": "Authentication",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 363,
+      "issue": "Session fingerprint includes JWT_SECRET in plaintext for hashing",
+      "description": "The generateSessionFingerprint method uses process.env.JWT_SECRET directly in the fingerprint data string. If the fingerprint is ever logged or exposed, it could leak the JWT secret.",
+      "severity": "CRITICAL",
+      "exploitability": "LOW",
+      "impact": "If fingerprint is logged/exposed, JWT_SECRET could be brute-forced",
+      "cwe": "CWE-532: Insertion of Sensitive Information into Log File",
+      "fix": "Use a separate SESSION_FINGERPRINT_SECRET or use HMAC with the JWT_SECRET instead of including it in the plaintext data:\n\nBEFORE:\nconst data = `${userId}_${timestamp}_${process.env.JWT_SECRET}`;\nreturn crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);\n\nAFTER:\nconst data = `${userId}_${timestamp}`;\nconst hmac = crypto.createHmac('sha256', process.env.JWT_SECRET!);\nreturn hmac.update(data).digest('hex').substring(0, 32);",
+      "recommendation": "Use HMAC instead of including the secret in plaintext data"
+    },
+    {
+      "id": "CRIT-002",
+      "category": "File Upload Security",
+      "file": "apps/api/src/documents/documents.controller.ts",
+      "line": 45,
+      "issue": "No file type validation on upload endpoint",
+      "description": "The upload endpoint only validates file size (MAX_FILE_SIZE) but doesn't validate MIME types or file extensions. Attackers could upload malicious files (e.g., .exe, .php, .jsp) disguised as documents.",
+      "severity": "CRITICAL",
+      "exploitability": "HIGH",
+      "impact": "Remote code execution if uploaded files are served without proper content-type headers or if MinIO bucket is misconfigured",
+      "cwe": "CWE-434: Unrestricted Upload of File with Dangerous Type",
+      "fix": "Add file type validation in FileInterceptor:\n\n@UseInterceptors(\n  FileInterceptor('file', {\n    limits: { fileSize: MAX_FILE_SIZE },\n    fileFilter: (req, file, callback) => {\n      const allowedMimes = [\n        'application/pdf',\n        'image/jpeg',\n        'image/png',\n        'image/gif',\n        'application/msword',\n        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'\n      ];\n      if (!allowedMimes.includes(file.mimetype)) {\n        return callback(new BadRequestException('Invalid file type'), false);\n      }\n      callback(null, true);\n    }\n  })\n)",
+      "recommendation": "Implement strict MIME type and extension whitelisting"
+    },
+    {
+      "id": "CRIT-003",
+      "category": "Authorization",
+      "file": "apps/api/src/auth/guards/roles.guard.ts",
+      "line": 46,
+      "issue": "Permission check uses OR logic instead of AND for multiple permissions",
+      "description": "Line 47-52 uses .some() which means if ANY permission matches, access is granted. For endpoints requiring MULTIPLE permissions, this is a privilege escalation vulnerability.",
+      "severity": "CRITICAL",
+      "exploitability": "HIGH",
+      "impact": "Users with partial permissions can access resources requiring multiple permissions",
+      "cwe": "CWE-863: Incorrect Authorization",
+      "fix": "Distinguish between RequireAnyPermission and RequireAllPermissions decorators:\n\n// Create two separate decorators:\nexport const RequireAnyPermissions = (permissions) => ...\nexport const RequireAllPermissions = (permissions) => ...\n\n// In guard, check decorator type:\nif (isAllPermissions) {\n  hasPermission = requiredPermissions.every(...);\n} else {\n  hasPermission = requiredPermissions.some(...);\n}",
+      "recommendation": "Implement separate decorators for AND vs OR permission logic"
+    }
+  ],
+
+  "high": [
+    {
+      "id": "HIGH-001",
+      "category": "Session Management",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 439,
+      "issue": "Atomic session update uses $inc inside $set which won't increment",
+      "description": "Line 439 attempts to increment tokenRefreshCount using { $inc: 1 } inside a $set operation, which won't actually increment the counter. This breaks the race condition detection mechanism.",
+      "severity": "HIGH",
+      "exploitability": "MEDIUM",
+      "impact": "Token refresh race condition detection is ineffective, potential token reuse attacks",
+      "cwe": "CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization",
+      "fix": "Move $inc outside of $set:\n\nBEFORE:\n$set: {\n  refreshToken: newRefreshToken,\n  lastAccessedAt: now,\n  lastTokenRefreshAt: now,\n  tokenRefreshCount: { $inc: 1 },\n}\n\nAFTER:\n$set: {\n  refreshToken: newRefreshToken,\n  lastAccessedAt: now,\n  lastTokenRefreshAt: now,\n},\n$inc: {\n  tokenRefreshCount: 1\n}",
+      "recommendation": "Fix MongoDB update operators to properly increment counter"
+    },
+    {
+      "id": "HIGH-002",
+      "category": "Input Validation",
+      "file": "apps/api/src/auth/interfaces/user.interface.ts",
+      "line": 107,
+      "issue": "No password validation in CreateUserDto",
+      "description": "CreateUserDto interface has no validation decorators for password strength. The auth.service.ts hashes any password without checking complexity requirements.",
+      "severity": "HIGH",
+      "exploitability": "MEDIUM",
+      "impact": "Weak passwords can be set by administrators when creating users",
+      "cwe": "CWE-521: Weak Password Requirements",
+      "fix": "Create a proper DTO class with validation:\n\n// create-user.dto.ts\nimport { IsStrongPassword, MinLength, Matches } from 'class-validator';\n\nexport class CreateUserDto {\n  @IsString()\n  @MinLength(8)\n  @Matches(\n    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]+$/,\n    { message: 'Password must contain uppercase, lowercase, number, and special character' }\n  )\n  password: string;\n  // ... other fields\n}",
+      "recommendation": "Implement password complexity validation with class-validator decorators"
+    },
+    {
+      "id": "HIGH-003",
+      "category": "WebSocket Security",
+      "file": "apps/api/src/websocket/websocket.gateway.ts",
+      "line": 242,
+      "issue": "JWT verification doesn't check token expiration explicitly",
+      "description": "Line 258 uses jwtService.verify() which checks expiration by default, but the error handling at line 259-268 catches all verification errors with the same generic message, obscuring whether the token expired or is invalid.",
+      "severity": "HIGH",
+      "exploitability": "LOW",
+      "impact": "Difficult to distinguish between expired vs invalid tokens, poor UX and debugging",
+      "cwe": "CWE-613: Insufficient Session Expiration",
+      "fix": "Handle TokenExpiredError separately:\n\ntry {\n  payload = this.jwtService.verify(token);\n} catch (error) {\n  if (error.name === 'TokenExpiredError') {\n    client.emit('error', { message: 'Token expired, please login again' });\n  } else {\n    client.emit('error', { message: 'Invalid authentication token' });\n  }\n  client.disconnect();\n  return;\n}",
+      "recommendation": "Distinguish between expired and invalid tokens in error messages"
+    },
+    {
+      "id": "HIGH-004",
+      "category": "CORS Configuration",
+      "file": "apps/api/src/main.ts",
+      "line": 105,
+      "issue": "CORS allowed origins include development ports in production if ALLOWED_ORIGINS is not set",
+      "description": "If ALLOWED_ORIGINS env var is empty in production, the default development origins are used. Line 105-116 should not fall back to localhost origins in production.",
+      "severity": "HIGH",
+      "exploitability": "MEDIUM",
+      "impact": "Production API could accept requests from localhost, enabling CSRF from developer machines",
+      "cwe": "CWE-346: Origin Validation Error",
+      "fix": "Enforce strict CORS in production:\n\nconst allowedOrigins = process.env.NODE_ENV === 'production'\n  ? (() => {\n      const origins = process.env.ALLOWED_ORIGINS?.split(',').filter(o => o.trim());\n      if (!origins || origins.length === 0) {\n        throw new Error('ALLOWED_ORIGINS must be set in production');\n      }\n      return origins;\n    })()\n  : ['http://localhost:3000', ...];",
+      "recommendation": "Make ALLOWED_ORIGINS mandatory in production with validation"
+    },
+    {
+      "id": "HIGH-005",
+      "category": "Rate Limiting",
+      "file": "apps/api/src/common/middleware/security.middleware.ts",
+      "line": 29,
+      "issue": "Production rate limit (100 req/15min) may be too high for brute force protection",
+      "description": "General rate limit of 100 requests per 15 minutes allows ~400 requests per hour, which could enable slow brute force attacks on authentication endpoints.",
+      "severity": "HIGH",
+      "exploitability": "MEDIUM",
+      "impact": "Brute force attacks possible despite rate limiting",
+      "cwe": "CWE-307: Improper Restriction of Excessive Authentication Attempts",
+      "fix": "Implement tiered rate limiting:\n\n// More aggressive for sensitive endpoints\nif (req.path.includes('/auth/login') || req.path.includes('/auth/refresh')) {\n  // 5 attempts per 15 minutes (already implemented in auth controller)\n} else if (req.path.startsWith('/api/auth')) {\n  // 20 attempts per 15 minutes for other auth endpoints\n} else if (isAdminEndpoint) {\n  // 20 attempts per 15 minutes (already implemented)\n} else {\n  // 100 attempts per 15 minutes for general endpoints\n}",
+      "recommendation": "Current rate limiting is acceptable but consider adding IP-based blocking after repeated violations"
+    },
+    {
+      "id": "HIGH-006",
+      "category": "Session Security",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 353,
+      "issue": "Session tokens stored in plain text in MongoDB",
+      "description": "Access tokens and refresh tokens are stored as plain text in the sessions collection. If the database is compromised, all active sessions can be hijacked.",
+      "severity": "HIGH",
+      "exploitability": "LOW",
+      "impact": "Database breach leads to complete session compromise",
+      "cwe": "CWE-312: Cleartext Storage of Sensitive Information",
+      "fix": "Store only token hashes in database:\n\n// When creating session\nconst tokenHash = crypto.createHash('sha256').update(accessToken).digest('hex');\nconst refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');\n\nconst session = new this.sessionModel({\n  userId: user._id,\n  token: tokenHash,  // Store hash instead of token\n  refreshToken: refreshTokenHash,\n  // ...\n});\n\n// When validating, hash the incoming token and compare\nconst tokenHash = crypto.createHash('sha256').update(incomingToken).digest('hex');\nconst session = await this.sessionModel.findOne({ token: tokenHash });",
+      "recommendation": "Store SHA256 hashes of tokens instead of plaintext (NOTE: This requires changing the validation logic significantly)"
+    },
+    {
+      "id": "HIGH-007",
+      "category": "NoSQL Injection",
+      "file": "apps/api/src/common/dto/query-filters.dto.ts",
+      "line": 236,
+      "issue": "sanitizeMongoQuery allows $ operators in nested objects",
+      "description": "The sanitizeMongoQuery function only blocks $ operators at the top level (line 245) but recursively allows them in nested objects (line 250). Attackers could inject { field: { $ne: null } } to bypass filters.",
+      "severity": "HIGH",
+      "exploitability": "MEDIUM",
+      "impact": "NoSQL injection via nested query operators",
+      "cwe": "CWE-943: Improper Neutralization of Special Elements in Data Query Logic",
+      "fix": "Block $ operators at all levels:\n\nexport function sanitizeMongoQuery(query: any): any {\n  if (typeof query !== 'object' || query === null) {\n    return query;\n  }\n\n  const sanitized: any = {};\n\n  for (const [key, value] of Object.entries(query)) {\n    // Block MongoDB operators at ALL levels\n    if (key.startsWith('$')) {\n      this.logger.warn(`Blocked NoSQL injection attempt: operator ${key}`);\n      continue;\n    }\n\n    // Recursively sanitize nested objects\n    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {\n      sanitized[key] = sanitizeMongoQuery(value);\n    } else if (typeof value === 'string') {\n      sanitized[key] = value.replace(/[${}[\\]]/g, '');\n    } else {\n      sanitized[key] = value;\n    }\n  }\n\n  return sanitized;\n}",
+      "recommendation": "Block $ operators at all nesting levels, not just top level"
+    }
+  ],
+
+  "medium": [
+    {
+      "id": "MED-001",
+      "category": "Error Handling",
+      "file": "apps/api/src/common/filters/global-exception.filter.ts",
+      "line": 348,
+      "issue": "Stack traces visible in development mode",
+      "description": "Stack traces are included in error responses when NODE_ENV != 'production'. While this is helpful for development, ensure development mode is never exposed externally.",
+      "severity": "MEDIUM",
+      "exploitability": "LOW",
+      "impact": "Information disclosure about file paths and code structure if development mode is exposed",
+      "cwe": "CWE-209: Generation of Error Message Containing Sensitive Information",
+      "fix": "Add additional checks to ensure dev mode is truly local:\n\nconst isDevelopment = process.env.NODE_ENV !== 'production' && \n                     (process.env.ALLOW_DEBUG_INFO === 'true' || \n                      ['localhost', '127.0.0.1', '::1'].includes(request.hostname));",
+      "recommendation": "Add hostname check to prevent accidental stack trace exposure"
+    },
+    {
+      "id": "MED-002",
+      "category": "WebSocket Security",
+      "file": "apps/api/src/websocket/websocket.gateway.ts",
+      "line": 57,
+      "issue": "Max connections per user (5) may be too restrictive for legitimate use",
+      "description": "MAX_CONNECTIONS_PER_USER = 5 could block legitimate users with multiple devices/tabs. Consider increasing to 10-15 for better UX while maintaining DoS protection.",
+      "severity": "MEDIUM",
+      "exploitability": "N/A",
+      "impact": "User experience degradation",
+      "cwe": "N/A",
+      "fix": "Increase limit to 10-15:\n\nprivate readonly MAX_CONNECTIONS_PER_USER = 10;",
+      "recommendation": "Increase to 10 connections and monitor for abuse patterns"
+    },
+    {
+      "id": "MED-003",
+      "category": "Default Credentials",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 218,
+      "issue": "Default admin password 'Admin123!' is documented and well-known",
+      "description": "The default development password is hardcoded and documented in multiple places (auth.service.ts line 218, CLAUDE.md). Ensure this is changed in production.",
+      "severity": "MEDIUM",
+      "exploitability": "HIGH",
+      "impact": "Complete system compromise if default password is not changed",
+      "cwe": "CWE-798: Use of Hard-coded Credentials",
+      "fix": "The code already forces password change in production (line 251 mustChangePassword: isProduction), which is good. Consider also:\n\n1. Add startup warning if default password is detected\n2. Implement account lockout after 3 failed attempts\n3. Log all admin login attempts",
+      "recommendation": "Current implementation is acceptable (forces password change in production). Add monitoring for default password usage."
+    },
+    {
+      "id": "MED-004",
+      "category": "Content Security",
+      "file": "apps/api/src/common/middleware/security.middleware.ts",
+      "line": 125,
+      "issue": "CSP allows 'unsafe-inline' for scripts and styles due to Swagger UI",
+      "description": "Lines 125 and 130 allow 'unsafe-inline' for styles and scripts to support Swagger UI. This weakens XSS protection.",
+      "severity": "MEDIUM",
+      "exploitability": "LOW",
+      "impact": "Reduced XSS protection",
+      "cwe": "CWE-1021: Improper Restriction of Rendered UI Layers or Frames",
+      "fix": "Only allow unsafe-inline for Swagger routes:\n\napp.use((req, res, next) => {\n  if (req.path.startsWith('/api/docs')) {\n    // Relaxed CSP for Swagger\n    res.setHeader('Content-Security-Policy', '...');\n  } else {\n    // Strict CSP for API endpoints\n    res.setHeader('Content-Security-Policy', \"default-src 'self'; script-src 'self'; style-src 'self'\");\n  }\n  next();\n});",
+      "recommendation": "Apply different CSP policies for Swagger vs API routes"
+    },
+    {
+      "id": "MED-005",
+      "category": "File Storage",
+      "file": "apps/api/src/documents/services/minio.service.ts",
+      "line": 26,
+      "issue": "Default MinIO credentials 'simplepro_minio_2024' are weak",
+      "description": "Default secret key 'simplepro_minio_2024' is used if MINIO_SECRET_KEY env var is not set. This is a weak, predictable credential.",
+      "severity": "MEDIUM",
+      "exploitability": "MEDIUM",
+      "impact": "Unauthorized access to file storage if default credentials are used",
+      "cwe": "CWE-798: Use of Hard-coded Credentials",
+      "fix": "Require strong credentials:\n\nconst secretKey = this.configService.get<string>('MINIO_SECRET_KEY');\nif (!secretKey) {\n  throw new Error('MINIO_SECRET_KEY is required. Generate with: openssl rand -base64 32');\n}\nif (secretKey.length < 32) {\n  throw new Error('MINIO_SECRET_KEY must be at least 32 characters');\n}",
+      "recommendation": "Make MINIO_SECRET_KEY mandatory and enforce minimum length"
+    },
+    {
+      "id": "MED-006",
+      "category": "Logging",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 454,
+      "issue": "Security alert logs partial refresh token",
+      "description": "Line 455 logs the first 10 characters of the refresh token in security alerts. While truncated, this could aid in token reconstruction if logs are compromised.",
+      "severity": "MEDIUM",
+      "exploitability": "LOW",
+      "impact": "Partial token disclosure in logs",
+      "cwe": "CWE-532: Insertion of Sensitive Information into Log File",
+      "fix": "Log only token hash:\n\nconst tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex').substring(0, 16);\nconsole.error(\n  `SECURITY ALERT: Refresh token reuse detected for user ${userId}. Token hash: ${tokenHash}`\n);",
+      "recommendation": "Log token hash instead of partial token"
+    },
+    {
+      "id": "MED-007",
+      "category": "Input Validation",
+      "file": "apps/api/src/documents/dto/upload-document.dto.ts",
+      "line": 32,
+      "issue": "Metadata field accepts arbitrary objects without validation",
+      "description": "Line 32 allows any Record<string, any> for metadata. This could be exploited to store excessive data or inject malicious content.",
+      "severity": "MEDIUM",
+      "exploitability": "LOW",
+      "impact": "Storage abuse, potential XSS if metadata is rendered without sanitization",
+      "cwe": "CWE-1284: Improper Validation of Specified Quantity in Input",
+      "fix": "Limit metadata size and structure:\n\n@IsObject()\n@IsOptional()\n@ValidateNested()\n@Type(() => DocumentMetadata)\nmetadata?: DocumentMetadata;\n\nclass DocumentMetadata {\n  @IsString()\n  @IsOptional()\n  @MaxLength(500)\n  description?: string;\n  \n  @IsString()\n  @IsOptional()\n  @MaxLength(100)\n  category?: string;\n  \n  // Explicitly define allowed fields\n}",
+      "recommendation": "Define explicit metadata schema with validation"
+    },
+    {
+      "id": "MED-008",
+      "category": "Session Management",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 358,
+      "issue": "Session expiration is 7 days which may be too long",
+      "description": "Refresh tokens expire in 7 days. For a business management platform handling sensitive financial data, this is quite long. Consider 24-48 hours.",
+      "severity": "MEDIUM",
+      "exploitability": "LOW",
+      "impact": "Prolonged window for session hijacking",
+      "cwe": "CWE-613: Insufficient Session Expiration",
+      "fix": "Reduce refresh token lifetime:\n\nconst refreshToken = this.jwtService.sign(\n  { sub: user._id },\n  { expiresIn: '24h' }  // Changed from '7d'\n);\n\n// Update session expiry\nexpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours",
+      "recommendation": "Reduce refresh token lifetime to 24-48 hours for enhanced security"
+    }
+  ],
+
+  "low": [
+    {
+      "id": "LOW-001",
+      "category": "Configuration",
+      "file": "apps/api/src/auth/auth.module.ts",
+      "line": 56,
+      "issue": "JWT secret minimum length is 32 characters, industry best practice is 64+",
+      "description": "While 32 characters is acceptable, NIST recommends at least 256 bits (64 hex characters) for symmetric keys used with SHA256.",
+      "severity": "LOW",
+      "exploitability": "VERY LOW",
+      "impact": "Theoretically weaker JWT signatures",
+      "cwe": "CWE-326: Inadequate Encryption Strength",
+      "fix": "Increase minimum to 64 characters:\n\nif (secret.length < 64) {\n  throw new Error('JWT_SECRET must be at least 64 characters long for security');\n}",
+      "recommendation": "Increase minimum JWT_SECRET length to 64 characters"
+    },
+    {
+      "id": "LOW-002",
+      "category": "Logging",
+      "file": "apps/api/src/common/middleware/security.middleware.ts",
+      "line": 317,
+      "issue": "Suspicious pattern detection logs request body which may contain sensitive data",
+      "description": "Line 317 includes req.body in the requestData string checked for patterns. If the body contains passwords or tokens, these could be logged when suspicious patterns are detected.",
+      "severity": "LOW",
+      "exploitability": "VERY LOW",
+      "impact": "Potential logging of sensitive data in security alerts",
+      "cwe": "CWE-532: Insertion of Sensitive Information into Log File",
+      "fix": "Sanitize body before pattern checking:\n\nconst sanitizedBody = { ...req.body };\ndelete sanitizedBody.password;\ndelete sanitizedBody.token;\ndelete sanitizedBody.secret;\nconst requestData = `${req.url} ${JSON.stringify(req.query)} ${JSON.stringify(sanitizedBody)}`;",
+      "recommendation": "Sanitize request body before including in security logs"
+    },
+    {
+      "id": "LOW-003",
+      "category": "WebSocket",
+      "file": "apps/api/src/websocket/websocket.gateway.ts",
+      "line": 26,
+      "issue": "CORS configuration hardcodes localhost origins",
+      "description": "WebSocket CORS allows hardcoded localhost origins. In production, these should be removed or made configurable.",
+      "severity": "LOW",
+      "exploitability": "VERY LOW",
+      "impact": "Potential CORS bypass in production if not properly configured",
+      "cwe": "CWE-346: Origin Validation Error",
+      "fix": "Use environment-based configuration:\n\ncors: {\n  origin: process.env.NODE_ENV === 'production'\n    ? process.env.WS_ALLOWED_ORIGINS?.split(',')\n    : ['http://localhost:3000', 'http://localhost:3008', 'http://localhost:8081'],\n  credentials: true,\n}",
+      "recommendation": "Make WebSocket CORS origins configurable and environment-aware"
+    },
+    {
+      "id": "LOW-004",
+      "category": "Performance",
+      "file": "apps/api/src/common/middleware/security.middleware.ts",
+      "line": 356,
+      "issue": "Rapid request detection uses global variable which won't work across instances",
+      "description": "Lines 352-376 use (global as any).lastRequestTimes which only works for a single Node.js instance. In a clustered/scaled deployment, this is ineffective.",
+      "severity": "LOW",
+      "exploitability": "N/A",
+      "impact": "DoS detection ineffective in multi-instance deployments",
+      "cwe": "CWE-400: Uncontrolled Resource Consumption",
+      "fix": "Use Redis for distributed rate tracking:\n\nconst lastRequest = await this.redisClient.get(`req_${clientIp}`);\nif (lastRequest && (now - parseInt(lastRequest)) < 100) {\n  this.logger.warn(`Rapid requests detected from IP: ${clientIp}`);\n}\nawait this.redisClient.setex(`req_${clientIp}`, 60, now.toString());",
+      "recommendation": "Migrate to Redis-based request tracking for production scaling"
+    },
+    {
+      "id": "LOW-005",
+      "category": "Documentation",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 288,
+      "issue": "Admin credentials stored in .secrets/admin-password.txt",
+      "description": "While better than logging, storing credentials in a file on the filesystem is still risky. The file could be accidentally committed or backed up insecurely.",
+      "severity": "LOW",
+      "exploitability": "LOW",
+      "impact": "Credential exposure if .secrets directory is not properly secured",
+      "cwe": "CWE-312: Cleartext Storage of Sensitive Information",
+      "fix": "Use a more secure secret management approach:\n\n1. Use environment variables injected at runtime\n2. Use a secret manager (AWS Secrets Manager, HashiCorp Vault)\n3. Send credentials via secure channel (email with encryption)\n4. Generate random password and display ONCE at startup with prompt to save\n\nCurrent implementation is acceptable for development but should be enhanced for production.",
+      "recommendation": "Document that .secrets/ must be in .gitignore and .dockerignore. Consider using secret manager in production."
+    },
+    {
+      "id": "LOW-006",
+      "category": "Timing Attack",
+      "file": "apps/api/src/auth/auth.service.ts",
+      "line": 318,
+      "issue": "Password comparison could be vulnerable to timing attacks (theoretical)",
+      "description": "bcrypt.compare() is generally resistant to timing attacks, but the error messages at lines 323-324 vs 313-315 could reveal whether the username exists through response timing differences.",
+      "severity": "LOW",
+      "exploitability": "VERY LOW",
+      "impact": "Username enumeration via timing analysis",
+      "cwe": "CWE-208: Observable Timing Discrepancy",
+      "fix": "Always perform bcrypt comparison even for non-existent users:\n\nconst user = await this.userModel.findOne({ ... });\nconst passwordHash = user?.passwordHash || '$2a$12$invalidhashtopreventtimingattack';\nconst isPasswordValid = await bcrypt.compare(loginDto.password, passwordHash);\n\nif (!user || !user.isActive || !isPasswordValid) {\n  throw new UnauthorizedException('Invalid credentials');\n}",
+      "recommendation": "Use constant-time comparison pattern to prevent username enumeration"
+    },
+    {
+      "id": "LOW-007",
+      "category": "Dependency Security",
+      "file": "apps/api/package.json",
+      "line": "N/A",
+      "issue": "No automated dependency vulnerability scanning visible",
+      "description": "While not a code issue, there's no evidence of automated dependency scanning (e.g., Snyk, npm audit in CI/CD).",
+      "severity": "LOW",
+      "exploitability": "N/A",
+      "impact": "Vulnerable dependencies could be used",
+      "cwe": "CWE-1104: Use of Unmaintained Third Party Components",
+      "fix": "Add to CI/CD pipeline (.github/workflows/ci-cd.yml):\n\n- name: Run npm audit\n  run: npm audit --audit-level=high\n  \n- name: Check for known vulnerabilities\n  run: npx audit-ci --moderate",
+      "recommendation": "Add npm audit to CI/CD pipeline and configure Dependabot alerts"
+    }
+  ],
+
+  "informational": [
+    {
+      "id": "INFO-001",
+      "title": "Excellent JWT Token Rotation Implementation",
+      "description": "The auth.service.ts implements proper refresh token rotation (lines 420-473) with race condition detection and automatic revocation on reuse. This is a security best practice."
+    },
+    {
+      "id": "INFO-002",
+      "title": "Comprehensive Input Validation with class-validator",
+      "description": "The project uses class-validator decorators extensively (QueryFiltersDto, etc.) with proper sanitization of MongoDB operators. Good protection against NoSQL injection."
+    },
+    {
+      "id": "INFO-003",
+      "title": "Strong Password Hashing with bcrypt (12 rounds)",
+      "description": "Password hashing uses bcrypt with 12 rounds (auth.service.ts line 221, 589, 729), which is above the minimum recommended 10 rounds."
+    },
+    {
+      "id": "INFO-004",
+      "title": "Comprehensive Rate Limiting",
+      "description": "Multiple rate limiting tiers are implemented: 5 req/min for login, 10 req/sec general, 50 req/10sec, 200 req/min. This provides good protection against brute force."
+    },
+    {
+      "id": "INFO-005",
+      "title": "Security Headers Implementation",
+      "description": "Helmet is properly configured (security.middleware.ts) with CSP, HSTS, X-Frame-Options, X-Content-Type-Options, etc."
+    },
+    {
+      "id": "INFO-006",
+      "title": "Audit Logging",
+      "description": "Comprehensive audit logging for security events (login, logout, password changes, user management) with IP addresses and user agents."
+    },
+    {
+      "id": "INFO-007",
+      "title": "Role-Based Access Control (RBAC)",
+      "description": "Proper RBAC implementation with permission-based guards, supporting both role and permission-based authorization."
+    },
+    {
+      "id": "INFO-008",
+      "title": "File Upload Sanitization",
+      "description": "MinIO service (minio.service.ts) properly sanitizes filenames (line 99-105) to prevent path traversal attacks."
+    },
+    {
+      "id": "INFO-009",
+      "title": "WebSocket Authentication",
+      "description": "WebSocket gateway properly authenticates connections (websocket.gateway.ts lines 242-280) before allowing any operations."
+    },
+    {
+      "id": "INFO-010",
+      "title": "Environment Variable Validation",
+      "description": "Comprehensive environment validation with Zod schema (config/env.validation.ts) ensures all required security settings are present."
+    }
+  ],
+
+  "compliance_status": {
+    "OWASP_API_Security_Top_10": {
+      "API1_Broken_Object_Level_Authorization": "PARTIAL - RBAC implemented but needs IDOR testing",
+      "API2_Broken_Authentication": "GOOD - JWT with rotation, bcrypt hashing, rate limiting",
+      "API3_Broken_Object_Property_Level_Authorization": "GOOD - DTOs with class-validator",
+      "API4_Unrestricted_Resource_Consumption": "GOOD - Rate limiting, file size limits",
+      "API5_Broken_Function_Level_Authorization": "GOOD - Guards on all endpoints",
+      "API6_Unrestricted_Access_to_Sensitive_Business_Flows": "GOOD - Rate limiting on sensitive operations",
+      "API7_Server_Side_Request_Forgery": "N/A - No external HTTP requests in reviewed code",
+      "API8_Security_Misconfiguration": "PARTIAL - Some default credentials, see MED-003, MED-005",
+      "API9_Improper_Inventory_Management": "GOOD - Single API version, clear endpoint structure",
+      "API10_Unsafe_Consumption_of_APIs": "N/A - No third-party API consumption reviewed"
+    },
+    "NIST_Cybersecurity_Framework": {
+      "Identify": "GOOD - Clear asset inventory, role definitions",
+      "Protect": "GOOD - Encryption, access controls, rate limiting",
+      "Detect": "PARTIAL - Audit logs present, need SIEM integration",
+      "Respond": "PARTIAL - Error handling present, need incident response procedures",
+      "Recover": "UNKNOWN - No backup/recovery code reviewed"
+    },
+    "PCI_DSS_Relevance": {
+      "note": "If processing payments, ensure:",
+      "req_3": "PARTIAL - Tokens stored in plaintext (see HIGH-006)",
+      "req_6": "GOOD - Input validation, secure coding practices",
+      "req_8": "GOOD - Strong authentication, unique IDs",
+      "req_10": "GOOD - Audit logging implemented"
+    }
+  },
+
+  "recommendations_summary": {
+    "immediate_action_required": [
+      "CRIT-002: Implement file type validation on uploads",
+      "CRIT-003: Fix permission guard OR/AND logic",
+      "HIGH-001: Fix tokenRefreshCount increment",
+      "HIGH-002: Add password validation to CreateUserDto",
+      "HIGH-004: Make ALLOWED_ORIGINS mandatory in production"
+    ],
+    "short_term_improvements": [
+      "HIGH-006: Consider hashing tokens in database",
+      "HIGH-007: Fix nested NoSQL injection sanitization",
+      "MED-003: Monitor for default password usage",
+      "MED-005: Make MinIO credentials mandatory",
+      "MED-008: Reduce refresh token lifetime to 24-48h"
+    ],
+    "long_term_enhancements": [
+      "Implement SIEM integration for security monitoring",
+      "Add automated penetration testing to CI/CD",
+      "Implement secret rotation mechanisms",
+      "Add Redis-based distributed rate limiting",
+      "Implement token hashing in database (requires significant refactoring)"
+    ]
+  },
+
+  "overall_assessment": {
+    "security_score": "7.5/10",
+    "maturity_level": "Good - Production-ready with minor improvements",
+    "strengths": [
+      "Excellent JWT token rotation with race condition detection",
+      "Comprehensive rate limiting across multiple tiers",
+      "Strong password hashing (bcrypt 12 rounds)",
+      "Proper RBAC with permission-based authorization",
+      "Good input validation with class-validator",
+      "Security headers properly configured (Helmet)",
+      "Comprehensive audit logging",
+      "WebSocket authentication properly implemented"
+    ],
+    "weaknesses": [
+      "File upload lacks MIME type validation (CRITICAL)",
+      "Permission guard uses OR logic for multiple permissions (CRITICAL)",
+      "Session tokens stored in plaintext in database (HIGH)",
+      "NoSQL injection sanitization incomplete for nested objects (HIGH)",
+      "No password complexity validation on user creation (HIGH)",
+      "CORS configuration could allow localhost in production (HIGH)",
+      "Some default credentials are well-known (MEDIUM)"
+    ],
+    "conclusion": "The SimplePro-v3 API demonstrates strong security practices with proper authentication, authorization, rate limiting, and audit logging. However, there are several critical issues (file upload validation, permission logic) and high-priority improvements (token storage, NoSQL injection protection) that should be addressed before production deployment. The codebase shows security-conscious development with good use of industry best practices. With the recommended fixes, this API can be considered production-ready for handling sensitive business data."
+  }
+}

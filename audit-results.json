@@ -1,14 +1,716 @@
 {
   "auditReportVersion": 2,
   "vulnerabilities": {
+    "@module-federation/cli": {
+      "name": "@module-federation/cli",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@module-federation/dts-plugin"
+      ],
+      "effects": [
+        "@module-federation/enhanced"
+      ],
+      "range": "<=0.0.0-research-issue-4085-20251016232757 || >=0.18.0",
+      "nodes": [
+        "node_modules/@module-federation/cli",
+        "node_modules/@module-federation/node/node_modules/@module-federation/cli"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "@module-federation/dts-plugin": {
+      "name": "@module-federation/dts-plugin",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "koa"
+      ],
+      "effects": [
+        "@module-federation/cli",
+        "@module-federation/enhanced",
+        "@module-federation/manifest",
+        "@module-federation/rspack"
+      ],
+      "range": "<=0.0.0-research-issue-4085-20251016232757 || >=0.18.0",
+      "nodes": [
+        "node_modules/@module-federation/dts-plugin",
+        "node_modules/@module-federation/node/node_modules/@module-federation/dts-plugin"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "@module-federation/enhanced": {
+      "name": "@module-federation/enhanced",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@module-federation/cli",
+        "@module-federation/dts-plugin",
+        "@module-federation/manifest",
+        "@module-federation/rspack"
+      ],
+      "effects": [
+        "@module-federation/node",
+        "@nx/module-federation"
+      ],
+      "range": "<=0.0.1-rc.0 || >=0.18.0",
+      "nodes": [
+        "node_modules/@module-federation/enhanced",
+        "node_modules/@module-federation/node/node_modules/@module-federation/enhanced"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "@module-federation/manifest": {
+      "name": "@module-federation/manifest",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@module-federation/dts-plugin"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-research-issue-4085-20251016232757 || >=0.18.0",
+      "nodes": [
+        "node_modules/@module-federation/manifest",
+        "node_modules/@module-federation/node/node_modules/@module-federation/manifest"
+      ],
+      "fixAvailable": true
+    },
+    "@module-federation/node": {
+      "name": "@module-federation/node",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@module-federation/enhanced"
+      ],
+      "effects": [],
+      "range": ">=2.7.11",
+      "nodes": [
+        "node_modules/@module-federation/node"
+      ],
+      "fixAvailable": true
+    },
+    "@module-federation/rspack": {
+      "name": "@module-federation/rspack",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@module-federation/dts-plugin",
+        "@module-federation/manifest"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-research-issue-4085-20251016232757 || >=0.18.0",
+      "nodes": [
+        "node_modules/@module-federation/node/node_modules/@module-federation/rspack",
+        "node_modules/@module-federation/rspack"
+      ],
+      "fixAvailable": true
+    },
+    "@nestjs/apollo": {
+      "name": "@nestjs/apollo",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/graphql"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@nestjs/apollo"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/apollo",
+        "version": "10.2.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/axios": {
+      "name": "@nestjs/axios",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/@nestjs/axios"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/axios",
+        "version": "3.1.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/bull": {
+      "name": "@nestjs/bull",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/bull-shared",
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=10.0.0",
+      "nodes": [
+        "node_modules/@nestjs/bull"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/bull",
+        "version": "0.6.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/bull-shared": {
+      "name": "@nestjs/bull-shared",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=10.0.0",
+      "nodes": [
+        "node_modules/@nestjs/bull-shared"
+      ],
+      "fixAvailable": true
+    },
+    "@nestjs/cache-manager": {
+      "name": "@nestjs/cache-manager",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@nestjs/cache-manager"
+      ],
+      "fixAvailable": false
+    },
+    "@nestjs/common": {
+      "name": "@nestjs/common",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "class-validator"
+      ],
+      "effects": [
+        "@nestjs/apollo",
+        "@nestjs/axios",
+        "@nestjs/bull",
+        "@nestjs/bull-shared",
+        "@nestjs/cache-manager",
+        "@nestjs/config",
+        "@nestjs/core",
+        "@nestjs/event-emitter",
+        "@nestjs/graphql",
+        "@nestjs/jwt",
+        "@nestjs/mapped-types",
+        "@nestjs/microservices",
+        "@nestjs/mongoose",
+        "@nestjs/passport",
+        "@nestjs/platform-express",
+        "@nestjs/platform-socket.io",
+        "@nestjs/schedule",
+        "@nestjs/swagger",
+        "@nestjs/terminus",
+        "@nestjs/testing",
+        "@nestjs/websockets",
+        "nestjs-pino"
+      ],
+      "range": "4.3.0 - 5.0.0-rc.4 || >=7.6.0-next.1",
+      "nodes": [
+        "node_modules/@nestjs/common"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/config": {
+      "name": "@nestjs/config",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/@nestjs/config"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/config",
+        "version": "2.3.4",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/core": {
+      "name": "@nestjs/core",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/microservices",
+        "@nestjs/platform-express",
+        "@nestjs/websockets"
+      ],
+      "effects": [
+        "@nestjs/cache-manager",
+        "@nestjs/graphql",
+        "@nestjs/mongoose",
+        "@nestjs/swagger",
+        "@nestjs/terminus"
+      ],
+      "range": "<=2.0.2 || >=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/core"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/event-emitter": {
+      "name": "@nestjs/event-emitter",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/@nestjs/event-emitter"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/event-emitter",
+        "version": "1.4.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/graphql": {
+      "name": "@nestjs/graphql",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/mapped-types",
+        "class-validator"
+      ],
+      "effects": [
+        "@nestjs/apollo"
+      ],
+      "range": "<=2.0.0 || >=7.3.1-next.1",
+      "nodes": [
+        "node_modules/@nestjs/graphql"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/jwt": {
+      "name": "@nestjs/jwt",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=9.0.0",
+      "nodes": [
+        "node_modules/@nestjs/jwt"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/jwt",
+        "version": "8.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/mapped-types": {
+      "name": "@nestjs/mapped-types",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@nestjs/common",
+        "class-validator"
+      ],
+      "effects": [
+        "@nestjs/graphql",
+        "@nestjs/swagger"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@nestjs/graphql/node_modules/@nestjs/mapped-types",
+        "node_modules/@nestjs/mapped-types"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/microservices": {
+      "name": "@nestjs/microservices",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/websockets"
+      ],
+      "effects": [
+        "@nestjs/core",
+        "@nestjs/terminus"
+      ],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/microservices"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/mongoose": {
+      "name": "@nestjs/mongoose",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [
+        "@nestjs/terminus"
+      ],
+      "range": "<=3.0.1 || >=9.2.0",
+      "nodes": [
+        "node_modules/@nestjs/mongoose"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/mongoose",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/passport": {
+      "name": "@nestjs/passport",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=9.0.0",
+      "nodes": [
+        "node_modules/@nestjs/passport"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/passport",
+        "version": "8.2.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/platform-express": {
+      "name": "@nestjs/platform-express",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/platform-express"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/platform-express",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/platform-socket.io": {
+      "name": "@nestjs/platform-socket.io",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/websockets"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/platform-socket.io"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/platform-socket.io",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/schedule": {
+      "name": "@nestjs/schedule",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/@nestjs/schedule"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/schedule",
+        "version": "2.2.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/swagger": {
+      "name": "@nestjs/swagger",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/mapped-types",
+        "class-validator"
+      ],
+      "effects": [],
+      "range": "1.2.0 - 1.3.1 || >=4.5.2",
+      "nodes": [
+        "node_modules/@nestjs/swagger"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/swagger",
+        "version": "6.1.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/terminus": {
+      "name": "@nestjs/terminus",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/microservices",
+        "@nestjs/mongoose"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-next.0",
+      "nodes": [
+        "node_modules/@nestjs/terminus"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/terminus",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/testing": {
+      "name": "@nestjs/testing",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/microservices",
+        "@nestjs/platform-express"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/testing"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/testing",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nestjs/websockets": {
+      "name": "@nestjs/websockets",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common",
+        "@nestjs/core",
+        "@nestjs/platform-socket.io"
+      ],
+      "effects": [],
+      "range": ">=8.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@nestjs/websockets"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/websockets",
+        "version": "7.6.18",
+        "isSemVerMajor": true
+      }
+    },
+    "@nx/detox": {
+      "name": "@nx/detox",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@nx/react"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-pr-33229-fff13a7 || >=21.4.0-beta.0",
+      "nodes": [
+        "node_modules/@nx/detox"
+      ],
+      "fixAvailable": true
+    },
+    "@nx/module-federation": {
+      "name": "@nx/module-federation",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@module-federation/enhanced",
+        "@module-federation/node"
+      ],
+      "effects": [
+        "@nx/react"
+      ],
+      "range": "<=0.0.0-pr-33229-fff13a7 || >=21.4.0-beta.0",
+      "nodes": [
+        "node_modules/@nx/detox/node_modules/@nx/module-federation",
+        "node_modules/@nx/module-federation",
+        "node_modules/@nx/react-native/node_modules/@nx/module-federation"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "@nx/next": {
+      "name": "@nx/next",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nx/react"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-pr-33229-fff13a7 || >=21.4.0-beta.0",
+      "nodes": [
+        "node_modules/@nx/next"
+      ],
+      "fixAvailable": {
+        "name": "@nx/next",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "@nx/react": {
+      "name": "@nx/react",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nx/module-federation"
+      ],
+      "effects": [
+        "@nx/detox",
+        "@nx/next",
+        "@nx/react-native"
+      ],
+      "range": "<=0.0.0-pr-33229-fff13a7 || >=21.4.0-beta.0",
+      "nodes": [
+        "node_modules/@nx/detox/node_modules/@nx/react",
+        "node_modules/@nx/react",
+        "node_modules/@nx/react-native/node_modules/@nx/react"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "@nx/react-native": {
+      "name": "@nx/react-native",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nx/detox",
+        "@nx/react"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-pr-33229-fff13a7 || >=21.4.0-beta.0",
+      "nodes": [
+        "node_modules/@nx/react-native"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react-native",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "class-validator": {
+      "name": "class-validator",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "validator"
+      ],
+      "effects": [
+        "@nestjs/common",
+        "@nestjs/graphql",
+        "@nestjs/mapped-types",
+        "@nestjs/swagger"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/class-validator"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
+        "isSemVerMajor": true
+      }
+    },
     "commitizen": {
       "name": "commitizen",
       "severity": "low",
       "isDirect": true,
-      "via": ["cz-conventional-changelog", "inquirer"],
-      "effects": ["cz-conventional-changelog"],
+      "via": [
+        "cz-conventional-changelog",
+        "inquirer"
+      ],
+      "effects": [
+        "cz-conventional-changelog"
+      ],
       "range": ">=3.0.1",
-      "nodes": ["node_modules/commitizen"],
+      "nodes": [
+        "node_modules/commitizen"
+      ],
       "fixAvailable": {
         "name": "commitizen",
         "version": "3.0.0",
@@ -19,10 +721,16 @@
       "name": "cz-conventional-changelog",
       "severity": "low",
       "isDirect": true,
-      "via": ["commitizen"],
-      "effects": ["commitizen"],
+      "via": [
+        "commitizen"
+      ],
+      "effects": [
+        "commitizen"
+      ],
       "range": ">=3.0.2",
-      "nodes": ["node_modules/cz-conventional-changelog"],
+      "nodes": [
+        "node_modules/cz-conventional-changelog"
+      ],
       "fixAvailable": {
         "name": "commitizen",
         "version": "3.0.0",
@@ -33,10 +741,16 @@
       "name": "external-editor",
       "severity": "low",
       "isDirect": false,
-      "via": ["tmp"],
-      "effects": ["inquirer"],
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "inquirer"
+      ],
       "range": ">=1.1.1",
-      "nodes": ["node_modules/external-editor"],
+      "nodes": [
+        "node_modules/external-editor"
+      ],
       "fixAvailable": {
         "name": "commitizen",
         "version": "3.0.0",
@@ -47,13 +761,72 @@
       "name": "inquirer",
       "severity": "low",
       "isDirect": false,
-      "via": ["external-editor"],
-      "effects": ["commitizen"],
+      "via": [
+        "external-editor"
+      ],
+      "effects": [
+        "commitizen"
+      ],
       "range": "3.0.0 - 8.2.6 || 9.0.0 - 9.3.7",
-      "nodes": ["node_modules/inquirer"],
+      "nodes": [
+        "node_modules/inquirer"
+      ],
       "fixAvailable": {
         "name": "commitizen",
         "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "koa": {
+      "name": "koa",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109139,
+          "name": "koa",
+          "dependency": "koa",
+          "title": "Koa Vulnerable to Open Redirect via Trailing Double-Slash (//) in back Redirect Logic",
+          "url": "https://github.com/advisories/GHSA-g8mr-fgfg-5qpc",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-601"
+          ],
+          "cvss": {
+            "score": 4.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N"
+          },
+          "range": ">=3.0.1 <3.0.3"
+        }
+      ],
+      "effects": [
+        "@module-federation/dts-plugin"
+      ],
+      "range": "3.0.1 - 3.0.2",
+      "nodes": [
+        "node_modules/koa"
+      ],
+      "fixAvailable": {
+        "name": "@nx/react",
+        "version": "21.3.11",
+        "isSemVerMajor": true
+      }
+    },
+    "nestjs-pino": {
+      "name": "nestjs-pino",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@nestjs/common"
+      ],
+      "effects": [],
+      "range": ">=2.5.2-alpha.2528",
+      "nodes": [
+        "node_modules/nestjs-pino"
+      ],
+      "fixAvailable": {
+        "name": "nestjs-pino",
+        "version": "2.5.1",
         "isSemVerMajor": true
       }
     },
@@ -69,7 +842,9 @@
           "title": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter",
           "url": "https://github.com/advisories/GHSA-52f5-9888-hmc6",
           "severity": "low",
-          "cwe": ["CWE-59"],
+          "cwe": [
+            "CWE-59"
+          ],
           "cvss": {
             "score": 2.5,
             "vectorString": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N"
@@ -77,12 +852,51 @@
           "range": "<=0.2.3"
         }
       ],
-      "effects": ["external-editor"],
+      "effects": [
+        "external-editor"
+      ],
       "range": "<=0.2.3",
-      "nodes": ["node_modules/external-editor/node_modules/tmp"],
+      "nodes": [
+        "node_modules/external-editor/node_modules/tmp"
+      ],
       "fixAvailable": {
         "name": "commitizen",
         "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "validator": {
+      "name": "validator",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1108959,
+          "name": "validator",
+          "dependency": "validator",
+          "title": "validator.js has a URL validation bypass vulnerability in its isURL function",
+          "url": "https://github.com/advisories/GHSA-9965-vmph-33xx",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 6.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": "<=13.15.15"
+        }
+      ],
+      "effects": [
+        "class-validator"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/validator"
+      ],
+      "fixAvailable": {
+        "name": "@nestjs/graphql",
+        "version": "10.1.6",
         "isSemVerMajor": true
       }
     }
@@ -91,18 +905,18 @@
     "vulnerabilities": {
       "info": 0,
       "low": 5,
-      "moderate": 0,
+      "moderate": 37,
       "high": 0,
       "critical": 0,
-      "total": 5
+      "total": 42
     },
     "dependencies": {
-      "prod": 1846,
+      "prod": 1857,
       "dev": 1721,
       "optional": 328,
       "peer": 0,
       "peerOptional": 0,
-      "total": 3743
+      "total": 3754
     }
   }
 }

@@ -101,10 +101,20 @@ async function bootstrap() {
     }),
   );
 
-  // CORS configuration - restrict origins in production
+  // SECURITY FIX: CORS configuration - enforce strict origin validation in production
   const allowedOrigins =
     process.env.NODE_ENV === 'production'
-      ? process.env.ALLOWED_ORIGINS?.split(',') || []
+      ? (() => {
+          const origins = process.env.ALLOWED_ORIGINS?.split(',').filter(
+            (o) => o.trim(),
+          );
+          if (!origins || origins.length === 0) {
+            throw new Error(
+              'ALLOWED_ORIGINS environment variable must be set in production. Example: ALLOWED_ORIGINS=https://app.simplepro.com,https://api.simplepro.com',
+            );
+          }
+          return origins;
+        })()
       : [
           'http://localhost:3000',
           'http://localhost:3004',

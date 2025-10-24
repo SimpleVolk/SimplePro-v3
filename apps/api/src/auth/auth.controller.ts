@@ -14,13 +14,13 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import type {
-  CreateUserDto,
-  UpdateUserDto,
   LoginDto,
   ChangePasswordDto,
   RefreshTokenDto,
   User,
 } from './interfaces/user.interface';
+// SECURITY FIX: Import DTO classes with validation instead of interfaces
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Public } from './decorators/public.decorator';

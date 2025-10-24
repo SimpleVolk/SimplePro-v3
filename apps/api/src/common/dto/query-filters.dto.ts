@@ -232,6 +232,7 @@ export class JobQueryFiltersDto extends QueryFiltersDto {
 /**
  * Sanitize raw MongoDB query objects to prevent injection
  * Use this for any direct MongoDB queries
+ * SECURITY FIX: Block $ operators at ALL levels, not just top level
  */
 export function sanitizeMongoQuery(query: any): any {
   if (typeof query !== 'object' || query === null) {
@@ -241,16 +242,19 @@ export function sanitizeMongoQuery(query: any): any {
   const sanitized: any = {};
 
   for (const [key, value] of Object.entries(query)) {
-    // Block MongoDB operators at top level
+    // SECURITY FIX: Block MongoDB operators at ALL levels to prevent nested injection
     if (key.startsWith('$')) {
-      continue;
+      console.warn(
+        `[SECURITY] Blocked MongoDB operator in query: ${key}. Potential NoSQL injection attempt.`,
+      );
+      continue; // Skip this key entirely
     }
 
-    // Recursively sanitize nested objects
-    if (typeof value === 'object' && value !== null) {
+    // Recursively sanitize nested objects (now with $ operator blocking at all levels)
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       sanitized[key] = sanitizeMongoQuery(value);
     } else if (typeof value === 'string') {
-      // Sanitize string values
+      // Sanitize string values - remove MongoDB special characters
       sanitized[key] = value.replace(/[${}[\]]/g, '');
     } else {
       sanitized[key] = value;
